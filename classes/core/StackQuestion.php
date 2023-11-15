@@ -178,7 +178,7 @@ class StackQuestion
                 $this->state = self::STACK_QUESTION_STATE_ERROR;
                 return false;
             } else {
-                //Initialise the object with the internal data of the question
+                //Initialise the object with the internal data of the question from the JSON
                 if (!$this->internalInitialization($json_internal)) {
                     //TODO: Log error, internal data could not be initialized
                     $this->state = self::STACK_QUESTION_STATE_ERROR;
@@ -192,7 +192,7 @@ class StackQuestion
                     $this->state = self::STACK_QUESTION_STATE_ERROR;
                     return false;
                 } else {
-                    //Initialise the object with the external data of the question
+                    //Initialise the object with the external data of the question from the JSON
                     if (!$this->externalInitialization($json_external)) {
                         //TODO: Log error, external data could not be initialized
                         $this->state = self::STACK_QUESTION_STATE_ERROR;
@@ -221,7 +221,7 @@ class StackQuestion
     {
         //Ensure that the object is in the correct state
         if ($this->state === self::STACK_QUESTION_STATE_UNINITIALIZED) {
-            //TODO: Initialise the object with the internal data of the question
+            //TODO: Initialise the object with the internal data of the question from the JSON
             return true;
         } else {
             return false;
