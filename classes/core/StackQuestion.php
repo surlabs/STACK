@@ -31,7 +31,7 @@ class StackQuestion
     /**
      * @var int The state of the current STACK Question.
      */
-    private int $state;
+    private int $state = self::STACK_QUESTION_STATE_UNINITIALIZED;
 
     /**
      * @var StackVersion The version information of the current STACK Question.
@@ -132,9 +132,7 @@ class StackQuestion
      */
     public function __construct(StackVersion $version)
     {
-        //Only here must be the state set to uninitialized
-        $this->state = self::STACK_QUESTION_STATE_UNINITIALIZED;
-
+        //Check if the version of the question is correct
         if ($this->checkVersion($version)) {
             $this->version = $version;
         } else {
