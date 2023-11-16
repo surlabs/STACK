@@ -101,6 +101,11 @@ class StackQuestion
     private ?StackText $hint = null;
 
     /**
+     * @var ?StackOptions The options of the current STACK Question.
+     */
+    private ?StackOptions $options = null;
+
+    /**
      * @var ?StackInput[] The inputs of the current STACK Question.
      */
     private ?array $inputs = null;
@@ -110,21 +115,10 @@ class StackQuestion
      */
     private ?array $potential_response_trees = null;
 
-
-    /**
-     * @var ?StackOptions The options of the current STACK Question.
-     */
-    private ?StackOptions $options = null;
-
     /**
      * @var ?StackSession The session of variables of the current STACK Question.
      */
     private ?StackSession $session = null;
-
-    /**
-     * @var StackQuestionTeacherAnswer[] The solution of the current STACK Question.
-     */
-    private ?array $solution = null;
 
     /**
      * @var ?StackQuestionSecurity
@@ -132,16 +126,6 @@ class StackQuestion
      * settings, i.e. forbidden keys and wether units are in play.
      */
     private ?StackQuestionSecurity $security = null;
-
-    /**
-     * @var ?StackCache The cache of the current STACK Question.
-     */
-    private ?StackCache $cache = null;
-
-    /**
-     * @var array Set of expensive to evaluate but static things.
-     */
-    private array $compiled_cache = [];
 
     /**
      * @var array The internal data of the question as array
@@ -173,21 +157,18 @@ class StackQuestion
     }
 
     /**
-     * Receives the question data in JSON format and generates the object
-     * Mask the initialisation of the question
+     * Initializes the question for different purposes
+     * Mask the initialisation of the question, which is done internally
      * @param bool $with_external_data_from_user
      * @param bool $with_external_data_from_teacher
      * @return bool
      */
-    protected function generate(
-        bool $with_external_data_from_user = false,
-        bool $with_external_data_from_teacher = false
-    ): bool
+    protected function generate(bool $with_external_data_from_user = false, bool $with_external_data_from_teacher = false): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
             //Get the JSON data of the question from the DB
-            $json_internal = StackDatabase::getQuestionInternalJSON($this->version);
+            $json_internal = $this->getSecurity()->getQuestionInternalJSONFromDB($this->getVersion());
             //Check JSON format and security for internal data of the question
             if (!StackQuestionSecurity::checkInternal($json_internal)) {
                 //TODO: Log error, internal data is not secure
@@ -201,17 +182,17 @@ class StackQuestion
                     return false;
                 }
             }
-
             //Check JSON format and security for external data of the question if required
             if ($with_external_data_from_user || $with_external_data_from_teacher) {
-
-                if ($with_external_data_from_teacher)
+                //force internal validation to ensure that the object is in the correct status
+                $this->validateInternal();
+                if ($with_external_data_from_teacher) {
                     //Correct solution from teacher
-                    $json_external = $this->security->getQuestionExternalJSONFromTeacher($this->version);
-                else
+                    $json_external = $this->getSecurity()->getQuestionExternalJSONFromTeacher($this);
+                } else {
                     //Student answer
-                    $json_external = $this->security->getQuestionExternalJSONFromStudent($this->version);
-
+                    $json_external = $this->getSecurity()->getQuestionExternalJSONFromStudent($this);
+                }
                 //Check JSON format and security for external data of the question
                 if (!StackQuestionSecurity::checkExternal($json_external)) {
                     //TODO: Log error, external data is not secure
@@ -224,11 +205,9 @@ class StackQuestion
                         $this->status = self::STACK_QUESTION_STATUS_ERROR;
                         return false;
                     }
-
                     //Only here must be the status set to externally initialized
                     $this->status = self::STACK_QUESTION_STATUS_EXTERNALLY_INITIALIZED;
                 }
-
             }
 
             return true;
@@ -247,7 +226,7 @@ class StackQuestion
     private function internalInitialization(string $json_internal): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
             try {
                 //Decode the JSON string to an array
                 $array_internal = json_decode($json_internal, true);
@@ -294,13 +273,13 @@ class StackQuestion
     }
 
     /**
-     * Validates the author changes to the question
+     * Validates the question internally before being externally validated / evaluated
      * Mask the internal validation of the question
      * @return bool
      */
     protected function validateInternal(): bool
     {
-        if ($this->status === self::STACK_QUESTION_STATUS_INTERNALLY_INITIALIZED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_INTERNALLY_INITIALIZED) {
             //Validate the question
             if (!$this->internalValidation()) {
                 //TODO: Log error, not possible to validate the question
@@ -326,9 +305,9 @@ class StackQuestion
     private function internalValidation(): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_INTERNALLY_INITIALIZED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_INTERNALLY_INITIALIZED) {
             //TODO: Indeed, validate the question
-            $this->options->prepareForMaxima();
+            $this->getOptions()->prepareForMaxima();
 
             return true;
         } else {
@@ -347,7 +326,7 @@ class StackQuestion
     private function externalInitialization(string $json_external): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_INTERNALLY_VALIDATED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_INTERNALLY_VALIDATED) {
             //TODO: Initialise the object with the external data of the question
             $this->status = self::STACK_QUESTION_STATUS_EXTERNALLY_INITIALIZED;
             return true;
@@ -364,7 +343,7 @@ class StackQuestion
      */
     protected function validateExternal(bool $refresh_validation = false): bool
     {
-        if ($this->status === self::STACK_QUESTION_STATUS_EXTERNALLY_INITIALIZED ||
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_EXTERNALLY_INITIALIZED ||
             ($refresh_validation && $this->status >= self::STACK_QUESTION_STATUS_INTERNALLY_VALIDATED)) {
 
             //Validate the question
@@ -393,7 +372,7 @@ class StackQuestion
     private function externalValidation(bool $refresh_validation = false): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_EXTERNALLY_INITIALIZED || $refresh_validation) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_EXTERNALLY_INITIALIZED || $refresh_validation) {
             //TODO: Indeed, validate the user answer
             return true;
         } else {
@@ -410,7 +389,7 @@ class StackQuestion
     protected function evaluateInternal(): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_INTERNALLY_VALIDATED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_INTERNALLY_VALIDATED) {
 
             if (!$this->internalEvaluation()) {
                 //TODO: Log error, not possible to evaluate the question
@@ -436,7 +415,7 @@ class StackQuestion
     private function internalEvaluation(): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_INTERNALLY_VALIDATED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_INTERNALLY_VALIDATED) {
             //TODO: Indeed, evaluate the unit tests of the question
             return true;
         } else {
@@ -453,7 +432,7 @@ class StackQuestion
     protected function evaluateExternal(): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_EXTERNALLY_VALIDATED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_EXTERNALLY_VALIDATED) {
 
             if (!$this->externalEvaluation()) {
                 //TODO: Log error, not possible to evaluate the question
@@ -479,7 +458,7 @@ class StackQuestion
     private function externalEvaluation(): bool
     {
         //Ensure that the object is in the correct status
-        if ($this->status === self::STACK_QUESTION_STATUS_EXTERNALLY_VALIDATED) {
+        if ($this->getStatus() === self::STACK_QUESTION_STATUS_EXTERNALLY_VALIDATED) {
             //TODO: Indeed, evaluate the student answer to the question
             return true;
         } else {
@@ -614,35 +593,11 @@ class StackQuestion
     }
 
     /**
-     * @return array|null
-     */
-    public function getSolution(): ?array
-    {
-        return $this->solution;
-    }
-
-    /**
      * @return StackQuestionSecurity|null
      */
     public function getSecurity(): ?StackQuestionSecurity
     {
         return $this->security;
-    }
-
-    /**
-     * @return StackCache|null
-     */
-    public function getCache(): ?StackCache
-    {
-        return $this->cache;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCompiledCache(): array
-    {
-        return $this->compiled_cache;
     }
 
     /**
@@ -660,6 +615,5 @@ class StackQuestion
     {
         return $this->external_data;
     }
-
 
 }

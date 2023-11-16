@@ -2,7 +2,10 @@
 declare(strict_types=1);
 
 namespace src\core\security;
+
+use src\core\StackQuestion;
 use src\core\version\StackVersion;
+use src\platform\StackDatabase;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -61,12 +64,21 @@ class StackQuestionSecurity
         }
     }
 
-    public function getQuestionExternalJSONFromStudent(StackVersion $version): string
+    public function getQuestionInternalJSONFromDB(StackVersion $version): string
     {
         return '';
     }
 
-    public function getQuestionExternalJSONFromTeacher(StackVersion $version): string
+    public function getQuestionExternalJSONFromStudent(StackQuestion $question): string
+    {
+        if ($question->getStatus() === StackQuestion::STACK_QUESTION_STATUS_EVALUATED) {
+            return StackDatabase::getQuestionExternalJSON($question->getVersion());
+        } else {
+            return StackQuestionStudentAnswer::getQuestionExternalJSON($question->getVersion());
+        }
+    }
+
+    public function getQuestionExternalJSONFromTeacher(StackQuestion $question): string
     {
         return '';
     }
