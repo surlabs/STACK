@@ -42,6 +42,11 @@ class StackOptions
      */
     private array $data = [];
 
+    /**
+     * @var array The array of options in Maxima format
+     */
+    private array $maxima_options = [];
+
     //STACK Options
 
     private ?string $display_mode = null;
@@ -127,39 +132,40 @@ class StackOptions
     /**
      * @return array|null Returns the array of options in Maxima format, null if error.
      */
-    public function getMaximaOptions(): ?array
+    public function setMaximaOptions(): ?bool
     {
-        $maxima_options = [];
-
         if ($this->status !== self::STACK_OPTIONS_STATUS_INITIALIZED) {
             //TODO: Log error, object already initialized or with error
-            return null;
+            return false;
         }
 
-        $names = [];
-        $commands = [];
-
-        foreach ($this->data as $option_key => $option_value) {
-            if (!is_null($option_value['castype'])) {
-                $value = $this->formatValueBasedOnType($option_value);
-                $this->processCasType($option_value, $value, $names, $commands);
+        try {
+            $names = [];
+            $commands = [];
+            foreach ($this->data as $option_key => $option_value) {
+                if (!is_null($option_value['castype'])) {
+                    $value = $this->formatOptionsValueBasedOnType($option_value);
+                    $this->processCasType($option_value, $value, $names, $commands);
+                }
             }
+        } catch (StackException $e) {
+            //TODO: Log error,  invalid option value
         }
 
-        $maxima_options = [
+        $this->maxima_options = [
             'names' => implode(', ', $names),
             'commands' => implode(StackSession::MAXIMA_COMMANDS_SEPARATOR, $commands)
         ];
 
         $this->status = self::STACK_OPTIONS_STATUS_MAXIMA;
-        return $maxima_options;
+        return true;
     }
 
     /**
      * @param $option
      * @return mixed|string
      */
-    private function formatValueBasedOnType($option): mixed
+    private function formatOptionsValueBasedOnType($option): mixed
     {
         return ('boolean' === $option['type']) ? ($option['value'] ? 'true' : 'false') : $option['value'];
     }
