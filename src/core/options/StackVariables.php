@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 namespace src\core\options;
+use src\core\text\StackText;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -22,5 +24,16 @@ namespace src\core\options;
  *********************************************************************/
 class StackVariables
 {
+    /**
+     * @var ?StackText
+     */
+    private ?StackText $note = null;
 
+    /**
+     * @return StackText|null
+     */
+    public function getNote(): ?StackText
+    {
+        return $this->note;
+    }
 }

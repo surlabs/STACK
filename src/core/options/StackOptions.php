@@ -30,7 +30,7 @@ class StackOptions
     const STACK_OPTIONS_STATUS_ERROR = -1;
     const STACK_OPTIONS_STATUS_UNINITIALIZED = 0;
     const STACK_OPTIONS_STATUS_INITIALIZED = 1;
-    const STACK_OPTIONS_STATUS_MAXIMA = 2;
+    const STACK_OPTIONS_STATUS_PREPARED_FOR_MAXIMA = 2;
 
     /**
      * @var int The current status of the StackOptions object
@@ -69,7 +69,6 @@ class StackOptions
 
     private ?string $matrix_parentheses = null;
 
-
     /**
      * StackOptions constructor.
      * Creates a new StackOptions object with the given options.
@@ -96,20 +95,9 @@ class StackOptions
                 }
             }
         }
-    }
-
-    /**
-     * @return bool Returns true if the object has been initialized, false otherwise.
-     */
-    public function initialize(): bool
-    {
-        // Ensure status is correct
-        if ($this->status !== self::STACK_OPTIONS_STATUS_UNINITIALIZED) {
-            //TODO: Log error, object already initialized or with error
-            return false;
-        }
 
         try {
+            //Set attributes of the object
             //Castings are done here
             $this->display_mode = (string)$this->data['display']['value'];
             $this->multiplication_sign = (string)$this->data['multiplicationsign']['value'];
@@ -121,18 +109,19 @@ class StackOptions
             $this->assume_positive = (bool)$this->data['assumepos']['value'];
             $this->assume_real = (bool)$this->data['assumereal']['value'];
             $this->matrix_parentheses = (string)$this->data['matrixparens']['value'];
+
+            $this->status = self::STACK_OPTIONS_STATUS_INITIALIZED;
         } catch (StackException $e) {
             //TODO: Log error, invalid option value
+            $this->status = self::STACK_OPTIONS_STATUS_ERROR;
         }
-
-        $this->status = self::STACK_OPTIONS_STATUS_INITIALIZED;
-        return true;
     }
 
     /**
-     * @return array|null Returns the array of options in Maxima format, null if error.
+     * Sets maxima_options array with the options in Maxima format.
+     * @return array|null returns true if the object has been initialized, false otherwise
      */
-    public function setMaximaOptions(): ?bool
+    public function prepareForMaxima(): ?bool
     {
         if ($this->status !== self::STACK_OPTIONS_STATUS_INITIALIZED) {
             //TODO: Log error, object already initialized or with error
@@ -157,7 +146,7 @@ class StackOptions
             'commands' => implode(StackSession::MAXIMA_COMMANDS_SEPARATOR, $commands)
         ];
 
-        $this->status = self::STACK_OPTIONS_STATUS_MAXIMA;
+        $this->status = self::STACK_OPTIONS_STATUS_PREPARED_FOR_MAXIMA;
         return true;
     }
 
@@ -194,7 +183,6 @@ class StackOptions
         }
     }
 
-
     /**
      * Returns current status of the object.
      * @return int
@@ -210,6 +198,14 @@ class StackOptions
     public function getData(): array
     {
         return $this->data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMaximaOptions(): array
+    {
+        return $this->maxima_options;
     }
 
     /**

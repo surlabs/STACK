@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 namespace src\core\security;
+use src\core\version\StackVersion;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -34,7 +36,7 @@ class StackQuestionSecurity
         $decoded = json_decode($json, true);
         //JSON coding checks
         if ($decoded !== null && json_last_error() === JSON_ERROR_NONE) {
-            //TODO: Check internal status of the question  and saves it in cache
+            //TODO: Check internal status of the json values
             return true;
         } else {
             return false;
@@ -57,6 +59,16 @@ class StackQuestionSecurity
         } else {
             return false;
         }
+    }
+
+    public function getQuestionExternalJSONFromStudent(StackVersion $version): string
+    {
+        return '';
+    }
+
+    public function getQuestionExternalJSONFromTeacher(StackVersion $version): string
+    {
+        return '';
     }
 
 }

@@ -1,7 +1,5 @@
 <?php
 declare(strict_types=1);
-
-namespace src\platform\ilias;
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -20,15 +18,8 @@ namespace src\platform\ilias;
  * stack@surlabs.es
  *
  *********************************************************************/
-abstract class StackPlatformIlias
-{
 
-    /**
-     * @return array|null
-     */
-    public static function getPlatformDefaultOptions(): ?array
-    {
-        //TODO: Implement
-    }
+class EditUnitTestUI
+{
 
 }

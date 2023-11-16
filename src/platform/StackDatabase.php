@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace src\core\version;
+namespace src\platform;
+use src\core\version\StackVersion;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -20,16 +22,19 @@ namespace src\core\version;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackVersion
+abstract class StackDatabase
 {
 
-    /**
-     * @return bool
-     */
-    public function checkVersion(): bool
+    public static function getQuestionInternalJSON(StackVersion $version): ?string
     {
-        //TODO: Implement version check
-        return true;
+
+        return '';
     }
+
+    public static function getQuestionExternalJSON(StackVersion $version): ?string
+    {
+        return '';
+    }
+
 
 }

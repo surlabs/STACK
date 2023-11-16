@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace src\core\version;
+namespace src\platform\ilias;
+
+use src\platform\StackPlatform;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -20,16 +23,27 @@ namespace src\core\version;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackVersion
+class StackPlatformIlias extends StackPlatform
 {
+    /**
+     * Gets all required platform information to run stack
+     * @return array|null
+     */
+    public static function getPlatformInformation(): ?array
+    {
+        // TODO: Implement getPlatformInformation() method.
+        return [];
+    }
+
 
     /**
-     * @return bool
+     * Gets platform default settings for STACK question options
+     * @return array|null
      */
-    public function checkVersion(): bool
+    public static function getPlatformDefaultQuestionOptions(): ?array
     {
-        //TODO: Implement version check
-        return true;
+        //TODO: Implement
+        return [];
     }
 
 }

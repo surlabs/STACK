@@ -24,11 +24,21 @@ abstract class StackPlatform
 {
 
     /**
+     * Gets all required platform information to run stack
      * @return array|null
      */
-    public static function getPlatformDefaultOptions(): ?array
+    public static function getPlatformInformation(): ?array
     {
-        //TODO: Implement
+        return [];
+    }
+
+    /**
+     * Gets platform default settings for STACK question options
+     * @return array|null
+     */
+    public static function getPlatformDefaultQuestionOptions(): ?array
+    {
+        return [];
     }
 
 }
