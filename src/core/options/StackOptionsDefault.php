@@ -122,7 +122,7 @@ class StackOptionsDefault
             ],
         ];
 
-        $array_platform_default_options = StackPlatform::getPlatformDefaultOptions();
+        $array_platform_default_options = StackPlatform::getPlatformDefaultQuestionOptions();
 
         //Overwrite default with given options
         foreach ($array_platform_default_options as $option_key => $option_value) {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace src\core\options;
 
+use src\core\maxima\StackSession;
 use src\core\security\StackException;
 
 /**
@@ -29,18 +30,40 @@ class StackOptions
     const STACK_OPTIONS_STATUS_ERROR = -1;
     const STACK_OPTIONS_STATUS_UNINITIALIZED = 0;
     const STACK_OPTIONS_STATUS_INITIALIZED = 1;
+    const STACK_OPTIONS_STATUS_MAXIMA = 2;
 
     /**
-     * The current status of the StackOptions object.
-     * @var int
+     * @var int The current status of the StackOptions object
      */
     private int $status = self::STACK_OPTIONS_STATUS_UNINITIALIZED;
 
     /**
-     * The array of options.
-     * @var array
+     * @var array The array of options
      */
     private array $data = [];
+
+    //STACK Options
+
+    private ?string $display_mode = null;
+
+    private ?string $multiplication_sign = null;
+
+    private ?string $complex_number = null;
+
+    private ?string $inverse_trigonometric = null;
+
+    private ?string $logic_symbols = null;
+
+    private ?bool $surd_for_square_root = null;
+
+    private ?bool $question_level_simplify = null;
+
+    private ?bool $assume_positive = null;
+
+    private ?bool $assume_real = null;
+
+    private ?string $matrix_parentheses = null;
+
 
     /**
      * StackOptions constructor.
@@ -60,13 +83,111 @@ class StackOptions
                 $this->status = self::STACK_OPTIONS_STATUS_ERROR;
                 throw new StackException('stack_options construct: $key ' . $option_key . ' is not a valid option name.');
             } else {
-                $this->data[$option_key]['value'] = $option_value;
+                if (isset($this->data[$option_key]['value'])) {
+                    $this->data[$option_key]['value'] = $option_value;
+                } else {
+                    //TODO: Log error, invalid option value
+                    return null;
+                }
+            }
+        }
+    }
+
+    /**
+     * @return bool Returns true if the object has been initialized, false otherwise.
+     */
+    public function initialize(): bool
+    {
+        // Ensure status is correct
+        if ($this->status !== self::STACK_OPTIONS_STATUS_UNINITIALIZED) {
+            //TODO: Log error, object already initialized or with error
+            return false;
+        }
+
+        try {
+            //Castings are done here
+            $this->display_mode = (string)$this->data['display']['value'];
+            $this->multiplication_sign = (string)$this->data['multiplicationsign']['value'];
+            $this->complex_number = (string)$this->data['complexno']['value'];
+            $this->inverse_trigonometric = (string)$this->data['inversetrig']['value'];
+            $this->logic_symbols = (string)$this->data['logicsymbol']['value'];
+            $this->surd_for_square_root = (bool)$this->data['sqrtsign']['value'];
+            $this->question_level_simplify = (bool)$this->data['simplify']['value'];
+            $this->assume_positive = (bool)$this->data['assumepos']['value'];
+            $this->assume_real = (bool)$this->data['assumereal']['value'];
+            $this->matrix_parentheses = (string)$this->data['matrixparens']['value'];
+        } catch (StackException $e) {
+            //TODO: Log error, invalid option value
+        }
+
+        $this->status = self::STACK_OPTIONS_STATUS_INITIALIZED;
+        return true;
+    }
+
+    /**
+     * @return array|null Returns the array of options in Maxima format, null if error.
+     */
+    public function getMaximaOptions(): ?array
+    {
+        $maxima_options = [];
+
+        if ($this->status !== self::STACK_OPTIONS_STATUS_INITIALIZED) {
+            //TODO: Log error, object already initialized or with error
+            return null;
+        }
+
+        $names = [];
+        $commands = [];
+
+        foreach ($this->data as $option_key => $option_value) {
+            if (!is_null($option_value['castype'])) {
+                $value = $this->formatValueBasedOnType($option_value);
+                $this->processCasType($option_value, $value, $names, $commands);
             }
         }
 
-        //This must be the unique place where the status is set to initialized
-        $this->status = self::STACK_OPTIONS_STATUS_INITIALIZED;
+        $maxima_options = [
+            'names' => implode(', ', $names),
+            'commands' => implode(StackSession::MAXIMA_COMMANDS_SEPARATOR, $commands)
+        ];
+
+        $this->status = self::STACK_OPTIONS_STATUS_MAXIMA;
+        return $maxima_options;
     }
+
+    /**
+     * @param $option
+     * @return mixed|string
+     */
+    private function formatValueBasedOnType($option): mixed
+    {
+        return ('boolean' === $option['type']) ? ($option['value'] ? 'true' : 'false') : $option['value'];
+    }
+
+    /**
+     * @param $option
+     * @param $value
+     * @param $names
+     * @param $commands
+     * @return void
+     */
+    private function processCasType($option, $value, &$names, &$commands): void
+    {
+        switch ($option['castype']) {
+            case 'ex':
+                $names[] = $option['caskey'];
+                $commands[] = $option['caskey'] . ':' . $value;
+                break;
+            case 'exs':
+                $names[] = $option['caskey'];
+                $commands[] = $option['caskey'] . ':"' . $value . '"';
+                break;
+            case 'fun':
+                $commands[] = $option['caskey'] . '("' . $value . '")';
+                break;
+        }
+    }
+
 
     /**
      * Returns current status of the object.
@@ -75,6 +196,94 @@ class StackOptions
     public function getStatus(): int
     {
         return $this->status;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDisplayMode(): ?string
+    {
+        return $this->display_mode;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMultiplicationSign(): ?string
+    {
+        return $this->multiplication_sign;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getComplexNumber(): ?string
+    {
+        return $this->complex_number;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInverseTrigonometric(): ?string
+    {
+        return $this->inverse_trigonometric;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLogicSymbols(): ?string
+    {
+        return $this->logic_symbols;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getSurdForSquareRoot(): ?bool
+    {
+        return $this->surd_for_square_root;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getQuestionLevelSimplify(): ?bool
+    {
+        return $this->question_level_simplify;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getAssumePositive(): ?bool
+    {
+        return $this->assume_positive;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getAssumeReal(): ?bool
+    {
+        return $this->assume_real;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMatrixParentheses(): ?string
+    {
+        return $this->matrix_parentheses;
     }
 
 }

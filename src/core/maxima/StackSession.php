@@ -22,5 +22,8 @@ namespace src\core\maxima;
  *********************************************************************/
 class StackSession
 {
-
+    /**
+     * @var string separator used between successive CAS commands inside the block.
+     */
+    const MAXIMA_COMMANDS_SEPARATOR = ",\n  ";
 }
