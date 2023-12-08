@@ -20,7 +20,7 @@ namespace src\core\quality;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackQuestionBulktesting
+class StackQuestionBulkTesting
 {
 
 }
