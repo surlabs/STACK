@@ -3,18 +3,17 @@ declare(strict_types=1);
 
 namespace src\core;
 
-use src\core\evaluation\StackPotentialResponseTree;
-use src\core\inputs\StackInput;
-use src\core\maxima\StackSession;
-use src\core\options\StackOptions;
-use src\core\options\StackVariables;
-use src\core\performance\StackCache;
-use src\core\security\StackException;
-use src\core\security\StackQuestionSecurity;
-use src\core\security\StackQuestionTeacherAnswer;
-use src\core\text\StackText;
 use src\core\version\StackVersion;
-use src\platform\StackDatabase;
+use src\core\security\StackQuestionSecurity;
+use src\core\security\StackException;
+
+use src\core\options\StackVariables;
+use src\core\maxima\StackSession;
+
+use src\core\text\StackText;
+use src\core\options\StackOptions;
+use src\core\inputs\StackInput;
+use src\core\evaluation\StackPotentialResponseTree;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -467,7 +466,6 @@ class StackQuestion
             return false;
         }
     }
-
 
     // Getters
 
