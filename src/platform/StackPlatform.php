@@ -42,11 +42,14 @@ abstract class StackPlatform
     /**
      * Gets the platform translation of a string
      * @param string $str
+     * @param array|null $params
      * @return string|null
      */
-    public static function getTranslation(string $str): ?string
+    public static function getTranslation(string $str, ?array $params): ?string
     {
-        return self::$platform->getTranslation($str);
+        $txt = self::$platform->getTranslation($str);
+
+        return isset($txt) && isset($params) ? vsprintf($txt, $params) : $str;
     }
 
     /**
