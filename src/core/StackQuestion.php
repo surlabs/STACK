@@ -14,6 +14,8 @@ use src\core\text\StackText;
 use src\core\options\StackOptions;
 use src\core\inputs\StackInput;
 use src\core\evaluation\StackPotentialResponseTree;
+use src\platform\ilias\StackPlatformIlias;
+use src\platform\StackPlatform;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -43,6 +45,11 @@ class StackQuestion
     const STACK_QUESTION_STATUS_EXTERNALLY_VALIDATED = 4;
     const STACK_QUESTION_STATUS_EVALUATED = 5;
     const STACK_QUESTION_STATUS_STATIC = 6;
+
+    /**
+     * @var StackPlatform The platform information of the current STACK Question (Ilias, Moodle, etc.).
+     */
+    private StackPlatform $platform;
 
     /**
      * @var ?int The status  of the current STACK Question.
@@ -139,9 +146,17 @@ class StackQuestion
     /**
      * StackQuestion constructor.
      * @param StackVersion $version
+     * @throws StackException
      */
     public function __construct(StackVersion $version)
     {
+        if (function_exists('ilContainer')) {
+            $platform = new StackPlatformIlias();
+        } else {
+            throw new StackException('StackQuestion: No platform detected.');
+        }
+
+
         if ($version->checkVersion()) {
             //Build the object with the version of the question
             $this->security = new StackQuestionSecurity($version);
