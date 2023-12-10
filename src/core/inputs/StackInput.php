@@ -220,6 +220,10 @@ class StackInput
         return(array($option, $arg));
     }
 
+    /**
+     * Check if all extra options are valid
+     * @return void
+     */
     private function validateExtraOptions(): void
     {
         foreach ($this->extra_options as $option => $arg) {
