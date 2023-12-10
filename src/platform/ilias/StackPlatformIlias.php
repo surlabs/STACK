@@ -33,9 +33,10 @@ class StackPlatformIlias extends StackPlatform
     /**
      * Gets the platform translation of a string
      * @param string $str
+     * @param array|null $params
      * @return string|null
      */
-    public static function getTranslation(string $str): ?string
+    public static function getTranslationInternal(string $str): ?string
     {
         //TODO: Implement getTranslation() method.
         return $str;

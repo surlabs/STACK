@@ -47,9 +47,9 @@ abstract class StackPlatform
      */
     public static function getTranslation(string $str, ?array $params): ?string
     {
-        $txt = self::$platform->getTranslation($str);
+        $txt = self::$platform->getTranslationInternal($str);
 
-        return isset($txt) && isset($params) ? vsprintf($txt, $params) : $str;
+        return isset($params) ? vsprintf($txt, $params) : $txt;
     }
 
     /**
