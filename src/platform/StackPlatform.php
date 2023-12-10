@@ -58,6 +58,6 @@ abstract class StackPlatform
      */
     public static function getPlatformDefaultQuestionOptions(): ?array
     {
-        return self::$platform->getPlatformDefaultQuestionOptions();
+        return self::$platform->getPlatformDefaultQuestionOptionsInternal();
     }
 }
