@@ -25,16 +25,21 @@ use src\platform\StackPlatform;
  *********************************************************************/
 class StackPlatformIlias extends StackPlatform
 {
-    /**
-     * Gets all required platform information to run stack
-     * @return array|null
-     */
-    public static function getPlatformInformation(): ?array
+    public function __construct()
     {
-        // TODO: Implement getPlatformInformation() method.
-        return [];
+
     }
 
+    /**
+     * Gets the platform translation of a string
+     * @param string $str
+     * @return string|null
+     */
+    public static function getTranslation(string $str): ?string
+    {
+        //TODO: Implement getTranslation() method.
+        return $str;
+    }
 
     /**
      * Gets platform default settings for STACK question options
@@ -42,8 +47,6 @@ class StackPlatformIlias extends StackPlatform
      */
     public static function getPlatformDefaultQuestionOptions(): ?array
     {
-        //TODO: Implement
         return [];
     }
-
 }
