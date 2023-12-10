@@ -122,7 +122,7 @@ class StackInput
         }
 
         if ($key == 'showValidation' && !$value && $this->isParameterUsed('mustVerify')) {
-            $this->setParameter('mustVerify', "0");
+            $this->setParameter('mustVerify', "false");
         }
 
         $this->parameters[$key] = $value;
@@ -236,7 +236,7 @@ class StackInput
                 case 'calculus':
                 case 'nounits':
                 case 'hideequiv':
-                    if (!($arg == "true" || $arg == "false")) {
+                    if (!($arg == "true" || $arg == "false" || $arg == "0")) {
                         $this->errors[] = StackPlatform::getTranslation('numericalinputoptboolerr', array($option, $arg));
                     }
                     break;
@@ -289,5 +289,55 @@ class StackInput
         if ((array_key_exists('mindp', $this->extra_options) || array_key_exists('maxdp', $this->extra_options)) && (array_key_exists('minsf', $this->extra_options) || array_key_exists('maxsf', $this->extra_options))) {
             $this->errors[] = StackPlatform::getTranslation('numericalinputminsfmaxdperr', null);
         }
+    }
+
+    /**
+     * Set context session
+     * @param array|null $context_session
+     * @return void
+     */
+    public function setContextSession(?array $context_session) {
+        $this->$context_session = $context_session;
+    }
+
+    /**
+     * Check if a value for a parameter is valid
+     * @param string $key
+     * @param string $value
+     * @return bool
+     * @throws StackException
+     */
+    public function isValidParameter(string $key, string $value): bool
+    {
+        if (!$this->isParameterUsed($key)) {
+            throw new StackException('StackInput: setting parameter ' . $key . ' which does not exist for inputs of type ' . get_class($this));
+        }
+
+        switch($key) {
+            case 'strictSyntax':
+            case 'forbidFloats':
+            case 'lowestTerms':
+            case 'sameType':
+            case 'mustVerify':
+                return ($value == "true" || $value == "false" || $value == "0");
+            case 'showValidation':
+                $number = filter_var($value, FILTER_VALIDATE_FLOAT);
+
+                if ($number === false) {
+                    $number = filter_var($value, FILTER_VALIDATE_INT);
+                }
+
+                return is_numeric($number) && $number >= 0 && $number <= 3;
+            case 'insertStars':
+                $number = filter_var($value, FILTER_VALIDATE_FLOAT);
+
+                if ($number === false) {
+                    $number = filter_var($value, FILTER_VALIDATE_INT);
+                }
+
+                return is_numeric($number);
+        }
+
+        return true;
     }
 }
