@@ -71,6 +71,7 @@ class StackInput
     private bool $runtime = true;
 
     /**
+     * StackInput constructor
      * @throws StackException
      */
     public function __construct($name, $teacher_answer, $options = null, $parameters = null, $runtime = true) {
@@ -101,6 +102,8 @@ class StackInput
 
     /**
      * Check if parameter is used
+     * @param string $key
+     * @return bool
      */
     private function isParameterUsed(string $key): bool
     {
@@ -109,29 +112,115 @@ class StackInput
 
     /**
      * Set value of parameter
+     * @param string $key
+     * @param string $value
      * @throws StackException
      */
-    private function setParameter(string $key, int $value): void
+    private function setParameter(string $key, String $value): void
     {
         if (!$this->isParameterUsed($key)) {
             throw new StackException('StackInput: setting parameter ' . $key . ' which does not exist for inputs of type ' . get_class($this));
         }
 
         if ($key == 'showValidation' && !$value && $this->isParameterUsed('mustVerify')) {
-            $this->setParameter('mustVerify', 0);
+            $this->setParameter('mustVerify', "0");
         }
 
         $this->parameters[$key] = $value;
 
         if ($key == 'insertStars') {
-            $this->parameters['grammarAutofixes'] = stack_input_factory::convert_legacy_insert_stars($value);
+            $this->parameters['grammarAutofixes'] = (string) $this->convertLegacyInsertStars($value);
         }
 
         $this->internalConstruct();
     }
 
+    /**
+     * Construct extra options from parameter options
+     * @return void
+     */
     private function internalConstruct()
     {
-        // TODO: Implement internalConstruct() method.
+        $tmp_options = $this->getParameter('options') | "";
+
+        if ($tmp_options != "") {
+            $tmp_options = explode(',', $tmp_options);
+
+            foreach ($tmp_options as $option) {
+                $option = strtolower(trim($option));
+
+                list($option, $arg) = $this->parseOption($option);
+
+                if (array_key_exists($option, $this->extra_options)) {
+                    if ($arg === '') {
+                        $this->extra_options[$option] = "true";
+                    } else {
+                        $this->extra_options[$option] = $arg;
+                    }
+                } else {
+                    // TODO: $this->errors[] = CLASS_TO_GET_STRING_IN_PLATFORM('inputOptionUnknown', $option);
+                }
+            }
+        }
+
+        $this->validateExtraOptions();
+    }
+
+    /**
+     * Convert legacy insert stars
+     * @param string $value
+     * @return int
+     */
+    private function convertLegacyInsertStars(string $value) : int
+    {
+        $map = [
+            // Don't insert stars.
+            "0" => 0,
+            // Insert stars for implied multiplication only.
+            "1" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS,
+            // Insert stars assuming single-character variable names.
+            "2" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | StackInput::STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR,
+            // Insert stars for spaces only.
+            "3" => StackInput::STACK_INPUT_GRAMMAR_FIX_SPACES,
+            // Insert stars for implied multiplication and for spaces.
+            "4" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | StackInput::STACK_INPUT_GRAMMAR_FIX_SPACES,
+            // Insert stars assuming single-character variables, implied and for spaces.
+            "5" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | StackInput::STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR | StackInput::STACK_INPUT_GRAMMAR_FIX_SPACES
+        ];
+
+        return $map[$value];
+    }
+
+    /**
+     * Get value of parameter
+     * @param string $string
+     * @return string|null
+     */
+    private function getParameter(string $string): ?string
+    {
+        return $this->parameters[$string];
+    }
+
+    /**
+     * Parse option separated by : to get option and argument
+     * @param string $option
+     * @return array|null
+     */
+    private function parseOption(string $option): ?array
+    {
+        $arg = '';
+
+        if (!(strpos($option, ':') === false)) {
+            $ops = explode(':', $option);
+            $option = $ops[0];
+            $arg = trim($ops[1]);
+        }
+
+        return(array($option, $arg));
+    }
+
+    private function validateExtraOptions(): void
+    {
+        // TODO
     }
 }
