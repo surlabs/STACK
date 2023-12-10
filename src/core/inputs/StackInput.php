@@ -280,5 +280,21 @@ class StackInput
                     $this->errors[] = StackPlatform::getTranslation('inputoptionunknown', array($option));
             }
         }
+
+        if (array_key_exists('mindp', $this->extra_options) && array_key_exists('maxdp', $this->extra_options)) {
+            if ((float) $this->extra_options['mindp'] > (float) $this->extra_options['maxdp']) {
+                $this->errors[] = StackPlatform::getTranslation('numericalinputminmaxerr', null);
+            }
+        }
+
+        if (array_key_exists('minsf', $this->extra_options) && array_key_exists('maxsf', $this->extra_options)) {
+            if ((float) $this->extra_options['minsf'] > (float) $this->extra_options['maxsf']) {
+                $this->errors[] = StackPlatform::getTranslation('numericalinputminmaxerr', null);
+            }
+        }
+
+        if ((array_key_exists('mindp', $this->extra_options) || array_key_exists('maxdp', $this->extra_options)) && (array_key_exists('minsf', $this->extra_options) || array_key_exists('maxsf', $this->extra_options))) {
+            $this->errors[] = StackPlatform::getTranslation('numericalinputminsfmaxdperr', null);
+        }
     }
 }
