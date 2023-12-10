@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace src\core\inputs;
 use src\core\options\StackOptions;
 use src\core\security\StackException;
+use src\platform\StackPlatform;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -158,7 +159,7 @@ class StackInput
                         $this->extra_options[$option] = $arg;
                     }
                 } else {
-                    // TODO: $this->errors[] = CLASS_TO_GET_STRING_IN_PLATFORM('inputOptionUnknown', $option);
+                    $this->errors[] = StackPlatform::getTranslation('inputOptionUnknown', array($option));
                 }
             }
         }
@@ -221,6 +222,63 @@ class StackInput
 
     private function validateExtraOptions(): void
     {
-        // TODO
+        foreach ($this->extra_options as $option => $arg) {
+            switch ($option) {
+                case 'manualgraded':
+                case 'novars':
+                case 'simp':
+                case 'floatnum':
+                case 'intnum':
+                case 'rationalnum':
+                case 'hideanswer':
+                case 'allowempty':
+                case 'rationalized':
+                case 'negpow':
+                case 'consolidatesubscripts':
+                case 'hidedomain':
+                case 'comments':
+                case 'firstline':
+                case 'assume_pos':
+                case 'assume_real':
+                case 'calculus':
+                case 'nounits':
+                case 'hideequiv':
+                    if (!($arg == "true" || $arg == "false")) {
+                        $this->errors[] = StackPlatform::getTranslation('numericalinputoptboolerr', array($option, $arg));
+                    }
+                    break;
+                case 'mindp':
+                case 'maxdp':
+                case 'minsf':
+                case 'maxsf':
+                case 'checkvars':
+                    if (!($arg == "false" || filter_var($arg, FILTER_VALIDATE_INT) || filter_var($arg, FILTER_VALIDATE_FLOAT))) {
+                        $this->errors[] = StackPlatform::getTranslation('numericalinputoptinterr', array($option, $arg));
+                    }
+                    break;
+                case 'mul':
+                    // Mul was deprecated in version 4.2.
+                    $this->errors[] = StackPlatform::getTranslation('stackversionmulerror', null);
+
+
+                    if (!($arg == "true" || $arg == "false")) {
+                        $this->errors[] = StackPlatform::getTranslation('numericalinputoptboolerr', array($option, $arg));
+                    }
+                    break;
+
+                case 'align':
+                    if ($arg !== 'left' && $arg !== 'right') {
+                        $this->errors[] = StackPlatform::getTranslation('inputopterr', array($option, $arg));
+                    }
+                    break;
+                case 'validator':
+                    if (!preg_match('/^([a-zA-Z]+|[a-zA-Z]+[0-9a-zA-Z_]*[0-9a-zA-Z]+)$/', $arg)) {
+                        $this->errors[] = StackPlatform::getTranslation('inputvalidatorerr', array($option, $arg));
+                    }
+                    break;
+                default:
+                    $this->errors[] = StackPlatform::getTranslation('inputoptionunknown', array($option));
+            }
+        }
     }
 }
