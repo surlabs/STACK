@@ -40,22 +40,6 @@ class StackInput
 
     private ?string $teacher_answer;
 
-    private static array $all_parameter_names = array(
-        'mustVerify',
-        'showValidation',
-        'boxWidth',
-        'boxHeight',
-        'strictSyntax',
-        'insertStars',
-        'syntaxHint',
-        'syntaxAttribute',
-        'forbidWords',
-        'allowWords',
-        'forbidFloats',
-        'lowestTerms',
-        'sameType'
-    );
-
     private array $extra_options = array(
         'hideanswer' => false,
         'allowempty' => false
