@@ -324,4 +324,28 @@ class StackInput
 
         return true;
     }
+
+    /**
+     * Get the value of one extra options
+     * @param string $option
+     * @param mixed $default the default to return if this parameter is not set.
+     * @return string
+     */
+    public function getExtraOption(string $option, string $default = "false"): string
+    {
+        if (array_key_exists($option, $this->extra_options)) {
+            return $this->extra_options[$option];
+        } else {
+            return $default;
+        }
+    }
+
+    /*
+     * Return the value of all extra options.
+     * @return array
+     */
+    public function getExtraOptions(): array
+    {
+        return $this->extra_options;
+    }
 }
