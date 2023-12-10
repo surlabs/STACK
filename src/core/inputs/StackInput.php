@@ -97,8 +97,6 @@ class StackInput
         foreach ($parameters as $name => $value) {
             $this->setParameter($name, $value);
         }
-
-        $this->internalConstruct();
     }
 
     /**
@@ -133,38 +131,29 @@ class StackInput
             $this->parameters['grammarAutofixes'] = (string) $this->convertLegacyInsertStars($value);
         }
 
-        $this->internalConstruct();
-    }
+        if ($key == 'options') {
+            if ($value != "") {
+                $tmp_options = explode(',', $value);
 
-    /**
-     * Construct extra options from parameter options
-     * @return void
-     */
-    private function internalConstruct()
-    {
-        $tmp_options = $this->getParameter('options') | "";
+                foreach ($tmp_options as $option) {
+                    $option = strtolower(trim($option));
 
-        if ($tmp_options != "") {
-            $tmp_options = explode(',', $tmp_options);
+                    list($option, $arg) = $this->parseOption($option);
 
-            foreach ($tmp_options as $option) {
-                $option = strtolower(trim($option));
-
-                list($option, $arg) = $this->parseOption($option);
-
-                if (array_key_exists($option, $this->extra_options)) {
-                    if ($arg === '') {
-                        $this->extra_options[$option] = "true";
+                    if (array_key_exists($option, $this->extra_options)) {
+                        if ($arg === '') {
+                            $this->extra_options[$option] = "true";
+                        } else {
+                            $this->extra_options[$option] = $arg;
+                        }
                     } else {
-                        $this->extra_options[$option] = $arg;
+                        $this->errors[] = StackPlatform::getTranslation('inputoptionunknown', array($option));
                     }
-                } else {
-                    $this->errors[] = StackPlatform::getTranslation('inputOptionUnknown', array($option));
                 }
             }
-        }
 
-        $this->validateExtraOptions();
+            $this->validateExtraOptions();
+        }
     }
 
     /**
