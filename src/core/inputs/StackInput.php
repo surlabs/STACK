@@ -328,7 +328,7 @@ class StackInput
     /**
      * Get the value of one extra options
      * @param string $option
-     * @param mixed $default the default to return if this parameter is not set.
+     * @param string $default the default to return if this parameter is not set.
      * @return string
      */
     public function getExtraOption(string $option, string $default = "false"): string
@@ -347,5 +347,47 @@ class StackInput
     public function getExtraOptions(): array
     {
         return $this->extra_options;
+    }
+
+    /**
+     * Get the teacher answer if it is set
+     * @return string|null
+     */
+    public function getTeacherAnswer(): ?string
+    {
+        return $this->teacher_answer;
+    }
+
+    /**
+     * Get the teacher answer displayed in the general feedback
+     * @param string $value
+     * @param string $display
+     * @return string
+     */
+    public function getTeacherAnswerDisplay(string $value, string $display) :string {
+        if ($this->getExtraOption('hideanswer') != "false") {
+            return '';
+        }
+
+        if (trim($value) == 'EMPTYANSWER') {
+            return StackPlatform::getTranslation('teacheranswerempty', null);
+        }
+
+        return StackPlatform::getTranslation('teacheranswershow_disp', array('\( '.$display.' \)'));
+    }
+
+    /**
+     * Check if the response is blank
+     * @param array $response
+     * @return bool
+     */
+    public function isBlankResponse(array $response): bool {
+        foreach ($response as $value) {
+            if (trim($value) != '' || $value == 'EMPTYANSWER') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
