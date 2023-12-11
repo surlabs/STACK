@@ -340,7 +340,7 @@ class StackInput
         }
     }
 
-    /*
+    /**
      * Return the value of all extra options.
      * @return array
      */
