@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace src\core\inputs;
 use src\core\options\StackOptions;
 use src\core\security\StackException;
+use src\core\security\StackQuestionSecurity;
 use src\platform\StackPlatform;
 
 /**
@@ -381,7 +382,7 @@ class StackInput
      * @param array $response
      * @return bool
      */
-    public function isBlankResponse(array $response): bool {
+    protected function isBlankResponse(array $response): bool {
         foreach ($response as $value) {
             if (trim($value) != '' || $value == 'EMPTYANSWER') {
                 return false;
@@ -389,5 +390,43 @@ class StackInput
         }
 
         return true;
+    }
+
+    /**
+     * @param array $response
+     * @return StackInputState
+     */
+    public function validateStudentResponse(array $response): StackInputState
+    {
+        // TODO: Implement validateStudentResponse() method.
+
+        return new StackInputState();
+    }
+
+    /**
+     * Allow different input types to change the CAS method used
+     * @return string
+     */
+    protected function getValidationMethod() :string {
+        return $this->getParameter('sameType') == "true" ? 'checktype' : 'typeless';
+    }
+
+    /**
+     * @param StackQuestionSecurity $base_security
+     * @return array
+     */
+    protected function validateContentsFilters(StackQuestionSecurity $base_security) :array {
+        // TODO: Implement validateContentsFilters() method.
+
+        return array();
+    }
+
+    /**
+     * @return array
+     */
+    protected function validateContents() :array {
+        // TODO: Implement validateContents() method.
+
+        return array();
     }
 }
