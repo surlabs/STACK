@@ -406,22 +406,92 @@ class StackInput
         return $this->getParameter('sameType') == "true" ? 'checktype' : 'typeless';
     }
 
-    /**
-     * @param StackQuestionSecurity $base_security
-     * @return array
-     */
-    protected function validateContentsFilters(StackQuestionSecurity $base_security) :array {
-        // TODO: Implement validateContentsFilters() method.
 
-        return array();
+    protected function validateContentsFilters() {
+        // TODO: Implement validateContentsFilters() method.
+        // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
+    }
+
+    protected function validateContents() {
+        // TODO: Implement validateContents() method.
+        // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
+    }
+
+    protected function extraOptionVariables() {
+        // TODO: Implement extraOptionVariables() method.
+        // ¿Que es stack_ast_container en el nuevo core?
+    }
+
+    protected function validationDisplay() {
+        // TODO: Implement validationDisplay() method.
+        // ¿Que es stack_maxima_format_casstring en el nuevo core?
+    }
+
+    // TODO: Check render abstract method
+
+    protected function render_error() {
+        // TODO: Implement render_error() method.
+        // ¿Esto como lo hacemos si no escribimos html a pelo con html_writer?
+    }
+
+    public function renderValidation() {
+        // TODO: Implement renderValidation() method.
+        // ¿Que es stack_maths en el nuevo core?
     }
 
     /**
+     * Get translation for list of variables
+     * @param string $vars
+     * @return string
+     */
+    protected function tagListOfVariables(string $vars) :string {
+        return StackPlatform::getTranslation('studentValidation_listofvariables', array($vars));
+    }
+
+    //TODO: Explain this method in PHPDoc
+    /**
+     * @param array $response
      * @return array
      */
-    protected function validateContents() :array {
-        // TODO: Implement validateContents() method.
+    protected function responseToContents(array $response) :array {
+        $contents = array();
 
-        return array();
+        if (array_key_exists($this->name, $response)) {
+            $val = $response[$this->name];
+
+            if (trim($val) == '' && $this->getExtraOption('allowempty')) {
+                $val = 'EMPTYANSWER';
+            }
+
+            $contents = array($val);
+        }
+
+        return $contents;
+    }
+
+    //TODO: Explain this method in PHPDoc
+    /**
+     * @param array $caslines
+     * @return string
+     * @throws StackException
+     */
+    protected function casLinesToAnswer(array $caslines) :string {
+        if (array_key_exists(0, $caslines)) {
+            return $caslines[0];
+        }
+        throw new StackException('casLinesToAnswer could not create the answer.');
+    }
+
+    //TODO: ¿0 Logic?
+    /**
+     * @param array $contents
+     * @return string
+     */
+    public function contentsToMaxima(array $contents) :string {
+        if (array_key_exists(0, $contents)) {
+            return $contents[0];
+        } else {
+            return '';
+        }
     }
 }
