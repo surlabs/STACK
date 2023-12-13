@@ -37,11 +37,11 @@ class StackInput
 
     private ?string $name;
 
-    private array $context_session = array();
+    private array $contextSession = array();
 
-    private ?string $teacher_answer;
+    private ?string $teacherAnswer;
 
-    private array $extra_options = array(
+    private array $extraOptions = array(
         'hideanswer' => false,
         'allowempty' => false
     );
@@ -52,7 +52,7 @@ class StackInput
 
     private array $errors = array();
 
-    private array $raw_contents = array();
+    private array $rawContents = array();
 
     private bool $runtime = true;
 
@@ -60,13 +60,13 @@ class StackInput
      * StackInput constructor
      * @throws StackException
      */
-    public function __construct($name, $teacher_answer, $options = null, $parameters = null, $runtime = true) {
+    public function __construct($name, $teacherAnswer, $options = null, $parameters = null, $runtime = true) {
         if (trim($name) === '') {
             throw new StackException('StackInput: $name must be non-empty.');
         }
 
         $this->name = $name;
-        $this->teacher_answer = $teacher_answer;
+        $this->teacherAnswer = $teacherAnswer;
         $this->runtime = $runtime;
 
         if ($options == null || !is_a($options, 'src\core\options\StackOptions')) {
@@ -125,11 +125,11 @@ class StackInput
 
                     list($option, $arg) = $this->parseOption($option);
 
-                    if (array_key_exists($option, $this->extra_options)) {
+                    if (array_key_exists($option, $this->extraOptions)) {
                         if ($arg === '') {
-                            $this->extra_options[$option] = "true";
+                            $this->extraOptions[$option] = "true";
                         } else {
-                            $this->extra_options[$option] = $arg;
+                            $this->extraOptions[$option] = $arg;
                         }
                     } else {
                         $this->errors[] = StackPlatform::getTranslation('inputoptionunknown', array($option));
@@ -200,7 +200,7 @@ class StackInput
      */
     private function validateExtraOptions(): void
     {
-        foreach ($this->extra_options as $option => $arg) {
+        foreach ($this->extraOptions as $option => $arg) {
             switch ($option) {
                 case 'manualgraded':
                 case 'novars':
@@ -259,30 +259,30 @@ class StackInput
             }
         }
 
-        if (array_key_exists('mindp', $this->extra_options) && array_key_exists('maxdp', $this->extra_options)) {
-            if ((float) $this->extra_options['mindp'] > (float) $this->extra_options['maxdp']) {
+        if (array_key_exists('mindp', $this->extraOptions) && array_key_exists('maxdp', $this->extraOptions)) {
+            if ((float) $this->extraOptions['mindp'] > (float) $this->extraOptions['maxdp']) {
                 $this->errors[] = StackPlatform::getTranslation('numericalinputminmaxerr', null);
             }
         }
 
-        if (array_key_exists('minsf', $this->extra_options) && array_key_exists('maxsf', $this->extra_options)) {
-            if ((float) $this->extra_options['minsf'] > (float) $this->extra_options['maxsf']) {
+        if (array_key_exists('minsf', $this->extraOptions) && array_key_exists('maxsf', $this->extraOptions)) {
+            if ((float) $this->extraOptions['minsf'] > (float) $this->extraOptions['maxsf']) {
                 $this->errors[] = StackPlatform::getTranslation('numericalinputminmaxerr', null);
             }
         }
 
-        if ((array_key_exists('mindp', $this->extra_options) || array_key_exists('maxdp', $this->extra_options)) && (array_key_exists('minsf', $this->extra_options) || array_key_exists('maxsf', $this->extra_options))) {
+        if ((array_key_exists('mindp', $this->extraOptions) || array_key_exists('maxdp', $this->extraOptions)) && (array_key_exists('minsf', $this->extraOptions) || array_key_exists('maxsf', $this->extraOptions))) {
             $this->errors[] = StackPlatform::getTranslation('numericalinputminsfmaxdperr', null);
         }
     }
 
     /**
      * Set context session
-     * @param array|null $context_session
+     * @param array|null $contextSession
      * @return void
      */
-    public function setContextSession(?array $context_session) {
-        $this->$context_session = $context_session;
+    public function setContextSession(?array $contextSession) {
+        $this->$contextSession = $contextSession;
     }
 
     /**
@@ -334,8 +334,8 @@ class StackInput
      */
     public function getExtraOption(string $option, string $default = "false"): string
     {
-        if (array_key_exists($option, $this->extra_options)) {
-            return $this->extra_options[$option];
+        if (array_key_exists($option, $this->extraOptions)) {
+            return $this->extraOptions[$option];
         } else {
             return $default;
         }
@@ -347,7 +347,7 @@ class StackInput
      */
     public function getExtraOptions(): array
     {
-        return $this->extra_options;
+        return $this->extraOptions;
     }
 
     /**
@@ -356,7 +356,7 @@ class StackInput
      */
     public function getTeacherAnswer(): ?string
     {
-        return $this->teacher_answer;
+        return $this->teacherAnswer;
     }
 
     /**
