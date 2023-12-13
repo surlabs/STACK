@@ -392,15 +392,10 @@ class StackInput
         return true;
     }
 
-    /**
-     * @param array $response
-     * @return StackInputState
-     */
-    public function validateStudentResponse(array $response): StackInputState
+    public function validateStudentResponse()
     {
         // TODO: Implement validateStudentResponse() method.
-
-        return new StackInputState();
+        // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_units?
     }
 
     /**
