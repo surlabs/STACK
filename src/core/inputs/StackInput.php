@@ -60,7 +60,7 @@ class StackInput
      * StackInput constructor
      * @throws StackException
      */
-    public function __construct($name, $teacherAnswer, $options = null, $parameters = null, $runtime = true) {
+    public function __construct(string $name, ?string $teacherAnswer, ?StackOptions $options = null, ?array $parameters = null, bool $runtime = true) {
         if (trim($name) === '') {
             throw new StackException('StackInput: $name must be non-empty.');
         }
@@ -169,11 +169,12 @@ class StackInput
     /**
      * Get value of parameter
      * @param string $string
+     * @param string $default
      * @return string|null
      */
-    private function getParameter(string $string): ?string
+    private function getParameter(string $string, string $default): ?string
     {
-        return $this->parameters[$string];
+        return $this->parameters[$string] ?? $default;
     }
 
     /**
@@ -394,7 +395,7 @@ class StackInput
 
     public function validateStudentResponse()
     {
-        // TODO: Implement validateStudentResponse() method.
+        //TODO: Implement validateStudentResponse() method.
         // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_units?
     }
 
@@ -408,34 +409,34 @@ class StackInput
 
 
     protected function validateContentsFilters() {
-        // TODO: Implement validateContentsFilters() method.
+        //TODO: Implement validateContentsFilters() method.
         // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
     }
 
     protected function validateContents() {
-        // TODO: Implement validateContents() method.
+        //TODO: Implement validateContents() method.
         // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
     }
 
     protected function extraOptionVariables() {
-        // TODO: Implement extraOptionVariables() method.
+        //TODO: Implement extraOptionVariables() method.
         // ¿Que es stack_ast_container en el nuevo core?
     }
 
     protected function validationDisplay() {
-        // TODO: Implement validationDisplay() method.
+        //TODO: Implement validationDisplay() method.
         // ¿Que es stack_maxima_format_casstring en el nuevo core?
     }
 
     // TODO: Check render abstract method
 
     protected function render_error() {
-        // TODO: Implement render_error() method.
+        //TODO: Implement render_error() method.
         // ¿Esto como lo hacemos si no escribimos html a pelo con html_writer?
     }
 
     public function renderValidation() {
-        // TODO: Implement renderValidation() method.
+        //TODO: Implement renderValidation() method.
         // ¿Que es stack_maths en el nuevo core?
     }
 
@@ -493,5 +494,64 @@ class StackInput
         } else {
             return '';
         }
+    }
+
+    public function getCorrectResponse()
+    {
+        //TODO: Implement getCorrectResponse() method.
+        // ¿Que es stack_ast_container en el nuevo core? ¿Que es stack_ast_container en el nuevo core?
+    }
+
+    //TODO: Explain this method in PHPDoc
+    /**
+     * @param array $in
+     * @return array
+     */
+    public function maximaToResponseArray(array $in) :array {
+        $response[$this->name] = $in;
+
+        if ($this->getParameter('mustVerify', "true") == "true") {
+            $response[$this->name . '_val'] = $in;
+        }
+        return $response;
+    }
+
+    public function replaceValidationTags() {
+        //TODO: Implement replaceValidationTags() method.
+        // ¿Esto como lo hacemos si no escribimos html a pelo con html_writer?
+    }
+
+    //TODO: Explain this method in PHPDoc
+
+    /**
+     * @param string $in
+     * @return array
+     */
+    public function ajaxToResponseArray(string $in) :array {
+        return array($this->name => $in);
+    }
+
+    /**
+     * Return the list of errors
+     * @return array
+     */
+    public function getErrors(): array {
+        $errors = array();
+
+        foreach ($this->errors as $err) {
+            $errors[trim($err)] = true;
+        }
+
+        return array_keys($errors);
+    }
+
+    //TODO: Explain this method in PHPDoc
+    /**
+     * @param string $name
+     * @param StackInputState $state
+     * @return string
+     */
+    public function summariseResponse(string $name, StackInputState $state): string {
+        return $name . ': ' . $this->contentsToMaxima($state->contents) . ' [' . $state->status . ']';
     }
 }
