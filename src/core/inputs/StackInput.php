@@ -97,23 +97,23 @@ class StackInput
     /**
      * Set value of parameter
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @throws StackException
      */
-    private function setParameter(string $key, String $value): void
+    private function setParameter(string $key, mixed $value): void
     {
         if (!$this->isParameterUsed($key)) {
             throw new StackException('StackInput: setting parameter ' . $key . ' which does not exist for inputs of type ' . get_class($this));
         }
 
         if ($key == 'showValidation' && !$value && $this->isParameterUsed('mustVerify')) {
-            $this->setParameter('mustVerify', "false");
+            $this->setParameter('mustVerify', false);
         }
 
         $this->parameters[$key] = $value;
 
         if ($key == 'insertStars') {
-            $this->parameters['grammarAutofixes'] = (string) $this->convertLegacyInsertStars($value);
+            $this->parameters['grammarAutofixes'] = $this->convertLegacyInsertStars($value);
         }
 
         if ($key == 'options') {
@@ -169,10 +169,10 @@ class StackInput
     /**
      * Get value of parameter
      * @param string $string
-     * @param string $default
+     * @param mixed $default
      * @return string|null
      */
-    private function getParameter(string $string, string $default): ?string
+    private function getParameter(string $string, mixed $default): ?mixed
     {
         return $this->parameters[$string] ?? $default;
     }
@@ -404,7 +404,7 @@ class StackInput
      * @return string
      */
     protected function getValidationMethod() :string {
-        return $this->getParameter('sameType') == "true" ? 'checktype' : 'typeless';
+        return $this->getParameter('sameType', false) ? 'checktype' : 'typeless';
     }
 
 
@@ -510,7 +510,7 @@ class StackInput
     public function maximaToResponseArray(array $in) :array {
         $response[$this->name] = $in;
 
-        if ($this->getParameter('mustVerify', "true") == "true") {
+        if ($this->getParameter('mustVerify', true)) {
             $response[$this->name . '_val'] = $in;
         }
         return $response;
