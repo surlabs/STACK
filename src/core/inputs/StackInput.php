@@ -439,6 +439,21 @@ class StackInput
     abstract public function render(StackInputState $state, string $fieldname, bool $readonly, array $tavalue);
 
     /**
+     * This function returns the HTML of errors for the input
+     * @return string
+     */
+    protected function renderErrors(): string
+    {
+        $errors = $this->getErrors();
+
+        if ($errors) {
+            $errors = implode(' ', $errors);
+        }
+
+        return StackPlatform::createTag("div", $errors, array('class' => 'error'));
+    }
+
+    /**
      * Get translation for list of variables
      * @param string $vars
      * @return string
