@@ -35,7 +35,7 @@ class StackPlatformIlias extends StackPlatform
      * @param string $str
      * @return string|null
      */
-    public static function getTranslationInternal(string $str): ?string
+    public function getTranslationInternal(string $str): ?string
     {
         //TODO: Implement getTranslation() method.
         return $str;
@@ -45,7 +45,7 @@ class StackPlatformIlias extends StackPlatform
      * Gets platform default settings for STACK question options
      * @return array|null
      */
-    public static function getPlatformDefaultQuestionOptionsInternal(): ?array
+    public function getPlatformDefaultQuestionOptionsInternal(): ?array
     {
         return [];
     }
