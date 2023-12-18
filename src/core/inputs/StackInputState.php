@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace src\core\inputs;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -22,5 +23,116 @@ namespace src\core\inputs;
  *********************************************************************/
 class StackInputState
 {
+    protected string $status;
 
+    protected array $contents;
+    protected string $contentsmodified;
+    protected string $contentsdisplayed;
+    protected string $errors;
+    protected string $note;
+    protected string $lvars;
+    protected bool $simp;
+
+    /**
+     * Constructor
+     *
+     * @param string $status
+     * @param array $contents
+     * @param string $contentsmodified
+     * @param string $contentsdisplayed
+     * @param string $errors
+     * @param string $note
+     * @param string $lvars
+     * @param bool $simp
+     */
+    public function __construct(string $status, array $contents, string $contentsmodified, string $contentsdisplayed, string $errors, string $note, string $lvars, bool $simp = false) {
+        $this->status              = $status;
+        $this->contents            = $contents;
+        $this->contentsmodified    = $contentsmodified;
+        $this->contentsdisplayed   = $contentsdisplayed;
+        $this->errors              = $errors;
+        $this->note                = $note;
+        $this->lvars               = $lvars;
+        $this->simp                = $simp;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): void
+    {
+        $this->status = $status;
+    }
+
+    public function getContents(): array
+    {
+        return $this->contents;
+    }
+
+    public function setContents(array $contents): void
+    {
+        $this->contents = $contents;
+    }
+
+    public function getContentsmodified(): string
+    {
+        return $this->contentsmodified;
+    }
+
+    public function setContentsmodified(string $contentsmodified): void
+    {
+        $this->contentsmodified = $contentsmodified;
+    }
+
+    public function getContentsdisplayed(): string
+    {
+        return $this->contentsdisplayed;
+    }
+
+    public function setContentsdisplayed(string $contentsdisplayed): void
+    {
+        $this->contentsdisplayed = $contentsdisplayed;
+    }
+
+    public function getErrors(): string
+    {
+        return $this->errors;
+    }
+
+    public function setErrors(string $errors): void
+    {
+        $this->errors = $errors;
+    }
+
+    public function getNote(): string
+    {
+        return $this->note;
+    }
+
+    public function setNote(string $note): void
+    {
+        $this->note = $note;
+    }
+
+    public function getLvars(): string
+    {
+        return $this->lvars;
+    }
+
+    public function setLvars(string $lvars): void
+    {
+        $this->lvars = $lvars;
+    }
+
+    public function isSimp(): bool
+    {
+        return $this->simp;
+    }
+
+    public function setSimp(bool $simp): void
+    {
+        $this->simp = $simp;
+    }
 }

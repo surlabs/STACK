@@ -31,6 +31,7 @@ class StackInput
     const STACK_INPUT_VALID = 'valid';
     const STACK_INPUT_INVALID = 'invalid';
     const STACK_INPUT_SCORE = 'score';
+
     const STACK_INPUT_GRAMMAR_FIX_INSERT_STARS = 1;
     const STACK_INPUT_GRAMMAR_FIX_SPACES = 2;
     const STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR = 4;
@@ -397,6 +398,7 @@ class StackInput
     {
         //TODO: Implement validateStudentResponse() method.
         // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_units?
+        // Si
     }
 
     /**
@@ -411,16 +413,19 @@ class StackInput
     protected function validateContentsFilters() {
         //TODO: Implement validateContentsFilters() method.
         // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
+        // Si
     }
 
     protected function validateContents() {
         //TODO: Implement validateContents() method.
         // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
+        // Si
     }
 
     protected function extraOptionVariables() {
         //TODO: Implement extraOptionVariables() method.
         // ¿Que es stack_ast_container en el nuevo core?
+        // StackQuestionSecurity
     }
 
     protected function validationDisplay() {
@@ -449,8 +454,8 @@ class StackInput
         return StackPlatform::getTranslation('studentValidation_listofvariables', array($vars));
     }
 
-    //TODO: Explain this method in PHPDoc
     /**
+     * Transforms the student's response input into an array
      * @param array $response
      * @return array
      */
@@ -470,8 +475,8 @@ class StackInput
         return $contents;
     }
 
-    //TODO: Explain this method in PHPDoc
     /**
+     * Transforms the lines array into a single string representing the student's answer
      * @param array $caslines
      * @return string
      * @throws StackException
@@ -483,7 +488,6 @@ class StackInput
         throw new StackException('casLinesToAnswer could not create the answer.');
     }
 
-    //TODO: ¿0 Logic?
     /**
      * @param array $contents
      * @return string
@@ -502,8 +506,11 @@ class StackInput
         // ¿Que es stack_ast_container en el nuevo core? ¿Que es stack_ast_container en el nuevo core?
     }
 
-    //TODO: Explain this method in PHPDoc
     /**
+     * Transforms a Maxima expression into an array of raw inputs which are part of a response.
+     * Most inputs are very simple, but textarea and matrix need more here.
+     * This is used to take a Maxima expression, e.g. a Teacher's answer or a test case, and directly transform it into expected inputs.
+     *
      * @param array $in
      * @return array
      */
@@ -521,9 +528,13 @@ class StackInput
         // ¿Esto como lo hacemos si no escribimos html a pelo con html_writer?
     }
 
-    //TODO: Explain this method in PHPDoc
-
     /**
+     * The AJAX instant validation method mostly returns a Maxima expression.
+     * Mostly, we need an array, labelled with the input name.
+     *
+     * The text areas and equiv input types are not Maxima expressions yet, as they have newline characters in.
+     *
+     * The matrix type is different.  The javascript creates a single Maxima expression, and we need to split this up into an array of individual elements.
      * @param string $in
      * @return array
      */
@@ -545,13 +556,14 @@ class StackInput
         return array_keys($errors);
     }
 
-    //TODO: Explain this method in PHPDoc
     /**
+     * Provide a summary of the student's response for the Moodle reporting.
+     * Notes do something different here.
      * @param string $name
      * @param StackInputState $state
      * @return string
      */
     public function summariseResponse(string $name, StackInputState $state): string {
-        return $name . ': ' . $this->contentsToMaxima($state->contents) . ' [' . $state->status . ']';
+        return $name . ': ' . $this->contentsToMaxima($state->getContents()) . ' [' . $state->getStatus() . ']';
     }
 }
