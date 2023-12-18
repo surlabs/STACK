@@ -60,4 +60,16 @@ abstract class StackPlatform
     {
         return self::$platform->getPlatformDefaultQuestionOptionsInternal();
     }
+
+
+    /**
+     * @param string $tag
+     * @param string $contents
+     * @param array $attributes
+     * @return string
+     */
+    public static function createTag(string $tag, string $contents, array $attributes = []): string
+    {
+        return self::$platform->createTagInternal($tag, $contents, $attributes);
+    }
 }

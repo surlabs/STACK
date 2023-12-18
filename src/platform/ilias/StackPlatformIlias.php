@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace src\platform\ilias;
 
+use ILIAS\UI\Factory;
+use ILIAS\UI\Renderer;
+use ilCtrlInterface;
+use ilLanguage;
 use src\platform\StackPlatform;
 
 /**
@@ -25,9 +29,19 @@ use src\platform\StackPlatform;
  *********************************************************************/
 class StackPlatformIlias extends StackPlatform
 {
+    private Factory $factory;
+    private Renderer $renderer;
+    private ilLanguage $language;
+    private ilCtrlInterface $control;
+
     public function __construct()
     {
+        global $DIC;
 
+        $this->factory = $DIC->ui()->factory();
+        $this->renderer = $DIC->ui()->renderer();
+        $this->language = $DIC->language();
+        $this->control = $DIC->ctrl();
     }
 
     /**
@@ -37,8 +51,7 @@ class StackPlatformIlias extends StackPlatform
      */
     public function getTranslationInternal(string $str): ?string
     {
-        //TODO: Implement getTranslation() method.
-        return $str;
+        return $this->language->txt($str);
     }
 
     /**
@@ -48,5 +61,24 @@ class StackPlatformIlias extends StackPlatform
     public function getPlatformDefaultQuestionOptionsInternal(): ?array
     {
         return [];
+    }
+
+    /**
+     * Creates an HTML object from the contents
+     * @param string $tag
+     * @param string $contents
+     * @param array $attributes
+     * @return string
+     */
+    public function createTagInternal(string $tag, string $contents, array $attributes = []): string {
+        $html = "<" . $tag;
+
+        foreach ($attributes as $key => $value) {
+            $html .= " " . $key . "=\"" . $value . "\"";
+        }
+
+        $html .= ">" . $contents . "</" . $tag . ">";
+
+        return $html;
     }
 }
