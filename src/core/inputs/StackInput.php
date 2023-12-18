@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace src\core\inputs;
 use src\core\options\StackOptions;
 use src\core\security\StackException;
-use src\core\security\StackQuestionSecurity;
 use src\platform\StackPlatform;
 
 /**
@@ -61,7 +60,7 @@ class StackInput
      * StackInput constructor
      * @throws StackException
      */
-    public function __construct(string $name, ?string $teacherAnswer, ?StackOptions $options = null, ?array $parameters = null, bool $runtime = true) {
+    public function __construct(string $name, ?string $teacherAnswer, StackOptions $options, ?array $parameters = null, bool $runtime = true) {
         if (trim($name) === '') {
             throw new StackException('StackInput: $name must be non-empty.');
         }
@@ -70,18 +69,16 @@ class StackInput
         $this->teacherAnswer = $teacherAnswer;
         $this->runtime = $runtime;
 
-        if ($options == null || !is_a($options, 'src\core\options\StackOptions')) {
-            throw new StackException('StackInput: $options must be stack_options.');
-        }
-
         $this->options = $options;
 
-        if ($parameters == null || !is_array($parameters)) {
+        if ($parameters != null && !is_array($parameters)) {
             throw new StackException('StackInput: __construct: 3rd argument, $parameters, ' . 'must be null or an array of parameters.');
         }
 
-        foreach ($parameters as $name => $value) {
-            $this->setParameter($name, $value);
+        if ($parameters)  {
+            foreach ($parameters as $name => $value) {
+                $this->setParameter($name, $value);
+            }
         }
     }
 
@@ -128,7 +125,7 @@ class StackInput
 
                     if (array_key_exists($option, $this->extraOptions)) {
                         if ($arg === '') {
-                            $this->extraOptions[$option] = "true";
+                            $this->extraOptions[$option] = true;
                         } else {
                             $this->extraOptions[$option] = $arg;
                         }
@@ -151,17 +148,17 @@ class StackInput
     {
         $map = [
             // Don't insert stars.
-            "0" => 0,
+            0 => 0,
             // Insert stars for implied multiplication only.
-            "1" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS,
+            1 => self::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS,
             // Insert stars assuming single-character variable names.
-            "2" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | StackInput::STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR,
+            2 => self::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | self::STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR,
             // Insert stars for spaces only.
-            "3" => StackInput::STACK_INPUT_GRAMMAR_FIX_SPACES,
+            3 => self::STACK_INPUT_GRAMMAR_FIX_SPACES,
             // Insert stars for implied multiplication and for spaces.
-            "4" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | StackInput::STACK_INPUT_GRAMMAR_FIX_SPACES,
+            4 => self::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | self::STACK_INPUT_GRAMMAR_FIX_SPACES,
             // Insert stars assuming single-character variables, implied and for spaces.
-            "5" => StackInput::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | StackInput::STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR | StackInput::STACK_INPUT_GRAMMAR_FIX_SPACES
+            5 => self::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS | self::STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR | self::STACK_INPUT_GRAMMAR_FIX_SPACES
         ];
 
         return $map[$value];
@@ -223,7 +220,7 @@ class StackInput
                 case 'calculus':
                 case 'nounits':
                 case 'hideequiv':
-                    if (!($arg == "true" || $arg == "false" || $arg == "0")) {
+                    if (!is_bool($arg)) {
                         $this->errors[] = StackPlatform::getTranslation('numericalinputoptboolerr', array($option, $arg));
                     }
                     break;
@@ -232,7 +229,7 @@ class StackInput
                 case 'minsf':
                 case 'maxsf':
                 case 'checkvars':
-                    if (!($arg == "false" || filter_var($arg, FILTER_VALIDATE_INT) || filter_var($arg, FILTER_VALIDATE_FLOAT))) {
+                    if (!($arg || filter_var($arg, FILTER_VALIDATE_INT) || filter_var($arg, FILTER_VALIDATE_FLOAT))) {
                         $this->errors[] = StackPlatform::getTranslation('numericalinputoptinterr', array($option, $arg));
                     }
                     break;
@@ -241,7 +238,7 @@ class StackInput
                     $this->errors[] = StackPlatform::getTranslation('stackversionmulerror', null);
 
 
-                    if (!($arg == "true" || $arg == "false")) {
+                    if (!is_bool($arg)) {
                         $this->errors[] = StackPlatform::getTranslation('numericalinputoptboolerr', array($option, $arg));
                     }
                     break;
@@ -294,7 +291,7 @@ class StackInput
      * @return bool
      * @throws StackException
      */
-    public function isValidParameter(string $key, string $value): bool
+    public function isValidParameter(string $key, mixed $value): bool
     {
         if (!$this->isParameterUsed($key)) {
             throw new StackException('StackInput: setting parameter ' . $key . ' which does not exist for inputs of type ' . get_class($this));
@@ -306,7 +303,7 @@ class StackInput
             case 'lowestTerms':
             case 'sameType':
             case 'mustVerify':
-                return ($value == "true" || $value == "false" || $value == "0");
+                return is_bool($value);
             case 'showValidation':
                 $number = filter_var($value, FILTER_VALIDATE_FLOAT);
 
@@ -331,10 +328,10 @@ class StackInput
     /**
      * Get the value of one extra options
      * @param string $option
-     * @param string $default the default to return if this parameter is not set.
-     * @return string
+     * @param mixed $default the default to return if this parameter is not set.
+     * @return mixed
      */
-    public function getExtraOption(string $option, string $default = "false"): string
+    public function getExtraOption(string $option, mixed $default = false): mixed
     {
         if (array_key_exists($option, $this->extraOptions)) {
             return $this->extraOptions[$option];
@@ -368,7 +365,7 @@ class StackInput
      * @return string
      */
     public function getTeacherAnswerDisplay(string $value, string $display) :string {
-        if ($this->getExtraOption('hideanswer') != "false") {
+        if (!$this->getExtraOption('hideanswer')) {
             return '';
         }
 
@@ -433,17 +430,13 @@ class StackInput
         // ¿Que es stack_maxima_format_casstring en el nuevo core?
     }
 
-    // TODO: Check render abstract method
-
-    protected function render_error() {
-        //TODO: Implement render_error() method.
-        // ¿Esto como lo hacemos si no escribimos html a pelo con html_writer?
-    }
-
-    public function renderValidation() {
-        //TODO: Implement renderValidation() method.
-        // ¿Que es stack_maths en el nuevo core?
-    }
+    /**
+     * @param StackInputState $state
+     * @param string $fieldname
+     * @param bool $readonly
+     * @param array $tavalue
+     */
+    abstract public function render(StackInputState $state, string $fieldname, bool $readonly, array $tavalue);
 
     /**
      * Get translation for list of variables
