@@ -172,7 +172,7 @@ class StackInput
      * @param mixed $default
      * @return string|null
      */
-    private function getParameter(string $string, mixed $default): ?mixed
+    private function getParameter(string $string, mixed $default): mixed
     {
         return $this->parameters[$string] ?? $default;
     }
