@@ -32,7 +32,6 @@ class StackPlatformIlias extends StackPlatform
     private Factory $factory;
     private Renderer $renderer;
     private ilLanguage $language;
-    private ilCtrlInterface $control;
 
     public function __construct()
     {
@@ -41,7 +40,6 @@ class StackPlatformIlias extends StackPlatform
         $this->factory = $DIC->ui()->factory();
         $this->renderer = $DIC->ui()->renderer();
         $this->language = $DIC->language();
-        $this->control = $DIC->ctrl();
     }
 
     /**
