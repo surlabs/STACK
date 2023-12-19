@@ -100,6 +100,61 @@ class PluginConfigurationDefaultsUI
             $plugin_object->txt("ui_admin_configuration_defaults_assume_real_description")
         )->withValue($options_assume_real_value);
 
+        //Feedback for fully correct question
+        if (isset($data["options_prt_correct"]) && is_string($data["options_prt_correct"])) {
+            $options_feedback_fully_correct_value = $data["options_prt_correct"];
+        } else {
+            $options_feedback_fully_correct_value = $plugin_object->txt("ui_admin_configuration_defaults_feedback_fully_correct_default");
+        }
+
+        $options_feedback_fully_correct = self::$factory->input()->field()->textarea(
+            $plugin_object->txt("ui_admin_configuration_defaults_feedback_fully_correct_title"),
+            $plugin_object->txt("ui_admin_configuration_defaults_feedback_fully_correct_description")
+        )->withValue($options_feedback_fully_correct_value);
+
+        //Feedback for partially correct question
+        if (isset($data["options_prt_partially_correct"]) && is_string($data["options_prt_partially_correct"])) {
+            $options_feedback_partially_correct_value = $data["options_prt_partially_correct"];
+        } else {
+            $options_feedback_partially_correct_value = $plugin_object->txt("ui_admin_configuration_defaults_feedback_partially_correct_default");
+        }
+
+        $options_feedback_partially_correct = self::$factory->input()->field()->textarea(
+            $plugin_object->txt("ui_admin_configuration_defaults_feedback_partially_correct_title"),
+            $plugin_object->txt("ui_admin_configuration_defaults_feedback_partially_correct_description")
+        )->withValue($options_feedback_partially_correct_value);
+
+        //Feedback for fully incorrect question
+        if (isset($data["options_prt_incorrect"]) && is_string($data["options_prt_incorrect"])) {
+            $options_feedback_fully_incorrect_value = $data["options_prt_incorrect"];
+        } else {
+            $options_feedback_fully_incorrect_value = $plugin_object->txt("ui_admin_configuration_defaults_feedback_fully_incorrect_default");
+        }
+
+        $options_feedback_fully_incorrect = self::$factory->input()->field()->textarea(
+            $plugin_object->txt("ui_admin_configuration_defaults_feedback_fully_incorrect_title"),
+            $plugin_object->txt("ui_admin_configuration_defaults_feedback_fully_incorrect_description")
+        )->withValue($options_feedback_fully_incorrect_value);
+
+        //Multiplication sign
+        $multiplication_sign_options = [
+            "dot" => $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_dot"),
+            "cross" => $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_cross"),
+            "none" => $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_none")
+        ];
+
+        if (isset($data["options_multiplication_sign"]) && array_key_exists($data["options_multiplication_sign"], $multiplication_sign_options)) {
+            $options_multiplication_sign_value = $data["options_multiplication_sign"];
+        } else {
+            throw new StackException("Invalid value for multiplication sign.");
+        }
+
+        $options_multiplication_sign = self::$factory->input()->field()->select(
+            $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_title"),
+            $multiplication_sign_options,
+            $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_description")
+        )->withValue($options_multiplication_sign_value)->withRequired(true);
+
         //Surd for sqrt
         if (isset($data["options_sqrt_sign"]) && $data["options_sqrt_sign"] == "1") {
             $options_sqrt_sign_value = true;
@@ -131,25 +186,6 @@ class PluginConfigurationDefaultsUI
             $complex_numbers_options,
             $plugin_object->txt("ui_admin_configuration_defaults_complex_numbers_description")
         )->withValue($options_complex_numbers_value)->withRequired(true);
-
-        //Multiplication sign
-        $multiplication_sign_options = [
-            "dot" => $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_dot"),
-            "cross" => $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_cross"),
-            "none" => $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_none")
-        ];
-
-        if (isset($data["options_multiplication_sign"]) && array_key_exists($data["options_multiplication_sign"], $multiplication_sign_options)) {
-            $options_multiplication_sign_value = $data["options_multiplication_sign"];
-        } else {
-            throw new StackException("Invalid value for multiplication sign.");
-        }
-
-        $options_multiplication_sign = self::$factory->input()->field()->select(
-            $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_title"),
-            $multiplication_sign_options,
-            $plugin_object->txt("ui_admin_configuration_defaults_multiplication_sign_description")
-        )->withValue($options_multiplication_sign_value)->withRequired(true);
 
         //Inverse trigonometric functions
         $inverse_trigonometric_options = [
@@ -215,6 +251,9 @@ class PluginConfigurationDefaultsUI
                 $options_question_level_simplify,
                 $options_assume_positive,
                 $options_assume_real,
+                $options_feedback_fully_correct,
+                $options_feedback_partially_correct,
+                $options_feedback_fully_incorrect,
                 $options_surd_for_sqrt,
                 $options_complex_numbers,
                 $options_multiplication_sign,
@@ -257,9 +296,9 @@ class PluginConfigurationDefaultsUI
         $input_box_size_value = $data["input_box_size"] ?? "15";
 
         $input_box_size = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_defaults_input_type_title"),
-            $plugin_object->txt("ui_admin_configuration_defaults_input_type_description")
-        )->withValue($input_box_size_value)->withRequired(true);
+            $plugin_object->txt("ui_admin_configuration_defaults_input_box_size_title"),
+            $plugin_object->txt("ui_admin_configuration_defaults_input_box_size_description")
+        )->withValue($input_box_size_value);
 
         //Strict syntax
         if (isset($data["input_strict_syntax"]) && $data["input_strict_syntax"] == "1") {
@@ -295,7 +334,7 @@ class PluginConfigurationDefaultsUI
         $input_forbidden_words = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_defaults_input_forbidden_words_title"),
             $plugin_object->txt("ui_admin_configuration_defaults_input_forbidden_words_description")
-        )->withValue($input_forbidden_words_value)->withRequired(true);
+        )->withValue($input_forbidden_words_value);
 
         //Forbid floats
         if (isset($data["input_forbid_float"]) && $data["input_forbid_float"] == "1") {
