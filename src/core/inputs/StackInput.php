@@ -490,13 +490,12 @@ abstract class StackInput
 
     protected function extraOptionVariables() {
         //TODO: Implement extraOptionVariables() method.
-        // ¿Que es stack_ast_container en el nuevo core?
-        // StackQuestionSecurity
+        // First we have to implement static method stack_ast_container::make_from_teacher_source & class stack_secure_loader
     }
 
     protected function validationDisplay() {
         //TODO: Implement validationDisplay() method.
-        // ¿Que es stack_maxima_format_casstring en el nuevo core?
+        // First we have to implement static methods castext2_parser_utils::postprocess_mp_parsed & class MP_Node and child classes
     }
 
     /**
