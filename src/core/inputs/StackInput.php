@@ -5,7 +5,6 @@ namespace src\core\inputs;
 use src\core\options\StackOptions;
 use src\core\security\StackException;
 use src\core\security\StackQuestionSecurity;
-use src\core\security\StackQuestionTeacherAnswer;
 use src\platform\StackPlatform;
 
 /**
@@ -186,7 +185,7 @@ abstract class StackInput
     {
         $arg = '';
 
-        if (!(strpos($option, ':') === false)) {
+        if (str_contains($option, ':')) {
             $ops = explode(':', $option);
             $option = $ops[0];
             $arg = trim($ops[1]);
@@ -282,7 +281,7 @@ abstract class StackInput
      * @param array|null $contextSession
      * @return void
      */
-    public function setContextSession(?array $contextSession) {
+    public function setContextSession(?array $contextSession) :void {
         $this->$contextSession = $contextSession;
     }
 
@@ -453,20 +452,12 @@ abstract class StackInput
         }
 
         // Insert stars = 1.
-        if ($grammarautofixes & self::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS) {
-            // The rules are applied anyway, we just check the use of them.
-            // If code-tidy issue just negate the test and cut this one out.
-            $donothing = true;
-        } else if ($grammarautofixes !== 0) {
+        if ($grammarautofixes !== 0) {
             $filterstoapply[] = '991_no_fixing_stars';
         }
 
         // Fix spaces = 2.
-        if ($grammarautofixes & self::STACK_INPUT_GRAMMAR_FIX_SPACES) {
-            // The rules are applied anyway, we just check the use of them.
-            // If code-tidy issue just negate the test and cut this one out.
-            $donothing = true;
-        } else if ($grammarautofixes !== 0) {
+        if ($grammarautofixes !== 0) {
             $filterstoapply[] = '990_no_fixing_spaces';
         }
 
@@ -476,7 +467,7 @@ abstract class StackInput
         }
 
         // Consolidate M_1 to M1 and so on.
-        if ($this->getExtraOption('consolidatesubscripts', false)) {
+        if ($this->getExtraOption('consolidatesubscripts')) {
             $filterstoapply[] = '420_consolidate_subscripts';
         }
 
