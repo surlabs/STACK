@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace src\core\inputs;
+use src\core\filters\StackParser;
 use src\core\options\StackOptions;
 use src\core\security\StackException;
 use src\core\security\StackQuestionSecurity;
@@ -122,7 +123,7 @@ abstract class StackInput
                 foreach ($tmp_options as $option) {
                     $option = strtolower(trim($option));
 
-                    list($option, $arg) = $this->parseOption($option);
+                    list($option, $arg) = StackParser::parseOption($option);
 
                     if (array_key_exists($option, $this->extraOptions)) {
                         if ($arg === '') {
@@ -174,24 +175,6 @@ abstract class StackInput
     private function getParameter(string $string, mixed $default): mixed
     {
         return $this->parameters[$string] ?? $default;
-    }
-
-    /**
-     * Parse option separated by : to get option and argument
-     * @param string $option
-     * @return array|null
-     */
-    private function parseOption(string $option): ?array
-    {
-        $arg = '';
-
-        if (str_contains($option, ':')) {
-            $ops = explode(':', $option);
-            $option = $ops[0];
-            $arg = trim($ops[1]);
-        }
-
-        return(array($option, $arg));
     }
 
     /**
@@ -395,7 +378,7 @@ abstract class StackInput
     public function validateStudentResponse()
     {
         //TODO: Implement validateStudentResponse() method.
-        // First we have to implement class stack_secure_loader & static method stack_utils::php_string_to_maxima_string
+        // First we have to implement class stack_secure_loader & validateContents() method
     }
 
     /**
