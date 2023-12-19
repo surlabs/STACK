@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace src\core\inputs;
 use src\core\options\StackOptions;
 use src\core\security\StackException;
+use src\core\security\StackQuestionSecurity;
+use src\core\security\StackQuestionTeacherAnswer;
 use src\platform\StackPlatform;
 
 /**
@@ -24,7 +26,7 @@ use src\platform\StackPlatform;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackInput
+abstract class StackInput
 {
     const STACK_INPUT_BLANK = '';
     const STACK_INPUT_VALID = 'valid';
@@ -394,8 +396,7 @@ class StackInput
     public function validateStudentResponse()
     {
         //TODO: Implement validateStudentResponse() method.
-        // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_units?
-        // Si
+        // First we have to implement class stack_secure_loader & static method stack_utils::php_string_to_maxima_string
     }
 
     /**
@@ -406,17 +407,85 @@ class StackInput
         return $this->getParameter('sameType', false) ? 'checktype' : 'typeless';
     }
 
+    /**
+     * Sort out which filters to apply, based on options to the input
+     * Should be mostly independent of input type
+     * @param StackQuestionSecurity $basesecurity
+     * @return array
+     */
+    protected function validateContentsFilters(StackQuestionSecurity $basesecurity) :array {
+        $secrules = clone $basesecurity;
 
-    protected function validateContentsFilters() {
-        //TODO: Implement validateContentsFilters() method.
-        // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
-        // Si
+        $secrules->setAllowedWords(explode(',', $this->getParameter('allowWords', '')));
+        $secrules->setForbiddenWords(explode(',', $this->getParameter('forbidWords', '')));
+
+        $grammarautofixes = $this->getParameter('grammarAutofixes', 0);
+
+        $filterstoapply = array();
+
+        if ($this->getParameter('forbidFloats', false)) {
+            $filterstoapply[] = '101_no_floats';
+        }
+
+        if (get_class($this) === 'StackScientificUnitsInput' || get_class($this) === 'StackNumericalInput') {
+            $filterstoapply[] = '210_x_used_as_multiplication';
+        }
+
+        // The common insert stars rules, that will be forced
+        // and if you do not allow insertion of stars then it is invalid.
+        $filterstoapply[] = '402_split_prefix_from_common_function_name';
+        $filterstoapply[] = '403_split_at_number_letter_boundary';
+        $filterstoapply[] = '406_split_implied_variable_names';
+
+        $filterstoapply[] = '502_replace_pm';
+
+        // Replace evaluation groups with tuples.
+        $filterstoapply[] = '504_insert_tuples_for_groups';
+        // Then ban the rest.
+        $filterstoapply[] = '505_no_evaluation_groups';
+
+        // Remove scripts and other related things from string-values.
+        $filterstoapply[] = '997_string_security';
+
+        // If stars = 0 then strict, ignore the other strict syntax.
+        if ($grammarautofixes === 0) {
+            $filterstoapply[] = '999_strict';
+        }
+
+        // Insert stars = 1.
+        if ($grammarautofixes & self::STACK_INPUT_GRAMMAR_FIX_INSERT_STARS) {
+            // The rules are applied anyway, we just check the use of them.
+            // If code-tidy issue just negate the test and cut this one out.
+            $donothing = true;
+        } else if ($grammarautofixes !== 0) {
+            $filterstoapply[] = '991_no_fixing_stars';
+        }
+
+        // Fix spaces = 2.
+        if ($grammarautofixes & self::STACK_INPUT_GRAMMAR_FIX_SPACES) {
+            // The rules are applied anyway, we just check the use of them.
+            // If code-tidy issue just negate the test and cut this one out.
+            $donothing = true;
+        } else if ($grammarautofixes !== 0) {
+            $filterstoapply[] = '990_no_fixing_spaces';
+        }
+
+        // Assume single letter variable names = 4.
+        if ($grammarautofixes & self::STACK_INPUT_GRAMMAR_FIX_SINGLE_CHAR) {
+            $filterstoapply[] = '410_single_char_vars';
+        }
+
+        // Consolidate M_1 to M1 and so on.
+        if ($this->getExtraOption('consolidatesubscripts', false)) {
+            $filterstoapply[] = '420_consolidate_subscripts';
+        }
+
+        return array($secrules, $filterstoapply);
     }
 
     protected function validateContents() {
         //TODO: Implement validateContents() method.
-        // ¿Hay que usar StackQuestionSecurity? ¿Hay que implementar set_allowedwords y set_forbiddenwords en StackSecurity?
-        // Si
+        // First we have to implement static method stack_ast_container::make_from_student_source
     }
 
     protected function extraOptionVariables() {
@@ -451,6 +520,12 @@ class StackInput
         }
 
         return StackPlatform::createTag("div", $errors, array('class' => 'error'));
+    }
+
+    public function renderValidation()
+    {
+        //TODO: Implement renderValidation() method.
+        // First we have to implement static methods stack_ast_container::make_from_teacher_source, stack_maths::process_lang_string
     }
 
     /**
@@ -511,7 +586,7 @@ class StackInput
     public function getCorrectResponse()
     {
         //TODO: Implement getCorrectResponse() method.
-        // ¿Que es stack_ast_container en el nuevo core? ¿Que es stack_ast_container en el nuevo core?
+        // First we have to implement static method stack_ast_container::make_from_teacher_source
     }
 
     /**
@@ -533,7 +608,7 @@ class StackInput
 
     public function replaceValidationTags() {
         //TODO: Implement replaceValidationTags() method.
-        // ¿Esto como lo hacemos si no escribimos html a pelo con html_writer?
+        // First we have to implement renderValidation()
     }
 
     /**

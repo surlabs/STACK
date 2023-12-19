@@ -27,6 +27,8 @@ use src\platform\StackDatabase;
  *********************************************************************/
 class StackQuestionSecurity
 {
+    private array $allowedWords = [];
+    private array $forbiddenWords = [];
 
     /**
      * Checks the internal security of the question
@@ -83,4 +85,21 @@ class StackQuestionSecurity
         return '';
     }
 
+    /**
+     * Sets the allowed words
+     * @param array $words
+     * @return void
+     */
+    public function setAllowedWords(array $words) :void {
+        $this->allowedWords = $words;
+    }
+
+    /**
+     * Sets the forbidden words
+     * @param array $words
+     * @return void
+     */
+    public function setForbiddenWords(array $words) :void {
+        $this->forbiddenWords = $words;
+    }
 }
