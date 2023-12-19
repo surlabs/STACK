@@ -6,6 +6,46 @@
 //
 
 <!-- language file start -->
+ui_admin_configuration_title#:#STACK Question Configuration
+ui_admin_configuration_description#:#This page allows you to configure the STACK Question plugin.
+ui_admin_configuration_overview_title#:#STACK Plugin Overview
+ui_admin_configuration_maxima_title#:#Connection to Maxima
+ui_admin_configuration_defaults_title#:#Default values
+ui_admin_configuration_quality_title#:#Quality Assurance
+ui_admin_configuration_defaults_options_title#:#Default values for Question level Options
+ui_admin_configuration_defaults_options_description#:#These are the default values for the options of the question. These values will be used when a new question is created.
+ui_admin_configuration_defaults_question_simplify_title#:#Question-level simplify
+ui_admin_configuration_defaults_question_simplify_description#:#Sets the variable "simp" within Maxima by default as true at question level. E.g. question variables, question text etc. The value set in each potential response tree will override this for any expressions subsequently defined within the tree.
+ui_admin_configuration_defaults_assume_positive_title#:#Assume positive
+ui_admin_configuration_defaults_assume_positive_description#:#This option sets the default value of Maxima's assume positive variable in new questions.
+ui_admin_configuration_defaults_assume_real_title#:#Assume real
+ui_admin_configuration_defaults_assume_real_description#:#This option sets the default value of Maxima's assume real variable in new questions.
+ui_admin_configuration_defaults_surd_for_sqrt_title#:#Surd for square root
+ui_admin_configuration_defaults_surd_for_sqrt_description#:#Controls how surds are displayed.
+ui_admin_configuration_defaults_complex_numbers_title#:#Meaning and display of sqrt(-1)
+ui_admin_configuration_defaults_complex_numbers_description#:#Controls the meaning and display of the symbol i and sqrt(-1)
+ui_admin_configuration_defaults_complex_numbers_i#:#i
+ui_admin_configuration_defaults_complex_numbers_j#:#j
+ui_admin_configuration_defaults_complex_numbers_symi#:#symi
+ui_admin_configuration_defaults_complex_numbers_symj#:#symj
+ui_admin_configuration_defaults_multiplication_sign_title#:#Multiplication sign
+ui_admin_configuration_defaults_multiplication_sign_description#:#Controls how multiplication signs are displayed.
+ui_admin_configuration_defaults_multiplication_sign_dot#:#Dot
+ui_admin_configuration_defaults_multiplication_sign_cross#:#Cross
+ui_admin_configuration_defaults_multiplication_sign_only_numbers#:#Only numbers
+ui_admin_configuration_defaults_multiplication_sign_none#:#None
+ui_admin_configuration_defaults_inverse_trigonometric_title#:#Inverse trigonometric functions
+ui_admin_configuration_defaults_inverse_trigonometric_description#:#Controls how inverse trigonometric functions are displayed in CAS output.
+ui_admin_configuration_defaults_inverse_trigonometric_cos#:#cos-1
+ui_admin_configuration_defaults_inverse_trigonometric_acos#:#acos(x)
+ui_admin_configuration_defaults_inverse_trigonometric_arccos#:#arccos(x)
+ui_admin_configuration_defaults_inverse_trigonometric_arccos_arcosh#:#arccos(x)/arcosh(x)
+ui_admin_configuration_defaults_logic_symbols_title#:#Logic symbols
+ui_admin_configuration_defaults_logic_symbols_description#:#Controls how logic symbols are displayed.
+ui_admin_configuration_defaults_logic_symbols_lang#:#Language
+ui_admin_configuration_defaults_logic_symbols_symbolic#:#Symbolic
+ui_admin_configuration_defaults_matrix_parentheses_title#:#Matrix parentheses
+ui_admin_configuration_defaults_matrix_parentheses_description#:#Controls the default shape of matrix parentheses when displayed in CAS output.
 assStackQuestion#:#STACK Question
 question_imported_successfully#:#Question was imported successfully
 error_importing_question#:#Error importing question
@@ -77,13 +117,6 @@ options_assume_positive_info#:#This option sets the value of Maxima's assume_pos
 options_prt_correct#:#Feedback for correct answers
 options_prt_partially_correct#:#Feedback for partially correct answers
 options_prt_incorrect#:#Feedback for incorrect answers
-options_multiplication_sign#:#Multiplication sign
-options_multiplication_sign_info#:#Controls how multiplication signs are displayed.
-options_mult_sign_dot#:#Dot
-options_mult_sign_cross#:#Cross
-options_mult_sign_none#:#None
-options_sqrt_sign#:#Surd for square root
-options_sqrt_sign_info#:#Controls how surds are displayed.
 options_complex_numbers#:#Meaning and display of sqrt(-1)
 options_complex_numbers_info#:#Controls the meaning and display of the symbol i and sqrt(-1)
 options_complex_numbers_i#:#i
