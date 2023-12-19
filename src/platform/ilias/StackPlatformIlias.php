@@ -5,7 +5,6 @@ namespace src\platform\ilias;
 
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
-use ilCtrlInterface;
 use ilLanguage;
 use src\platform\StackPlatform;
 
@@ -69,6 +68,8 @@ class StackPlatformIlias extends StackPlatform
      * @return string
      */
     public function createTagInternal(string $tag, string $contents, array $attributes = []): string {
+        // TODO: Check this to use $this->factory and $this->renderer instead of pure HTML
+
         $html = "<" . $tag;
 
         foreach ($attributes as $key => $value) {
