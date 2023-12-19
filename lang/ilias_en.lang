@@ -12,6 +12,12 @@ ui_admin_configuration_overview_title#:#STACK Plugin Overview
 ui_admin_configuration_maxima_title#:#Connection to Maxima
 ui_admin_configuration_defaults_title#:#Default values
 ui_admin_configuration_quality_title#:#Quality Assurance
+ui_admin_configuration_defaults_validation_title#:#Validation mode
+ui_admin_configuration_defaults_validation_description#:#Decide whether to use manual or instant validation at running STACK questions.
+ui_admin_configuration_defaults_user_validation_title#:#User validation
+ui_admin_configuration_defaults_user_validation_description#:#This option activates manual validation for all questions.
+ui_admin_configuration_defaults_instant_validation_title#:#Instant validation
+ui_admin_configuration_defaults_instant_validation_description#:#This option activates instant validation for all questions.
 ui_admin_configuration_defaults_options_title#:#Default options settings
 ui_admin_configuration_defaults_options_description#:#These are the default values for the options of the question. These values will be used when a new question is created.
 ui_admin_configuration_defaults_question_simplify_title#:#Question-level simplify
@@ -20,6 +26,15 @@ ui_admin_configuration_defaults_assume_positive_title#:#Assume positive
 ui_admin_configuration_defaults_assume_positive_description#:#This option sets the default value of Maxima's assume positive variable in new questions.
 ui_admin_configuration_defaults_assume_real_title#:#Assume real
 ui_admin_configuration_defaults_assume_real_description#:#This option sets the default value of Maxima's assume real variable in new questions.
+ui_admin_configuration_defaults_feedback_fully_correct_default#:#Congratulations! All your answers are correct.
+ui_admin_configuration_defaults_feedback_fully_correct_title#:#Standard feedback for fully correct questions
+ui_admin_configuration_defaults_feedback_fully_correct_description#:#This is the feedback which is shown to the student if they get all the answers correct.
+ui_admin_configuration_defaults_feedback_partially_correct_default#:#Some of your answers are correct.
+ui_admin_configuration_defaults_feedback_partially_correct_title#:#Standard feedback for partially correct questions
+ui_admin_configuration_defaults_feedback_partially_correct_description#:#This is the feedback which is shown to the student if they get some of the answers correct.
+ui_admin_configuration_defaults_feedback_fully_incorrect_default#:#None of your answers are correct.
+ui_admin_configuration_defaults_feedback_fully_incorrect_title#:#Standard feedback for fully incorrect questions
+ui_admin_configuration_defaults_feedback_fully_incorrect_description#:#This is the feedback which is shown to the student if they get none of the answers correct.
 ui_admin_configuration_defaults_surd_for_sqrt_title#:#Surd for square root
 ui_admin_configuration_defaults_surd_for_sqrt_description#:#Controls how surds are displayed.
 ui_admin_configuration_defaults_complex_numbers_title#:#Meaning and display of sqrt(-1)
@@ -51,6 +66,8 @@ ui_admin_configuration_defaults_input_type_textarea#:#Text area
 ui_admin_configuration_defaults_input_type_matrix#:#Matrix
 ui_admin_configuration_defaults_input_type_title#:#Input type
 ui_admin_configuration_defaults_input_type_description#:#This determines the type of the input element, e.g. form field, true/false, text area.
+ui_admin_configuration_defaults_input_box_size_title#:#Input box size
+ui_admin_configuration_defaults_input_box_size_description#:#Width of the html formfield.
 ui_admin_configuration_defaults_input_strict_syntax_title#:#Strict syntax
 ui_admin_configuration_defaults_input_strict_syntax_description#:#Does the input have to be done using strict Maxima syntax? If not, this increases the range of patterns which indicate missing *s on input, including any function application and scientific notation.
 ui_admin_configuration_defaults_insert_star_options_0#:#Don't insert stars
