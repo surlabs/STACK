@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 use ILIAS\UI\Factory;
-use ILIAS\UI\Implementation\Component\Button\Bulky;
+use ILIAS\UI\Implementation\Component\Input\Field\Section;
 use ILIAS\UI\Renderer;
-use ILIAS\UI\Implementation\Component\Panel\Standard;
+use src\core\security\StackException;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -30,8 +30,6 @@ class PluginConfigurationMainUI
     private static Factory $factory;
     private static Renderer $renderer;
     private static ilCtrlInterface $control;
-    private static $request;
-    private static $ui;
 
     /**
      * Shows the plugin configuration overview
@@ -43,62 +41,59 @@ class PluginConfigurationMainUI
         self::$factory = $DIC->ui()->factory();
         self::$renderer = $DIC->ui()->renderer();
         self::$control = $DIC->ctrl();
-        self::$request = $DIC->http()->request();
-
-        $content = '';
 
         try {
 
-            //Show security reminder
-            $content .= self::$renderer->render(self::getSecurityReminderButton($plugin_object));
-            $content .= self::$renderer->render(self::getMaximaConnectionPanel($data, $plugin_object));
+            //Form action
+            $form_action = self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "save");
 
-            //Show global configuration form
+            //try to show a composed form
+            $content = self::$factory->input()->container()->form()->standard($form_action, [
+                self::getValidationDefaultsSection($data, $plugin_object),
+            ]);
+
         } catch (Exception $e) {
-
+            $content = self::$factory->messageBox()->failure($e->getMessage());
         }
 
-        return $content;
+        return self::$renderer->render($content);
     }
 
     /**
-     * Gets the security button showed in the configuration page
-     * @throws ilCtrlException
+     * Gets the defaults validation section
+     * @throws StackException
      */
-    private static function getSecurityReminderButton(ilPlugin $plugin_object): Bulky
+    private static function getValidationDefaultsSection(array $data, ilPlugin $plugin_object): Section
     {
-        return self::$factory->button()->bulky(
-            self::$factory->symbol()->icon()->standard(
-                'nota',
-                $plugin_object->txt('ui_admin_configuration_security_button_label'),
-                'medium'
-            ),
-            $plugin_object->txt('ui_admin_configuration_security_button_label'),
-            self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", 'security')
-        );
-    }
 
-    private static function getMaximaConnectionPanel(array $data, ilPlugin $plugin_object): ILIAS\UI\Component\Input\Container\Form\Standard
-    {
-        global $DIC;
-
-        $checkbox_input = self::$factory->input()->field()->checkbox("Checkbox", "Check or not.")
-            ->withValue(true);
-
-        $form_action = self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", 'security');
-        //Step 2: define form and form actions
-        $form = self::$factory->input()->container()->form()->standard($form_action, [ $checkbox_input]);
-
-        //Step 3: implement some form data processing. Note, the value of the checkbox will
-        // be 'checked' if checked a null if unchecked.
-        if (self::$request->getMethod() == "POST") {
-            $form = $form->withRequest(self::$request);
-            $result = $form->getData();
+        if (isset($data['instant_validation']) && $data['instant_validation'] == '1') {
+            $validation_value = $data['instant_validation'];
+        } elseif (isset($data['instant_validation']) && $data['instant_validation'] == '0') {
+            $validation_value = $data['instant_validation'];
         } else {
-            $result = "No result yet.";
+            throw new StackException("Error: instant_validation value not found");
         }
 
-        return $form;
+        $validation_options = self::$factory->input()->field()->radio(
+            "",
+            ""
+        )
+            ->withOption('0',
+                $plugin_object->txt("ui_admin_configuration_defaults_user_validation_title"),
+                $plugin_object->txt("ui_admin_configuration_defaults_user_validation_description"))
+            ->withOption('1',
+                $plugin_object->txt("ui_admin_configuration_defaults_instant_validation_title"),
+                $plugin_object->txt("ui_admin_configuration_defaults_instant_validation_description")
+            )
+            ->withValue($validation_value);
+
+        return self::$factory->input()->field()->section(
+            [
+                $validation_options
+            ],
+            $plugin_object->txt("ui_admin_configuration_defaults_validation_title"),
+            $plugin_object->txt("ui_admin_configuration_defaults_validation_description")
+        );
     }
 
 }
