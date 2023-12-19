@@ -12,7 +12,7 @@ ui_admin_configuration_overview_title#:#STACK Plugin Overview
 ui_admin_configuration_maxima_title#:#Connection to Maxima
 ui_admin_configuration_defaults_title#:#Default values
 ui_admin_configuration_quality_title#:#Quality Assurance
-ui_admin_configuration_defaults_options_title#:#Default values for Question level Options
+ui_admin_configuration_defaults_options_title#:#Default options settings
 ui_admin_configuration_defaults_options_description#:#These are the default values for the options of the question. These values will be used when a new question is created.
 ui_admin_configuration_defaults_question_simplify_title#:#Question-level simplify
 ui_admin_configuration_defaults_question_simplify_description#:#Sets the variable "simp" within Maxima by default as true at question level. E.g. question variables, question text etc. The value set in each potential response tree will override this for any expressions subsequently defined within the tree.
@@ -46,6 +46,39 @@ ui_admin_configuration_defaults_logic_symbols_lang#:#Language
 ui_admin_configuration_defaults_logic_symbols_symbolic#:#Symbolic
 ui_admin_configuration_defaults_matrix_parentheses_title#:#Matrix parentheses
 ui_admin_configuration_defaults_matrix_parentheses_description#:#Controls the default shape of matrix parentheses when displayed in CAS output.
+ui_admin_configuration_defaults_input_type_algebraic#:#Algebraic input
+ui_admin_configuration_defaults_input_type_textarea#:#Text area
+ui_admin_configuration_defaults_input_type_matrix#:#Matrix
+ui_admin_configuration_defaults_input_type_title#:#Input type
+ui_admin_configuration_defaults_input_type_description#:#This determines the type of the input element, e.g. form field, true/false, text area.
+ui_admin_configuration_defaults_input_strict_syntax_title#:#Strict syntax
+ui_admin_configuration_defaults_input_strict_syntax_description#:#Does the input have to be done using strict Maxima syntax? If not, this increases the range of patterns which indicate missing *s on input, including any function application and scientific notation.
+ui_admin_configuration_defaults_insert_star_options_0#:#Don't insert stars
+ui_admin_configuration_defaults_insert_star_options_1#:#Insert stars for implied multiplication only.
+ui_admin_configuration_defaults_insert_star_options_2#:#Insert stars assuming single-character variable names
+ui_admin_configuration_defaults_insert_star_options_3#:#Insert stars for spaces only
+ui_admin_configuration_defaults_insert_star_options_4#:#Insert stars for implied multiplication and for spaces
+ui_admin_configuration_defaults_insert_star_options_5#:#Insert stars assuming single-character variables, implied and for spaces
+ui_admin_configuration_defaults_input_insert_stars_title#:#Insert stars
+ui_admin_configuration_defaults_input_insert_stars_description#:#If set to yes then the system will automatically insert *s into any patterns identified by Strict Syntax. Otherwise, it shows an error.
+ui_admin_configuration_defaults_input_forbidden_words_title#:#Forbidden words
+ui_admin_configuration_defaults_input_forbidden_words_description#:#This is a comma separated list of text strings which are forbidden in a student's answer.
+ui_admin_configuration_defaults_input_forbid_float_title#:#Forbid float
+ui_admin_configuration_defaults_input_forbid_float_description#:#If set to yes, then any answer of the student which has a floating point number will be rejected as invalid.
+ui_admin_configuration_defaults_input_require_lowest_terms_title#:#Require lowest terms
+ui_admin_configuration_defaults_input_require_lowest_terms_description#:#When this option is set to yes, any coefficients or other rational numbers in an expression, must be written in lowest terms. Otherwise the answer is rejected as invalid.
+ui_admin_configuration_defaults_input_check_answer_type_title#:#Check the type of the response
+ui_admin_configuration_defaults_input_check_answer_type_description#:#If yes, answers which are of a different "type" (e.g. expression, equation, matrix, list, set) are rejected as invalid.
+ui_admin_configuration_defaults_input_must_verify_title#:#Student must verify
+ui_admin_configuration_defaults_input_must_verify_description#:#Specifies whether the student's input is presented back to them before scoring.
+ui_admin_configuration_defaults_input_show_validation_options_0#:#No
+ui_admin_configuration_defaults_input_show_validation_options_1#:#Yes, with variable list
+ui_admin_configuration_defaults_input_show_validation_options_2#:#Yes, without variable list
+ui_admin_configuration_defaults_input_show_validation_options_3#:#Yes, Compact
+ui_admin_configuration_defaults_input_show_validation_title#:#Show the validation
+ui_admin_configuration_defaults_input_show_validation_description#:#Setting this option displays any validation feedback from this input, including echoing back their expression in traditional two dimensional notation.
+ui_admin_configuration_defaults_inputs_title#:#Default input settings
+ui_admin_configuration_defaults_inputs_description#:#These are the default values for the inputs of the question. These values will be used when a new question is created or a new input is added to a question.
 assStackQuestion#:#STACK Question
 question_imported_successfully#:#Question was imported successfully
 error_importing_question#:#Error importing question
