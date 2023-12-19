@@ -26,8 +26,8 @@ class StackInputState
     protected string $status;
 
     protected array $contents;
-    protected string $contentsmodified;
-    protected string $contentsdisplayed;
+    protected string $contentsModified;
+    protected string $contentsDisplayed;
     protected string $errors;
     protected string $note;
     protected string $lvars;
@@ -38,18 +38,18 @@ class StackInputState
      *
      * @param string $status
      * @param array $contents
-     * @param string $contentsmodified
-     * @param string $contentsdisplayed
+     * @param string $contentsModified
+     * @param string $contentsDisplayed
      * @param string $errors
      * @param string $note
      * @param string $lvars
      * @param bool $simp
      */
-    public function __construct(string $status, array $contents, string $contentsmodified, string $contentsdisplayed, string $errors, string $note, string $lvars, bool $simp = false) {
+    public function __construct(string $status, array $contents, string $contentsModified, string $contentsDisplayed, string $errors, string $note, string $lvars, bool $simp = false) {
         $this->status              = $status;
         $this->contents            = $contents;
-        $this->contentsmodified    = $contentsmodified;
-        $this->contentsdisplayed   = $contentsdisplayed;
+        $this->contentsModified    = $contentsModified;
+        $this->contentsDisplayed   = $contentsDisplayed;
         $this->errors              = $errors;
         $this->note                = $note;
         $this->lvars               = $lvars;
@@ -76,24 +76,24 @@ class StackInputState
         $this->contents = $contents;
     }
 
-    public function getContentsmodified(): string
+    public function getContentsModified(): string
     {
-        return $this->contentsmodified;
+        return $this->contentsModified;
     }
 
-    public function setContentsmodified(string $contentsmodified): void
+    public function setContentsModified(string $contentsModified): void
     {
-        $this->contentsmodified = $contentsmodified;
+        $this->contentsModified = $contentsModified;
     }
 
-    public function getContentsdisplayed(): string
+    public function getContentsDisplayed(): string
     {
-        return $this->contentsdisplayed;
+        return $this->contentsDisplayed;
     }
 
-    public function setContentsdisplayed(string $contentsdisplayed): void
+    public function setContentsDisplayed(string $contentsDisplayed): void
     {
-        $this->contentsdisplayed = $contentsdisplayed;
+        $this->contentsDisplayed = $contentsDisplayed;
     }
 
     public function getErrors(): string
