@@ -48,10 +48,21 @@ class PluginConfigurationMaximaUI
             //Form action
             $form_action = self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "save");
 
-            $content = self::$factory->input()->container()->form()->standard($form_action, [
-                    self::getMaximaLocalSection($data, $plugin_object)
-                ]
-            );
+            if ($data["platform_type"] == "server") {
+                $content = self::$factory->input()->container()->form()->standard($form_action, [
+                        self::getMaximaCommonSection($data, $plugin_object),
+                        self::getMaximaServerSection($data, $plugin_object)
+                    ]
+                );
+            } elseif ($data["platform_type"] == "unix") {
+                $content = self::$factory->input()->container()->form()->standard($form_action, [
+                        self::getMaximaCommonSection($data, $plugin_object),
+                        self::getMaximaLocalSection($data, $plugin_object)
+                    ]
+                );
+            } else {
+                throw new StackException("Error: Platform type not valid: " . $data["platform_type"]);
+            }
 
         } catch (Exception $e) {
             $content = self::$factory->messageBox()->failure($e->getMessage());
@@ -61,27 +72,14 @@ class PluginConfigurationMaximaUI
     }
 
     /**
-     * Gets the form for the plugin configuration Maxima settings when using
-     * the Server option to connect to Maxima
-     * @param array $data
-     * @param ilPlugin $plugin_object
-     */
-    private static function getMaximaServerSection(array $data, ilPlugin $plugin_object)
-    {
-
-    }
-
-    /**
-     * Gets the form for the plugin configuration Maxima settings when using
-     * the Local option to connect to Maxima
+     * Gets the Maxima connection section
      * @param array $data
      * @param ilPlugin $plugin_object
      * @return Section
      * @throws StackException
      */
-    private static function getMaximaLocalSection(array $data, ilPlugin $plugin_object): Section
+    private static function getMaximaCommonSection(array $data, ilPlugin $plugin_object): Section
     {
-
         //Maxima version
         $maxima_version_options = [
             '5.40.0' => '5.40.0', '5.41.0' => '5.41.0', '5.42.0' => '5.42.0',
@@ -142,20 +140,48 @@ class PluginConfigurationMaximaUI
             $plugin_object->txt("ui_admin_configuration_connection_preparse_all_description")
         )->withValue($preparse_all_value)->withRequired(true);
 
-        //Maxima command
-        $maxima_command_value = $data["maxima_command"] ?? "";
-        $maxima_command = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_command_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_command_description")
-        )->withValue($maxima_command_value);
 
-        //Optimized Maxima command
-        $optimized_maxima_command_value = $data["optimized_maxima_command"] ?? "";
-        $optimized_maxima_command = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_description")
-        )->withValue($optimized_maxima_command_value);
+        //CAS debugging
+        if (isset($data["cas_debugging"]) && $data["cas_debugging"] == "1") {
+            $cas_debugging_value = true;
+        } else {
+            $cas_debugging_value = false;
+        }
+        $cas_debugging = self::$factory->input()->field()->checkbox(
+            $plugin_object->txt("ui_admin_configuration_connection_cas_debugging_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_cas_debugging_description")
+        )->withValue($cas_debugging_value);
 
+        //Cache parsed expressions longer than
+        $cache_parsed_expressions_longer_than_value = $data["cache_parsed_expressions_longer_than"] ?? "50";
+        $cache_parsed_expressions_longer_than = self::$factory->input()->field()->text(
+            $plugin_object->txt("ui_admin_configuration_connection_cache_parsed_expressions_longer_than_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_cache_parsed_expressions_longer_than_description")
+        )->withValue($cache_parsed_expressions_longer_than_value);
+
+        return self::$factory->input()->field()->section(
+            [
+                $maxima_version,
+                $cas_connection_timeout,
+                $cas_result_caching,
+                $preparse_all,
+                $cas_debugging,
+                $cache_parsed_expressions_longer_than,
+            ],
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_common_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_common_description")
+        );
+    }
+
+    /**
+     * Gets the form for the plugin configuration Maxima settings when using
+     * the Server option to connect to Maxima
+     * @param array $data
+     * @param ilPlugin $plugin_object
+     * @return Section
+     */
+    private static function getMaximaServerSection(array $data, ilPlugin $plugin_object): Section
+    {
         //URL of the maxima pool
         $maxima_pool_url_value = $data["maxima_pool_url"] ?? "";
         $maxima_pool_url = self::$factory->input()->field()->text(
@@ -169,31 +195,6 @@ class PluginConfigurationMaximaUI
             $plugin_object->txt("ui_admin_configuration_connection_maxima_pool_server_username_password_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_pool_server_username_password_description")
         )->withValue($maxima_pool_server_username_password_value);
-
-        //Plot command
-        $plot_command_value = $data["plot_command"] ?? "";
-        $plot_command = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_plot_command_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_plot_command_description")
-        )->withValue($plot_command_value);
-
-        //Maxima libraries
-        $maxima_libraries_value = $data["cas_maxima_libraries"] ?? "";
-        $maxima_libraries = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_description")
-        )->withValue($maxima_libraries_value);
-
-        //CAS debugging
-        if (isset($data["cas_debugging"]) && $data["cas_debugging"] == "1") {
-            $cas_debugging_value = true;
-        } else {
-            $cas_debugging_value = false;
-        }
-        $cas_debugging = self::$factory->input()->field()->checkbox(
-            $plugin_object->txt("ui_admin_configuration_connection_cas_debugging_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_cas_debugging_description")
-        )->withValue($cas_debugging_value);
 
         //Cache parsed expressions longer than
         $cache_parsed_expressions_longer_than_value = $data["cache_parsed_expressions_longer_than"] ?? "50";
@@ -215,19 +216,70 @@ class PluginConfigurationMaximaUI
 
         return self::$factory->input()->field()->section(
             [
-                $maxima_version,
-                $cas_connection_timeout,
-                $cas_result_caching,
-                $preparse_all,
-                $maxima_command,
-                $optimized_maxima_command,
                 $maxima_pool_url,
                 $maxima_pool_server_username_password,
+                $cache_parsed_expressions_longer_than,
+                $maxima_uses_proxy,
+            ],
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_description")
+        );
+    }
+
+    /**
+     * Gets the form for the plugin configuration Maxima settings when using
+     * the Local option to connect to Maxima
+     * @param array $data
+     * @param ilPlugin $plugin_object
+     * @return Section
+     */
+    private static function getMaximaLocalSection(array $data, ilPlugin $plugin_object): Section
+    {
+        //Maxima command
+        $maxima_command_value = $data["maxima_command"] ?? "";
+        $maxima_command = self::$factory->input()->field()->text(
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_command_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_command_description")
+        )->withValue($maxima_command_value);
+
+        //Optimized Maxima command
+        $optimized_maxima_command_value = $data["optimized_maxima_command"] ?? "";
+        $optimized_maxima_command = self::$factory->input()->field()->text(
+            $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_description")
+        )->withValue($optimized_maxima_command_value);
+
+        //Plot command
+        $plot_command_value = $data["plot_command"] ?? "";
+        $plot_command = self::$factory->input()->field()->text(
+            $plugin_object->txt("ui_admin_configuration_connection_plot_command_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_plot_command_description")
+        )->withValue($plot_command_value);
+
+        //Maxima libraries
+        $maxima_libraries_value = $data["cas_maxima_libraries"] ?? "";
+        $maxima_libraries = self::$factory->input()->field()->text(
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_description")
+        )->withValue($maxima_libraries_value);
+
+        //Maxima uses proxy
+        if (isset($data["maxima_uses_proxy"]) && $data["maxima_uses_proxy"] == "1") {
+            $maxima_uses_proxy_value = true;
+        } else {
+            $maxima_uses_proxy_value = false;
+        }
+        $maxima_uses_proxy = self::$factory->input()->field()->checkbox(
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_uses_proxy_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_uses_proxy_description")
+        )->withValue($maxima_uses_proxy_value);
+
+        return self::$factory->input()->field()->section(
+            [
+                $maxima_command,
+                $optimized_maxima_command,
                 $plot_command,
                 $maxima_libraries,
-                $maxima_libraries,
-                $cas_debugging,
-                $cache_parsed_expressions_longer_than,
                 $maxima_uses_proxy,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_title"),

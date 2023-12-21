@@ -1,10 +1,3 @@
-//
-// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
-// GPLv2, see LICENSE 
-// 
-// English Language File for assStackQuestion Plugin
-//
-
 <!-- language file start -->
 ui_admin_configuration_title#:#STACK Question Configuration
 ui_admin_configuration_description#:#This page allows you to configure the STACK Question plugin.
@@ -30,8 +23,12 @@ ui_admin_configuration_dont_allow_jsxgraph_title#:#Don't allow JSXGraph
 ui_admin_configuration_dont_allow_jsxgraph_description#:#This option deactivates JSXGraph for all questions.
 ui_admin_configuration_do_allow_jsxgraph_title#:#Do allow JSXGraph
 ui_admin_configuration_do_allow_jsxgraph_description#:#This option activates JSXGraph for all questions.
+ui_admin_configuration_connection_maxima_connection_common_title#:#Common Maxima connection settings
+ui_admin_configuration_connection_maxima_connection_common_description#:#These are the common Maxima connection settings.
 ui_admin_configuration_connection_maxima_connection_local_title#:#Local Maxima (Linux)
-ui_admin_configuration_connection_maxima_connection_local_description#:#This option activates local Maxima for all questions on this platform.
+ui_admin_configuration_connection_maxima_connection_local_description#:#These are the settings for a local Maxima installation on a Linux system.
+ui_admin_configuration_connection_maxima_connection_server_title#:#Server Maxima (Maxima Pool or Goemaxima)
+ui_admin_configuration_connection_maxima_connection_server_description#:#This option activates server Maxima for all questions on this platform.
 ui_admin_configuration_connection_maxima_version_title#:#Maxima version
 ui_admin_configuration_connection_maxima_version_description#:#This option sets the version of Maxima being used.
 ui_admin_configuration_defaults_cas_connection_timeout_title#:#CAS connection timeout
@@ -59,9 +56,9 @@ ui_admin_configuration_connection_maxima_libraries_description#:#This is a comma
 ui_admin_configuration_connection_cas_debugging_title#:#CAS debugging
 ui_admin_configuration_connection_cas_debugging_description#:#Whether to store debugging information about the CAS connection.
 ui_admin_configuration_connection_cache_parsed_expressions_longer_than_title#:#Cache parsed expressions longer than
-ui_admin_configuration_connection_cache_parsed_expressions_longer_than_description#:#The expression parser gets quite slow on long expressions (for example complicated question variables). Therefore we cache the result of parsing expressions longer than a this limit. Ideally, this setting should be set to a value where doign the cache lookup takes about as long as doing the parsing. 50 characters is an educated guess at this. If set to 0, the cache is disabled.
+ui_admin_configuration_connection_cache_parsed_expressions_longer_than_description#:#The expression parser gets quite slow on long expressions (for example complicated question variables). Therefore we cache the result of parsing expressions longer than a this limit. Ideally, this setting should be set to a value where doing the cache lookup takes about as long as doing the parsing. 50 characters is an educated guess at this. If set to 0, the cache is disabled.
 ui_admin_configuration_connection_maxima_uses_proxy_title#:#Maxima uses proxy
-ui_admin_configuration_connection_maxima_uses_proxy_description#:#If you are using a Maxima pool server, and that server is behind a proxy, then you can enable this option. This will cause the Maxima pool server to use the proxy settings from the ILIAS server.
+ui_admin_configuration_connection_maxima_uses_proxy_description#:#To be described
 ui_admin_configuration_defaults_options_title#:#Default options settings
 ui_admin_configuration_defaults_options_description#:#These are the default values for the options of the question. These values will be used when a new question is created.
 ui_admin_configuration_defaults_question_simplify_title#:#Question-level simplify

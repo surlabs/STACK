@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
+use src\core\security\StackException;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -34,6 +35,9 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     private ilTabsGUI $tabs;
     private ilCtrlInterface $control;
 
+    /**
+     * @throws StackException
+     */
     public function performCommand(string $cmd): void
     {
         global $DIC;
@@ -72,25 +76,34 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                 $this->control->getLinkTarget($this, "quality")
             );
 
+            //Add plugin title and description
+            $this->tpl->setTitle($this->getPluginObject()->txt('ui_admin_configuration_title'));
+            $this->tpl->setDescription($this->getPluginObject()->txt('ui_admin_configuration_description'));
+
+            //Get stored settings
+            $data = assStackQuestionConfig::_getStoredSettings('all');
+
+            switch ($cmd) {
+                case "configure":
+                    $this->configure($data);
+                    break;
+                case "maxima":
+                    $this->maxima($data);
+                    break;
+                case "defaults":
+                    $this->defaults($data);
+                    break;
+                case "quality":
+                    $this->quality($data);
+                    break;
+                case "save":
+                    $this->save();
+                    break;
+                default:
+                    throw new StackException("Unknown configuration command: " . $cmd);
+            }
         } catch (Exception $e) {
-
-        }
-
-        //Add plugin title and description
-        $this->tpl->setTitle($this->getPluginObject()->txt('ui_admin_configuration_title'));
-        $this->tpl->setDescription($this->getPluginObject()->txt('ui_admin_configuration_description'));
-
-        //Get stored settings
-        $data = assStackQuestionConfig::_getStoredSettings('all');
-
-        switch ($cmd) {
-            case "configure":
-            case "maxima":
-            case "defaults":
-            case "quality":
-            case "save":
-                $this->$cmd($data);
-                break;
+            throw new StackException($e->getMessage());
         }
     }
 
@@ -128,5 +141,14 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     {
         $this->tabs->activateTab("quality");
         $this->tpl->setContent(PluginConfigurationQualityUI::show($data, $this->getPluginObject()));
+    }
+
+    /**
+     * Saves the configuration
+     */
+    private function save(): void
+    {
+        $this->tabs->activateTab("configure");
+        $this->tpl->setContent(PluginConfigurationMainUI::save($this->getPluginObject()));
     }
 }
