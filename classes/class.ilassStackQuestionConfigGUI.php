@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use ILIAS\UI\Factory;
-use ILIAS\UI\Renderer;
 use src\core\security\StackException;
 
 /**
@@ -28,9 +26,6 @@ use src\core\security\StackException;
  */
 class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
 {
-    private Factory $factory;
-    private Renderer $renderer;
-    private ilLanguage $language;
     private ilGlobalTemplateInterface $tpl;
     private ilTabsGUI $tabs;
     private ilCtrlInterface $control;
@@ -42,9 +37,6 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
-        $this->factory = $DIC->ui()->factory();
-        $this->renderer = $DIC->ui()->renderer();
-        $this->language = $DIC->language();
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->tabs = $DIC->tabs();
         $this->control = $DIC->ctrl();
