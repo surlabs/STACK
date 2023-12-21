@@ -45,11 +45,17 @@ abstract class StackPlatform
      * @param array|null $params
      * @return string|null
      */
-    public static function getTranslation(string $str, ?array $params): ?string
+    public static function getTranslation(string $str, mixed $params): ?string
     {
         $txt = self::$platform->getTranslationInternal($str);
 
-        return isset($params) ? vsprintf($txt, $params) : $txt;
+        if (isset($params)) {
+            if (is_string($params)) $params = array($params);
+
+            $txt = vsprintf($txt, $params);
+        }
+
+        return $txt;
     }
 
     /**
