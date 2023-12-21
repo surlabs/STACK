@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace src\core\evaluation;
 use src\core\maxima\StackSession;
 use src\core\StackQuestion;
+use src\platform\StackPlatform;
 use stdClass;
 
 /**
@@ -35,6 +36,7 @@ class StackPotentialResponseTree
     private object $nodes;
     private string $firstNode;
     private ?StackQuestion $question;
+    private array $trace;
 
     public function __construct(stdClass $prtdata, float $value, StackQuestion $question = null)
     {
@@ -60,6 +62,8 @@ class StackPotentialResponseTree
         $this->firstNode = (string)$prtdata->firstnodename;
 
         $this->question = $question;
+
+        $this->trace = array();
     }
 
     /**
@@ -238,5 +242,66 @@ class StackPotentialResponseTree
     public function getNodesSummary() {
         //TODO: Implement getNodesSummary() method.
         // First we need to implement method compileNodeAnswertests();
+    }
+
+    /**
+     * Return the options for the show validation select menu
+     * @return array.
+     */
+    public function getFeedbackStyleOptions() :array {
+        return array(
+            '0' => StackPlatform::getTranslation('feedbackstyle0', null),
+            '1' => StackPlatform::getTranslation('feedbackstyle1', null),
+            '2' => StackPlatform::getTranslation('feedbackstyle2', null),
+            '3' => StackPlatform::getTranslation('feedbackstyle3', null),
+        );
+    }
+
+    /**
+     * This is only for testing, you need to do more to check the actual text.
+     *
+     * @return string Raw feedback text as a single blob for checking.
+     */
+    public function getFeedbackTest() :string {
+        $text = '';
+
+        foreach ($this->nodes as $node) {
+            if ($node->truefeedback !== null) {
+                $text .= $node->truefeedback;
+            }
+            if ($node->falsefeedback !== null) {
+                $text .= $node->falsefeedback;
+            }
+        }
+
+        return $text;
+    }
+
+    public function compile() {
+        //TODO: Implement compile() method.
+        // First we need to implement stack_cas_keyval class
+    }
+
+    public static function compileNodeAnswerTest() {
+        //TODO: Implement compileNodeAnswerTest() method.
+        // First we need to implement stack_ans_test_controller class
+    }
+
+    public static function compileNode() {
+        //TODO: Implement compileNode() method.
+        // First we need to implement stack_ans_test_controller class
+    }
+
+    public function getPrtGraph() {
+        //TODO: Implement getPrtGraph() method.
+        // First we need to implement stack_abstract_graph class & getNodesSummary() method
+    }
+
+    /**
+     * Returns the trace of the PRT.
+     * @return array
+     */
+    public function getTrace() :array {
+        return $this->trace;
     }
 }
