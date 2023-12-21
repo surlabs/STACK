@@ -4,7 +4,7 @@ declare(strict_types=1);
 use ILIAS\UI\Factory;
 use ILIAS\UI\Implementation\Component\Button\Bulky;
 use ILIAS\UI\Renderer;
-use ILIAS\UI\Implementation\Component\Panel\Standard;
+use src\core\security\StackException;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -42,15 +42,51 @@ class PluginConfigurationQualityUI
         self::$renderer = $DIC->ui()->renderer();
         self::$control = $DIC->ctrl();
 
-        $content = '';
-
         try {
-        } catch (Exception $e) {
 
+            $rendered_content =
+                self::$renderer->render(self::getHealthcheckButton($plugin_object)) .
+                self::$renderer->render(self::getBulktestingButton($plugin_object));
+
+        } catch (Exception $e) {
+            $rendered_content =
+                self::$renderer->render(self::$factory->messageBox()->failure($e->getMessage()));
         }
 
-        return $content;
+        return $rendered_content;
     }
 
+    /**
+     * Gets the healthcheck button for the plugin configuration
+     * @throws ilCtrlException
+     */
+    private static function getHealthcheckButton(ilPlugin $plugin_object): Bulky
+    {
+        return self::$factory->button()->bulky(
+            self::$factory->symbol()->icon()->standard(
+                'nota',
+                $plugin_object->txt('ui_admin_configuration_security_button_label'),
+                'medium'
+            ),
+            $plugin_object->txt('ui_admin_configuration_security_button_label'),
+            self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "doHealthCheck")
+        );
+    }
 
+    /**
+     * Gets the Bulktesting button for the plugin configuration
+     * @throws ilCtrlException
+     */
+    private static function getBulktestingButton(ilPlugin $plugin_object): Bulky
+    {
+        return self::$factory->button()->bulky(
+            self::$factory->symbol()->icon()->standard(
+                'nota',
+                $plugin_object->txt('ui_admin_configuration_bulktesting_button_label'),
+                'medium'
+            ),
+            $plugin_object->txt('ui_admin_configuration_bulktesting_button_label'),
+            self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "doBulktesting")
+        );
+    }
 }
