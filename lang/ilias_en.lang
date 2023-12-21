@@ -30,6 +30,38 @@ ui_admin_configuration_dont_allow_jsxgraph_title#:#Don't allow JSXGraph
 ui_admin_configuration_dont_allow_jsxgraph_description#:#This option deactivates JSXGraph for all questions.
 ui_admin_configuration_do_allow_jsxgraph_title#:#Do allow JSXGraph
 ui_admin_configuration_do_allow_jsxgraph_description#:#This option activates JSXGraph for all questions.
+ui_admin_configuration_connection_maxima_connection_local_title#:#Local Maxima (Linux)
+ui_admin_configuration_connection_maxima_connection_local_description#:#This option activates local Maxima for all questions on this platform.
+ui_admin_configuration_connection_maxima_version_title#:#Maxima version
+ui_admin_configuration_connection_maxima_version_description#:#This option sets the version of Maxima being used.
+ui_admin_configuration_defaults_cas_connection_timeout_title#:#CAS connection timeout
+ui_admin_configuration_defaults_cas_connection_timeout_description#:#This option sets the timeout to use when trying to connect to Maxima.
+ui_admin_configuration_connection_cas_result_caching_title#:#CAS result caching
+ui_admin_configuration_connection_cas_result_caching_description#:#This option determines whether calls the to CAS are cached. This setting should be turned on unless you are doing development that involves changing the Maxima code. The current state of the cache is shown on the healthcheck page. If you change your settings, e.g. the gnuplot command, you will need to clear the cache before you can see the effects of these changes.
+ui_admin_configuration_connection_cas_result_caching_db#:#Cache in the database
+ui_admin_configuration_connection_cas_result_caching_none#:#Do not cache
+ui_admin_configuration_connection_preparse_all_title#:#Preparse all
+ui_admin_configuration_connection_preparse_all_description#:#We recommend all code in question variables, etc., even from trusted teachers, is pre-parsed for potentially malicious patterns.  This is especially important when accepting imported questions from known sources.  However, it is possible for this pre-parse to time-out and it would be necessary to disable this check (temporarily) to back out of a potential dead end.  This code is still under testing and development and this setting will be removed in future releases ensuring this pre-parse is always applied.
+ui_admin_configuration_connection_preparse_all_yes#:#Always preparse
+ui_admin_configuration_connection_preparse_all_no#:#Do not preparse (not recommended)
+ui_admin_configuration_connection_maxima_command_title#:#Maxima command
+ui_admin_configuration_connection_maxima_command_description#:#If this is blank, STACK will make an educated guess as to where to find Maxima. If that fails, this should be set to the full path of the maxima or maxima-optimised executable.  Use for development and debugging only. Do not use on a production system: use optimised, or better, the Maxima Pool option.
+ui_admin_configuration_connection_optimized_maxima_command_title#:#Optimized Maxima command
+ui_admin_configuration_connection_optimized_maxima_command_description#:#This should be set to the full path of the maxima-optimised executable.  Consider using the timeout command on linux based systems. E.g. timeout --kill-after=10s 10s maxima
+ui_admin_configuration_connection_maxima_pool_url_title#:#Maxima Pool URL
+ui_admin_configuration_connection_maxima_pool_url_description#:#For Platform type: Server, this is must be set to the URL of the Maxima Pool servlet
+ui_admin_configuration_connection_maxima_pool_server_username_password_title#:#Maxima Pool server username:password
+ui_admin_configuration_connection_maxima_pool_server_username_password_description#:#If you are using Platform type: Server, and if you have set up your Maxima pool server with HTTP authentication, then you can put the username and password here. That is slighly safer than putting them in the URL. The format is username:password.
+ui_admin_configuration_connection_plot_command_title#:#Plot command
+ui_admin_configuration_connection_plot_command_description#:#This should be set to the full path of the gnuplot executable.
+ui_admin_configuration_connection_maxima_libraries_title#:#Maxima libraries
+ui_admin_configuration_connection_maxima_libraries_description#:#This is a comma separated list of Maxima library names which will be automatically loaded into Maxima.  Only supported library names can be used: "stats, distrib, descriptive, simplex". When you change the listed libraties you must rebuild the Maxima optimised image
+ui_admin_configuration_connection_cas_debugging_title#:#CAS debugging
+ui_admin_configuration_connection_cas_debugging_description#:#Whether to store debugging information about the CAS connection.
+ui_admin_configuration_connection_cache_parsed_expressions_longer_than_title#:#Cache parsed expressions longer than
+ui_admin_configuration_connection_cache_parsed_expressions_longer_than_description#:#The expression parser gets quite slow on long expressions (for example complicated question variables). Therefore we cache the result of parsing expressions longer than a this limit. Ideally, this setting should be set to a value where doign the cache lookup takes about as long as doing the parsing. 50 characters is an educated guess at this. If set to 0, the cache is disabled.
+ui_admin_configuration_connection_maxima_uses_proxy_title#:#Maxima uses proxy
+ui_admin_configuration_connection_maxima_uses_proxy_description#:#If you are using a Maxima pool server, and that server is behind a proxy, then you can enable this option. This will cause the Maxima pool server to use the proxy settings from the ILIAS server.
 ui_admin_configuration_defaults_options_title#:#Default options settings
 ui_admin_configuration_defaults_options_description#:#These are the default values for the options of the question. These values will be used when a new question is created.
 ui_admin_configuration_defaults_question_simplify_title#:#Question-level simplify
