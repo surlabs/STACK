@@ -81,6 +81,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
             $this->tpl->setDescription($this->getPluginObject()->txt('ui_admin_configuration_description'));
 
             //Get stored settings
+            //TODO: get stored settings from database with new config if needed
             $data = assStackQuestionConfig::_getStoredSettings('all');
 
             switch ($cmd) {
