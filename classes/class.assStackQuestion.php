@@ -434,7 +434,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param null $test_obj_id
      * @return int|null the duplicated question id
      */
-    public function duplicate(bool $for_test = true, string $title = "", string $author = "", string $owner = "", $testObjId = null): int
+    public function duplicate(bool $for_test = true, string $title = "", string $author = "", string|int $owner = "", $testObjId = null): int
     {
         if ($this->id <= 0) {
             // The question has not been saved. It cannot be duplicated
@@ -3277,4 +3277,13 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     }
 
 
+    public function getAdditionalTableName()
+    {
+        // TODO: Implement getAdditionalTableName() method.
+    }
+
+    public function getAnswerTableName()
+    {
+        // TODO: Implement getAnswerTableName() method.
+    }
 }
