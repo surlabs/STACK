@@ -16,6 +16,8 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Node;
 /**
  * A chain of filters represeneted as singular filter and returned by
  * the filter factory if asked for a set of filters.

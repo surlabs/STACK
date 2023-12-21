@@ -15,6 +15,8 @@
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2;
 
+use src\core\external\maximaparser\MP_Node;
+
 abstract class stack_cas_castext2_block {
 
     // In entry phase these are the params of the CTP_Node matching this block.

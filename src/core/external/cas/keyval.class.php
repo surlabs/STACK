@@ -23,6 +23,18 @@
 
 namespace src\core\external\cas;
 
+use src\core\external\cas\castext2\castext2_static_replacer;
+use src\core\external\cas\castext2\parsingrules\stack_parsing_rule_factory;
+use src\core\external\maximaparser\maxima_parser_utils;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_Root;
+use src\core\external\maximaparser\MP_Statement;
+use src\core\filters\StackParser;
+use src\core\security\StackException;
+use src\platform\StackPlatform;
+
 class stack_cas_keyval {
 
     /** @var Holds the raw text as entered by a question author. */
@@ -66,8 +78,8 @@ class stack_cas_keyval {
             throw new StackException('stack_cas_keyval: raw must be a string.');
         }
 
-        if (!is_null($options) && !is_a($options, 'stack_options')) {
-            throw new StackException('stack_cas_keyval: options must be null or stack_options.');
+        if (!is_null($options) && !is_a($options, 'StackOptions')) {
+            throw new StackException('stack_cas_keyval: options must be null or StackOptions.');
         }
 
         if (!is_null($seed) && !is_int($seed)) {
@@ -92,7 +104,7 @@ class stack_cas_keyval {
             return true;
         }
 
-        $strings = stack_utils::all_substring_strings($str);
+        $strings = StackParser::allSubstringStrings($str);
         foreach ($strings as $key => $string) {
             $str = str_replace('"'.$string.'"', '[STR:'.$key.']', $str);
         }
@@ -102,7 +114,7 @@ class stack_cas_keyval {
         // CAS keyval may not contain @ or $ outside strings.
         // We should certainly prevent the $ to make sure statements are separated by ;, although Maxima does allow $.
         if (strpos($str, '@') !== false || strpos($str, '$') !== false) {
-            $this->errors[] = new $this->errclass(StackPlatform::getTranslation('illegalcaschars'), $this->context);
+            $this->errors[] = new $this->errclass(StackPlatform::getTranslation('illegalcaschars', null), $this->context);
             $this->valid = false;
             return false;
         }
@@ -305,7 +317,7 @@ class stack_cas_keyval {
         // with comments as well.
         $str = $this->raw;
         // Similar QMCHAR protection as previously.
-        $strings = stack_utils::all_substring_strings($str);
+        $strings = StackParser::allSubstringStrings($str);
         foreach ($strings as $key => $string) {
             $str = str_replace('"'.$string.'"', '[STR:'.$key.']', $str);
         }
@@ -360,7 +372,7 @@ class stack_cas_keyval {
                 if (isset($item->position['included-src'])) {
                     $includes[$item->position['included-src']] = true;
                 }
-                $scope = stack_utils::php_string_to_maxima_string($cn .
+                $scope = StackParser::phpStringToMaximaString($cn .
                         $item->position['start'] . '-' . $item->position['end']);
                 $payload = $item->toString($tostringparams);
                 if ($item->flags !== null && count($item->flags) > 0) {

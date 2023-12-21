@@ -25,6 +25,14 @@
 
 namespace src\core\external\cas\castext2;
 
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_commonstring;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_special_ioblock;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_special_rewrite_pluginfile_urls;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_special_root;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_special_stack_maxima_latex_tidy;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_special_stack_translate;
+use src\core\security\StackException;
+
 interface castext2_processor {
     // The override helps when you want to chain things. Basically, use it to
     // give the top most processor to the lower ones so that they can pass things
@@ -64,7 +72,7 @@ class castext2_qa_processor extends castext2_default_processor {
     public $qa;
     public function __construct($qa) {
         if (!method_exists($qa, 'rewrite_pluginfile_urls')) {
-            StackException('Error in constructing castext2_qa_processor: argument must provide rewrite_pluginfile_urls.');
+            throw new StackException('Error in constructing castext2_qa_processor: argument must provide rewrite_pluginfile_urls.');
         }
         $this->qa = $qa;
     }

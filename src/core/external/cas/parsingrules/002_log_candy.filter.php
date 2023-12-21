@@ -16,6 +16,20 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\maxima_corrective_parser;
+use src\core\external\maximaparser\MP_Atom;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_Set;
+use src\core\external\maximaparser\MP_Statement;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that handles the logarithm base syntax-extension.
  *
@@ -62,7 +76,7 @@ class stack_ast_filter_002_log_candy implements stack_cas_astfilter {
                     // This will unfortunately lose all the information about insertted stars
                     // but that is hardly an issue.
                     $parsed = maxima_corrective_parser::parse($argument, $errors, $answernotes, array('startRule' => 'Root',
-                               'letToken' => StackPlatform::getTranslation('equiv_LET')));
+                               'letToken' => StackPlatform::getTranslation('equiv_LET', null)));
                     // Should there be something truly unexpected.
                     if ($parsed === null) {
                         $node->position['invalid'] = true;

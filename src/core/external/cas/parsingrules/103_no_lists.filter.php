@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that prevents the use of any lists.
  */
@@ -26,7 +31,7 @@ class stack_ast_filter_103_no_lists implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_lists', $answernotes) === false) {
                     $answernotes[] = 'Illegal_lists';
-                    $errors[] = StackPlatform::getTranslation('Illegal_lists');
+                    $errors[] = StackPlatform::getTranslation('Illegal_lists', null);
                 }
             }
             return true;

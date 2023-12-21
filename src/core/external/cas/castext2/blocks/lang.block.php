@@ -15,6 +15,16 @@
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_If;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_String;
+
 /**
  * A block for togling content based on a the active language.
  * The active language is defined elsewhere and exists as an variable

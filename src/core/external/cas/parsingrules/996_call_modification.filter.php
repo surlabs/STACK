@@ -16,6 +16,17 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Atom;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Indexing;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_PrefixOp;
+
 /**
  * AST filter that rewrites calls to functions to be checked at runtime.
  */

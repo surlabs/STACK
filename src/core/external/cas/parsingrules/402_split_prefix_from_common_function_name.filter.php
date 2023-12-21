@@ -16,6 +16,12 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+
 /**
  * AST filter that identifies cases like 'xsin(x)' and splits them
  * 'x*sin(x)'. Applies to all possible globally known functions and

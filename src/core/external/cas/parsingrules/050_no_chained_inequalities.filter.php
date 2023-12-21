@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that spots inequalities that are chained.
  */
@@ -31,7 +36,7 @@ class stack_ast_filter_050_no_chained_inequalities implements stack_cas_astfilte
                 if (($node->lhs instanceof MP_Operation && isset($ops[$node->lhs->op])) ||
                     ($node->rhs instanceof MP_Operation && isset($ops[$node->rhs->op]))) {
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTranslation('stackCas_chained_inequalities');
+                    $errors[] = StackPlatform::getTranslation('stackCas_chained_inequalities', null);
                     if (array_search('chained_inequalities', $answernotes) === false) {
                         $answernotes[] = 'chained_inequalities';
                     }

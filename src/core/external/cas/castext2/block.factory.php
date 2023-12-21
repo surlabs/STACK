@@ -16,6 +16,8 @@
 
 namespace src\core\external\cas\castext2;
 
+use DirectoryIterator;
+
 class castext2_block_factory {
     /**
      * Cache the block types so that we do not need to check from the

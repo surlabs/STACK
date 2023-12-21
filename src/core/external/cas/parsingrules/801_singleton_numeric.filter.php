@@ -16,6 +16,17 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\maxima_parser_utils;
+use src\core\external\maximaparser\MP_Float;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_PrefixOp;
+use src\core\external\maximaparser\MP_Root;
+use src\core\external\maximaparser\MP_Statement;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that checks that the AST represents a singleton value
  * that is purely numeric. It can also be used to turn that value

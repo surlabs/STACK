@@ -16,6 +16,12 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+
 /**
  * AST filter that splits variable names into single characters.
  * Or longest known variable names.

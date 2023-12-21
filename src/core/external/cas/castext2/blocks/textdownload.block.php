@@ -16,6 +16,14 @@
 //
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\castext2_parser_utils;
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+use src\core\security\StackException;
+
 /**
  * This is a block allowing one to construct a text-file using CASText
  * inside the block and generates an URL for a download link for that file.

@@ -23,6 +23,11 @@
 
 namespace src\core\external\cas;
 
+use src\core\filters\StackParser;
+use src\core\security\StackLog;
+use src\platform\StackPlatform;
+use stdClass;
+
 abstract class stack_cas_connection_base implements stack_cas_connection {
     /** @var string path to write Maxiam error output to. */
     protected $logs;
@@ -39,7 +44,7 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
     /** @var int the timeout to use on connections to Maxima. */
     protected $timeout;
 
-    /** @var stack_debug_log does the debugging. */
+    /** @var StackLog does the debugging. */
     protected $debug;
 
     /**
@@ -129,13 +134,13 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
     /* @see stack_cas_connection::get_debuginfo() */
     // @codingStandardsIgnoreEnd
     public function get_debuginfo() {
-        return $this->debug->get_log();
+        return $this->debug->getLog();
     }
 
     /* On a Linux system list the versions of maxima available for use. */
     public function get_maxima_available() {
         if ('linux' != stack_connection_helper::get_platform()) {
-            return StackPlatform::getTranslation('healthunabletolistavail');
+            return StackPlatform::getTranslation('healthunabletolistavail', null);
         }
         $this->command = 'maxima --list-avail';
         $rawresult = $this->call_maxima('');
@@ -161,9 +166,9 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
     /**
      * Constructor.
      * @param stdClass $settings the Maxima configuration settings.
-     * @param stack_debug_log $debuglog the debug log to use.
+     * @param StackLog $debuglog the debug log to use.
      */
-    public function __construct($settings, stack_debug_log $debuglog) {
+    public function __construct($settings, StackLog $debuglog) {
         global $CFG;
 
         $path = $CFG->dataroot . '/stack';
@@ -199,8 +204,8 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
 
     /**
      * Top level Maxima-specific function used to parse CAS output into an array.
-     *
-     * @param array $rawresult Raw CAS output
+     *  Raw CAS output
+     * @param $rawresult
      * @return array
      */
     protected function unpack_raw_result($rawresult) {
@@ -242,7 +247,7 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
             if (is_array($valdval)) {
                 $errors["CAS"] = "unpack_raw_result: CAS failed to generate any useful output.";
             } else {
-                if (preg_match('/.*\[.*\].*/', $valdval)) {
+                if (preg_match('/.*\[.*].*/', $valdval)) {
                     // There are some []'s in the string.
                     $loc = $this->unpack_helper($valdval);
                     if ('' == trim($loc['error'])) {
@@ -291,7 +296,7 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
         if ($eqpos) {
             // Check there are ='s.
             do {
-                $gb = stack_utils::substring_between($rawresultfragment, '[', ']', $eqpos);
+                $gb = StackParser::substringBetween($rawresultfragment, '[', ']', $eqpos);
                 $val = substr($gb[0], 1, strlen($gb[0]) - 2);
                 $val = trim($val);
 
@@ -332,16 +337,16 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
         $errorclean = array();
         foreach ($error as $err) {
             // This case arises when we use a numerical test for algebraic equivalence.
-            if (strpos($err, 'STACK: ignore previous error.') !== false) {
+            if (str_contains($err, 'STACK: ignore previous error.')) {
                 $err = '';
             }
 
-            if (strpos($err, '0 to a negative exponent') !== false) {
-                $err = StackPlatform::getTranslation('Maxima_DivisionZero');
+            if (str_contains($err, '0 to a negative exponent')) {
+                $err = StackPlatform::getTranslation('Maxima_DivisionZero', null);
             }
 
-            if (strpos($err, 'args: argument must be a non-atomic expression;') !== false) {
-                $err = StackPlatform::getTranslation('Maxima_Args');
+            if (str_contains($err, 'args: argument must be a non-atomic expression;')) {
+                $err = StackPlatform::getTranslation('Maxima_Args', null);
             }
 
             $errorclean[] = $err;

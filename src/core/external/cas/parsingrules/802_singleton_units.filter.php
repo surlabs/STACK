@@ -16,6 +16,25 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Float;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_If;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Loop;
+use src\core\external\maximaparser\MP_LoopBit;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_PostfixOp;
+use src\core\external\maximaparser\MP_PrefixOp;
+use src\core\external\maximaparser\MP_Root;
+use src\core\external\maximaparser\MP_Set;
+use src\core\external\maximaparser\MP_Statement;
+use src\core\external\maximaparser\MP_String;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that checks that the AST represents a singleton value
  * that consists of a numeric part and a part that describes a unit
@@ -194,7 +213,7 @@ class stack_ast_filter_802_singleton_units implements stack_cas_astfilter_parame
             }
         }
         if ($opfail || $formfail) {
-            $errors[] = StackPlatform::getTranslation('Illegal_input_form_units');
+            $errors[] = StackPlatform::getTranslation('Illegal_input_form_units', null);
         }
 
         // Check floats and fix if need be.

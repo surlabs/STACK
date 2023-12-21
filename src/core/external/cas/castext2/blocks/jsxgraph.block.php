@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
+use src\core\external\cas\castext2\castext2_parser_utils;
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+use src\platform\StackPlatform;
+
 stack_cas_castext2_iframe::register_counter('///JSXGRAPH_COUNT///');
 
 class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
@@ -235,37 +243,37 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
 
         if (!$widthend) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_width');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_width', null);
         }
         if (!$heightend) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_height');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_height', null);
         }
-        if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $widthtrim)) {
+        if (!preg_match('/^[0-9]*[.]?[0-9]+$/', $widthtrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_width_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_width_num', null);
         }
-        if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $heighttrim)) {
+        if (!preg_match('/^[0-9]*[.]?[0-9]+$/', $heighttrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_height_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_height_num', null);
         }
 
         if (array_key_exists('width', $this->params) &&
             array_key_exists('height', $this->params) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_overdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_overdefined_dimension', null);
         }
         if (!(array_key_exists('width', $this->params) ||
             array_key_exists('height', $this->params)) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_underdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_underdefined_dimension', null);
         }
 
         if (array_key_exists('version', $this->params) && array_key_exists($this->params['version'], self::$namedversions)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_unknown_named_version');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_unknown_named_version', null);
         }
 
         $valids = null;

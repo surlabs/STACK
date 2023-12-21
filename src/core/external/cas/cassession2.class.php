@@ -24,6 +24,14 @@
 
 namespace src\core\external\cas;
 
+use Exception;
+use src\core\external\maximaparser\maxima_parser_utils;
+use src\core\filters\StackParser;
+use src\core\options\StackOptions;
+use src\core\security\StackException;
+use src\core\version\MaximaVersion;
+use src\platform\StackPlatform;
+
 class stack_cas_session2 {
     /**
      * @var string separator used between successive CAS commands inside the block.
@@ -41,7 +49,7 @@ class stack_cas_session2 {
     private $instantiated;
 
     /**
-     * @var stack_options
+     * @var StackOptions
      */
     private $options;
 
@@ -76,11 +84,11 @@ class stack_cas_session2 {
         }
 
         if ($options === null) {
-            $this->options = new stack_options();
-        } else if (is_a($options, 'stack_options')) {
+            $this->options = new StackOptions(null);
+        } else if (is_a($options, 'StackOptions')) {
             $this->options = $options;
         } else {
-            throw new StackException('stack_cas_session: $options must be stack_options.');
+            throw new StackException('stack_cas_session: $options must be StackOptions.');
         }
 
         if (!($seed === null)) {
@@ -109,7 +117,7 @@ class stack_cas_session2 {
         return $ret;
     }
 
-    public function get_options(): stack_options {
+    public function get_options(): StackOptions {
         return $this->options;
     }
 
@@ -203,7 +211,7 @@ class stack_cas_session2 {
         $errors = array();
 
         if ($this->timeoutdebug !== '') {
-            $errors[] = array(StackPlatform::getTranslation('stackCas_failedtimeout'));
+            $errors[] = array(StackPlatform::getTranslation('stackCas_failedtimeout', null));
         }
 
         foreach ($this->statements as $num => $statement) {
@@ -293,7 +301,7 @@ class stack_cas_session2 {
         // Make the value of the seed available in the session.
         $command .= self::SEP . 'stack_seed:' . $this->seed;
         // The options.
-        $command .= $this->options->get_cas_commands()['commands'];
+        $command .= implode(self::SEP, $this->options->getCommands());
         // Some parts of logic storage.
         $command .= self::SEP . '_RESPONSE:["stack_map"]';
         $command .= self::SEP . '_VALUES:["stack_map"]';
@@ -309,7 +317,7 @@ class stack_cas_session2 {
 
         // Evaluate statements.
         foreach ($this->statements as $num => $statement) {
-            $command .= self::SEP . '%stmt:' . stack_utils::php_string_to_maxima_string('s' . $num);
+            $command .= self::SEP . '%stmt:' . StackParser::phpStringToMaximaString('s' . $num);
             $ef = $statement->get_evaluationform();
             $line = '_EC(errcatch(' . $ef . '),';
             $key = null;
@@ -323,7 +331,7 @@ class stack_cas_session2 {
                     $line = '_EC(errcatch(__s' . $num . ':' . $ef . '),';
                 }
             }
-            $line .= stack_utils::php_string_to_maxima_string($statement->get_source_context());
+            $line .= StackParser::phpStringToMaximaString($statement->get_source_context());
             $line .= ')';
 
             if (method_exists($statement, 'is_toplevel_property') && $statement->is_toplevel_property('blockexternal')) {
@@ -337,7 +345,7 @@ class stack_cas_session2 {
             if ($statement instanceof cas_latex_extractor) {
                 if ($collectlatex[$key] === $statement) {
                     $command .= self::SEP . '_CS2l(';
-                    $command .= stack_utils::php_string_to_maxima_string($key);
+                    $command .= StackParser::phpStringToMaximaString($key);
                     $command .= ',' . $key . ')';
                 }
             }
@@ -345,17 +353,17 @@ class stack_cas_session2 {
         // Collect values if required.
         foreach ($collectvalues as $key => $statement) {
             $command .= self::SEP . '_CS2v(';
-            $command .= stack_utils::php_string_to_maxima_string($key);
+            $command .= StackParser::phpStringToMaximaString($key);
             $command .= ',' . $key . ')';
         }
         foreach ($collectdvs as $key => $statement) {
             $command .= self::SEP . '_CS2dv(';
-            $command .= stack_utils::php_string_to_maxima_string($key);
+            $command .= StackParser::phpStringToMaximaString($key);
             $command .= ',' . $key . ')';
         }
         foreach ($collectdvsandvalues as $key => $statement) {
             $command .= self::SEP . '_CS2dvv(';
-            $command .= stack_utils::php_string_to_maxima_string($key);
+            $command .= StackParser::phpStringToMaximaString($key);
             $command .= ',' . $key . ')';
         }
 
@@ -386,7 +394,7 @@ class stack_cas_session2 {
                 $this->timeoutdebug = $results['timeoutdebug'];
             }
             foreach ($this->statements as $num => $statement) {
-                $errors = array(new $this->errclass(StackPlatform::getTranslation('stackCas_failedtimeout'), ''));
+                $errors = array(new $this->errclass(StackPlatform::getTranslation('stackCas_failedtimeout', null), ''));
                 $statement->set_cas_status($errors, array(), array());
             }
             return false;
@@ -435,7 +443,7 @@ class stack_cas_session2 {
                         // There can be multiple errors from multiple positions.
                         // The second element is the position.
                         foreach ($errs[0] as $er) {
-                            $err[] = new $this->errclass(stack_utils::maxima_translate_string($er), $errs[1]);
+                            $err[] = new $this->errclass(StackParser::maximaTranslateString($er), $errs[1]);
                         }
                     }
                 }
@@ -476,10 +484,9 @@ class stack_cas_session2 {
         // Check the Maxima versions match and fail badly if not.
         if (array_key_exists('__stackmaximaversion', $results['values'])) {
             $usedversion = $results['values']['__stackmaximaversion'];
-            $config = stack_utils::get_config();
-            if ($usedversion !== $config->stackmaximaversion) {
-                $errors = array(new $this->errclass(StackPlatform::getTranslation_error('healthchecksstackmaximaversionmismatch',
-                    array('fix' => '', 'usedversion' => $usedversion, 'expectedversion' => $config->stackmaximaversion)), ''));
+            if (!MaximaVersion::checkVersion($usedversion)) {
+                $errors = array(new $this->errclass(StackPlatform::getTranslation('healthchecksstackmaximaversionmismatch',
+                    array('fix' => '', 'usedversion' => $usedversion, 'expectedversion' => MaximaVersion::getVersion())), ''));
                 foreach ($this->statements as $num => $statement) {
                     $statement->set_cas_status($errors, array(), array());
                 }
@@ -535,7 +542,7 @@ class stack_cas_session2 {
                     $val = trim($statement->ast_to_string(null, $params));
                     $keyvals .= $val . ";\n";
                 } else {
-                    $keyvals .= "/* " . StackPlatform::getTranslation('stackInstall_testsuite_errors') . " */\n";
+                    $keyvals .= "/* " . StackPlatform::getTranslation('stackInstall_testsuite_errors', null) . " */\n";
                     $keyvals .= "/* " . trim($statement->get_errors()) . " */\n";
                 }
             }

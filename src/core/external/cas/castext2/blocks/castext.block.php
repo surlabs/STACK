@@ -15,6 +15,12 @@
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\cas\stack_ast_container;
+use src\core\external\cas\stack_ast_container_silent;
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Node;
+
 class stack_cas_castext2_castext extends stack_cas_castext2_block {
 
     public function compile($format, $options): ?MP_Node {

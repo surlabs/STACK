@@ -73,25 +73,27 @@ class StackOptions
      * StackOptions constructor.
      * Creates a new StackOptions object with the given options.
      * If blank array, the default options are used.
-     * @param array $array_options
+     * @param array|null $array_options
      * @throws StackException
      */
-    public function __construct(array $array_options)
+    public function __construct(?array $array_options)
     {
         $this->data = StackOptionsDefault::getDefaultOptions();
 
         //Overwrite default with given options
-        foreach ($array_options as $option_key => $option_value) {
-            if (!array_key_exists($option_key, $this->data)) {
-                //TODO: Log error, invalid option name
-                $this->status = self::STACK_OPTIONS_STATUS_ERROR;
-                throw new StackException('stack_options construct: $key ' . $option_key . ' is not a valid option name.');
-            } else {
-                if (isset($this->data[$option_key]['value'])) {
-                    $this->data[$option_key]['value'] = $option_value;
+        if (isset($array_options) && is_array($array_options)) {
+            foreach ($array_options as $option_key => $option_value) {
+                if (!array_key_exists($option_key, $this->data)) {
+                    //TODO: Log error, invalid option name
+                    $this->status = self::STACK_OPTIONS_STATUS_ERROR;
+                    throw new StackException('StackOptions construct: $key ' . $option_key . ' is not a valid option name.');
                 } else {
-                    //TODO: Log error, invalid option value
-                    return null;
+                    if (isset($this->data[$option_key]['value'])) {
+                        $this->data[$option_key]['value'] = $option_value;
+                    } else {
+                        //TODO: Log error, invalid option value
+                        return null;
+                    }
                 }
             }
         }
@@ -288,4 +290,12 @@ class StackOptions
         return $this->matrix_parentheses;
     }
 
+    /**
+     * Get the coomands
+     * @return array
+     */
+    public function getCommands() : array
+    {
+        return $this->maxima_options['commands'] ?? [];
+    }
 }

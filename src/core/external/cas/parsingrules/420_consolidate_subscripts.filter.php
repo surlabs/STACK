@@ -16,6 +16,10 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Node;
+
 /**
  * AST filter that consolidates subscripted atoms in the form M_1 into M1.
  * Consolidating students' input in this way makes it less likley they will be penalised

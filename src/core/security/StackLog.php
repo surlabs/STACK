@@ -22,5 +22,24 @@ namespace src\core\security;
  *********************************************************************/
 class StackLog
 {
+    /**
+     * Log a message
+     * @param string $header
+     * @param string $message
+     * @return void
+     */
+    public function log(string $header, string $message)
+    {
+        // TODO: Implement logging
+    }
 
+    /**
+     * Get the log
+     * @return array
+     */
+    public function getLog(): array
+    {
+        //TODO: Implement logging
+        return array();
+    }
 }

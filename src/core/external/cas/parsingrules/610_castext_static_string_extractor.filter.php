@@ -16,6 +16,13 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Atom;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+
 /**
  * AST filter that extracts static strings from CASText.
  * To be run after the CASText has been simplified.

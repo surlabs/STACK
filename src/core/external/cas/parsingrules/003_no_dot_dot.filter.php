@@ -16,6 +16,12 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Float;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that spots one inconvenient parser missconception dealing
  * with floats and the matrix multiplication operator.
@@ -83,7 +89,7 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                         $node->position['invalid'] = true;
                         // No need to warn about this if we are already invalid due to whatever reason.
                         $answernotes[] = 'MatrixMultWithFloat';
-                        $errors[] = StackPlatform::getTranslation('stackCas_baddotdot') . $node->toString();
+                        $errors[] = StackPlatform::getTranslation('stackCas_baddotdot', null) . $node->toString();
                     }
                 }
             }

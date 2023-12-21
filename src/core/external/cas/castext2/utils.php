@@ -20,6 +20,17 @@ declare(strict_types = 1);
 
 namespace src\core\external\cas\castext2;
 
+use src\core\external\cas\castext2\autogen\CTP_Parser;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_special_root;
+use src\core\external\maximaparser\maxima_parser_utils;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Root;
+use src\core\external\maximaparser\MP_Statement;
+use src\core\external\maximaparser\MP_String;
+use src\core\external\cas\castext2\CTP_Node;
+use src\core\external\cas\castext2\CTP_Root;
+use src\core\filters\StackParser;
+
 class castext2_parser_utils {
 
     // For the cases where you need to define the format.
@@ -69,7 +80,7 @@ class castext2_parser_utils {
     public static function postprocess_string(string $casresult): string {
         if (mb_substr($casresult, 0, 1) === '"') {
             // If it was flat.
-            return stack_utils::maxima_string_to_php_string($casresult);
+            return StackParser::maximaStringToPhpString($casresult);
         }
 
         $parsed = maxima_parser_utils::parse($casresult);
@@ -403,11 +414,11 @@ class castext2_parser_utils {
         string $stringwithcommasandnesting,
         bool $deep = false
     ): array {
-        $strings = stack_utils::all_substring_strings(
+        $strings = StackParser::allSubstringStrings(
             $stringwithcommasandnesting);
-        $safe = stack_utils::eliminate_strings(
+        $safe = StackParser::eliminateStrings(
             $stringwithcommasandnesting);
-        $elems = stack_utils::list_to_array($safe, false);
+        $elems = StackParser::listToArray($safe, false);
         if (count($strings) == 0) {
             return $elems;
         }
@@ -444,7 +455,7 @@ class castext2_parser_utils {
             if (is_array($value)) {
                 $r[] = self::unpack_maxima_strings($value);
             } else if (is_string($value)) {
-                $r[] = stack_utils::maxima_string_to_php_string($value);
+                $r[] = StackParser::maximaStringToPhpString($value);
             } else {
                 $r[] = $value;
             }

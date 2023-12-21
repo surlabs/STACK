@@ -16,6 +16,13 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that examines whether we have a pattern like a*x*b which might have arisen from axb, indicating
  * x has been used to indicate multiplication.  Typically 23.2 x 10^b, which is why we look for an identifier x10.
@@ -51,7 +58,7 @@ class stack_ast_filter_210_x_used_as_multiplication implements stack_cas_astfilt
                     ) {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
-                $errors[] = StackPlatform::getTranslation('Illegal_x10');
+                $errors[] = StackPlatform::getTranslation('Illegal_x10', null);
                 return false;
             }
 
@@ -63,14 +70,14 @@ class stack_ast_filter_210_x_used_as_multiplication implements stack_cas_astfilt
                     ) {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
-                $errors[] = StackPlatform::getTranslation('Illegal_x10');
+                $errors[] = StackPlatform::getTranslation('Illegal_x10', null);
                 return false;
             }
 
             if (($node instanceof MP_Identifier) && $node->value === 'x10') {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
-                $errors[] = StackPlatform::getTranslation('Illegal_x10');
+                $errors[] = StackPlatform::getTranslation('Illegal_x10', null);
                 return false;
             }
             return true;

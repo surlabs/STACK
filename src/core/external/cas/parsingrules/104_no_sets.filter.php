@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Set;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that prevents the use of any sets.
  */
@@ -26,7 +31,7 @@ class stack_ast_filter_104_no_sets implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_sets', $answernotes) === false) {
                     $answernotes[] = 'Illegal_sets';
-                    $errors[] = StackPlatform::getTranslation('Illegal_sets');
+                    $errors[] = StackPlatform::getTranslation('Illegal_sets', null);
                 }
             }
             return true;

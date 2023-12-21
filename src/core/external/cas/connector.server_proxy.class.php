@@ -27,6 +27,9 @@
 
 namespace src\core\external\cas;
 
+use Exception;
+use ZipArchive;
+
 class stack_cas_connection_server_proxy extends stack_cas_connection_base {
 
     protected function guess_maxima_command($path) {
@@ -99,7 +102,8 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
             file_put_contents($ziptemp, $ret);
 
             // Loop over the contents of the zip.
-            $zip = new ZipArchive();
+            $zip = new
+            ZipArchive();
             $zip->open($ziptemp);
             for ($i = 0; $i < $zip->numFiles; $i++) {
                 $filenameinzip = $zip->getNameIndex($i);

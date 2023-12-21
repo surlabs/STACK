@@ -18,6 +18,10 @@
 
 namespace src\core\external\cas;
 
+use src\core\filters\StackParser;
+use src\core\security\StackException;
+use src\platform\StackPlatform;
+
 class stack_cas_configuration {
     protected static $instance = null;
 
@@ -56,17 +60,17 @@ class stack_cas_configuration {
         $this->settings = get_config('qtype_stack');
         $this->date = date("F j, Y, g:i a");
 
-        $this->maximacodepath = stack_utils::convert_slash_paths(
+        $this->maximacodepath = StackParser::convertSlashPaths(
                 $CFG->dirroot . '/question/type/stack/stack/maxima');
 
-        $this->logpath = stack_utils::convert_slash_paths($CFG->dataroot . '/stack/logs');
+        $this->logpath = StackParser::convertSlashPaths($CFG->dataroot . '/stack/logs');
 
         $this->vnum = (float) substr($this->settings->maximaversion, 2);
 
         $this->blocksettings = array();
         $this->blocksettings['MAXIMA_PLATFORM'] = $this->settings->platform;
-        $this->blocksettings['maxima_tempdir'] = stack_utils::convert_slash_paths($CFG->dataroot . '/stack/tmp/');
-        $this->blocksettings['IMAGE_DIR']     = stack_utils::convert_slash_paths($CFG->dataroot . '/stack/plots/');
+        $this->blocksettings['maxima_tempdir'] = StackParser::convertSlashPaths($CFG->dataroot . '/stack/tmp/');
+        $this->blocksettings['IMAGE_DIR']     = StackParser::convertSlashPaths($CFG->dataroot . '/stack/plots/');
 
         $this->blocksettings['PLOT_SIZE'] = '[450,300]';
         // These are used by the GNUplot "set terminal" command. Currently no user interface...
@@ -124,11 +128,11 @@ class stack_cas_configuration {
         $plotcommands[] = $maximalocation. 'gnuplot/bin/wgnuplot.exe';
 
         // I'm really now totally and finally fed up with dealing with spaces in MS filenames.
-        $newplotlocation = stack_utils::convert_slash_paths($CFG->dataroot . '/stack/wgnuplot.exe');
+        $newplotlocation = StackParser::convertSlashPaths($CFG->dataroot . '/stack/wgnuplot.exe');
         foreach ($plotcommands as $plotcommand) {
             if (file_exists($plotcommand)) {
                 if (substr_count($plotcommand, ' ') === 0) {
-                    $newplotlocation = stack_utils::convert_slash_paths($CFG->dataroot . '/stack/wgnuplot.bat');
+                    $newplotlocation = StackParser::convertSlashPaths($CFG->dataroot . '/stack/wgnuplot.bat');
                     if (!file_put_contents($newplotlocation, $this->maxima_win_location() .
                             "gnuplot/bin/wgnuplot.exe %1 %2 %3 %3 %5 %6 %7 \n\n")) {
                         throw new StackException('Failed to write wgnuplot batch file to:'. $newplotlocation);
@@ -293,7 +297,7 @@ END;
      */
     public static function maximalocal_location() {
         global $CFG;
-        return stack_utils::convert_slash_paths($CFG->dataroot . '/stack/maximalocal.mac');
+        return StackParser::convertSlashPaths($CFG->dataroot . '/stack/maximalocal.mac');
     }
 
     /**
@@ -302,7 +306,7 @@ END;
      */
     public static function images_location() {
         global $CFG;
-        return stack_utils::convert_slash_paths($CFG->dataroot . '/stack/plots');
+        return StackParser::convertSlashPaths($CFG->dataroot . '/stack/plots');
     }
 
     /**
@@ -346,7 +350,10 @@ END;
         $message = '';
         $permittedlibraries = array_keys(self::$maximalibraries);
         $maximalib = $this->settings->maximalibraries;
-        $maximalib = explode(',', $maximalib);
+
+        if (is_string($maximalib)) {
+            $maximalib = explode(',', $maximalib);
+        }
         foreach ($maximalib as $lib) {
             $lib = trim($lib);
             // Only include and load supported libraries.

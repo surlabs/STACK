@@ -16,6 +16,12 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+
 /**
  * AST filter that rewrites `sconcat` calls to `simplode` calls if
  * the argument count is too high. To be used whenever we might

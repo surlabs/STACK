@@ -15,6 +15,10 @@
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+
 /**
  * Simple block for dealing with CORS content urls.
  */

@@ -15,6 +15,11 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+
 /**
  * AST filter that splits variables at number-letter boundaries not
  * at letter-number. e.g. a2b3c4 => a2*b3*c4.

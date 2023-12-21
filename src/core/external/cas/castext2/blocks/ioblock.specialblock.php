@@ -16,6 +16,12 @@
 namespace src\core\external\cas\castext2\blocks;
 
 
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+
 class stack_cas_castext2_special_ioblock extends stack_cas_castext2_block {
 
     public $channel;

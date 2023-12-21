@@ -16,6 +16,14 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Float;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_PrefixOp;
+
 /**
  * AST filter that rewrites floats as display functions to ensure
  * that the representation of them does not change when going through

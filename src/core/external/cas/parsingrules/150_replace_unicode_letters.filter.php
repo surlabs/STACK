@@ -16,6 +16,10 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Node;
+
 /**
  * AST filter that replaces unicode letters with the ASCII equivalent.
  * Note, this filter is currently not used.

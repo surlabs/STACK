@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+
 /**
  * AST filter that splits variables at number-letter boundaries and
  * at letter-number. e.g. ab3c4 => ab*3*c*4.

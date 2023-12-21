@@ -70,6 +70,7 @@ class stack_ast_container extends stack_ast_container_silent implements cas_late
      */
     private $displayvalue;
 
+    /** @noinspection PhpMissingParentConstructorInspection */
     protected function __construct() {
     }
 

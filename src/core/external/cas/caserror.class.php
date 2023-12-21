@@ -26,6 +26,8 @@
 
 namespace src\core\external\cas;
 
+use src\platform\StackPlatform;
+
 class stack_cas_error {
 
     /**
@@ -196,7 +198,8 @@ class stack_cas_error {
      * Note that we do not define the type of a question in the function declaration
      * this makes it simpler for other systems (i.e. Stateful) to extend this class.
      *
-     * @param $question A question that can be used to interpret the path and that can
+     * @param $question
+     * A question that can be used to interpret the path and that can
      * tell us if the user can edit it and should therefore see more descriptive errors.
      * @return string
      */
@@ -242,17 +245,17 @@ class stack_cas_error {
             if (isset($ctx['prt'])) {
                 if (isset($ctx['field'])
                     && ($ctx['field'] === 'truefeedback' || $ctx['field'] === 'falsefeedback')) {
-                    return StackPlatform::getTranslation('errorinfeedback');
+                    return StackPlatform::getTranslation('errorinfeedback', null);
                 }
-                return StackPlatform::getTranslation('erroringrading');
+                return StackPlatform::getTranslation('erroringrading', null);
             } else if (isset($ctx['input']) && isset($ctx['field'])
                 && $ctx['field'] === 'validation') { // This is a special field-name.
-                return StackPlatform::getTranslation('errorininputvalidation');
+                return StackPlatform::getTranslation('errorininputvalidation', null);
             } else if (isset($ctx['input'])) {
-                return StackPlatform::getTranslation('errorininitialisingquestion');
+                return StackPlatform::getTranslation('errorininitialisingquestion', null);
             }
             // Everyhing else is a general error.
-            return StackPlatform::getTranslation('generalerrorhappened');
+            return StackPlatform::getTranslation('generalerrorhappened', null);
         }
 
         if (isset($ctx['field'])) {
@@ -266,6 +269,6 @@ class stack_cas_error {
         }
 
         // Everything else is a general error.
-        return StackPlatform::getTranslation('generalerrorhappened');
+        return StackPlatform::getTranslation('generalerrorhappened', null);
     }
 }

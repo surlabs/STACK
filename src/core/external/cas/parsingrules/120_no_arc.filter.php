@@ -16,6 +16,12 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Node;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that identifies a particular family of function names
  * and marks them invalid.

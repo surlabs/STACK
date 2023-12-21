@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Node;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that prevents the use of parenthesis for wrapping expressions.
  * Basically, `2*(1+x)` has such a group while `sin(x)` is a function call
@@ -30,7 +35,7 @@ class stack_ast_filter_105_no_grouppings implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_groupping', $answernotes) === false) {
                     $answernotes[] = 'Illegal_groupping';
-                    $errors[] = StackPlatform::getTranslation('Illegal_groupping');
+                    $errors[] = StackPlatform::getTranslation('Illegal_groupping', null);
                 }
             }
             return true;

@@ -27,6 +27,9 @@
 
 namespace src\core\external\cas;
 
+use Exception;
+use ZipArchive;
+
 class stack_cas_connection_server extends stack_cas_connection_base {
 
     protected function guess_maxima_command($path) {

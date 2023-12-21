@@ -16,6 +16,8 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\security\StackException;
+
 /**
  * Unlike some other factories in STACK the parsing rule factory does not
  * try to find rules from the filesystem automatically, and rules must be
@@ -25,7 +27,7 @@ class stack_parsing_rule_factory {
 
     private static $singletons = array();
 
-    private static function build_from_name(string $name): stack_cas_astfilter {
+    private static function build_from_name(string $name): ?stack_cas_astfilter {
         // Might as well do the require once here, but better limit to
         // vetted and require all by default to catch syntax errors.
         switch ($name) {
@@ -134,6 +136,8 @@ class stack_parsing_rule_factory {
             case '999_strict':
                 return new stack_ast_filter_999_strict();
         }
+
+        return null;
     }
 
     public static function get_by_common_name(string $name): stack_cas_astfilter {

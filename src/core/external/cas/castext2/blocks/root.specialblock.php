@@ -15,6 +15,25 @@
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\castext2_block_factory;
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\CTP_IOBlock;
+use src\core\external\cas\castext2\CTP_Node;
+use src\core\external\cas\castext2\CTP_Raw;
+use src\core\external\cas\castext2\CTP_Root;
+use src\core\external\cas\castext2\CTP_String;
+use src\core\external\cas\castext2\parsingrules\stack_parsing_rule_factory;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\maxima_parser_utils;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+use src\core\security\StackException;
+
 class stack_cas_castext2_special_root extends stack_cas_castext2_block {
     public function compile($format, $options):  ? MP_Node {
         $r = null;

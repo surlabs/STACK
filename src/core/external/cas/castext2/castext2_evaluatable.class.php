@@ -29,6 +29,17 @@
 
 namespace src\core\external\cas\castext2;
 
+use Exception;
+use src\core\external\cas\cas_raw_value_extractor;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_include;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_special_root;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_textdownload;
+use src\core\external\cas\stack_ast_container;
+use src\core\external\cas\stack_cas_security;
+use src\core\filters\StackParser;
+use src\core\security\StackException;
+use src\platform\StackPlatform;
+
 class castext2_evaluatable implements cas_raw_value_extractor {
 
     private $compiled = null;
@@ -124,7 +135,7 @@ class castext2_evaluatable implements cas_raw_value_extractor {
             $ast = castext2_parser_utils::parse($this->source);
             // Turn the char indexes to line:column ones.
             $ast = castext2_parser_utils::position_remap($ast, $this->source);
-        } catch (SyntaxError $e) {
+        } catch (Exception $e) {
             $this->valid = false;
             $this->errors = [new $this->errclass($e->getMessage(), $this->context)];
             return false;
@@ -228,8 +239,8 @@ class castext2_evaluatable implements cas_raw_value_extractor {
         return '';
     }
 
-    public function set_cas_evaluated_value(string $stringval) {
-        $this->value = $stringval;
+    public function set_cas_evaluated_value(string $value) {
+        $this->value = $value;
     }
 
     public function requires_evaluation(): bool {
@@ -240,7 +251,7 @@ class castext2_evaluatable implements cas_raw_value_extractor {
         if (mb_substr($this->compiled, 0, 1) === '"') {
             // If the compiled value is already a string this does not need
             // to go to the CAS for evaluation.
-            $this->evaluated = stack_utils::maxima_string_to_php_string($this->compiled);
+            $this->evaluated = StackParser::maximaStringToPhpString($this->compiled);
             if ($this->statics !== null) {
                 // Even CASText2 that does not require evaluation goes through the common
                 // static string extraction, so return those into the string.
@@ -259,7 +270,7 @@ class castext2_evaluatable implements cas_raw_value_extractor {
             // Note that pure strings are even simpler...
             if (mb_substr((string) $this->value, 0, 1) === '"') {
                 // If it evaluated to entirely flat result.
-                $this->evaluated  = stack_utils::maxima_string_to_php_string($this->value);
+                $this->evaluated  = StackParser::maximaStringToPhpString($this->value);
                 if ($this->statics !== null) {
                     $this->evaluated = $this->statics->replace($this->evaluated);
                 }
@@ -268,8 +279,8 @@ class castext2_evaluatable implements cas_raw_value_extractor {
                 if ($this->value !== null) {
                     $value = castext2_parser_utils::string_to_list($this->value, true);
                 } else {
-                    $this->evaluated = '<h3>' . StackPlatform::getTranslation('castext_error_header') . '</h3><ul><li>';
-                    $this->evaluated .= StackPlatform::getTranslation('castext_error_unevaluated');
+                    $this->evaluated = '<h3>' . StackPlatform::getTranslation('castext_error_header', null) . '</h3><ul><li>';
+                    $this->evaluated .= StackPlatform::getTranslation('castext_error_unevaluated', null);
                     $this->evaluated .= '</li></ul>';
                     return $this->evaluated;
                 }
@@ -281,7 +292,7 @@ class castext2_evaluatable implements cas_raw_value_extractor {
                     $value = $this->statics->replace($value);
                 }
                 if ($value === null || $this->errors) {
-                    $this->evaluated = '<h3>' . StackPlatform::getTranslation('castext_error_header') . '</h3><ul><li>';
+                    $this->evaluated = '<h3>' . StackPlatform::getTranslation('castext_error_header', null) . '</h3><ul><li>';
                     $this->evaluated .= implode('</li><li>', $this->get_errors(false));
                     $this->evaluated .= '</li></ul>';
                 } else {

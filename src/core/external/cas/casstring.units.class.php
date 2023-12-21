@@ -21,6 +21,11 @@
 
 namespace src\core\external\cas;
 
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\security\StackException;
+use src\platform\StackPlatform;
+
 class stack_cas_casstring_units {
 
     /*
@@ -308,6 +313,7 @@ class stack_cas_casstring_units {
             if ($cache[strtolower($key)] != $key) {
                 $fndsynonym = true;
                 $answernote = 'unitssynonym';
+                //TODO: Implement stack_maxima_format_casstring() method.
                 $synonymerr = StackPlatform::getTranslation('stackCas_unitssynonym',
                         array('forbid' => stack_maxima_format_casstring($key),
                                 'unit' => stack_maxima_format_casstring($cache[strtolower($key)])));

@@ -26,6 +26,10 @@
 
 namespace src\core\external\cas\castext2;
 
+use src\core\external\maximaparser\maxima_parser_utils;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_String;
+
 class castext2_static_replacer {
     private $map;
 

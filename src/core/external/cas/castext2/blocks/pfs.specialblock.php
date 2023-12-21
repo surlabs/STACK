@@ -16,6 +16,15 @@
 namespace src\core\external\cas\castext2\blocks;
 
 
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+use src\core\filters\StackParser;
+
 /**
  * Special block allowing one to define plugin file details for subtrees
  * of the concatenated CASText. Basically, tag content like
@@ -46,9 +55,9 @@ class stack_cas_castext2_special_rewrite_pluginfile_urls extends stack_cas_caste
         // Now we might actually do the rewrite before everything else but
         // for now we prefer to leave it as a latter step, just in case someone
         // has managed to construct urls with parameters.
-        $r = '["%pfs",' . stack_utils::php_string_to_maxima_string($this->component) .
-            ',' . stack_utils::php_string_to_maxima_string($this->filearea) .
-            ',' . stack_utils::php_string_to_maxima_string($this->itemid) . ',';
+        $r = '["%pfs",' . StackParser::phpStringToMaximaString($this->component) .
+            ',' . StackParser::phpStringToMaximaString($this->filearea) .
+            ',' . StackParser::phpStringToMaximaString($this->itemid) . ',';
         $r = new MP_List([
             new MP_String('%pfs'),
             new MP_String($this->component),

@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that rewrites any strings present in the input by disabling
  * certain chars that would allow script injection.
@@ -30,7 +35,7 @@ class stack_ast_filter_997_string_security implements stack_cas_astfilter {
 
         $process = function($node) {
             if ($node instanceof MP_String) {
-                $node->value = StackPlatform::getTranslation_sanitise($node->value);
+                $node->value = StackPlatform::getTranslation($node->value, null);
             }
             return true;
         };

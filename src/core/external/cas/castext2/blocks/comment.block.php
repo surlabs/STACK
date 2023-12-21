@@ -16,6 +16,9 @@
 namespace src\core\external\cas\castext2\blocks;
 
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_Node;
+
 class stack_cas_castext2_comment extends stack_cas_castext2_block {
 
     public function compile($format, $options): ?MP_Node {

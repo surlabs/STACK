@@ -22,22 +22,28 @@
 
 namespace src\core\external\cas;
 
+use src\core\security\StackException;
+use src\core\security\StackLog;
+use src\platform\StackDatabase;
+use src\platform\StackPlatform;
+use stdClass;
+
 class stack_cas_connection_db_cache implements stack_cas_connection {
     /** @var stack_cas_connection the un-cached connection to Maxima. */
     protected $rawconnection;
 
-    /** @var stack_debug_log does the debugging. */
+    /** @var StackLog does the debugging. */
     protected $debug;
 
-    /** @var moodle_database The database connection to use for the cache. */
+    /** @var StackDatabase The database connection to use for the cache. */
     protected $db;
 
     /**
      * Constructor.
      * @param stack_cas_connection $rawconnection the un-cached connection.
-     * @param stack_debug_log $debuglog the debug log to use.
+     * @param StackLog $debuglog the debug log to use.
      */
-    public function __construct(stack_cas_connection $rawconnection, stack_debug_log $debuglog, moodle_database $db) {
+    public function __construct(stack_cas_connection $rawconnection, StackLog $debuglog, StackDatabase $db) {
         $this->rawconnection = $rawconnection;
         $this->debug = $debuglog;
         $this->db = $db;
@@ -56,7 +62,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
             }
             return $cached->result;
         }
-        $this->debug->log('Maxima command not found in the cache. Using the raw connection.');
+        $this->debug->log('Maxima command not found in the cache. Using the raw connection.', null);
         $result = $this->rawconnection->compute($command);
         // Only add to the cache if we didn't timeout!
         if (!stack_connection_helper::did_cas_timeout($result)) {
@@ -67,7 +73,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
 
     public function get_maxima_available() {
         if ('linux' != stack_connection_helper::get_platform()) {
-            return StackPlatform::getTranslation('healthunabletolistavail');
+            return StackPlatform::getTranslation('healthunabletolistavail', null);
         }
         $this->command = 'maxima --list-avail';
         $rawresult = $this->compute('');
@@ -83,7 +89,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
             // @codingStandardsIgnoreEnd
             return $cached->result;
         }
-        $this->debug->log('Maxima command not found in the cache. Using the raw connection.');
+        $this->debug->log('Maxima command not found in the cache. Using the raw connection.', null);
         $this->debug->log('Maxima command', $command);
         $parsed = $this->rawconnection->json_compute($command);
 
@@ -99,7 +105,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
     }
 
     public function get_debuginfo() {
-        return $this->debug->get_log();
+        return $this->debug->getLog();
     }
 
     /**
@@ -169,7 +175,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
 
     /**
      * Completely clear the cache.
-     * @param moodle_database $db the database connection to use to access the cache.
+     * @param StackDatabase $db the database connection to use to access the cache.
      */
     public static function clear_cache($db) {
         // Delete the cache records from the database.
@@ -195,7 +201,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
     }
 
     /**
-     * @param moodle_database $db the database connection to use to access the cache.
+     * @param StackDatabase $db the database connection to use to access the cache.
      * @return int the number of entries in the cache.
      */
     public static function entries_count($db) {

@@ -16,6 +16,16 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Atom;
+use src\core\external\maximaparser\MP_Boolean;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_Statement;
+
 /**
  * AST filter that rewrites calls to ev in such a way that they can deal
  * with the security system. Also rewrites evaluation flags if they are

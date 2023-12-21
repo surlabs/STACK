@@ -16,6 +16,13 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\maxima_corrective_parser;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that check identifiers for the use of chars that are
  * considered supercript. If found converts the expression into its
@@ -73,7 +80,7 @@ class stack_ast_filter_180_char_based_superscripts implements stack_cas_astfilte
                         $power = array_shift($segments);
 
                         $power = maxima_corrective_parser::parse($power, $errors, $answernotes, array('startRule' => 'Root',
-                                   'letToken' => StackPlatform::getTranslation('equiv_LET')));
+                                   'letToken' => StackPlatform::getTranslation('equiv_LET', null)));
                         // Should there be something truly unexpected.
                         if ($power === null) {
                             $node->position['invalid'] = true;

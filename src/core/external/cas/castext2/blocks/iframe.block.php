@@ -16,6 +16,14 @@
 //
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\castext2_parser_utils;
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+use src\platform\StackPlatform;
+
 /**
  * A block for providing means for creating IFRAMES.
  *
@@ -185,7 +193,7 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
         self::$counters['///IFRAME_COUNT///'] = self::$counters['///IFRAME_COUNT///'] + 1;
 
         // Output the placeholder for this frame.
-        return html_writer::tag('div', '', $attributes);
+        return StackPlatform::createTag('div', '', $attributes);
     }
 
     public function validate(&$errors=[], $options=[]): bool {
@@ -229,32 +237,32 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
 
         if (!$widthend) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_iframe_width');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_width', null);
         }
         if (!$heightend) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_iframe_height');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_height', null);
         }
-        if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $widthtrim)) {
+        if (!preg_match('/^[0-9]*[.]?[0-9]+$/', $widthtrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_iframe_width_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_width_num', null);
         }
-        if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $heighttrim)) {
+        if (!preg_match('/^[0-9]*[.]?[0-9]+$/', $heighttrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_iframe_height_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_height_num', null);
         }
 
         if (array_key_exists('width', $this->params) &&
             array_key_exists('height', $this->params) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_iframe_overdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_overdefined_dimension', null);
         }
         if (!(array_key_exists('width', $this->params) ||
             array_key_exists('height', $this->params)) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_iframe_underdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_underdefined_dimension', null);
         }
 
         return $valid;

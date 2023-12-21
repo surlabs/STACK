@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with STACK.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
+use src\core\external\cas\castext2\castext2_parser_utils;
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+use src\platform\StackPlatform;
+
 stack_cas_castext2_iframe::register_counter('///PARSONS_COUNT///');
 
 class stack_cas_castext2_parsons extends stack_cas_castext2_block {
@@ -179,15 +187,15 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         }
 
         // Parse steps and Sortable options separately if they exist. Invalid JSON will be identified by preprocess_steps function.
-        $code = 'var headers = {used: {header: "' . StackPlatform::getTranslation('stackBlock_parsons_used_header') . '"},
-        available: {header: "' . StackPlatform::getTranslation('stackBlock_parsons_available_header') . '"}};' . "\n";
+        $code = 'var headers = {used: {header: "' . StackPlatform::getTranslation('stackBlock_parsons_used_header', null) . '"},
+        available: {header: "' . StackPlatform::getTranslation('stackBlock_parsons_available_header', null) . '"}};' . "\n";
         $code .= 'var sortableUserOpts = {};' . "\n";
         $code .= 'var valid;' . "\n";
         $code .= '[proofSteps, headers, sortableUserOpts, valid] = preprocess_steps(proofSteps, headers, sortableUserOpts);' . "\n";
 
         // If the author's JSON has invalid format throw an error.
         $code .= 'if (valid === false)
-            {stack_js.display_error("' . StackPlatform::getTranslation('stackBlock_parsons_contents') . '");}' . "\n";
+            {stack_js.display_error("' . StackPlatform::getTranslation('stackBlock_parsons_contents', null) . '");}' . "\n";
 
         // Link up to STACK inputs.
         if (count($inputs) > 0) {
@@ -220,8 +228,8 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         // Options can now be validated since sortable objects have been instantiated, we throw warnings only.
         $code .= 'stackSortable.validate_options(
             possibleOptionKeys,
-            "' . StackPlatform::getTranslation('stackBlock_unknown_sortable_option') . '",
-            "' . StackPlatform::getTranslation('stackBlock_overwritten_sortable_option') . '");' . "\n";
+            "' . StackPlatform::getTranslation('stackBlock_unknown_sortable_option', null) . '",
+            "' . StackPlatform::getTranslation('stackBlock_overwritten_sortable_option', null) . '");' . "\n";
 
         // Create bin and add delete-all button events for clone mode.
         if ($clone === "true") {
@@ -307,30 +315,30 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
 
         if (!$widthend) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_parsons_width');
-        } else if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $widthtrim)) {
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_width', null);
+        } else if (!preg_match('/^[0-9]*[.]?[0-9]+$/', $widthtrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_parsons_width_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_width_num', null);
         }
         if (!$heightend) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_parsons_height');
-        } else if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $heighttrim)) {
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_height', null);
+        } else if (!preg_match('/^[0-9]*[.]?[0-9]+$/', $heighttrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_parsons_height_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_height_num', null);
         }
 
         if (array_key_exists('width', $this->params) &&
             array_key_exists('height', $this->params) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_parsons_overdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_overdefined_dimension', null);
         }
         if (!(array_key_exists('width', $this->params) ||
             array_key_exists('height', $this->params)) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTranslation('stackBlock_parsons_underdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_underdefined_dimension', null);
         }
 
         // Check version is only one of valid options.

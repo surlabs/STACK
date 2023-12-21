@@ -14,6 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\cas\stack_ast_container;
+use src\core\external\cas\stack_ast_container_silent;
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Boolean;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_String;
+use src\platform\StackPlatform;
+
 /**
  * The commonstring block is used to ouput string templates that
  * come from the localised strings. It requires that one defined
@@ -140,7 +154,7 @@ class stack_cas_castext2_commonstring extends stack_cas_castext2_block {
 
     public function postprocess(array $params, castext2_processor $processor): string {
         if (count($params) === 2) {
-            return StackPlatform::getTranslation($params[1]);
+            return StackPlatform::getTranslation($params[1], null);
         }
         $args = [];
         for ($i = 2; $i < count($params); $i += 2) {

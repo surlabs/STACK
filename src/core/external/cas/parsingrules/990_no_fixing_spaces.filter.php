@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Root;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that marks everything that has been fixed by fixing
  * spaces as invalid.

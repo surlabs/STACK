@@ -15,6 +15,11 @@
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+
 class stack_cas_castext2_special_stack_translate extends stack_cas_castext2_block {
     public function compile($format, $options): ?MP_Node {
         // These blocks do not actually exist in the normal input flow, they only appear in

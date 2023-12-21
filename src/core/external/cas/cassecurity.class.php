@@ -21,6 +21,8 @@
 
 namespace src\core\external\cas;
 
+use src\core\security\StackException;
+
 class stack_cas_security {
     // This holds a copy of the security-map.json so that it does not need to
     // be loaded too many times.
@@ -59,10 +61,10 @@ class stack_cas_security {
                     'logcontract' => true, 'logexpand' => true, 'member' => true, 'nroots' => true, 'nthroot' => true,
                     'numer' => true, 'partfrac' => true, 'polarform' => true, 'polartorect' => true, 'ratexpand' => true,
                     'ratsimp' => true, 'realpart' => true, 'round' => true, 'radcan' => true, 'num' => true, 'denom' => true,
-                    'trigsimp' => true, 'trigreduce' => true, 'solve' => true, 'allroots' => true,
+                    'trigreduce' => true, 'solve' => true, 'allroots' => true,
                     'simp' => true, 'setdifference' => true, 'sort' => true, 'subst' => true,
                     'trigexpand' => true, 'trigexpandplus' => true, 'trigexpandtimes' => true, 'triginverses' => true,
-                    'trigrat' => true, 'trigreduce' => true, 'trigsign' => true,
+                    'trigrat' => true, 'trigsign' => true,
                     'trigsimp' => true, 'truncate' => true, 'decimalplaces' => true, 'simplify' => true),
             '[[basic-calculus]]' => array('defint' => true, 'diff' => true, 'int' => true, 'integrate' => true,
                     'limit' => true, 'partial' => true, 'desolve' => true, 'express' => true, 'taylor' => true),

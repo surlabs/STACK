@@ -2113,7 +2113,7 @@ class MP_Let extends MP_Node {
         }
 
         if (isset($params['inputform']) && $params['inputform'] === true) {
-            return $indent . StackPlatform::getTranslation('equiv_LET') . ' ' .
+            return $indent . StackPlatform::getTranslation('equiv_LET', null) . ' ' .
                     $this->statement->toString($params);
         }
         $r = $indent . 'stacklet(' . $this->statement->lhs->toString($params) .',' .

@@ -14,6 +14,7 @@
     + [ ] maximaparser (Old)
   - filters
     + [ ] StackQuestionToJson
+    + [ ] StackParser
   - inputs
     + types
       - choices
@@ -56,4 +57,5 @@
       + [ ] StackText
     - version
       + [ ] StackVersion
+      + [ ] MaximaVersion
     - [x] StackQuestion

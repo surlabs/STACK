@@ -16,6 +16,13 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_If;
+use src\core\external\maximaparser\MP_Loop;
+use src\core\external\maximaparser\MP_LoopBit;
+use src\core\external\maximaparser\MP_Node;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that prevents the use of any programming logic.
  * Just `if` and `do`-keywords, note that one can use some functions
@@ -30,7 +37,7 @@ class stack_ast_filter_106_no_control_flow implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_control_flow', $answernotes) === false) {
                     $answernotes[] = 'Illegal_control_flow';
-                    $errors[] = StackPlatform::getTranslation('Illegal_control_flow');
+                    $errors[] = StackPlatform::getTranslation('Illegal_control_flow', null);
                 }
             }
             return true;

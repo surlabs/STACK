@@ -16,6 +16,10 @@
 //
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_Node;
+use src\platform\StackPlatform;
+
 /**
  * A block to turn unknown block references to something readable.
  *

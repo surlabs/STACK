@@ -23,11 +23,18 @@
 
 namespace src\core\external\cas;
 
+use src\core\filters\StackParser;
+use src\core\security\StackException;
+use src\core\security\StackLog;
+use src\platform\StackDatabase;
+use src\platform\StackPlatform;
+use stdClass;
+
 abstract class stack_connection_helper {
     /** @var stdClass cached copy of the STACK configuration settings. */
     protected static $config = null;
 
-    /** @var moodle_database keeps the connection to the 'otherdb' if we are using that option. */
+    /** @var StackDatabase keeps the connection to the 'otherdb' if we are using that option. */
     protected static $otherdb = null;
 
     /**
@@ -46,7 +53,7 @@ abstract class stack_connection_helper {
     public static function make() {
         self::ensure_config_loaded();
 
-        $debuglog = stack_utils::make_debug_log(self::$config->casdebugging);
+        $debuglog = new StackLog();
 
         switch (self::$config->platform) {
             case 'win':
@@ -71,7 +78,6 @@ abstract class stack_connection_helper {
                 throw new StackException('stack_connection_helper: ' .
                     '"tomcat" and "tomcat-optimised" settings are obsolete. ' .
                     ' Please choose "server" setting instead.');
-                break;
 
             default:
                 throw new StackException('stack_cas_connection: Unknown platform ' . self::$config->platform);
@@ -96,7 +102,7 @@ abstract class stack_connection_helper {
 
     /**
      * Initialises the database connection for the 'otherdb' cache type.
-     * @return moodle_database the DB connection to use.
+     * @return StackDatabase the DB connection to use.
      */
     protected static function get_other_db() {
         if (!is_null(self::$otherdb)) {
@@ -108,7 +114,7 @@ abstract class stack_connection_helper {
             $dboptions['dbsocket'] = true;
         }
 
-        self::$otherdb = moodle_database::get_driver_instance(
+        self::$otherdb = StackDatabase::get_driver_instance(
                 self::$config->cascachedbtype, self::$config->cascachedblibrary);
         self::$otherdb->connect(self::$config->cascachedbhost,
                 self::$config->cascachedbuser, self::$config->cascachedbpass,
@@ -204,12 +210,12 @@ abstract class stack_connection_helper {
     /**
      * Used when check_stackmaxima_version returns false. Give an appropriate
      * warning.
-     * @param stack_debug_log $debug log to write debug information to.
+     * @param StackLog $debug log to write debug information to.
      */
     public static function warn_about_version_mismatch($debug) {
         $warning = "WARNING: the version of the STACK-Maxima libraries used do not match the expected version. " .
                 "Please visit the STACK heathcheck page to resolve the problems.";
-        $debug->log($warning);
+        $debug->log($warning, null);
         debugging($warning);
     }
 
@@ -238,7 +244,7 @@ abstract class stack_connection_helper {
             return array('healthchecksstackmaximanotupdated', array($notificationsurl->out()), false);
         }
 
-        $usedversion = StackPlatform::getTranslation('healthchecksstackmaximatooold');
+        $usedversion = StackPlatform::getTranslation('healthchecksstackmaximatooold', null);
         foreach ($results as $result) {
             if ($result['key'] != '__stackmaximaversion') {
                 continue;
@@ -261,11 +267,11 @@ abstract class stack_connection_helper {
 
             case 'server':
             case 'server-proxy':
-                $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixserver');
+                $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixserver', null);
                 break;
 
             default:
-                $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixunknown');
+                $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixunknown', null);
         }
 
         return array('healthchecksstackmaximaversionmismatch',
@@ -324,7 +330,7 @@ abstract class stack_connection_helper {
         $success = true;
         $message = array();
         if (empty($results)) {
-            $message[] = StackPlatform::getTranslation('stackCas_allFailed');
+            $message[] = StackPlatform::getTranslation('stackCas_allFailed', null);
             $success = false;
         } else {
             $maximaversionum = 'unknown number';
@@ -346,7 +352,7 @@ abstract class stack_connection_helper {
                     }
                 } else if ('ts' === $result['key']) {
                     if ($result['value'] != '1') {
-                        $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_trigsimp');
+                        $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_trigsimp', null);
                         $success = false;
                     }
                 } else if ('MAXIMAversion' === $result['key']) {
@@ -364,14 +370,14 @@ abstract class stack_connection_helper {
         }
 
         if (strpos($debug, 'failed to load') !== false) {
-            $message[] = StackPlatform::getTranslation('settingmaximalibraries_failed');
+            $message[] = StackPlatform::getTranslation('settingmaximalibraries_failed', null);
             $success = false;
         }
 
         if ($success) {
-            $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_ok');
+            $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_ok', null);
         } else {
-            $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_not');
+            $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_not', null);
         }
 
         $message = implode(" ", $message);
@@ -387,7 +393,7 @@ abstract class stack_connection_helper {
         global $CFG;
         self::ensure_config_loaded();
 
-        $imagename = stack_utils::convert_slash_paths($CFG->dataroot . '/stack/maxima_opt_auto');
+        $imagename = StackParser::convertSlashPaths($CFG->dataroot . '/stack/maxima_opt_auto');
 
         $lisp = '1';
         // Try to guess the lisp version.
@@ -405,12 +411,12 @@ abstract class stack_connection_helper {
             case 'GCL':
                 $maximacommand = ':lisp (si::save-system "'.$imagename.'")' . "\n";
                 $maximacommand .= 'quit();'."\n";
-                $rawcommand = stack_utils::convert_slash_paths($imagename . ' -eval \'(cl-user::run)\'');
+                $rawcommand = StackParser::convertSlashPaths($imagename . ' -eval \'(cl-user::run)\'');
                 break;
 
             case 'SBCL':
                 $maximacommand = ':lisp (sb-ext:save-lisp-and-die "'.$imagename.'" :toplevel #\'run :executable t)' . "\n";
-                $rawcommand = stack_utils::convert_slash_paths($imagename);
+                $rawcommand = StackParser::convertSlashPaths($imagename);
                 break;
 
             case 'CLISP':
@@ -420,16 +426,16 @@ abstract class stack_connection_helper {
                 $lisprun = shell_exec('locate lisp.run');
                 if (trim($lisprun) == '') {
                     $success = false;
-                    $message = StackPlatform::getTranslation('healthautomaxopt_nolisprun');
+                    $message = StackPlatform::getTranslation('healthautomaxopt_nolisprun', null);
                     return array($message, '', $success, '');
                 }
                 $lisprun = explode("\n", $lisprun);
-                $rawcommand = $lisprun[0].' -q -M '.stack_utils::convert_slash_paths($imagename);
+                $rawcommand = $lisprun[0].' -q -M '.StackParser::convertSlashPaths($imagename);
                 break;
 
             default:
                 $success = false;
-                $message = StackPlatform::getTranslation('healthautomaxopt_nolisp');
+                $message = StackPlatform::getTranslation('healthautomaxopt_nolisp', null);
                 return array($message, '', $success, '');
         }
 
@@ -444,7 +450,7 @@ abstract class stack_connection_helper {
         $message = StackPlatform::getTranslation('healthautomaxopt_ok', array('command' => $commandline));
         if (!file_exists($imagename)) {
             $success = false;
-            $message = StackPlatform::getTranslation('healthautomaxopt_notok');
+            $message = StackPlatform::getTranslation('healthautomaxopt_notok', null);
         }
 
         return array($message, $debug, $success, $commandline, $rawcommand);

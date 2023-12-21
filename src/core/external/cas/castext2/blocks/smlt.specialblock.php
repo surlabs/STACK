@@ -16,6 +16,12 @@
 namespace src\core\external\cas\castext2\blocks;
 
 
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+
 /**
  * Special block handling the post processing using
  * stack_maxima_latex_tidy() function.

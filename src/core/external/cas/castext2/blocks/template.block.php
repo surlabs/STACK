@@ -16,6 +16,18 @@
 //
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\cas\stack_ast_container;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_If;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_String;
+
 /**
  * A block for providing means for repetition with the option for
  * overridable content.

@@ -23,6 +23,9 @@
 
 namespace src\core\external\cas;
 
+use src\core\external\maximaparser\MP_Node;
+use src\core\security\StackException;
+
 class stack_secure_loader implements cas_evaluatable {
 
     private $code;

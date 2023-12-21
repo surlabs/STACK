@@ -21,6 +21,24 @@
 
 namespace src\core\external\cas;
 
+use Exception;
+use src\core\external\cas\castext2\parsingrules\stack_parsing_rule_factory;
+use src\core\external\maximaparser\maxima_corrective_parser;
+use src\core\external\maximaparser\maxima_parser_utils;
+use src\core\external\maximaparser\MP_Float;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_PrefixOp;
+use src\core\external\maximaparser\MP_Root;
+use src\core\external\maximaparser\MP_Set;
+use src\core\external\maximaparser\MP_Statement;
+use src\core\external\maximaparser\MP_String;
+use src\core\filters\StackParser;
+use src\core\security\StackException;
 use src\platform\StackPlatform;
 
 class stack_ast_container_silent implements cas_evaluatable {
@@ -123,7 +141,7 @@ class stack_ast_container_silent implements cas_evaluatable {
         $errors = array();
         $answernotes = array();
         $parseroptions = array('startRule' => $grammar,
-                               'letToken' => StackPlatform::getTranslation('equiv_LET'),
+                               'letToken' => StackPlatform::getTranslation('equiv_LET', null),
                                'decimals' => $decimals
         );
 
@@ -177,7 +195,7 @@ class stack_ast_container_silent implements cas_evaluatable {
         $errors = array();
         $answernotes = array();
         $parseroptions = array('startRule' => 'Root',
-                               'letToken' => StackPlatform::getTranslation('equiv_LET'));
+                               'letToken' => StackPlatform::getTranslation('equiv_LET', null));
 
         if ($securitymodel === null) {
             $securitymodel = new stack_cas_security();
@@ -187,7 +205,7 @@ class stack_ast_container_silent implements cas_evaluatable {
         $ast = null;
         try {
             $ast = maxima_parser_utils::parse($raw);
-        } catch (SyntaxError $e) {
+        } catch (Exception $e) {
             $ast = maxima_corrective_parser::parse($raw, $errors, $answernotes, $parseroptions);
             // All stars that were insertted by that are invalid.
             // And that comes from the strict filter later.
@@ -564,6 +582,7 @@ class stack_ast_container_silent implements cas_evaluatable {
             $feedback = array();
             // Ensure feedback is given only once and translate it.
             foreach ($this->feedback as $fb) {
+                // TODO: Implement stack_maxima_translate() method.
                 $feedback[trim(stack_maxima_translate($fb))] = true;
             }
             return trim(implode(' ', array_keys($feedback)));
@@ -576,7 +595,7 @@ class stack_ast_container_silent implements cas_evaluatable {
      *  */
     public function decode_maxima_errors(string $error, bool $feedback=false) {
         $foundone = false;
-        $fixed = stack_utils::maxima_translate_string($error);
+        $fixed = StackParser::maximaTranslateString($error);
 
         foreach (self::$maximastrings as $s) {
             if (false !== strpos($fixed, $s)) {

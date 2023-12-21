@@ -16,6 +16,11 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Node;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that prevents the use of any evaluation groups.
  * `(x+y)` is ok but `(x,y)` is not. Happens later if someone does
@@ -28,7 +33,7 @@ class stack_ast_filter_505_no_evaluation_groups implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_groups', $answernotes) === false) {
                     $answernotes[] = 'Illegal_groups';
-                    $errors[] = StackPlatform::getTranslation('Illegal_groups');
+                    $errors[] = StackPlatform::getTranslation('Illegal_groups', null);
                 }
             }
             return true;

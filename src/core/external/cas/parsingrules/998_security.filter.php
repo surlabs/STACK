@@ -16,6 +16,25 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_casstring_units;
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_EvaluationFlag;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Group;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_Indexing;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_PostfixOp;
+use src\core\external\maximaparser\MP_PrefixOp;
+use src\core\external\maximaparser\MP_Root;
+use src\core\external\maximaparser\MP_Set;
+use src\core\external\maximaparser\MP_Statement;
+use src\core\external\maximaparser\MP_String;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that check security. Note that this is a parametric filter.
  */
@@ -117,14 +136,14 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
         if ($this->source === 's' && $evflags === true) {
             $valid = false;
             $answernotes[] = 'unencapsulated_comma';
-            $errors[] = StackPlatform::getTranslation('stackCas_unencpsulated_comma');
+            $errors[] = StackPlatform::getTranslation('stackCas_unencpsulated_comma', null);
         }
 
         // Nested function declarations are now forbidden. If you need to switch functions on the fly rename them.
         if ($nestedfunction) {
             $valid = false;
             $answernotes[] = 'nested_function_declaration';
-            $errors[] = StackPlatform::getTranslation('stackCas_nested_function_declaration');
+            $errors[] = StackPlatform::getTranslation('stackCas_nested_function_declaration', null);
         }
 
         // Separate the identifiers we meet for latter use. Not the nodes
@@ -166,7 +185,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
 
             // Add a limit, hiding behing nested mappings and definitions can be used as DOS.
             if ($i > 5000) {
-                $errors[] = trim(StackPlatform::getTranslation('stackCas_overrecursivesignatures'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_overrecursivesignatures', null));
                 $valid = false;
                 break;
             }
@@ -300,13 +319,13 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
         foreach (array_keys($operators) as $op) {
             // First handle certain fixed special rules for ops.
             if ($op === '?' || $op === '?? ' || $op === '? ') {
-                $errors[] = trim(StackPlatform::getTranslation('stackCas_qmarkoperators'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_qmarkoperators', null));
                 if (array_search('qmark', $answernotes) === false) {
                     $answernotes[] = 'qmark';
                 }
                 $valid = false;
             } else if ($this->source === 's' && ($op === "'" || $op === "''")) {
-                $errors[] = trim(StackPlatform::getTranslation('stackCas_apostrophe'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_apostrophe', null));
                 if (array_search('apostrophe', $answernotes) === false) {
                     $answernotes[] = 'apostrophe';
                 }
@@ -328,7 +347,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
             $vars = $identifierrules->get_case_variants($name, 'function');
 
             if ($this->source === 's' && $name === 'In' && !$identifierrules->is_allowed_word($name, 'function')) {
-                $errors[] = trim(StackPlatform::getTranslation('stackCas_badLogIn'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_badLogIn', null));
                 if (array_search('stackCas_badLogIn', $answernotes) === false) {
                     $answernotes[] = 'stackCas_badLogIn';
                 }
@@ -344,7 +363,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                 $valid = false;
             } else if (!$identifierrules->is_allowed_to_call($this->source, $name)) {
                 if ($name === 'ntuple') {
-                    $errors[] = StackPlatform::getTranslation('stackCas_forbiddenntuple');
+                    $errors[] = StackPlatform::getTranslation('stackCas_forbiddenntuple', null);
                 } else {
                     $errors[] = trim(StackPlatform::getTranslation('stackCas_forbiddenFunction',
                         array('forbid' => stack_maxima_format_casstring($name))));
@@ -360,7 +379,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                         if ($this->source === 's') {
                             $errors[] = trim(StackPlatform::getTranslation('stackCas_reserved_function', ['name' => $name]));
                         } else {
-                            $errors[] = trim(StackPlatform::getTranslation('stackCas_studentInputAsFunction'));
+                            $errors[] = trim(StackPlatform::getTranslation('stackCas_studentInputAsFunction', null));
                         }
                         $valid = false;
                     }

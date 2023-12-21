@@ -23,6 +23,8 @@
 
 namespace src\core\external\cas;
 
+use src\core\security\StackException;
+
 class stack_cas_connection_linux extends stack_cas_connection_base {
 
     protected function guess_maxima_command($path) {
@@ -106,7 +108,7 @@ class stack_cas_connection_linux extends stack_cas_connection_base {
             fclose($pipes[1]);
             $returnvalue = proc_close($casprocess);
 
-            $this->debug->log('CAS process return value: ' . $returnvalue);
+            $this->debug->log('CAS process return value: ' . $returnvalue, null);
 
             $this->debug->log('Timings', "Start: {$starttime}, End: {$now}, Taken = " .
                     ($now - $starttime));

@@ -23,6 +23,8 @@
 
 namespace src\core\external\cas;
 
+use src\core\security\StackException;
+
 class stack_cas_connection_windows extends stack_cas_connection_base {
 
     protected function guess_maxima_command($path) {

@@ -16,6 +16,16 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_demarkdown;
+use src\core\external\cas\castext2\blocks\stack_cas_castext2_demoodle;
+use src\core\external\cas\castext2\castext2_parser_utils;
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+
 /**
  * AST filter that simplifies compiled CASText, the aim is to merge
  * as much as possible down to as simple as possible parts.

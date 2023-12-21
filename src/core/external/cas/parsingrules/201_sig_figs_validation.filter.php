@@ -16,6 +16,14 @@
 
 namespace src\core\external\cas\castext2\parsingrules;
 
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Float;
+use src\core\external\maximaparser\MP_Integer;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Root;
+use src\core\external\maximaparser\MP_Statement;
+use src\platform\StackPlatform;
+
 /**
  * AST filter that examines the significant figures of the leftmost
  * integer or float.

@@ -16,6 +16,11 @@
 namespace src\core\external\cas\castext2\blocks;
 
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_String;
+
 class stack_cas_castext2_todo extends stack_cas_castext2_block {
 
     public function compile($format, $options): ?MP_Node {

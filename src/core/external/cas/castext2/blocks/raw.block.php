@@ -16,6 +16,17 @@
 namespace src\core\external\cas\castext2\blocks;
 
 
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\cas\stack_ast_container;
+use src\core\external\cas\stack_cas_security;
+use src\core\external\maximaparser\MP_Boolean;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_Operation;
+use src\core\external\maximaparser\MP_String;
+
 class stack_cas_castext2_raw extends stack_cas_castext2_block {
 
     public $content;

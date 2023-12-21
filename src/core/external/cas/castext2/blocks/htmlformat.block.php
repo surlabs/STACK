@@ -15,6 +15,15 @@
 // along with STACK.  If not, see <http://www.gnu.org/licenses/>.
 namespace src\core\external\cas\castext2\blocks;
 
+use src\core\external\cas\castext2\castext2_parser_utils;
+use src\core\external\cas\castext2\castext2_processor;
+use src\core\external\cas\castext2\stack_cas_castext2_block;
+use src\core\external\maximaparser\MP_FunctionCall;
+use src\core\external\maximaparser\MP_Identifier;
+use src\core\external\maximaparser\MP_List;
+use src\core\external\maximaparser\MP_Node;
+use src\core\external\maximaparser\MP_String;
+
 /**
  * Special block allowing swithing the injection formating back to RAW.
  * Useful if writing something one does not want to be escaped on output
@@ -42,7 +51,7 @@ class stack_cas_castext2_htmlformat extends stack_cas_castext2_block {
                 $r->items[] = $item;
             }
         } else {
-            $r->items[] = new MP_FunctionCall(new MP_Identifier('sconcat'), $$items);
+            $r->items[] = new MP_FunctionCall(new MP_Identifier('sconcat'), $items);
         }
 
         return $r;
