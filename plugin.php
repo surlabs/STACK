@@ -9,7 +9,7 @@ $id = "xqcas";
 $version = "8.1.0";
 
 $ilias_min_version = "8.0";
-$ilias_max_version = "8.999";
+$ilias_max_version = "9.999";
  
 $responsible = "Jesús Copado Mejías";
 $responsible_mail = "jcopado@surlabs.es";
