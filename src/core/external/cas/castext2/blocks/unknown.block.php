@@ -42,7 +42,7 @@ class stack_cas_castext2_unknown extends stack_cas_castext2_block {
      * Unknown blocks are always invalid.
      */
     public function validate(&$errors = [], $options = []): bool {
-        $errors[] = new $options['errclass'](StackPlatform::getTransaltion("unknown_block", ['type' => $this->params[' type']]),
+        $errors[] = new $options['errclass'](StackPlatform::getTranslation("unknown_block", ['type' => $this->params[' type']]),
                 $options['context'] . '/' . $this->position['start'] . '-' . $this->position['end']);
         return false;
     }

@@ -53,8 +53,8 @@ class stack_cas_healthcheck {
             $test['result'] = $result;
             $test['summary'] = $message;
             $test['details'] = html_writer::tag('p', $message);
-            $test['details'] .= html_writer::tag('p', StackPlatform::getTransaltion('settingmaximalibraries_failed'));
-            $test['details'] .= html_writer::tag('p', StackPlatform::getTransaltion('settingmaximalibraries_desc'));
+            $test['details'] .= html_writer::tag('p', StackPlatform::getTranslation('settingmaximalibraries_failed'));
+            $test['details'] .= html_writer::tag('p', StackPlatform::getTranslation('settingmaximalibraries_desc'));
             $this->tests[] = $test;
         }
 
@@ -70,7 +70,7 @@ class stack_cas_healthcheck {
                     $test['tag'] = 'stackmaximalibraries';
                     $test['result'] = null;
                     $test['summary'] = null;
-                    $test['details'] = html_writer::tag('p', StackPlatform::getTransaltion('healthcheckconfigintro1').' '.
+                    $test['details'] = html_writer::tag('p', StackPlatform::getTranslation('healthcheckconfigintro1').' '.
                         html_writer::tag('tt', $maximalocation));
                     $this->tests[] = $test;
                 } else {
@@ -88,8 +88,8 @@ class stack_cas_healthcheck {
                     $test = array();
                     $test['tag'] = 'healthcheckmaximabat';
                     $test['result'] = false;
-                    $test['summary'] = StackPlatform::getTransaltion('healthcheckmaximabatinfo', $CFG->dataroot);
-                    $test['details'] = html_writer::tag('p', StackPlatform::getTransaltion('healthcheckmaximabatinfo', $CFG->dataroot));
+                    $test['summary'] = StackPlatform::getTranslation('healthcheckmaximabatinfo', $CFG->dataroot);
+                    $test['details'] = html_writer::tag('p', StackPlatform::getTranslation('healthcheckmaximabatinfo', $CFG->dataroot));
                     $this->tests[] = $test;
                 }
 
@@ -109,7 +109,7 @@ class stack_cas_healthcheck {
                     $test = [];
                     $test['tag'] = 'healthcheckproxysettings';
                     $test['result'] = null;
-                    $test['summary'] = StackPlatform::getTransaltion('healthcheckproxysettings');
+                    $test['summary'] = StackPlatform::getTranslation('healthcheckproxysettings');
                     $this->tests[] = $test;
                     break;
                 }
@@ -139,7 +139,7 @@ class stack_cas_healthcheck {
             $test['tag'] = 'healthuncached';
             $test['result'] = $result;
             $test['summary'] = $message;
-            $test['details'] = html_writer::tag('p', StackPlatform::getTransaltion('healthuncachedintro')) . $message;
+            $test['details'] = html_writer::tag('p', StackPlatform::getTranslation('healthuncachedintro')) . $message;
             $test['details'] .= $genuinedebug;
             $this->tests[] = $test;
         }
@@ -149,11 +149,11 @@ class stack_cas_healthcheck {
             // Intentionally use get_string for the sample CAS and plots, so we don't render
             // the maths too soon.
             $this->output_cas_text('healthcheckconnect',
-                StackPlatform::getTransaltion('healthcheckconnectintro'), get_string('healthchecksamplecas', 'qtype_stack'));
+                StackPlatform::getTranslation('healthcheckconnectintro'), get_string('healthchecksamplecas', 'qtype_stack'));
             $this->output_cas_text('healthcheckconnectunicode',
-                StackPlatform::getTransaltion('healthcheckconnectintro'), get_string('healthchecksamplecasunicode', 'qtype_stack'));
+                StackPlatform::getTranslation('healthcheckconnectintro'), get_string('healthchecksamplecasunicode', 'qtype_stack'));
             $this->output_cas_text('healthcheckplots',
-                StackPlatform::getTransaltion('healthcheckplotsintro'), get_string('healthchecksampleplots', 'qtype_stack'));
+                StackPlatform::getTranslation('healthcheckplotsintro'), get_string('healthchecksampleplots', 'qtype_stack'));
         }
 
         // If we have a linux machine, and we are testing the raw connection then we should
@@ -165,7 +165,7 @@ class stack_cas_healthcheck {
             $test['tag'] = 'healthautomaxopt';
             $test['result'] = $result;
             $test['summary'] = $message;
-            $test['details'] = html_writer::tag('p', StackPlatform::getTransaltion('healthautomaxoptintro'));
+            $test['details'] = html_writer::tag('p', StackPlatform::getTranslation('healthautomaxoptintro'));
             $test['details'] .= html_writer::tag('pre', $debug);
             $this->tests[] = $test;
         }
@@ -175,8 +175,8 @@ class stack_cas_healthcheck {
             $test = array();
             $test['tag'] = 'healthchecksstackmaximaversion';
             $test['result'] = $result;
-            $test['summary'] = StackPlatform::getTransaltion($message, $details);
-            $test['details'] = StackPlatform::getTransaltion($message, $details);
+            $test['summary'] = StackPlatform::getTranslation($message, $details);
+            $test['details'] = StackPlatform::getTranslation($message, $details);
             $this->tests[] = $test;
         }
 
@@ -219,8 +219,8 @@ class stack_cas_healthcheck {
             $test = array();
             $test['tag'] = 'healthchecksstacklibrariesworking';
             $test['result'] = $result;
-            $test['summary'] = StackPlatform::getTransaltion($message, $details);
-            $test['details'] = StackPlatform::getTransaltion($message, $details);
+            $test['summary'] = StackPlatform::getTranslation($message, $details);
+            $test['details'] = StackPlatform::getTranslation($message, $details);
             $this->tests[] = $test;
         }
         // List the requested maxima packages in the summary.
@@ -235,7 +235,7 @@ class stack_cas_healthcheck {
         $test = array();
         $test['tag'] = 'settingcasresultscache';
         $test['result'] = null;
-        $test['summary'] = StackPlatform::getTransaltion('healthcheckcache_' . $config->casresultscache);
+        $test['summary'] = StackPlatform::getTranslation('healthcheckcache_' . $config->casresultscache);
         $test['details'] = null;
         $this->tests[] = $test;
     }
@@ -257,9 +257,9 @@ class stack_cas_healthcheck {
         if ($session->get_errors()) {
             $this->ishealthy = false;
             $test['result'] = false;
-            $test['summary'] = StackPlatform::getTransaltion('errors') . $ct->get_errors();
-            $test['details'] .= StackPlatform::getTransaltion('errors') . $ct->get_errors();
-            $test['details'] .= StackPlatform::getTransaltion('debuginfo') . $session->get_debuginfo();
+            $test['summary'] = StackPlatform::getTranslation('errors') . $ct->get_errors();
+            $test['details'] .= StackPlatform::getTranslation('errors') . $ct->get_errors();
+            $test['details'] .= StackPlatform::getTranslation('debuginfo') . $session->get_debuginfo();
         } else {
             $test['details'] .= html_writer::tag('p', stack_ouput_castext($ct->get_rendered()));
         }

@@ -34,7 +34,7 @@ class stack_ast_filter_030_no_trig_space implements stack_cas_astfilter {
                 $node->parentnode->op === '*' &&
                 isset($node->parentnode->position['fixspaces'])) {
                 if (array_key_exists($node->value, $selectednames)) {
-                    $errors[] = StackPlatform::getTransaltion('stackCas_trigspace',
+                    $errors[] = StackPlatform::getTranslation('stackCas_trigspace',
                             array('trig' => stack_maxima_format_casstring($node->value.'(...)')));
                     if (array_search('trigspace', $answernotes) === false) {
                         $answernotes[] = 'trigspace';

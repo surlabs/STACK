@@ -135,7 +135,7 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
     /* On a Linux system list the versions of maxima available for use. */
     public function get_maxima_available() {
         if ('linux' != stack_connection_helper::get_platform()) {
-            return StackPlatform::getTransaltion('healthunabletolistavail');
+            return StackPlatform::getTranslation('healthunabletolistavail');
         }
         $this->command = 'maxima --list-avail';
         $rawresult = $this->call_maxima('');
@@ -337,11 +337,11 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
             }
 
             if (strpos($err, '0 to a negative exponent') !== false) {
-                $err = StackPlatform::getTransaltion('Maxima_DivisionZero');
+                $err = StackPlatform::getTranslation('Maxima_DivisionZero');
             }
 
             if (strpos($err, 'args: argument must be a non-atomic expression;') !== false) {
-                $err = StackPlatform::getTransaltion('Maxima_Args');
+                $err = StackPlatform::getTranslation('Maxima_Args');
             }
 
             $errorclean[] = $err;

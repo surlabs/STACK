@@ -529,19 +529,19 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
 
         if (!$widthend) {
             $valid = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_width');
+            $err[] = StackPlatform::getTranslation('stackBlock_geogebra_width');
         }
         if (!$heightend) {
             $valid = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_height');
+            $err[] = StackPlatform::getTranslation('stackBlock_geogebra_height');
         }
         if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $widthtrim)) {
             $valid = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_width_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_geogebra_width_num');
         }
         if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $heighttrim)) {
             $valid = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_height_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_geogebra_height_num');
         }
 
         if (
@@ -550,7 +550,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
             array_key_exists('aspect-ratio', $this->params)
         ) {
             $valid = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_overdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_geogebra_overdefined_dimension');
         }
         if (
             !(
@@ -560,7 +560,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
             array_key_exists('aspect-ratio', $this->params)
         ) {
             $valid = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_underdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_geogebra_underdefined_dimension');
         }
 
         $valids = null;
@@ -571,7 +571,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
                     isset($options['inputs']) &&
                     !isset($options['inputs'][$varname])
                 ) {
-                    $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_input_missing', [
+                    $err[] = StackPlatform::getTranslation('stackBlock_geogebra_input_missing', [
                         'var' => $varname,
                     ]);
                 }
@@ -603,7 +603,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
                         }
                         $valids = array_merge($valids, $inputs);
                     }
-                    $err[] = StackPlatform::getTransaltion('stackBlock_geogebra_param', [
+                    $err[] = StackPlatform::getTranslation('stackBlock_geogebra_param', [
                         'param' => implode(', ', $valids),
                     ]);
                 }

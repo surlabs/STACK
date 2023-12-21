@@ -308,7 +308,7 @@ class stack_cas_casstring_units {
             if ($cache[strtolower($key)] != $key) {
                 $fndsynonym = true;
                 $answernote = 'unitssynonym';
-                $synonymerr = StackPlatform::getTransaltion('stackCas_unitssynonym',
+                $synonymerr = StackPlatform::getTranslation('stackCas_unitssynonym',
                         array('forbid' => stack_maxima_format_casstring($key),
                                 'unit' => stack_maxima_format_casstring($cache[strtolower($key)])));
             }
@@ -357,7 +357,7 @@ class stack_cas_casstring_units {
             return false;
         }
 
-        return(StackPlatform::getTransaltion('stackCas_unknownUnitsCase',
+        return(StackPlatform::getTranslation('stackCas_unknownUnitsCase',
             array('forbid' => stack_maxima_format_casstring($key),
                 'unit' => stack_maxima_format_casstring('['.implode(', ', $invalid[strtolower($key)]).']'))));
     }

@@ -129,7 +129,7 @@ class stack_ast_filter_802_singleton_units implements stack_cas_astfilter_parame
             }
             sort($keys);
             if (count($keys) > 0) {
-                $errors[] = StackPlatform::getTransaltion('Illegal_identifiers_in_units', implode(', ', $keys));
+                $errors[] = StackPlatform::getTranslation('Illegal_identifiers_in_units', implode(', ', $keys));
             }
         }
         if ((!$hasunits && $this->mandatoryunit) ||
@@ -155,7 +155,7 @@ class stack_ast_filter_802_singleton_units implements stack_cas_astfilter_parame
                 $formfail = true;
             } else if ($node instanceof MP_PrefixOp || $node instanceof MP_PostfixOp) {
                 $node->position['invalid'] = true;
-                $errors[] = StackPlatform::getTransaltion('Illegal_illegal_operation_in_units', $node->op);
+                $errors[] = StackPlatform::getTranslation('Illegal_illegal_operation_in_units', $node->op);
             } else if ($node instanceof MP_FunctionCall) {
                 $node->position['invalid'] = true;
                 $formfail = true;
@@ -182,7 +182,7 @@ class stack_ast_filter_802_singleton_units implements stack_cas_astfilter_parame
                     }
                     if (!($rhs instanceof MP_Integer)) {
                         $op->position['invalid'] = true;
-                        $errors[] = StackPlatform::getTransaltion('Illegal_illegal_power_of_ten_in_units', $node->op);
+                        $errors[] = StackPlatform::getTranslation('Illegal_illegal_power_of_ten_in_units', $node->op);
                     }
                 } else if ($op->lhs instanceof MP_Integer || $op->lhs instanceof MP_Float) {
                     $op->position['invalid'] = true;
@@ -194,7 +194,7 @@ class stack_ast_filter_802_singleton_units implements stack_cas_astfilter_parame
             }
         }
         if ($opfail || $formfail) {
-            $errors[] = StackPlatform::getTransaltion('Illegal_input_form_units');
+            $errors[] = StackPlatform::getTranslation('Illegal_input_form_units');
         }
 
         // Check floats and fix if need be.

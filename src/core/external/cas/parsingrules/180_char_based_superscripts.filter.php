@@ -73,7 +73,7 @@ class stack_ast_filter_180_char_based_superscripts implements stack_cas_astfilte
                         $power = array_shift($segments);
 
                         $power = maxima_corrective_parser::parse($power, $errors, $answernotes, array('startRule' => 'Root',
-                                   'letToken' => StackPlatform::getTransaltion('equiv_LET')));
+                                   'letToken' => StackPlatform::getTranslation('equiv_LET')));
                         // Should there be something truly unexpected.
                         if ($power === null) {
                             $node->position['invalid'] = true;

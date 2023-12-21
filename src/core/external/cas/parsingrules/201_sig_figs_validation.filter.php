@@ -47,9 +47,9 @@ class stack_ast_filter_201_sig_figs_validation implements stack_cas_astfilter_pa
         if ($node === null) {
             $root->position['invalid'] = true;
             if ($this->min !== null && $this->min > 0) {
-                $errors[] = StackPlatform::getTransaltion('numericalinputminsf', $this->min);
+                $errors[] = StackPlatform::getTranslation('numericalinputminsf', $this->min);
             } else {
-                $errors[] = StackPlatform::getTransaltion('numericalinputmaxsf', $this->max);
+                $errors[] = StackPlatform::getTranslation('numericalinputmaxsf', $this->max);
             }
         } else {
             // Hmm. where did stack_utils::decimal_places go?
@@ -90,16 +90,16 @@ class stack_ast_filter_201_sig_figs_validation implements stack_cas_astfilter_pa
             if ($this->min !== null && $this->min > 0) {
                 if ($max < $this->min) {
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTransaltion('numericalinputminsf', $this->min);
+                    $errors[] = StackPlatform::getTranslation('numericalinputminsf', $this->min);
                 } else if ($this->strict && $min < $this->min) {
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTransaltion('numericalinputminsf', $this->min);
+                    $errors[] = StackPlatform::getTranslation('numericalinputminsf', $this->min);
                 }
             }
             if ($this->max !== null && $this->max > 0) {
                 if ($min > $this->max) {
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTransaltion('numericalinputmaxsf', $this->max);
+                    $errors[] = StackPlatform::getTranslation('numericalinputmaxsf', $this->max);
                 }
             }
         }

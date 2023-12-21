@@ -45,7 +45,7 @@ class stack_ast_filter_120_no_arc implements stack_cas_astfilter {
                 if (array_key_exists($node->name->value, $selectednames)) {
                     $node->position['invalid'] = true;
 
-                    $errors[] = StackPlatform::getTransaltion('stackCas_triginv',
+                    $errors[] = StackPlatform::getTranslation('stackCas_triginv',
                         array('badinv' => stack_maxima_format_casstring($node->name->value),
                               'goodinv' => stack_maxima_format_casstring($selectednames[$node->name->value])));
                     if (array_search('triginv', $answernotes) === false) {

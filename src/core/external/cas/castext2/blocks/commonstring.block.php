@@ -140,7 +140,7 @@ class stack_cas_castext2_commonstring extends stack_cas_castext2_block {
 
     public function postprocess(array $params, castext2_processor $processor): string {
         if (count($params) === 2) {
-            return StackPlatform::getTransaltion($params[1]);
+            return StackPlatform::getTranslation($params[1]);
         }
         $args = [];
         for ($i = 2; $i < count($params); $i += 2) {
@@ -154,7 +154,7 @@ class stack_cas_castext2_commonstring extends stack_cas_castext2_block {
             $args[$params[$i]] = $val;
         }
 
-        return StackPlatform::getTransaltion($params[1], $args);
+        return StackPlatform::getTranslation($params[1], $args);
     }
 
 

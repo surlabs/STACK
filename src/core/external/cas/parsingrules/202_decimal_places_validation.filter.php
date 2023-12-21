@@ -44,9 +44,9 @@ class stack_ast_filter_202_decimal_places_validation implements stack_cas_astfil
         if ($node === null) {
             $root->position['invalid'] = true;
             if ($this->min !== null && $this->min > 0) {
-                $errors[] = StackPlatform::getTransaltion('numericalinputmindp', $this->min);
+                $errors[] = StackPlatform::getTranslation('numericalinputmindp', $this->min);
             } else {
-                $errors[] = StackPlatform::getTransaltion('numericalinputmaxdp', $this->max);
+                $errors[] = StackPlatform::getTranslation('numericalinputmaxdp', $this->max);
             }
         } else {
             // Hmm. where did stack_utils::decimal_places go?
@@ -63,13 +63,13 @@ class stack_ast_filter_202_decimal_places_validation implements stack_cas_astfil
             if ($this->min !== null && $this->min > 0) {
                 if (strlen($post) < $this->min) {
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTransaltion('numericalinputmindp', $this->min);
+                    $errors[] = StackPlatform::getTranslation('numericalinputmindp', $this->min);
                 }
             }
             if ($this->max !== null && $this->max > 0) {
                 if (strlen($post) > $this->max) {
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTransaltion('numericalinputmaxdp', $this->max);
+                    $errors[] = StackPlatform::getTranslation('numericalinputmaxdp', $this->max);
                 }
             }
         }

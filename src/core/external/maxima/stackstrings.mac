@@ -101,7 +101,7 @@ stackjson_parse(json) := block([r,tmp,tokens,mode,i,lastslash,c,starts,nt,k,v,dm
     elseif is(c="b") then r:sconcat(r,ascii(8))
     elseif is(c="f") then r:sconcat(r,ascii(12))
     elseif is(c="\"") then r:sconcat(r,"\"")
-    elseif is(c="u") then (r:sconcat(r,unicode(StackPlatform::getTransaltion_hex_to_num(substring(tmp,i+2,i+6)))),i:i+4)
+    elseif is(c="u") then (r:sconcat(r,unicode(StackPlatform::getTranslation_hex_to_num(substring(tmp,i+2,i+6)))),i:i+4)
     else r:sconcat(r,c)
    ) else (
     if is(c="\\") then lastslash:true
@@ -115,7 +115,7 @@ stackjson_parse(json) := block([r,tmp,tokens,mode,i,lastslash,c,starts,nt,k,v,dm
    elseif is(c="E") then r:append(r,[c])
    elseif is(c="+") then r:append(r,[c])
    elseif is(c="-") then r:append(r,[c])
-   else (tokens:append(tokens,[StackPlatform::getTransaltion_parse_number(simplode(r))]),i:i-1,mode:"raw")
+   else (tokens:append(tokens,[StackPlatform::getTranslation_parse_number(simplode(r))]),i:i-1,mode:"raw")
   ),
   i:i+1
  ),
@@ -166,7 +166,7 @@ stackjson_parse(json) := block([r,tmp,tokens,mode,i,lastslash,c,starts,nt,k,v,dm
 
 /* Takes a string that is assumed to be hexadecimal and turns it to an integer the hard way. */
 /* Returns interesting things if the input is not hexadecimal... */
-StackPlatform::getTransaltion_hex_to_num(hexstring) := block([c, tmp],
+StackPlatform::getTranslation_hex_to_num(hexstring) := block([c, tmp],
  c:0,
  for tmp in charlist(sdowncase(hexstring)) do c:c*16+(sposition(tmp,"0123456789abcdef")-1),
  return(ev(c, simp))
@@ -174,7 +174,7 @@ StackPlatform::getTransaltion_hex_to_num(hexstring) := block([c, tmp],
 
 /* Takes a string representing an integer or a float and parses it the hard way to avoid having to eval it. */
 /* probably sensitive to large exponents */
-StackPlatform::getTransaltion_parse_number(somestring) := block([c, b, phase, neg,nege, tmp, i],
+StackPlatform::getTranslation_parse_number(somestring) := block([c, b, phase, neg,nege, tmp, i],
  neg:false,
  nege:false,
  c:0,

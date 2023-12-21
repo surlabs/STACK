@@ -117,14 +117,14 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
         if ($this->source === 's' && $evflags === true) {
             $valid = false;
             $answernotes[] = 'unencapsulated_comma';
-            $errors[] = StackPlatform::getTransaltion('stackCas_unencpsulated_comma');
+            $errors[] = StackPlatform::getTranslation('stackCas_unencpsulated_comma');
         }
 
         // Nested function declarations are now forbidden. If you need to switch functions on the fly rename them.
         if ($nestedfunction) {
             $valid = false;
             $answernotes[] = 'nested_function_declaration';
-            $errors[] = StackPlatform::getTransaltion('stackCas_nested_function_declaration');
+            $errors[] = StackPlatform::getTranslation('stackCas_nested_function_declaration');
         }
 
         // Separate the identifiers we meet for latter use. Not the nodes
@@ -166,7 +166,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
 
             // Add a limit, hiding behing nested mappings and definitions can be used as DOS.
             if ($i > 5000) {
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_overrecursivesignatures'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_overrecursivesignatures'));
                 $valid = false;
                 break;
             }
@@ -179,7 +179,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                     if ($node->lhs->name instanceof MP_String || $node->lhs->name instanceof MP_Identifier) {
                         if ($identifierrules->has_feature($node->lhs->name->value, 'built-in')) {
                             $node->position['invalid'] = true;
-                            $errors[] = trim(StackPlatform::getTransaltion('stackCas_redefine_built_in', ['name' => $node->lhs->name->value]));
+                            $errors[] = trim(StackPlatform::getTranslation('stackCas_redefine_built_in', ['name' => $node->lhs->name->value]));
                             $valid = false;
                         }
                     }
@@ -300,19 +300,19 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
         foreach (array_keys($operators) as $op) {
             // First handle certain fixed special rules for ops.
             if ($op === '?' || $op === '?? ' || $op === '? ') {
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_qmarkoperators'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_qmarkoperators'));
                 if (array_search('qmark', $answernotes) === false) {
                     $answernotes[] = 'qmark';
                 }
                 $valid = false;
             } else if ($this->source === 's' && ($op === "'" || $op === "''")) {
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_apostrophe'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_apostrophe'));
                 if (array_search('apostrophe', $answernotes) === false) {
                     $answernotes[] = 'apostrophe';
                 }
                 $valid = false;
             } else if (!$identifierrules->is_allowed_as_operator($this->source, $op)) {
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_forbiddenOperator',
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_forbiddenOperator',
                         array('forbid' => stack_maxima_format_casstring($op))));
                 if (array_search('forbiddenOp', $answernotes) === false) {
                     $answernotes[] = 'forbiddenOp';
@@ -328,14 +328,14 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
             $vars = $identifierrules->get_case_variants($name, 'function');
 
             if ($this->source === 's' && $name === 'In' && !$identifierrules->is_allowed_word($name, 'function')) {
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_badLogIn'));
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_badLogIn'));
                 if (array_search('stackCas_badLogIn', $answernotes) === false) {
                     $answernotes[] = 'stackCas_badLogIn';
                 }
                 $valid = false;
             } else if ($this->source === 's' && count($vars) > 0 && array_search($name, $vars) === false) {
                 // Case sensitivity issues.
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_unknownFunctionCase',
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_unknownFunctionCase',
                     array('forbid' => stack_maxima_format_casstring($name),
                           'lower' => stack_maxima_format_casstring(implode(', ', $vars)))));
                 if (array_search('unknownFunctionCase', $answernotes) === false) {
@@ -344,9 +344,9 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                 $valid = false;
             } else if (!$identifierrules->is_allowed_to_call($this->source, $name)) {
                 if ($name === 'ntuple') {
-                    $errors[] = StackPlatform::getTransaltion('stackCas_forbiddenntuple');
+                    $errors[] = StackPlatform::getTranslation('stackCas_forbiddenntuple');
                 } else {
-                    $errors[] = trim(StackPlatform::getTransaltion('stackCas_forbiddenFunction',
+                    $errors[] = trim(StackPlatform::getTranslation('stackCas_forbiddenFunction',
                         array('forbid' => stack_maxima_format_casstring($name))));
                 }
                 if (array_search('forbiddenFunction', $answernotes) === false) {
@@ -358,9 +358,9 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                 foreach ($ctx[$name] as $key => $value) {
                     if ($key === -2) {
                         if ($this->source === 's') {
-                            $errors[] = trim(StackPlatform::getTransaltion('stackCas_reserved_function', ['name' => $name]));
+                            $errors[] = trim(StackPlatform::getTranslation('stackCas_reserved_function', ['name' => $name]));
                         } else {
-                            $errors[] = trim(StackPlatform::getTransaltion('stackCas_studentInputAsFunction'));
+                            $errors[] = trim(StackPlatform::getTranslation('stackCas_studentInputAsFunction'));
                         }
                         $valid = false;
                     }
@@ -373,7 +373,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
             if ($identifierrules->has_feature($name, 'constant')) {
                 // TODO: decide if we set this as validity issue, might break
                 // materials where the constants redefined do not affect things.
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_redefinitionOfConstant',
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_redefinitionOfConstant',
                         array('constant' => stack_maxima_format_casstring($name))));
                 if (array_search('writingToConstant', $answernotes) === false) {
                     $answernotes[] = 'writingToConstant';
@@ -398,7 +398,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
             };
             $ast->callbackRecurse($checkemptyfungroup);
             if (count($emptyfungroup) > 0) {
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_forbiddenWord',
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_forbiddenWord',
                             array('forbid' => stack_maxima_format_casstring('()'))));
                 if (array_search('emptyParens', $answernotes) === false) {
                     $answernotes[] = 'emptyParens';
@@ -430,7 +430,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
             // Check for operators like 'and' if they appear as variables
             // things have gone wrong.
             if ($identifierrules->has_feature($name, 'operator')) {
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_operatorAsVariable',
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_operatorAsVariable',
                     array('op' => stack_maxima_format_casstring($name))));
                 if (array_search('operatorPlacement', $answernotes) === false) {
                     $answernotes[] = 'operatorPlacement';
@@ -465,7 +465,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
 
             if ($identifierrules->has_feature($name, 'globalyforbiddenvariable')) {
                 // Very bad!
-                $errors[] = trim(StackPlatform::getTransaltion('stackCas_forbiddenWord',
+                $errors[] = trim(StackPlatform::getTranslation('stackCas_forbiddenWord',
                     array('forbid' => stack_maxima_format_casstring($name))));
                 if (array_search('forbiddenWord', $answernotes) === false) {
                     $answernotes[] = 'forbiddenWord';
@@ -490,7 +490,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                 if (!($identifierrules->is_allowed_to_read($this->source, $n) ||
                         ($name !== $n && $identifierrules->is_allowed_to_call($this->source, $n)))) {
                     if ($this->source === 't') {
-                        $errors[] = trim(StackPlatform::getTransaltion('stackCas_forbiddenWord',
+                        $errors[] = trim(StackPlatform::getTranslation('stackCas_forbiddenWord',
                             array('forbid' => stack_maxima_format_casstring($n))));
                         if (array_search('forbiddenWord', $answernotes) === false) {
                             $answernotes[] = 'forbiddenWord';
@@ -499,7 +499,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                     } else {
                         $vars = $identifierrules->get_case_variants($n, 'variable');
                         if (count($vars) > 0 && array_search($n, $vars) === false) {
-                            $errors[] = trim(StackPlatform::getTransaltion('stackCas_unknownVariableCase',
+                            $errors[] = trim(StackPlatform::getTranslation('stackCas_unknownVariableCase',
                                 array('forbid' => stack_maxima_format_casstring($n),
                                 'lower' => stack_maxima_format_casstring(
                                     implode(', ', $vars)))));
@@ -508,7 +508,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                             }
                             $valid = false;
                         } else {
-                            $errors[] = trim(StackPlatform::getTransaltion('stackCas_forbiddenVariable',
+                            $errors[] = trim(StackPlatform::getTranslation('stackCas_forbiddenVariable',
                                 array('forbid' => stack_maxima_format_casstring($n))));
                             if (array_search('forbiddenVariable', $answernotes) === false) {
                                 $answernotes[] = 'forbiddenVariable';
@@ -521,7 +521,7 @@ class stack_ast_filter_998_security implements stack_cas_astfilter_parametric {
                     if ($this->source === 's') {
                         $vars = $identifierrules->get_case_variants($n, 'variable');
                         if (count($vars) > 0 && array_search($n, $vars) === false) {
-                            $errors[] = trim(StackPlatform::getTransaltion('stackCas_unknownVariableCase',
+                            $errors[] = trim(StackPlatform::getTranslation('stackCas_unknownVariableCase',
                                 array('forbid' => stack_maxima_format_casstring($n),
                                 'lower' => stack_maxima_format_casstring(
                                     implode(', ', $vars)))));

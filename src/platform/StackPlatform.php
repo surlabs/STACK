@@ -42,7 +42,7 @@ abstract class StackPlatform
     /**
      * Gets the platform translation of a string
      * @param string $str
-     * @param array|null $params
+     * @param mixed $params
      * @return string|null
      */
     public static function getTranslation(string $str, mixed $params): ?string

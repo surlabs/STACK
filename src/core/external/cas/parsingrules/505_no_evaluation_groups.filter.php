@@ -28,7 +28,7 @@ class stack_ast_filter_505_no_evaluation_groups implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_groups', $answernotes) === false) {
                     $answernotes[] = 'Illegal_groups';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_groups');
+                    $errors[] = StackPlatform::getTranslation('Illegal_groups');
                 }
             }
             return true;

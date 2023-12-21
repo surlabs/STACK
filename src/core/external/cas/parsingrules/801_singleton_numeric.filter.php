@@ -96,7 +96,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
             } else {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_floats';
-                $errors[] = StackPlatform::getTransaltion('Illegal_singleton_floats', ['forms' => $this->acceptable_forms()]);
+                $errors[] = StackPlatform::getTranslation('Illegal_singleton_floats', ['forms' => $this->acceptable_forms()]);
                 return $ast;
             }
         }
@@ -104,7 +104,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
             if (!$this->integer) {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_integer';
-                $errors[] = StackPlatform::getTransaltion('Illegal_singleton_integer', ['forms' => $this->acceptable_forms()]);
+                $errors[] = StackPlatform::getTranslation('Illegal_singleton_integer', ['forms' => $this->acceptable_forms()]);
             }
             return $ast;
         }
@@ -115,7 +115,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
             (isset($usage['calls']) && count($usage['calls']) > 0)) {
             $node->position['invalid'] = true;
             $answernotes[] = 'Illegal_form';
-            $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+            $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
             return $ast;
         }
 
@@ -139,13 +139,13 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
                 } else {
                     $node->position['invalid'] = true;
                     $answernotes[] = 'Illegal_power';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+                    $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
                     return $ast;
                 }
             } else {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_power';
-                $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+                $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
                 return $ast;
             }
         }
@@ -164,13 +164,13 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
                 } else {
                     $node->position['invalid'] = true;
                     $answernotes[] = 'Illegal_power';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+                    $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
                     return $ast;
                 }
             } else {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_power';
-                $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+                $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
                 return $ast;
             }
             // Then the mantissa.
@@ -179,7 +179,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
                 if (!$this->integer) {
                     $node->position['invalid'] = true;
                     $answernotes[] = 'Illegal_integer';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_singleton_integer', ['forms' => $this->acceptable_forms()]);
+                    $errors[] = StackPlatform::getTranslation('Illegal_singleton_integer', ['forms' => $this->acceptable_forms()]);
                     return $ast;
                 }
             } else if ($node->lhs instanceof MP_Float) {
@@ -187,7 +187,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
                 if (!$this->float) {
                     $node->position['invalid'] = true;
                     $answernotes[] = 'Illegal_floats';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_singleton_floats', ['forms' => $this->acceptable_forms()]);
+                    $errors[] = StackPlatform::getTranslation('Illegal_singleton_floats', ['forms' => $this->acceptable_forms()]);
                     return $ast;
                 }
             } else if ($node->lhs instanceof MP_PrefixOp && ($node->lhs->op === '-' || $node->lhs->op === '+')) {
@@ -199,7 +199,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
                     if (!$this->integer) {
                         $node->position['invalid'] = true;
                         $answernotes[] = 'Illegal_integer';
-                        $errors[] = StackPlatform::getTransaltion('Illegal_singleton_integer', ['forms' => $this->acceptable_forms()]);
+                        $errors[] = StackPlatform::getTranslation('Illegal_singleton_integer', ['forms' => $this->acceptable_forms()]);
                         return $ast;
                     }
                 } else if ($node->lhs->rhs instanceof MP_Float) {
@@ -207,13 +207,13 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
                     if (!$this->float) {
                         $node->position['invalid'] = true;
                         $answernotes[] = 'Illegal_floats';
-                        $errors[] = StackPlatform::getTransaltion('Illegal_singleton_floats', ['forms' => $this->acceptable_forms()]);
+                        $errors[] = StackPlatform::getTranslation('Illegal_singleton_floats', ['forms' => $this->acceptable_forms()]);
                         return $ast;
                     }
                 } else {
                     $node->position['invalid'] = true;
                     $answernotes[] = 'Illegal_power';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+                    $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
                     return $ast;
                 }
             }
@@ -226,7 +226,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
         if ($m === null || $p === null) {
             $node->position['invalid'] = true;
             $answernotes[] = 'Illegal_power';
-            $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+            $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
             return $ast;
         }
 
@@ -236,7 +236,7 @@ class stack_ast_filter_801_singleton_numeric implements stack_cas_astfilter_para
             // Could have a separate error.
             $node->position['invalid'] = true;
             $answernotes[] = 'Illegal_power';
-            $errors[] = StackPlatform::getTransaltion('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
+            $errors[] = StackPlatform::getTranslation('Illegal_singleton_power', ['forms' => $this->acceptable_forms()]);
             return $ast;
         }
         // Only convert to float if safe to do so.

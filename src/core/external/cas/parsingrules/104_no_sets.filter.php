@@ -26,7 +26,7 @@ class stack_ast_filter_104_no_sets implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_sets', $answernotes) === false) {
                     $answernotes[] = 'Illegal_sets';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_sets');
+                    $errors[] = StackPlatform::getTranslation('Illegal_sets');
                 }
             }
             return true;

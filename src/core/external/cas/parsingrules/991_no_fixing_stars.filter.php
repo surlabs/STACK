@@ -46,7 +46,7 @@ class stack_ast_filter_991_no_fixing_stars implements stack_cas_astfilter_exclus
             $a = array();
             $a['cmd']  = stack_maxima_format_casstring($missingstring);
             // This is an error worthy of being at the top.
-            array_unshift($errors, StackPlatform::getTransaltion('stackCas_MissingStars', $a));
+            array_unshift($errors, StackPlatform::getTranslation('stackCas_MissingStars', $a));
         }
 
         return $ast;

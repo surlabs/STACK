@@ -357,7 +357,7 @@ END;
                 } else {
                     $valid = false;
                     $a = $lib;
-                    $message .= StackPlatform::getTransaltion('settingmaximalibraries_error', $a);
+                    $message .= StackPlatform::getTranslation('settingmaximalibraries_error', $a);
                 }
             }
         }

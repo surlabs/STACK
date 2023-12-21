@@ -235,37 +235,37 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
 
         if (!$widthend) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_width');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_width');
         }
         if (!$heightend) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_height');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_height');
         }
         if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $widthtrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_width_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_width_num');
         }
         if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $heighttrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_height_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_height_num');
         }
 
         if (array_key_exists('width', $this->params) &&
             array_key_exists('height', $this->params) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_overdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_overdefined_dimension');
         }
         if (!(array_key_exists('width', $this->params) ||
             array_key_exists('height', $this->params)) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_underdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_underdefined_dimension');
         }
 
         if (array_key_exists('version', $this->params) && array_key_exists($this->params['version'], self::$namedversions)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_unknown_named_version');
+            $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_unknown_named_version');
         }
 
         $valids = null;
@@ -273,7 +273,7 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
             if (substr($key, 0, 10) === 'input-ref-') {
                 $varname = substr($key, 10);
                 if (isset($options['inputs']) && !isset($options['inputs'][$varname])) {
-                    $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_input_missing',
+                    $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_input_missing',
                         ['var' => $varname]);
                 }
             } else if ($key !== 'width' && $key !== 'height' && $key !== 'aspect-ratio' &&
@@ -291,7 +291,7 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
                         }
                         $valids = array_merge($valids, $inputs);
                     }
-                    $err[] = StackPlatform::getTransaltion('stackBlock_jsxgraph_param', [
+                    $err[] = StackPlatform::getTranslation('stackBlock_jsxgraph_param', [
                         'param' => implode(', ', $valids)]);
                 }
             }

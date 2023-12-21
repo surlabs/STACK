@@ -33,7 +33,7 @@ class stack_ast_filter_031_no_trig_brackets implements stack_cas_astfilter {
                 $node->parentnode->target === $node) {
                 if (array_key_exists($node->value, $selectednames)) {
 
-                    $errors[] = StackPlatform::getTransaltion('stackCas_trigparens',
+                    $errors[] = StackPlatform::getTranslation('stackCas_trigparens',
                             array('forbid' => stack_maxima_format_casstring($node->value.'(x)')));
                     if (array_search('trigparens', $answernotes) === false) {
                         $answernotes[] = 'trigparens';

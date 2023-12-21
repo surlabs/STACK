@@ -45,8 +45,8 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                     substr($node->lhs->raw, -1) === '.')) {
                     $a = array();
                     $a['cmd']  = stack_maxima_format_casstring('..');
-                    if (array_search(StackPlatform::getTransaltion('stackCas_spuriousop', $a), $errors) === false) {
-                        $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+                    if (array_search(StackPlatform::getTranslation('stackCas_spuriousop', $a), $errors) === false) {
+                        $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
                     }
                     $node->position['invalid'] = true;
                     if (array_search('spuriousop', $answernotes) === false) {
@@ -63,8 +63,8 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                     $node->position['invalid'] = true;
                     $a = array();
                     $a['cmd']  = stack_maxima_format_casstring('..');
-                    if (array_search(StackPlatform::getTransaltion('stackCas_spuriousop', $a), $errors) === false) {
-                        $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+                    if (array_search(StackPlatform::getTranslation('stackCas_spuriousop', $a), $errors) === false) {
+                        $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
                     }
                     if (array_search('spuriousop', $answernotes) === false) {
                         $answernotes[] = 'spuriousop';
@@ -83,7 +83,7 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                         $node->position['invalid'] = true;
                         // No need to warn about this if we are already invalid due to whatever reason.
                         $answernotes[] = 'MatrixMultWithFloat';
-                        $errors[] = StackPlatform::getTransaltion('stackCas_baddotdot') . $node->toString();
+                        $errors[] = StackPlatform::getTranslation('stackCas_baddotdot') . $node->toString();
                     }
                 }
             }

@@ -26,7 +26,7 @@ class stack_ast_filter_102_no_strings implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_strings', $answernotes) === false) {
                     $answernotes[] = 'Illegal_strings';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_strings');
+                    $errors[] = StackPlatform::getTranslation('Illegal_strings');
                 }
             }
             return true;

@@ -52,7 +52,7 @@ class maxima_corrective_parser {
         $fixlet = false;
         $langlet = '';
         if (isset($parseroptions['startRule']) && $parseroptions['startRule'] === 'Equivline') {
-            $langlet = strtolower(StackPlatform::getTransaltion('equiv_LET')) . ' ';
+            $langlet = strtolower(StackPlatform::getTranslation('equiv_LET')) . ' ';
             if (strtolower(substr($stringles, 0, strlen($langlet))) === $langlet) {
                 $stringles = substr($stringles, strlen($langlet));
                 $fixlet = true;
@@ -74,7 +74,7 @@ class maxima_corrective_parser {
         if (strpos($stringles, '.') !== false &&
             strpos($stringles, ',') !== false &&
             strpos($stringles, ';') !== false) {
-                $errors[] = StackPlatform::getTransaltion('stackCas_decimal_usedthreesep');
+                $errors[] = StackPlatform::getTranslation('stackCas_decimal_usedthreesep');
         }
         $decimals = '.';
         if (array_key_exists('decimals', $parseroptions)) {
@@ -84,7 +84,7 @@ class maxima_corrective_parser {
             // Clearly there is a lot more work to do here to get this all to work!
             if (strpos($stringles, '.') !== false) {
                 $answernote[] = 'forbiddenCharDecimal';
-                $errors[] = StackPlatform::getTransaltion('stackCas_decimal_usedcomma');
+                $errors[] = StackPlatform::getTranslation('stackCas_decimal_usedcomma');
                 return null;
             }
             // Now we change from strict continental to British decimals.
@@ -143,9 +143,9 @@ class maxima_corrective_parser {
                 }
                 $answernote[] = 'forbiddenChar';
             }
-            $errors[] = StackPlatform::getTransaltion('stackCas_forbiddenChar', array( 'char' => implode(", ", array_unique($invalidchars))));
+            $errors[] = StackPlatform::getTranslation('stackCas_forbiddenChar', array( 'char' => implode(", ", array_unique($invalidchars))));
             foreach ($replaceablechars as $bad => $good) {
-                $errors[] = StackPlatform::getTransaltion('stackCas_useinsteadChar', array( 'bad' => $bad, 'char' => $good));
+                $errors[] = StackPlatform::getTranslation('stackCas_useinsteadChar', array( 'bad' => $bad, 'char' => $good));
             }
             return null;
         }
@@ -324,7 +324,7 @@ class maxima_corrective_parser {
                     }
                 }
             }
-            $errors[] = StackPlatform::getTransaltion('stackCas_forbiddenChar', array( 'char' => implode(", ", array_unique($invalidchars))));
+            $errors[] = StackPlatform::getTranslation('stackCas_forbiddenChar', array( 'char' => implode(", ", array_unique($invalidchars))));
             $answernote[] = 'forbiddenChar_parserError';
             return;
         }
@@ -334,12 +334,12 @@ class maxima_corrective_parser {
             $inline = stack_utils::check_bookends($stringles, '(', ')');
             if ($inline === 'left') {
                 $answernote[] = 'missingLeftBracket';
-                $errors[] = StackPlatform::getTransaltion('stackCas_missingLeftBracket',
+                $errors[] = StackPlatform::getTranslation('stackCas_missingLeftBracket',
                     array('bracket' => '(', 'cmd' => stack_maxima_format_casstring($string)));
                 return;
             } else if ($inline === 'right') {
                 $answernote[] = 'missingRightBracket';
-                $errors[] = StackPlatform::getTransaltion('stackCas_missingRightBracket',
+                $errors[] = StackPlatform::getTranslation('stackCas_missingRightBracket',
                   array('bracket' => ')', 'cmd' => stack_maxima_format_casstring($string)));
                 return;
             }
@@ -349,12 +349,12 @@ class maxima_corrective_parser {
             $inline = stack_utils::check_bookends($stringles, '[', ']');
             if ($inline === 'left') {
                 $answernote[] = 'missingLeftBracket';
-                $errors[] = StackPlatform::getTransaltion('stackCas_missingLeftBracket',
+                $errors[] = StackPlatform::getTranslation('stackCas_missingLeftBracket',
                     array('bracket' => '[', 'cmd' => stack_maxima_format_casstring($string)));
                 return;
             } else if ($inline === 'right') {
                 $answernote[] = 'missingRightBracket';
-                $errors[] = StackPlatform::getTransaltion('stackCas_missingRightBracket',
+                $errors[] = StackPlatform::getTranslation('stackCas_missingRightBracket',
                     array('bracket' => ']', 'cmd' => stack_maxima_format_casstring($string)));
                 return;
             }
@@ -364,12 +364,12 @@ class maxima_corrective_parser {
             $inline = stack_utils::check_bookends($stringles, '{', '}');
             if ($inline === 'left') {
                 $answernote[] = 'missingLeftBracket';
-                $errors[] = StackPlatform::getTransaltion('stackCas_missingLeftBracket',
+                $errors[] = StackPlatform::getTranslation('stackCas_missingLeftBracket',
                     array('bracket' => '{', 'cmd' => stack_maxima_format_casstring($string)));
                 return;
             } else if ($inline === 'right') {
                 $answernote[] = 'missingRightBracket';
-                $errors[] = StackPlatform::getTransaltion('stackCas_missingRightBracket',
+                $errors[] = StackPlatform::getTranslation('stackCas_missingRightBracket',
                     array('bracket' => '}', 'cmd' => stack_maxima_format_casstring($string)));
                 return;
             }
@@ -382,7 +382,7 @@ class maxima_corrective_parser {
             } else {
                 $a['cmd'] = stack_maxima_format_casstring('=>');
             }
-            $errors[] = StackPlatform::getTransaltion('stackCas_backward_inequalities', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_backward_inequalities', $a);
             $answernote[] = 'backward_inequalities';
         } else if ($foundchar === '=' && ($nextchar === '<' || $nextchar === '>')) {
             $a = array();
@@ -391,34 +391,34 @@ class maxima_corrective_parser {
             } else {
                 $a['cmd'] = stack_maxima_format_casstring('=>');
             }
-            $errors[] = StackPlatform::getTransaltion('stackCas_backward_inequalities', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_backward_inequalities', $a);
             $answernote[] = 'backward_inequalities';
         } else if ($foundchar === "'") {
-            $errors[] = StackPlatform::getTransaltion('stackCas_apostrophe');
+            $errors[] = StackPlatform::getTranslation('stackCas_apostrophe');
             $answernote[] = 'apostrophe';
         } else if (($foundchar === '/' && $nextchar === '*') || ($foundchar === '*' && $previouschar === '/')) {
             $a = array('cmd' => stack_maxima_format_casstring('/*'));
-            $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '=' && $nextchar === '=' && $previouschar === '=') {
             $a = array('cmd' => stack_maxima_format_casstring('==='));
-            $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '=' && ($nextchar === '=' || $previouschar === '=')) {
             $a = array('cmd' => stack_maxima_format_casstring('=='));
-            $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '&') {
             $a = array('cmd' => stack_maxima_format_casstring('&'));
-            $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '|') {
             $a = array('cmd' => stack_maxima_format_casstring('|'));
-            $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if (($foundchar === '>' && $previouschar === '<') || ($foundchar === '<' && $nextchar === '>')) {
             $a = array('cmd' => stack_maxima_format_casstring('<>'));
-            $errors[] = StackPlatform::getTransaltion('stackCas_spuriousop', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
 
         } else if (ctype_alpha($foundchar) && ctype_digit($previouschar)) {
@@ -428,13 +428,13 @@ class maxima_corrective_parser {
             $answernote[] = 'missing_stars';
         } else if ($foundchar === ',' || (ctype_digit($foundchar) && $previouschar === ',')) {
             if ($decimals == '.') {
-                $errors[] = StackPlatform::getTransaltion('stackCas_unencpsulated_comma');
+                $errors[] = StackPlatform::getTranslation('stackCas_unencpsulated_comma');
             } else {
-                $errors[] = StackPlatform::getTransaltion('stackCas_unencpsulated_semicolon');
+                $errors[] = StackPlatform::getTranslation('stackCas_unencpsulated_semicolon');
             }
             $answernote[] = 'unencapsulated_comma';
         } else if ($foundchar === '\\') {
-            $errors[] = StackPlatform::getTransaltion('illegalcaschars');
+            $errors[] = StackPlatform::getTranslation('illegalcaschars');
             $answernote[] = 'illegalcaschars';
         } else if ($previouschar === ' ') {
             $cmds = trim(mb_substr($original, 0, $exception->grammarOffset - 1));
@@ -443,9 +443,9 @@ class maxima_corrective_parser {
             $cmds = str_replace('@@IS@@', '*', $cmds);
             $cmds = str_replace('@@Is@@', '[[syntaxexamplehighlight]_[syntaxexamplehighlight]]', $cmds);
             $answernote[] = 'spaces';
-            $errors[] = StackPlatform::getTransaltion('stackCas_spaces', array('expr' => stack_maxima_format_casstring($cmds)));
+            $errors[] = StackPlatform::getTranslation('stackCas_spaces', array('expr' => stack_maxima_format_casstring($cmds)));
         } else if ($foundchar === ':' && (strpos($string, ':lisp') !== false)) {
-            $errors[] = StackPlatform::getTransaltion('stackCas_forbiddenWord',
+            $errors[] = StackPlatform::getTranslation('stackCas_forbiddenWord',
                     array('forbid' => stack_maxima_format_casstring('lisp')));
             $answernote[] = 'forbiddenWord';
         } else if (count($exception->expected) === 6 &&
@@ -458,42 +458,42 @@ class maxima_corrective_parser {
             // This is a sensitive check matching the expectations of the parser....
             // This is extra special, if we have an unencpsulated comma we might be parsing for an evaluation
             // flag but not find the assingment of flag value...
-            $errors[] = StackPlatform::getTransaltion('stackCas_unencpsulated_comma');
+            $errors[] = StackPlatform::getTranslation('stackCas_unencpsulated_comma');
             $answernote[] = 'unencapsulated_comma';
         } else if ($nextchar === '' && ($foundchar !== '' && mb_strpos($disallowedfinalchars, $foundchar) !== false)) {
             $a = array();
             $a['char'] = $foundchar;
             $a['cmd']  = stack_maxima_format_casstring($string);
-            $errors[] = StackPlatform::getTransaltion('stackCas_finalChar', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if ($foundchar === '' && ($previouschar !== '' &&
                 mb_strpos($disallowedfinalchars, $previouschar) !== false)) {
             $a = array();
             $a['char'] = $previouschar;
             $a['cmd']  = stack_maxima_format_casstring($string);
-            $errors[] = StackPlatform::getTransaltion('stackCas_finalChar', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if ($foundchar === '!' && ($previouschar === '' ||
                 !(ctype_alpha($previouschar) || ctype_digit($previouschar) || $previouschar === ')' || $previouschar === ']'))) {
             // TODO: Localise... "Operator X without a valid target. Needs something in front of it".
             $a = array('op' => stack_maxima_format_casstring('!'));
-            $errors[] = StackPlatform::getTransaltion('stackCas_badpostfixop', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_badpostfixop', $a);
             $answernote[] = 'badpostfixop';
         } else if (mb_strpos($disallowedfinalchars, mb_substr(trim($string), -1)) !== false) {
             $a = array();
             $a['char'] = mb_substr(trim($original), -1);
             $a['cmd']  = stack_maxima_format_casstring($string);
-            $errors[] = StackPlatform::getTransaltion('stackCas_finalChar', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if (($foundchar === '}' || $foundchar === ']' || $foundchar === ')') &&
                 mb_strpos($disallowedfinalchars, $previouschar) !== false) {
             $a = array();
             $a['char'] = $previouschar;
             $a['cmd']  = stack_maxima_format_casstring($string);
-            $errors[] = StackPlatform::getTransaltion('stackCas_finalChar', $a);
+            $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if ($previouschar === '"') {
-            $errors[] = StackPlatform::getTransaltion('stackCas_MissingString');
+            $errors[] = StackPlatform::getTranslation('stackCas_MissingString');
             $answernote[] = 'MissingString';
         } else {
             $errors[] = $exception->getMessage();

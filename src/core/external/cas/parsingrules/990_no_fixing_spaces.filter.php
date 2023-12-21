@@ -45,7 +45,7 @@ class stack_ast_filter_990_no_fixing_spaces implements stack_cas_astfilter_exclu
             }
             $a = array();
             $a['expr']  = stack_maxima_format_casstring($missingstring);
-            array_unshift($errors, StackPlatform::getTransaltion('stackCas_spaces', $a));
+            array_unshift($errors, StackPlatform::getTranslation('stackCas_spaces', $a));
         }
 
         return $ast;

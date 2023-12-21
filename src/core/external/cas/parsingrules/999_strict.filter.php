@@ -51,7 +51,7 @@ class stack_ast_filter_999_strict implements stack_cas_astfilter_exclusion {
             }
             $a = array();
             $a['expr']  = stack_maxima_format_casstring($missingstring);
-            array_unshift($errors, StackPlatform::getTransaltion('stackCas_spaces', $a));
+            array_unshift($errors, StackPlatform::getTranslation('stackCas_spaces', $a));
         }
 
         if ($stars === true) {
@@ -63,7 +63,7 @@ class stack_ast_filter_999_strict implements stack_cas_astfilter_exclusion {
             $a = array();
             $a['cmd']  = stack_maxima_format_casstring($missingstring);
             // This is an error worthy of being at the top.
-            array_unshift($errors, StackPlatform::getTransaltion('stackCas_MissingStars', $a));
+            array_unshift($errors, StackPlatform::getTranslation('stackCas_MissingStars', $a));
         }
 
         return $ast;

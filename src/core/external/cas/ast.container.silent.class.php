@@ -21,6 +21,8 @@
 
 namespace src\core\external\cas;
 
+use src\platform\StackPlatform;
+
 class stack_ast_container_silent implements cas_evaluatable {
 
     /**
@@ -121,7 +123,7 @@ class stack_ast_container_silent implements cas_evaluatable {
         $errors = array();
         $answernotes = array();
         $parseroptions = array('startRule' => $grammar,
-                               'letToken' => StackPlatform::getTransaltion('equiv_LET'),
+                               'letToken' => StackPlatform::getTranslation('equiv_LET'),
                                'decimals' => $decimals
         );
 
@@ -175,7 +177,7 @@ class stack_ast_container_silent implements cas_evaluatable {
         $errors = array();
         $answernotes = array();
         $parseroptions = array('startRule' => 'Root',
-                               'letToken' => StackPlatform::getTransaltion('equiv_LET'));
+                               'letToken' => StackPlatform::getTranslation('equiv_LET'));
 
         if ($securitymodel === null) {
             $securitymodel = new stack_cas_security();

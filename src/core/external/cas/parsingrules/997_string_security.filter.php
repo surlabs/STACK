@@ -30,7 +30,7 @@ class stack_ast_filter_997_string_security implements stack_cas_astfilter {
 
         $process = function($node) {
             if ($node instanceof MP_String) {
-                $node->value = StackPlatform::getTransaltion_sanitise($node->value);
+                $node->value = StackPlatform::getTranslation_sanitise($node->value);
             }
             return true;
         };

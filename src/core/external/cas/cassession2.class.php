@@ -203,7 +203,7 @@ class stack_cas_session2 {
         $errors = array();
 
         if ($this->timeoutdebug !== '') {
-            $errors[] = array(StackPlatform::getTransaltion('stackCas_failedtimeout'));
+            $errors[] = array(StackPlatform::getTranslation('stackCas_failedtimeout'));
         }
 
         foreach ($this->statements as $num => $statement) {
@@ -386,7 +386,7 @@ class stack_cas_session2 {
                 $this->timeoutdebug = $results['timeoutdebug'];
             }
             foreach ($this->statements as $num => $statement) {
-                $errors = array(new $this->errclass(StackPlatform::getTransaltion('stackCas_failedtimeout'), ''));
+                $errors = array(new $this->errclass(StackPlatform::getTranslation('stackCas_failedtimeout'), ''));
                 $statement->set_cas_status($errors, array(), array());
             }
             return false;
@@ -478,7 +478,7 @@ class stack_cas_session2 {
             $usedversion = $results['values']['__stackmaximaversion'];
             $config = stack_utils::get_config();
             if ($usedversion !== $config->stackmaximaversion) {
-                $errors = array(new $this->errclass(StackPlatform::getTransaltion_error('healthchecksstackmaximaversionmismatch',
+                $errors = array(new $this->errclass(StackPlatform::getTranslation_error('healthchecksstackmaximaversionmismatch',
                     array('fix' => '', 'usedversion' => $usedversion, 'expectedversion' => $config->stackmaximaversion)), ''));
                 foreach ($this->statements as $num => $statement) {
                     $statement->set_cas_status($errors, array(), array());
@@ -535,7 +535,7 @@ class stack_cas_session2 {
                     $val = trim($statement->ast_to_string(null, $params));
                     $keyvals .= $val . ";\n";
                 } else {
-                    $keyvals .= "/* " . StackPlatform::getTransaltion('stackInstall_testsuite_errors') . " */\n";
+                    $keyvals .= "/* " . StackPlatform::getTranslation('stackInstall_testsuite_errors') . " */\n";
                     $keyvals .= "/* " . trim($statement->get_errors()) . " */\n";
                 }
             }

@@ -37,7 +37,7 @@ class maxima_parser_utils {
 
         $parseoptions = [
             'startRule' => $parserule,
-            'letToken' => StackPlatform::getTransaltion('equiv_LET'),
+            'letToken' => StackPlatform::getTranslation('equiv_LET'),
             'allowPM' => $allowpm
         ];
         if ($parserule === 'Root') {

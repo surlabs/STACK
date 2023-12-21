@@ -229,32 +229,32 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
 
         if (!$widthend) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_iframe_width');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_width');
         }
         if (!$heightend) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_iframe_height');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_height');
         }
         if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $widthtrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_iframe_width_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_width_num');
         }
         if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $heighttrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_iframe_height_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_height_num');
         }
 
         if (array_key_exists('width', $this->params) &&
             array_key_exists('height', $this->params) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_iframe_overdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_overdefined_dimension');
         }
         if (!(array_key_exists('width', $this->params) ||
             array_key_exists('height', $this->params)) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_iframe_underdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_iframe_underdefined_dimension');
         }
 
         return $valid;

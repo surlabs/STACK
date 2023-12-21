@@ -268,8 +268,8 @@ class castext2_evaluatable implements cas_raw_value_extractor {
                 if ($this->value !== null) {
                     $value = castext2_parser_utils::string_to_list($this->value, true);
                 } else {
-                    $this->evaluated = '<h3>' . StackPlatform::getTransaltion('castext_error_header') . '</h3><ul><li>';
-                    $this->evaluated .= StackPlatform::getTransaltion('castext_error_unevaluated');
+                    $this->evaluated = '<h3>' . StackPlatform::getTranslation('castext_error_header') . '</h3><ul><li>';
+                    $this->evaluated .= StackPlatform::getTranslation('castext_error_unevaluated');
                     $this->evaluated .= '</li></ul>';
                     return $this->evaluated;
                 }
@@ -281,7 +281,7 @@ class castext2_evaluatable implements cas_raw_value_extractor {
                     $value = $this->statics->replace($value);
                 }
                 if ($value === null || $this->errors) {
-                    $this->evaluated = '<h3>' . StackPlatform::getTransaltion('castext_error_header') . '</h3><ul><li>';
+                    $this->evaluated = '<h3>' . StackPlatform::getTranslation('castext_error_header') . '</h3><ul><li>';
                     $this->evaluated .= implode('</li><li>', $this->get_errors(false));
                     $this->evaluated .= '</li></ul>';
                 } else {

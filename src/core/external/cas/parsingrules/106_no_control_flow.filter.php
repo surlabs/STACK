@@ -30,7 +30,7 @@ class stack_ast_filter_106_no_control_flow implements stack_cas_astfilter {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_control_flow', $answernotes) === false) {
                     $answernotes[] = 'Illegal_control_flow';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_control_flow');
+                    $errors[] = StackPlatform::getTranslation('Illegal_control_flow');
                 }
             }
             return true;

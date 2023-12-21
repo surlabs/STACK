@@ -179,15 +179,15 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         }
 
         // Parse steps and Sortable options separately if they exist. Invalid JSON will be identified by preprocess_steps function.
-        $code = 'var headers = {used: {header: "' . StackPlatform::getTransaltion('stackBlock_parsons_used_header') . '"},
-        available: {header: "' . StackPlatform::getTransaltion('stackBlock_parsons_available_header') . '"}};' . "\n";
+        $code = 'var headers = {used: {header: "' . StackPlatform::getTranslation('stackBlock_parsons_used_header') . '"},
+        available: {header: "' . StackPlatform::getTranslation('stackBlock_parsons_available_header') . '"}};' . "\n";
         $code .= 'var sortableUserOpts = {};' . "\n";
         $code .= 'var valid;' . "\n";
         $code .= '[proofSteps, headers, sortableUserOpts, valid] = preprocess_steps(proofSteps, headers, sortableUserOpts);' . "\n";
 
         // If the author's JSON has invalid format throw an error.
         $code .= 'if (valid === false)
-            {stack_js.display_error("' . StackPlatform::getTransaltion('stackBlock_parsons_contents') . '");}' . "\n";
+            {stack_js.display_error("' . StackPlatform::getTranslation('stackBlock_parsons_contents') . '");}' . "\n";
 
         // Link up to STACK inputs.
         if (count($inputs) > 0) {
@@ -220,8 +220,8 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         // Options can now be validated since sortable objects have been instantiated, we throw warnings only.
         $code .= 'stackSortable.validate_options(
             possibleOptionKeys,
-            "' . StackPlatform::getTransaltion('stackBlock_unknown_sortable_option') . '",
-            "' . StackPlatform::getTransaltion('stackBlock_overwritten_sortable_option') . '");' . "\n";
+            "' . StackPlatform::getTranslation('stackBlock_unknown_sortable_option') . '",
+            "' . StackPlatform::getTranslation('stackBlock_overwritten_sortable_option') . '");' . "\n";
 
         // Create bin and add delete-all button events for clone mode.
         if ($clone === "true") {
@@ -307,30 +307,30 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
 
         if (!$widthend) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_parsons_width');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_width');
         } else if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $widthtrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_parsons_width_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_width_num');
         }
         if (!$heightend) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_parsons_height');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_height');
         } else if (!preg_match('/^[0-9]*[\.]?[0-9]+$/', $heighttrim)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_parsons_height_num');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_height_num');
         }
 
         if (array_key_exists('width', $this->params) &&
             array_key_exists('height', $this->params) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_parsons_overdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_overdefined_dimension');
         }
         if (!(array_key_exists('width', $this->params) ||
             array_key_exists('height', $this->params)) &&
             array_key_exists('aspect-ratio', $this->params)) {
             $valid    = false;
-            $err[] = StackPlatform::getTransaltion('stackBlock_parsons_underdefined_dimension');
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_underdefined_dimension');
         }
 
         // Check version is only one of valid options.
@@ -338,7 +338,7 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
                 self::$namedversions)) {
             $valid    = false;
             $validversions = ['cdn', 'local'];
-            $err[] = StackPlatform::getTransaltion('stackBlock_parsons_unknown_named_version', ['version' => implode(', ',
+            $err[] = StackPlatform::getTranslation('stackBlock_parsons_unknown_named_version', ['version' => implode(', ',
                 $validversions)]);
         }
 
@@ -347,7 +347,7 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
             $validmjversions = ['2', '3'];
             if (!in_array($this->params['mathjax'], $validmjversions)) {
                 $valid = false;
-                $err[] = StackPlatform::getTransaltion('stackBlock_parsons_unknown_mathjax_version', ['mjversion' => implode(', ',
+                $err[] = StackPlatform::getTranslation('stackBlock_parsons_unknown_mathjax_version', ['mjversion' => implode(', ',
                     $validmjversions)]);
             }
         }
@@ -363,7 +363,7 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
                 if ($valids === null) {
                     $valids = ['width', 'height', 'aspect-ratio', 'version', 'overridecss',
                         'overridejs', 'input', 'orientation', 'clone'];
-                    $err[] = StackPlatform::getTransaltion('stackBlock_parsons_param', [
+                    $err[] = StackPlatform::getTranslation('stackBlock_parsons_param', [
                         'param' => implode(', ', $valids)]);
                 }
             }

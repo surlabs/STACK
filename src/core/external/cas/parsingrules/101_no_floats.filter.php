@@ -26,7 +26,7 @@ class stack_ast_filter_101_no_floats implements stack_cas_astfilter_exclusion {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_floats', $answernotes) === false) {
                     $answernotes[] = 'Illegal_floats';
-                    $errors[] = StackPlatform::getTransaltion('Illegal_floats');
+                    $errors[] = StackPlatform::getTranslation('Illegal_floats');
                 }
             }
             return true;

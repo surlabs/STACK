@@ -8,6 +8,10 @@
     + [ ] StackEvaluation
     + [ ] StackPotentialResponseTree
     + [ ] StackPotentialResponseTreeEvaluable
+  - external
+    + [ ] cas (Old)
+    + [ ] maxima (Old)
+    + [ ] maximaparser (Old)
   - filters
     + [ ] StackQuestionToJson
   - inputs

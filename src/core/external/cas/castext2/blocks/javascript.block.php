@@ -121,7 +121,7 @@ class stack_cas_castext2_javascript extends stack_cas_castext2_block {
             if (substr($key, 0, 10) === 'input-ref-') {
                 $varname = substr($key, 10);
                 if (isset($options['inputs']) && !isset($options['inputs'][$varname])) {
-                    $err[] = StackPlatform::getTransaltion('stackBlock_javascript_input_missing',
+                    $err[] = StackPlatform::getTranslation('stackBlock_javascript_input_missing',
                         ['var' => $varname]);
                 }
             }

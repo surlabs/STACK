@@ -51,7 +51,7 @@ class stack_ast_filter_210_x_used_as_multiplication implements stack_cas_astfilt
                     ) {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
-                $errors[] = StackPlatform::getTransaltion('Illegal_x10');
+                $errors[] = StackPlatform::getTranslation('Illegal_x10');
                 return false;
             }
 
@@ -63,14 +63,14 @@ class stack_ast_filter_210_x_used_as_multiplication implements stack_cas_astfilt
                     ) {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
-                $errors[] = StackPlatform::getTransaltion('Illegal_x10');
+                $errors[] = StackPlatform::getTranslation('Illegal_x10');
                 return false;
             }
 
             if (($node instanceof MP_Identifier) && $node->value === 'x10') {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
-                $errors[] = StackPlatform::getTransaltion('Illegal_x10');
+                $errors[] = StackPlatform::getTranslation('Illegal_x10');
                 return false;
             }
             return true;

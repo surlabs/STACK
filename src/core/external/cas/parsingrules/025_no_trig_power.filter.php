@@ -92,7 +92,7 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                     $node->position['invalid'] = true;
                     // TODO: now that we have the whole "function call" as the $node
                     // the error message could print out it all, but without that star...
-                    $errors[] = StackPlatform::getTransaltion('stackCas_trigexp',
+                    $errors[] = StackPlatform::getTranslation('stackCas_trigexp',
                         array('forbid' => stack_maxima_format_casstring($node->lhs->lhs->value.'^'),
                             'identifier' => $node->lhs->lhs->value));
                     if (array_search('trigexp', $answernotes) === false) {
@@ -140,7 +140,7 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                 if ($bad === true) {
                     // Those rules should not match anything else.
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTransaltion('stackCas_trigexp',
+                    $errors[] = StackPlatform::getTranslation('stackCas_trigexp',
                         array('forbid' => stack_maxima_format_casstring($node->lhs->value.'^'),
                         'identifier' => $node->lhs->value));
                     if (array_search('trigexp', $answernotes) === false) {
@@ -172,7 +172,7 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                 if ($bad === true) {
                     // Those rules should not match anything else.
                     $node->position['invalid'] = true;
-                    $errors[] = StackPlatform::getTransaltion('stackCas_trigexp',
+                    $errors[] = StackPlatform::getTranslation('stackCas_trigexp',
                         array('forbid' => stack_maxima_format_casstring($node->name->value.'^'),
                         'identifier' => $node->name->value));
                     if (array_search('trigexp', $answernotes) === false) {

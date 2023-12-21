@@ -218,7 +218,7 @@ abstract class stack_connection_helper {
      * remote libraries being used, then check that version against what it should be.
      * @return array with two elements, a string like healthchecksstackmaximaversionok
      * or healthchecksstackmaximanotupdated which can be used as the first argument to,
-     * StackPlatform::getTransaltion, and possibly some extra data that can be used as the second argument.
+     * StackPlatform::getTranslation, and possibly some extra data that can be used as the second argument.
      */
     public static function stackmaxima_version_healthcheck() {
         self::ensure_config_loaded();
@@ -238,7 +238,7 @@ abstract class stack_connection_helper {
             return array('healthchecksstackmaximanotupdated', array($notificationsurl->out()), false);
         }
 
-        $usedversion = StackPlatform::getTransaltion('healthchecksstackmaximatooold');
+        $usedversion = StackPlatform::getTranslation('healthchecksstackmaximatooold');
         foreach ($results as $result) {
             if ($result['key'] != '__stackmaximaversion') {
                 continue;
@@ -256,16 +256,16 @@ abstract class stack_connection_helper {
         switch (self::$config->platform) {
             case 'linux-optimised':
                 $docsurl = new moodle_url('/question/type/stack/doc/doc.php/CAS/Optimising_Maxima.md');
-                $fix = StackPlatform::getTransaltion('healthchecksstackmaximaversionfixoptimised', array('url' => $docsurl->out()));
+                $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixoptimised', array('url' => $docsurl->out()));
                 break;
 
             case 'server':
             case 'server-proxy':
-                $fix = StackPlatform::getTransaltion('healthchecksstackmaximaversionfixserver');
+                $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixserver');
                 break;
 
             default:
-                $fix = StackPlatform::getTransaltion('healthchecksstackmaximaversionfixunknown');
+                $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixunknown');
         }
 
         return array('healthchecksstackmaximaversionmismatch',
@@ -324,7 +324,7 @@ abstract class stack_connection_helper {
         $success = true;
         $message = array();
         if (empty($results)) {
-            $message[] = StackPlatform::getTransaltion('stackCas_allFailed');
+            $message[] = StackPlatform::getTranslation('stackCas_allFailed');
             $success = false;
         } else {
             $maximaversionum = 'unknown number';
@@ -336,7 +336,7 @@ abstract class stack_connection_helper {
             foreach ($results as $result) {
                 if ('CASresult' === $result['key']) {
                     if ($result['value'] != 'n*x^(n-1)') {
-                        $message[] = StackPlatform::getTransaltion('healthuncachedstack_CAS_calculation',
+                        $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_calculation',
                                 array('expected' => "n*x^(n-1)", 'actual' => $result['value']));
                         $success = false;
                     }
@@ -346,16 +346,16 @@ abstract class stack_connection_helper {
                     }
                 } else if ('ts' === $result['key']) {
                     if ($result['value'] != '1') {
-                        $message[] = StackPlatform::getTransaltion('healthuncachedstack_CAS_trigsimp');
+                        $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_trigsimp');
                         $success = false;
                     }
                 } else if ('MAXIMAversion' === $result['key']) {
                     $maximaversionstr = $result['value'] . ' ('.$maximaversionum.')';
                     if ('default' == $maximaversion) {
-                        $message[] = StackPlatform::getTransaltion('healthuncachedstack_CAS_versionnotchecked',
+                        $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_versionnotchecked',
                                 array('actual' => $maximaversionstr));
                     } else if ($result['value'] != '"'.$maximaversion.'"') {
-                        $message[] = StackPlatform::getTransaltion('healthuncachedstack_CAS_version',
+                        $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_version',
                                 array('expected' => $maximaversion, 'actual' => $maximaversionstr));
                         $success = false;
                     }
@@ -364,14 +364,14 @@ abstract class stack_connection_helper {
         }
 
         if (strpos($debug, 'failed to load') !== false) {
-            $message[] = StackPlatform::getTransaltion('settingmaximalibraries_failed');
+            $message[] = StackPlatform::getTranslation('settingmaximalibraries_failed');
             $success = false;
         }
 
         if ($success) {
-            $message[] = StackPlatform::getTransaltion('healthuncachedstack_CAS_ok');
+            $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_ok');
         } else {
-            $message[] = StackPlatform::getTransaltion('healthuncachedstack_CAS_not');
+            $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_not');
         }
 
         $message = implode(" ", $message);
@@ -420,7 +420,7 @@ abstract class stack_connection_helper {
                 $lisprun = shell_exec('locate lisp.run');
                 if (trim($lisprun) == '') {
                     $success = false;
-                    $message = StackPlatform::getTransaltion('healthautomaxopt_nolisprun');
+                    $message = StackPlatform::getTranslation('healthautomaxopt_nolisprun');
                     return array($message, '', $success, '');
                 }
                 $lisprun = explode("\n", $lisprun);
@@ -429,7 +429,7 @@ abstract class stack_connection_helper {
 
             default:
                 $success = false;
-                $message = StackPlatform::getTransaltion('healthautomaxopt_nolisp');
+                $message = StackPlatform::getTranslation('healthautomaxopt_nolisp');
                 return array($message, '', $success, '');
         }
 
@@ -441,10 +441,10 @@ abstract class stack_connection_helper {
 
         // Add the timeout command to the message.
         $commandline = 'timeout --kill-after=10s 10s '.$rawcommand;
-        $message = StackPlatform::getTransaltion('healthautomaxopt_ok', array('command' => $commandline));
+        $message = StackPlatform::getTranslation('healthautomaxopt_ok', array('command' => $commandline));
         if (!file_exists($imagename)) {
             $success = false;
-            $message = StackPlatform::getTransaltion('healthautomaxopt_notok');
+            $message = StackPlatform::getTranslation('healthautomaxopt_notok');
         }
 
         return array($message, $debug, $success, $commandline, $rawcommand);

@@ -25,6 +25,8 @@
 
 namespace src\core\external\cas;
 
+use src\core\external\maximaparser\MP_Node;
+
 interface cas_evaluatable {
 
     /**

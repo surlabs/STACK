@@ -102,7 +102,7 @@ class stack_cas_keyval {
         // CAS keyval may not contain @ or $ outside strings.
         // We should certainly prevent the $ to make sure statements are separated by ;, although Maxima does allow $.
         if (strpos($str, '@') !== false || strpos($str, '$') !== false) {
-            $this->errors[] = new $this->errclass(StackPlatform::getTransaltion('illegalcaschars'), $this->context);
+            $this->errors[] = new $this->errclass(StackPlatform::getTranslation('illegalcaschars'), $this->context);
             $this->valid = false;
             return false;
         }
@@ -124,7 +124,7 @@ class stack_cas_keyval {
             $syntaxerror = $ast;
             $error = $syntaxerror->getMessage();
             if (isset($syntaxerror->grammarLine) && isset($syntaxerror->grammarColumn)) {
-                $error .= ' (' . StackPlatform::getTransaltion('stackCas_errorpos',
+                $error .= ' (' . StackPlatform::getTranslation('stackCas_errorpos',
                         ['line' => $syntaxerror->grammarLine, 'col' => $syntaxerror->grammarColumn]) . ')';
             }
             $this->errors[] = new $this->errclass($error, $this->context);
@@ -175,7 +175,7 @@ class stack_cas_keyval {
             foreach ($usage['write'] as $key => $used) {
                 if (in_array($key, $inputs)) {
                     $this->valid = false;
-                    $this->errors[] = new $this->errclass(StackPlatform::getTransaltion('stackCas_inputsdefined', $key), $this->context);
+                    $this->errors[] = new $this->errclass(StackPlatform::getTranslation('stackCas_inputsdefined', $key), $this->context);
                 }
             }
         }

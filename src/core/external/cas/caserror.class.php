@@ -216,56 +216,56 @@ class stack_cas_error {
                 if (isset($ctx['node'])) {
                     // In node it is either in the test, the points or in feedback.
                     if (isset($ctx['detail'])) {
-                        return StackPlatform::getTransaltion('errorinprtnodewithdetail', $ctx);
+                        return StackPlatform::getTranslation('errorinprtnodewithdetail', $ctx);
                     }
-                    return StackPlatform::getTransaltion('errorinprtnode', $ctx);
+                    return StackPlatform::getTranslation('errorinprtnode', $ctx);
                 } else {
                     // If not in a node it is a general issue or in feedback vars.
                     if (isset($ctx['field']) && $ctx['field'] === 'feedbackvariables') {
                         if (isset($ctx['detail'])) {
                             // Here use 'err', 'prt' and 'detail' in the string to describe more.
-                            return StackPlatform::getTransaltion('errorinfeedbackvarswithdetail', $ctx);
+                            return StackPlatform::getTranslation('errorinfeedbackvarswithdetail', $ctx);
                         }
                         // With no detail use only 'err' and 'prt'.
-                        return StackPlatform::getTransaltion('errorinfeedbackvars', $ctx);
+                        return StackPlatform::getTranslation('errorinfeedbackvars', $ctx);
                     }
                 }
-                return StackPlatform::getTransaltion('generalerrorinprt', $ctx);
+                return StackPlatform::getTranslation('generalerrorinprt', $ctx);
             } else if (isset($ctx['input'])) {
                 // TODO errors in inputs, tans, options, validation.
-                return StackPlatform::getTransaltion('errorininput', $ctx);
+                return StackPlatform::getTranslation('errorininput', $ctx);
             } else if (isset($ctx['questiontest'])) {
                 // TODO errors in evalution of specific inputs to tests.
-                return StackPlatform::getTransaltion('errorinquestiontest', $ctx);
+                return StackPlatform::getTranslation('errorinquestiontest', $ctx);
             }
         } else {
             if (isset($ctx['prt'])) {
                 if (isset($ctx['field'])
                     && ($ctx['field'] === 'truefeedback' || $ctx['field'] === 'falsefeedback')) {
-                    return StackPlatform::getTransaltion('errorinfeedback');
+                    return StackPlatform::getTranslation('errorinfeedback');
                 }
-                return StackPlatform::getTransaltion('erroringrading');
+                return StackPlatform::getTranslation('erroringrading');
             } else if (isset($ctx['input']) && isset($ctx['field'])
                 && $ctx['field'] === 'validation') { // This is a special field-name.
-                return StackPlatform::getTransaltion('errorininputvalidation');
+                return StackPlatform::getTranslation('errorininputvalidation');
             } else if (isset($ctx['input'])) {
-                return StackPlatform::getTransaltion('errorininitialisingquestion');
+                return StackPlatform::getTranslation('errorininitialisingquestion');
             }
             // Everyhing else is a general error.
-            return StackPlatform::getTransaltion('generalerrorhappened');
+            return StackPlatform::getTranslation('generalerrorhappened');
         }
 
         if (isset($ctx['field'])) {
             // General unspecific error or error in a top-level field.
             if (isset($ctx['detail'])) {
                 // Here use 'field' and 'detail' in the string to describe more.
-                return StackPlatform::getTransaltion('generalfielderrorwithdetail', $ctx);
+                return StackPlatform::getTranslation('generalfielderrorwithdetail', $ctx);
             }
             // With no detail use only 'field'.
-            return StackPlatform::getTransaltion('generalfielderror', $ctx);
+            return StackPlatform::getTranslation('generalfielderror', $ctx);
         }
 
         // Everything else is a general error.
-        return StackPlatform::getTransaltion('generalerrorhappened');
+        return StackPlatform::getTranslation('generalerrorhappened');
     }
 }
