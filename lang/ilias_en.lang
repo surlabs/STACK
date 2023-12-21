@@ -12,12 +12,24 @@ ui_admin_configuration_overview_title#:#STACK Plugin Overview
 ui_admin_configuration_maxima_title#:#Connection to Maxima
 ui_admin_configuration_defaults_title#:#Default values
 ui_admin_configuration_quality_title#:#Quality Assurance
+ui_admin_configuration_maxima_connection_title#:#Connection to Maxima
+ui_admin_configuration_maxima_connection_description#:#This section allows you to configure the main values for the connection to Maxima.
+ui_admin_configuration_maxima_connection_unix_title#:#Unix
+ui_admin_configuration_defaults_maxima_connection_unix_description#:#Maxima is installed locally in the server where the ILIAS platform is running.
+ui_admin_configuration_defaults_maxima_connection_server_title#:#Server
+ui_admin_configuration_defaults_maxima_connection_server_description#:#Maxima is installed in a server different from the one where the ILIAS platform is running.
+ui_admin_configuration_defaults_display_title#:#Maths display options
+ui_admin_configuration_defaults_display_description#:#These are the default values for the display of maths.
 ui_admin_configuration_defaults_validation_title#:#Validation mode
-ui_admin_configuration_defaults_validation_description#:#Decide whether to use manual or instant validation at running STACK questions.
 ui_admin_configuration_defaults_user_validation_title#:#User validation
 ui_admin_configuration_defaults_user_validation_description#:#This option activates manual validation for all questions.
 ui_admin_configuration_defaults_instant_validation_title#:#Instant validation
 ui_admin_configuration_defaults_instant_validation_description#:#This option activates instant validation for all questions.
+ui_admin_configuration_allow_jsxgraph_title#:#Allow JSXGraph
+ui_admin_configuration_dont_allow_jsxgraph_title#:#Don't allow JSXGraph
+ui_admin_configuration_dont_allow_jsxgraph_description#:#This option deactivates JSXGraph for all questions.
+ui_admin_configuration_do_allow_jsxgraph_title#:#Do allow JSXGraph
+ui_admin_configuration_do_allow_jsxgraph_description#:#This option activates JSXGraph for all questions.
 ui_admin_configuration_defaults_options_title#:#Default options settings
 ui_admin_configuration_defaults_options_description#:#These are the default values for the options of the question. These values will be used when a new question is created.
 ui_admin_configuration_defaults_question_simplify_title#:#Question-level simplify
@@ -96,6 +108,8 @@ ui_admin_configuration_defaults_input_show_validation_title#:#Show the validatio
 ui_admin_configuration_defaults_input_show_validation_description#:#Setting this option displays any validation feedback from this input, including echoing back their expression in traditional two dimensional notation.
 ui_admin_configuration_defaults_inputs_title#:#Default input settings
 ui_admin_configuration_defaults_inputs_description#:#These are the default values for the inputs of the question. These values will be used when a new question is created or a new input is added to a question.
+
+
 assStackQuestion#:#STACK Question
 question_imported_successfully#:#Question was imported successfully
 error_importing_question#:#Error importing question

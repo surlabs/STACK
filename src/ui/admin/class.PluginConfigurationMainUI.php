@@ -49,8 +49,10 @@ class PluginConfigurationMainUI
 
             //try to show a composed form
             $content = self::$factory->input()->container()->form()->standard($form_action, [
-                self::getValidationDefaultsSection($data, $plugin_object),
-            ]);
+                    self::getMaximaConnectionSection($data, $plugin_object),
+                    self::getDisplayOptionsSection($data, $plugin_object)
+                ]
+            );
 
         } catch (Exception $e) {
             $content = self::$factory->messageBox()->failure($e->getMessage());
@@ -60,12 +62,52 @@ class PluginConfigurationMainUI
     }
 
     /**
+     * Gets the Maxima connection section
+     * @throws StackException
+     */
+    private static function getMaximaConnectionSection(array $data, ilPlugin $plugin_object): Section
+    {
+
+        if (isset($data['platform_type']) && $data['platform_type'] == 'unix') {
+            $maxima_connection_value = $data['platform_type'];
+        } elseif (isset($data['platform_type']) && $data['platform_type'] == 'server') {
+            $maxima_connection_value = $data['platform_type'];
+        } else {
+            throw new StackException("Error: Maxima connection value not valid: " . $data['platform_type']);
+        }
+
+        $maxima_connection_options = self::$factory->input()->field()->radio(
+            "",
+            ""
+        )
+            ->withOption('unix',
+                $plugin_object->txt("ui_admin_configuration_maxima_connection_unix_title"),
+                $plugin_object->txt("ui_admin_configuration_defaults_maxima_connection_unix_description"))
+            ->withOption('server',
+                $plugin_object->txt("ui_admin_configuration_defaults_maxima_connection_server_title"),
+                $plugin_object->txt("ui_admin_configuration_defaults_maxima_connection_server_description")
+            )
+            ->withValue($maxima_connection_value);
+
+        return self::$factory->input()->field()->section(
+            [
+                $maxima_connection_options
+            ],
+            $plugin_object->txt("ui_admin_configuration_maxima_connection_title"),
+            $plugin_object->txt("ui_admin_configuration_maxima_connection_description")
+        );
+
+
+    }
+
+    /**
      * Gets the defaults validation section
      * @throws StackException
      */
-    private static function getValidationDefaultsSection(array $data, ilPlugin $plugin_object): Section
+    private static function getDisplayOptionsSection(array $data, ilPlugin $plugin_object): Section
     {
 
+        //Validation mode
         if (isset($data['instant_validation']) && $data['instant_validation'] == '1') {
             $validation_value = $data['instant_validation'];
         } elseif (isset($data['instant_validation']) && $data['instant_validation'] == '0') {
@@ -75,7 +117,7 @@ class PluginConfigurationMainUI
         }
 
         $validation_options = self::$factory->input()->field()->radio(
-            "",
+            $plugin_object->txt("ui_admin_configuration_defaults_validation_title"),
             ""
         )
             ->withOption('0',
@@ -87,13 +129,38 @@ class PluginConfigurationMainUI
             )
             ->withValue($validation_value);
 
+        //Allow JSXGraph
+        if (isset($data['allow_jsx_graph']) && $data['allow_jsx_graph'] == '1') {
+            $allow_jsxgraph_value = "1";
+        } elseif (isset($data['allow_jsx_graph']) && ($data['allow_jsx_graph'] == '0' || $data['allow_jsx_graph'] == '')) {
+            $allow_jsxgraph_value = "0";
+        } else {
+            throw new StackException("Error: instant_validation value not found");
+        }
+
+        $allow_jsxgraph_options = self::$factory->input()->field()->radio(
+            $plugin_object->txt("ui_admin_configuration_allow_jsxgraph_title"),
+            ""
+        )
+            ->withOption('0',
+                $plugin_object->txt("ui_admin_configuration_dont_allow_jsxgraph_title"),
+                $plugin_object->txt("ui_admin_configuration_dont_allow_jsxgraph_description"))
+            ->withOption('1',
+                $plugin_object->txt("ui_admin_configuration_do_allow_jsxgraph_title"),
+                $plugin_object->txt("ui_admin_configuration_do_allow_jsxgraph_description")
+            )
+            ->withValue($allow_jsxgraph_value);
+
         return self::$factory->input()->field()->section(
             [
-                $validation_options
+                $validation_options,
+                $allow_jsxgraph_options
             ],
-            $plugin_object->txt("ui_admin_configuration_defaults_validation_title"),
-            $plugin_object->txt("ui_admin_configuration_defaults_validation_description")
+            $plugin_object->txt("ui_admin_configuration_defaults_display_title"),
+            $plugin_object->txt("ui_admin_configuration_defaults_display_description")
         );
+
+
     }
 
 }
