@@ -149,6 +149,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     private function save(): void
     {
         $this->tabs->activateTab("configure");
-        $this->tpl->setContent(PluginConfigurationMainUI::save($this->getPluginObject()));
+        //TODO save configuration
+
     }
 }
