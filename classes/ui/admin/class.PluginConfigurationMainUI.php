@@ -108,10 +108,10 @@ class PluginConfigurationMainUI
     {
 
         //Validation mode
-        if (isset($data['instant_validation']) && $data['instant_validation'] == '1') {
-            $validation_value = $data['instant_validation'];
-        } elseif (isset($data['instant_validation']) && $data['instant_validation'] == '0') {
-            $validation_value = $data['instant_validation'];
+        if (isset($data['instant_validation']) && $data['instant_validation'] === 0) {
+            $validation_value = '1';
+        } elseif (isset($data['instant_validation']) && $data['instant_validation'] === 1) {
+            $validation_value = '0';
         } else {
             throw new StackException("Error: instant_validation value not found");
         }
@@ -130,12 +130,14 @@ class PluginConfigurationMainUI
             ->withValue($validation_value);
 
         //Allow JSXGraph
-        if (isset($data['allow_jsx_graph']) && $data['allow_jsx_graph'] == '1') {
+        if (isset($data['allow_jsx_graph']) && $data['allow_jsx_graph'] === 1) {
             $allow_jsxgraph_value = "1";
-        } elseif (isset($data['allow_jsx_graph']) && ($data['allow_jsx_graph'] == '0' || $data['allow_jsx_graph'] == '')) {
+        } elseif (isset($data['allow_jsx_graph']) && ($data['allow_jsx_graph'] === 0)) {
             $allow_jsxgraph_value = "0";
         } else {
-            throw new StackException("Error: instant_validation value not found");
+            //TODO throw new StackException("Error: allow_jsx_graph value not found");
+            //set by default to 1
+            $allow_jsxgraph_value = "1";
         }
 
         $allow_jsxgraph_options = self::$factory->input()->field()->radio(

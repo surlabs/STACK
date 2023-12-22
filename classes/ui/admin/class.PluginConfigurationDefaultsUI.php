@@ -293,7 +293,7 @@ class PluginConfigurationDefaultsUI
         )->withValue($default_input_options_value)->withRequired(true);
 
         //Box size
-        $input_box_size_value = $data["input_box_size"] ?? "15";
+        $input_box_size_value = (string)$data["input_box_size"] ?? "15";
 
         $input_box_size = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_defaults_input_box_size_title"),

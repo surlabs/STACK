@@ -82,8 +82,9 @@ class PluginConfigurationMaximaUI
     {
         //Maxima version
         $maxima_version_options = [
-            '5.40.0' => '5.40.0', '5.41.0' => '5.41.0', '5.42.0' => '5.42.0',
-            '5.42.1' => '5.42.1', '5.42.2' => '5.42.2',
+            '5.32.1' => $plugin_object->txt("ui_admin_configuration_connection_maxima_version_5_32_1"),
+            '5.40.0' => '5.40.0', '5.41.0' => '5.41.0',
+            '5.42.0' => '5.42.0', '5.42.1' => '5.42.1', '5.42.2' => '5.42.2',
             '5.43.0' => '5.43.0', '5.43.1' => '5.43.1', '5.43.2' => '5.43.2',
             '5.44.0' => '5.44.0', '5.46.0' => '5.46.0', '5.47.0' => '5.47.0',
             'default' => 'default'
@@ -100,7 +101,7 @@ class PluginConfigurationMaximaUI
         )->withValue($maxima_version_value)->withRequired(true);
 
         //CAS Connection timeout
-        $cas_connection_timeout_value = $data["cas_connection_timeout"] ?? "10";
+        $cas_connection_timeout_value = (string)$data["cas_connection_timeout"] ?? "10";
 
         $cas_connection_timeout = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_defaults_cas_connection_timeout_title"),
