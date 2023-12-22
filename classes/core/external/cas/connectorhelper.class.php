@@ -34,9 +34,6 @@ abstract class stack_connection_helper {
     /** @var stdClass cached copy of the STACK configuration settings. */
     protected static $config = null;
 
-    /** @var StackDatabase keeps the connection to the 'otherdb' if we are using that option. */
-    protected static $otherdb = null;
-
     /**
      * Ensure that self::$config is set.
      */
@@ -84,28 +81,6 @@ abstract class stack_connection_helper {
         }
 
         return $connection;
-    }
-
-    /**
-     * Initialises the database connection for the 'otherdb' cache type.
-     * @return StackDatabase the DB connection to use.
-     */
-    protected static function get_other_db() {
-        if (!is_null(self::$otherdb)) {
-            return self::$otherdb;
-        }
-
-        $dboptions = array();
-        if (!empty(self::$config->cascachedbsocket)) {
-            $dboptions['dbsocket'] = true;
-        }
-
-        self::$otherdb = StackDatabase::get_driver_instance(
-                self::$config->cascachedbtype, self::$config->cascachedblibrary);
-        self::$otherdb->connect(self::$config->cascachedbhost,
-                self::$config->cascachedbuser, self::$config->cascachedbpass,
-                self::$config->cascachedbname, self::$config->cascachedbprefix, $dboptions);
-        return self::$otherdb;
     }
 
     /**
