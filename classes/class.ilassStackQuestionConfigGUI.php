@@ -147,5 +147,14 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         $this->tabs->activateTab("configure");
         //TODO save configuration
 
+        global $DIC;
+
+        $maxima_connection_value = $DIC->http()->wrapper()->post()->retrieve('form_input_2', $DIC->refinery()->kindlyTo()->string());
+
+        var_dump($_POST);
+
+        var_dump("--------------------------------------");
+
+        var_dump($maxima_connection_value); exit();
     }
 }
