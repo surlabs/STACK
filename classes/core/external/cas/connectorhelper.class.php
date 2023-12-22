@@ -83,20 +83,6 @@ abstract class stack_connection_helper {
                 throw new StackException('stack_cas_connection: Unknown platform ' . self::$config->platform);
         }
 
-        switch (self::$config->casresultscache) {
-            case 'db':
-                global $DB;
-                $connection = new stack_cas_connection_db_cache($connection, $debuglog, $DB);
-                break;
-
-            case 'otherdb':
-                $connection = new stack_cas_connection_db_cache($connection, $debuglog, self::get_other_db());
-                break;
-
-            default:
-                // Just use the raw $connection.
-        }
-
         return $connection;
     }
 

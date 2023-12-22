@@ -21,6 +21,8 @@
 
 namespace classes\core\external\maximaparser;
 
+use classes\core\external\cas\stack_cas_security;
+use classes\core\security\StackException;
 use classes\platform\StackPlatform;
 
 class maxima_parser_utils {

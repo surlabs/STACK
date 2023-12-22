@@ -110,6 +110,7 @@ class stack_cas_healthcheck {
                 $this->tests[] = $test;
                 break;
             case 'server':
+                // TODO: Check is_proxybypass function
                 if (!empty($CFG->proxyhost) && !is_proxybypass(StackPlatform::getConfig('maximacommandserver'))) {
                     $test = [];
                     $test['tag'] = 'healthcheckproxysettings';

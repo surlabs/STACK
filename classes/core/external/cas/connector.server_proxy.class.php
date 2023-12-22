@@ -62,6 +62,7 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
         // proxy bypass then, this will just
         // carry on as if we're using the server platform.
         // Based on auth/cas/auth.php/auth_plugin_cas->connectCAS() checks.
+        // TODO: Check is_proxybypass function
         if (!empty($CFG->proxyhost) && !is_proxybypass($this->command)) {
             curl_setopt($request, CURLOPT_PROXY, $CFG->proxyhost);
             if (!empty($CFG->proxyport)) {

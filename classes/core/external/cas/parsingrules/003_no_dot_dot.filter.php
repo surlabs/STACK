@@ -20,6 +20,7 @@ use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_Float;
 use classes\core\external\maximaparser\MP_Node;
 use classes\core\external\maximaparser\MP_Operation;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**

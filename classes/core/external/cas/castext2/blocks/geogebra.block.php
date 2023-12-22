@@ -606,18 +606,6 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
                         'set',
                         'remember',
                     ];
-                    // The variable $inputdefinitions is not defined!
-                    if ($inputdefinitions !== null) {
-                        $tmp = $root->get_parameter('ioblocks');
-                        $inputs = [];
-                        foreach ($inputdefinitions->get_names() as $key) {
-                            $inputs[] = "input-ref-$key";
-                        }
-                        $valids = array_merge($valids, $inputs);
-                    }
-                    $err[] = StackPlatform::getTranslation('stackBlock_geogebra_param', [
-                        'param' => implode(', ', $valids),
-                    ]);
                 }
             }
         }
