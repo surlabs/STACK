@@ -35,6 +35,12 @@ class StackConfig {
         $config = StackDatabase::select('xqcas_configuration', array('parameter_name', 'value', 'category'));
 
         foreach ($config as $row) {
+            $json_decoded = json_decode($row['value'], true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $row['value'] = $json_decoded;
+            }
+
             if (isset($row['category'])) {
                 self::$config[$row['category']][$row['parameter_name']] = $row['value'];
             } else {
@@ -50,9 +56,12 @@ class StackConfig {
      * @param string|null $category
      * @return void
      */
-    public static function set(string $key, mixed $value, ?string $category = null): void
-    {
+    public static function set(string $key, mixed $value, ?string $category = null): void {
         if (isset($category)) {
+            if (!isset(self::$config[$category])) {
+                self::$config[$category] = [];
+            }
+
             self::$config[$category][$key] = $value;
             self::$updatedPaths[] = $category . '/' . $key;
         } else {
@@ -98,11 +107,13 @@ class StackConfig {
 
             $data = array();
 
+            $where = array();
+
             if (count($path) === 1) {
-                $data['parameter_name'] = $path[0];
+                $where['parameter_name'] = $path[0];
                 $data['value'] = self::$config[$path[0]];
             } elseif (count($path) === 2) {
-                $data['parameter_name'] = $path[1];
+                $where['parameter_name'] = $path[1];
                 $data['value'] = self::$config[$path[0]][$path[1]];
                 $data['category'] = $path[0];
             }
@@ -111,9 +122,10 @@ class StackConfig {
                 $data['value'] = json_encode($data['value']);
             }
 
-            StackDatabase::insertOnDuplicatedKey(
+            StackDatabase::update(
                 'xqcas_configuration',
-                $data
+                $data,
+                $where
             );
 
             // This eliminates one by one, in case in any case the execution of save() fails,
