@@ -189,7 +189,7 @@ class stack_cas_error {
 
     public function get_interpreted_context($question): array {
         // Maybe that should be cached, on the other hand errors are slow anyway.
-        return self::interpret_context($this->context);
+        return self::interpret_context($this->context, $question);
     }
 
     /**
