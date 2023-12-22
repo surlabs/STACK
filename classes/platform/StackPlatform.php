@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace classes\platform;
 
+use classes\core\options\StackOptions;
 use classes\core\security\StackException;
 use classes\platform\ilias\StackPlatformIlias;
 
@@ -29,13 +30,15 @@ abstract class StackPlatform
     public static StackPlatform $platform;
 
     /**
-     * Sets the platform
+     * Start the platform
+     * In this mathod, the platform should be initialized, the database connection should be established and the configuration should be loaded
+     *
      * @param string $x
      * @return void
      * @throws StackException
      * @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection
      */
-    public static function setPlatform(string $x): void {
+    public static function initialize(string $x): void {
         switch ($x) {
             case 'ilias':
                 self::$platform = new StackPlatformIlias();
@@ -45,6 +48,8 @@ abstract class StackPlatform
         }
 
         StackDatabase::setPlatform($x);
+
+        StackConfig::load();
     }
 
     /**
@@ -85,37 +90,5 @@ abstract class StackPlatform
     public static function createTag(string $tag, string $contents, array $attributes = []): string
     {
         return self::$platform->createTagInternal($tag, $contents, $attributes);
-    }
-
-    /**
-     * Set the platform configuration value for a given key to a given value
-     * @param string $key
-     * @param mixed $value
-     * @param string|null $category
-     * @return void
-     */
-    public static function setConfig(string $key, mixed $value, ?string $category = null): void
-    {
-        self::$platform->setConfigInternal($key, $value, $category);
-    }
-
-    /**
-     * Gets the platform configuration value for a given key
-     * @param string $key
-     * @param string|null $category
-     * @return mixed
-     */
-    public static function getConfig(string $key, ?string $category = null): mixed
-    {
-        return self::$platform->getConfigInternal($key, $category);
-    }
-
-    /**
-     * Gets all platform configuration values
-     * @param string|null $category
-     * @return array
-     */
-    public static function getAllConfig(?string $category = null) :array {
-        return self::$platform->getAllConfigInternal($category);
     }
 }
