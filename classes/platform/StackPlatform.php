@@ -39,17 +39,19 @@ abstract class StackPlatform
      * @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection
      */
     public static function initialize(string $x): void {
-        switch ($x) {
-            case 'ilias':
-                self::$platform = new StackPlatformIlias();
-                break;
-            default:
-                throw new StackException('Invalid platform selected: ' . $x . '.');
+        if (!isset(self::$platform)) {
+            switch ($x) {
+                case 'ilias':
+                    self::$platform = new StackPlatformIlias();
+                    break;
+                default:
+                    throw new StackException('Invalid platform selected: ' . $x . '.');
+            }
+
+            StackDatabase::setPlatform($x);
+
+            StackConfig::load();
         }
-
-        StackDatabase::setPlatform($x);
-
-        StackConfig::load();
     }
 
     /**
