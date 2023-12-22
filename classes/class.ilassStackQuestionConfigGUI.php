@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use classes\core\security\StackException;
+use classes\platform\StackConfig;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -73,8 +74,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
             $this->tpl->setDescription($this->getPluginObject()->txt('ui_admin_configuration_description'));
 
             //Get stored settings
-            //TODO: get stored settings from database with new config if needed
-            $data = assStackQuestionConfig::_getStoredSettings('all');
+            $data = StackConfig::getAll();
 
             switch ($cmd) {
                 case "configure":
