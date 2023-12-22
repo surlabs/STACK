@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use src\core\security\StackException;
+use classes\core\security\StackException;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
