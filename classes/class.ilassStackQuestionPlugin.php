@@ -24,7 +24,7 @@ class ilassStackQuestionPlugin extends ilQuestionsPlugin
 
     final function getQuestionType(): string
     {
-        return "xqcas";
+        return "assStackQuestion";
     }
 
     final function getQuestionTypeTranslation(): string
