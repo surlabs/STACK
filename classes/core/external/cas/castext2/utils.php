@@ -27,8 +27,6 @@ use classes\core\external\maximaparser\MP_Node;
 use classes\core\external\maximaparser\MP_Root;
 use classes\core\external\maximaparser\MP_Statement;
 use classes\core\external\maximaparser\MP_String;
-use classes\core\external\cas\castext2\CTP_Node;
-use classes\core\external\cas\castext2\CTP_Root;
 use classes\core\filters\StackParser;
 use classes\core\filters\StackUtils;
 

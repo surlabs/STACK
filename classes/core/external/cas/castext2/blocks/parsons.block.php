@@ -20,6 +20,7 @@ use classes\core\external\cas\castext2\stack_cas_castext2_block;
 use classes\core\external\maximaparser\MP_List;
 use classes\core\external\maximaparser\MP_Node;
 use classes\core\external\maximaparser\MP_String;
+use classes\core\filters\StackUtils;
 use classes\platform\StackPlatform;
 
 stack_cas_castext2_iframe::register_counter('///PARSONS_COUNT///');
@@ -98,7 +99,7 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         $r->items[] = new MP_String(json_encode($xpars));
 
         // Plug in some style and scripts.
-        $mathjax = ($mathjaxversion === "2") ? stack_get_mathjax_url() : stack_get_mathjax3_url();
+        $mathjax = ($mathjaxversion === "2") ? StackUtils::stackGetMathjaxUrl() : StackUtils::stackGetMathjax3Url();
         $r->items[] = new MP_List([
             new MP_String('script'),
             new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax]))]);
