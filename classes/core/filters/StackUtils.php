@@ -124,4 +124,20 @@ class StackUtils {
             return self::stackMaximaLatexTidy(implode(' ', $translated));
         }
     }
+
+    /**
+     * Get mathjax url.
+     * @return string
+     */
+    public static function stackGetMathjaxUrl(): string {
+        return 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    }
+
+    /**
+     * Gets the url for MathJax 3.
+     * @return string
+     */
+    public static function stackGetMathjax3Url() :string {
+        return 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+    }
 }

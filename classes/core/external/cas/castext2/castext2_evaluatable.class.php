@@ -200,12 +200,6 @@ class castext2_evaluatable implements cas_raw_value_extractor {
                         }
                         $special['text-download'][$k] = $v;
                     }
-                } else if ($node instanceof stack_cas_castext2_include) {
-                    if (!isset($special['castext-includes'])) {
-                        $special['castext-includes'] = [$node->params['src']];
-                    } else if (array_search($node->params['src'], $special['castext-includes']) === false) {
-                        $special['castext-includes'][] = $node->params['src'];
-                    }
                 }
             };
             $root->callbackRecurse($specialsearch);

@@ -216,7 +216,6 @@ abstract class stack_connection_helper {
         $warning = "WARNING: the version of the STACK-Maxima libraries used do not match the expected version. " .
                 "Please visit the STACK heathcheck page to resolve the problems.";
         $debug->log($warning, null);
-        debugging($warning);
     }
 
     /**
@@ -240,8 +239,7 @@ abstract class stack_connection_helper {
         }
 
         if (!isset(self::$config->stackmaximaversion)) {
-            $notificationsurl = new moodle_url('/admin/index.php');
-            return array('healthchecksstackmaximanotupdated', array($notificationsurl->out()), false);
+            return array('healthchecksstackmaximanotupdated', array(), false);
         }
 
         $usedversion = StackPlatform::getTranslation('healthchecksstackmaximatooold', null);
@@ -261,7 +259,6 @@ abstract class stack_connection_helper {
 
         switch (self::$config->platform) {
             case 'linux-optimised':
-                $docsurl = new moodle_url('/question/type/stack/doc/doc.php/CAS/Optimising_Maxima.md');
                 $fix = StackPlatform::getTranslation('healthchecksstackmaximaversionfixoptimised');
                 break;
 

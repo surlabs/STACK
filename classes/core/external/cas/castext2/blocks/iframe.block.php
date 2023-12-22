@@ -165,16 +165,13 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
         $code = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $code .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"' .
             ' "http://www.w3.org/TR/xhtml1/DTD/strict.dtd">' . "\n";
-        $code .= '<html xmlns="http://www.w3.org/TR/xhtml1/strict">';
+        $code .= '<html xmlns="http://www.w3.org/TR/xhtml1/strict" lang="">';
         // Include a title to help JS debugging.
         $code .= '<head><title>' . $title . '</title>';
         $code .= $style;
         $code .= $scripts;
-        $code .= '</head><body style="margin:0px;">' . $content . '</body></html>';
+        $code .= '</head><body style="margin:0;">' . $content . '</body></html>';
 
-        // Ensure plots get their full URL at this point.
-        $code = str_replace('!ploturl!',
-            moodle_url::make_file_url('/question/type/stack/plot.php', '/'), $code);
         // Escape some JavaScript strings.
         $args = [
             json_encode($frameid),

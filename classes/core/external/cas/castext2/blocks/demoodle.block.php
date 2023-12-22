@@ -71,9 +71,6 @@ class stack_cas_castext2_demoodle extends stack_cas_castext2_block {
         foreach ($content as $k => $v) {
             if (isset($dontproc[$k])) {
                 $r .= $v;
-            } else {
-                // Parameters as they would be if this were called through the question->format_text.
-                $r .= text_to_html($v, null, false, true);
             }
         }
 
