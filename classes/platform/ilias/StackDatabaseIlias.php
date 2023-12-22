@@ -96,13 +96,19 @@ class StackDatabaseIlias extends StackDatabase {
      * Usage: StackDatabase::select('table_name', ['id' => 1]);
      *
      * @param string $table
-     * @param array $where
+     * @param array|null $where
      * @return array
      */
-    public function selectInternal(string $table, array $where): array {
-        $result = $this->db->query("SELECT * FROM " . $table . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
-            return $key . " = " . $value;
-        }, array_keys($where), array_values($where))));
+    public function selectInternal(string $table, ?array $where = null): array {
+        $query = "SELECT * FROM " . $table;
+
+        if (isset($where)) {
+            $query .= " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+                return $key . " = " . $value;
+            }, array_keys($where), array_values($where)));
+        }
+
+        $result = $this->db->query($query);
 
         $rows = [];
 

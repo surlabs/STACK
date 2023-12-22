@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use classes\core\security\StackException;
 use classes\platform\StackConfig;
+use classes\platform\StackPlatform;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -41,6 +42,8 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->tabs = $DIC->tabs();
         $this->control = $DIC->ctrl();
+
+        StackPlatform::initialize('ilias');
 
         //Set tabs
         try {

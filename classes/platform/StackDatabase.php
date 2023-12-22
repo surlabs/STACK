@@ -103,10 +103,10 @@ abstract class StackDatabase {
      * Usage: StackDatabase::select('table_name', ['id' => 1]);
      *
      * @param string $table
-     * @param array $where
+     * @param array|null $where
      * @return array
      */
-    public static function select(string $table, array $where): array {
+    public static function select(string $table, ?array $where = null): array {
         return self::$platform->selectInternal($table, $where);
     }
 }

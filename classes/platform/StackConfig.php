@@ -32,7 +32,7 @@ class StackConfig {
      * @return void
      */
     public static function load() :void {
-        $config = StackDatabase::select('xqcas_configuration', array('parameter_name', 'value', 'category'));
+        $config = StackDatabase::select('xqcas_configuration');
 
         foreach ($config as $row) {
             $json_decoded = json_decode($row['value'], true);
