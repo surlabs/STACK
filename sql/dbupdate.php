@@ -882,5 +882,9 @@ if ($db->tableExists('xqcas_configuration')) {
 ?>
 <#44>
 <?php
+//TODO add new entries to xqcas_config for the new fields in the plugin configuration
+?>
+<#45>
+<?php
 //TODO add question_description (longtext) and question_description_format (tinyint 2) to xqcas_options
 ?>
