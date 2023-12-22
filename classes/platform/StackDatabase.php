@@ -28,7 +28,7 @@ abstract class StackDatabase {
     public static StackDatabase $platform;
 
     /**
-     * Sets the platform database (this method is called automatically from StackPlatform::setPlatform)
+     * Sets the platform database (this method is called automatically from StackPlatform::initialize)
      * @param string $x
      * @return void
      * @throws StackException

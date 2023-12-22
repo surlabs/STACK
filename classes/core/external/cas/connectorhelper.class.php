@@ -26,6 +26,7 @@ namespace classes\core\external\cas;
 use classes\core\filters\StackParser;
 use classes\core\security\StackException;
 use classes\core\security\StackLog;
+use classes\platform\StackConfig;
 use classes\platform\StackDatabase;
 use classes\platform\StackPlatform;
 use stdClass;
@@ -39,7 +40,7 @@ abstract class stack_connection_helper {
      */
     protected static function ensure_config_loaded() {
         if (is_null(self::$config)) {
-            self::$config = StackPlatform::getAllConfig();
+            self::$config = StackConfig::getAll();
         }
     }
 

@@ -25,6 +25,7 @@ namespace classes\core\external\cas;
 
 use classes\core\external\cas\castext2\castext2_evaluatable;
 use classes\core\filters\StackParser;
+use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 
 class stack_cas_healthcheck {
@@ -111,7 +112,7 @@ class stack_cas_healthcheck {
                 break;
             case 'server':
                 // TODO: Check is_proxybypass function
-                if (!empty($CFG->proxyhost) && !is_proxybypass(StackPlatform::getConfig('maximacommandserver'))) {
+                if (!empty($CFG->proxyhost) && !is_proxybypass(StackConfig::get('maximacommandserver'))) {
                     $test = [];
                     $test['tag'] = 'healthcheckproxysettings';
                     $test['result'] = null;

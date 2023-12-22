@@ -20,6 +20,7 @@ namespace classes\core\external\cas;
 
 use classes\core\filters\StackParser;
 use classes\core\security\StackException;
+use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 
 class stack_cas_configuration {
@@ -58,7 +59,7 @@ class stack_cas_configuration {
      */
     public function __construct() {
         global $CFG;
-        $this->settings = StackPlatform::getAllConfig();
+        $this->settings = StackConfig::getAll();
         $this->date = date("F j, Y, g:i a");
 
         $this->maximacodepath = StackParser::convertSlashPaths(
@@ -384,7 +385,7 @@ END;
      * the configuration settings.
      */
     public static function create_auto_maxima_image() {
-        $config = StackPlatform::getAllConfig();
+        $config = StackConfig::getAll();
             // Do not try to generate the optimised image on MS platforms.
         if ($config["platform"] == 'win') {
             $errmsg = "Microsoft Windows version cannot be automatically optimised";
@@ -397,10 +398,10 @@ END;
         // Revert to the plain Linux platform.  This will genuinely call the CAS, and
         // as a result create a new image.
         $oldplatform = $config["platform"];
-        StackPlatform::setConfig('platform', "linux");
+        StackConfig::set('platform', "linux");
         if ($oldplatform == 'linux-optimised') {
             // If we have explicitly set a path, or a --use-version = we should respect it here.
-            StackPlatform::setConfig('maximacommand', '');
+            StackConfig::set('maximacommand', '');
             self::get_instance()->settings["maximacommand"] = '';
             self::get_instance()->settings["platform"] = 'linux';
         }
@@ -413,7 +414,7 @@ END;
         // Check if the libraries look like they are messing things up.
         if (strpos($genuinedebug, 'eval_string not found') > 0) {
             // If so, get rid of the libraries and try again.
-            StackPlatform::setConfig('maximalibraries', '');
+            StackConfig::set('maximalibraries', '');
             list($message, $genuinedebug, $result) = stack_connection_helper::stackmaxima_genuine_connect();
         }
 
@@ -429,8 +430,8 @@ END;
             if (!$result) {
                 $errmsg = "Automake failed: $message\n\n$genuinedebug";
             } else {
-                StackPlatform::setConfig('platform', 'linux-optimised');
-                StackPlatform::setConfig('maximacommand', $rawcommand);
+                StackConfig::set('platform', 'linux-optimised');
+                StackConfig::set('maximacommand', $rawcommand);
                 // We need to regenerate this file to supress stackmaxima.mac and libraries being reloaded.
                 self::create_maximalocal();
 
@@ -450,7 +451,7 @@ END;
         }
 
         if ($revert) {
-            StackPlatform::setConfig('platform', $oldplatform);
+            StackConfig::set('platform', $oldplatform);
             self::get_instance()->settings["platform"] = $oldplatform;
             self::create_maximalocal();
             return array(false, $errmsg);

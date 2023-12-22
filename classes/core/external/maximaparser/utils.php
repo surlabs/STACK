@@ -23,6 +23,7 @@ namespace classes\core\external\maximaparser;
 
 use classes\core\external\cas\stack_cas_security;
 use classes\core\security\StackException;
+use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 
 class maxima_parser_utils {
@@ -72,7 +73,7 @@ class maxima_parser_utils {
      * @return MP_Node the AST.
      */
     protected static function do_parse(string $code, array $parseoptions, string $cachekey): MP_Node {
-        $muccachelimit = StackPlatform::getConfig('parsercacheinputlength');
+        $muccachelimit = StackConfig::get('parsercacheinputlength');
 
         $cache = null;
         if ($cachekey && $muccachelimit && strlen($code) >= $muccachelimit && mb_strpos($code, 'stack_include') === false) {

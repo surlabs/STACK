@@ -32,6 +32,7 @@ use classes\core\external\maximaparser\MP_Integer;
 use classes\core\external\maximaparser\MP_List;
 use classes\core\external\maximaparser\MP_Node;
 use classes\core\external\maximaparser\MP_String;
+use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 
 class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
@@ -405,7 +406,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
         $commonpostcode .= "\n}";
 
         $commonpostcode .= "\nvar applet = new GGBApplet(params, true);";
-        $customgeogebrabaseurl = StackPlatform::getConfig("geogebrabaseurl");
+        $customgeogebrabaseurl = StackConfig::get("geogebrabaseurl");
         if (isset($customgeogebrabaseurl) && trim($customgeogebrabaseurl) != '') {
             // Use JSON-encode to ensure that should the URL have something fancy
             // in it we can still survive.
