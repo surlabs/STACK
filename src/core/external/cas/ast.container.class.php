@@ -31,6 +31,7 @@ use src\core\external\maximaparser\MP_Node;
 use src\core\external\maximaparser\MP_Operation;
 use src\core\external\maximaparser\MP_Root;
 use src\core\external\maximaparser\MP_Statement;
+use src\core\filters\StackUtils;
 use src\core\security\StackException;
 
 class stack_ast_container extends stack_ast_container_silent implements cas_latex_extractor,
@@ -150,8 +151,7 @@ class stack_ast_container extends stack_ast_container_silent implements cas_late
     }
 
     public function set_cas_latex_value(string $latex) {
-        // TODO: Implement stack_maxima_latex_tidy() method.
-        $this->latex = stack_maxima_latex_tidy($latex);
+        $this->latex = StackUtils::stackMaximaLatexTidy($latex);
     }
 
     public function get_evaluated(): MP_Node {

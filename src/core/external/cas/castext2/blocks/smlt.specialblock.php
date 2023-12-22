@@ -21,10 +21,11 @@ use src\core\external\cas\castext2\stack_cas_castext2_block;
 use src\core\external\maximaparser\MP_List;
 use src\core\external\maximaparser\MP_Node;
 use src\core\external\maximaparser\MP_String;
+use src\core\filters\StackUtils;
 
 /**
  * Special block handling the post processing using
- * stack_maxima_latex_tidy() function.
+ * StackUtils::stackMaximaLatexTidy() function.
  */
 class stack_cas_castext2_special_stack_maxima_latex_tidy extends stack_cas_castext2_block {
     public $content;
@@ -60,7 +61,7 @@ class stack_cas_castext2_special_stack_maxima_latex_tidy extends stack_cas_caste
             $mdmode = $params[2] == '1';
         }
         if ($mdmode) {
-            $toproc = stack_maxima_latex_tidy($t);
+            $toproc = StackUtils::stackMaximaLatexTidy($t);
             // @codingStandardsIgnoreStart
             return str_replace(['\\', '-', '#', '*', '+', '`', '.', '[', ']', '(', ')',
                 '{', '}', '!', '&', '<', '>', '_'],
@@ -69,7 +70,7 @@ class stack_cas_castext2_special_stack_maxima_latex_tidy extends stack_cas_caste
                  $toproc);
             // @codingStandardsIgnoreEnd
         }
-        return stack_maxima_latex_tidy($t);
+        return StackUtils::stackMaximaLatexTidy($t);
     }
 
     public function validate_extract_attributes(): array {

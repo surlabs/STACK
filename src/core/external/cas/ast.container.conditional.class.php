@@ -22,6 +22,7 @@
 namespace src\core\external\cas;
 
 use src\core\external\maximaparser\MP_Node;
+use src\core\filters\StackUtils;
 use src\core\security\StackException;
 
 class stack_ast_container_conditional extends stack_ast_container {
@@ -202,8 +203,7 @@ class stack_ast_container_conditional_latex_and_value extends stack_ast_containe
     }
 
     public function set_cas_latex_value(string $latex) {
-        // TODO: Implement stack_maxima_latex_tidy() method.
-        $this->latex = stack_maxima_latex_tidy($latex);
+        $this->latex = StackUtils::stackMaximaLatexTidy($latex);
     }
 
     public function get_display() {
