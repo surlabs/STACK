@@ -24,8 +24,8 @@ namespace classes\platform;
 
 class StackConfig {
     private static array $config = [];
-
-    private static array $updatedPaths = [];
+    private static array $categories = [];
+    private static array $updated = [];
 
     /**
      * Load the platform configuration
@@ -41,11 +41,13 @@ class StackConfig {
                 $row['value'] = $json_decoded;
             }
 
-            if (isset($row['category'])) {
-                self::$config[$row['category']][$row['parameter_name']] = $row['value'];
-            } else {
-                self::$config[$row['parameter_name']] = $row['value'];
+            self::$config[$row['parameter_name']] = $row['value'];
+
+            if (!isset(self::$categories[$row['group_name']])) {
+                self::$categories[$row['group_name']] = array();
             }
+
+            self::$categories[$row['parameter_name']] = $row['group_name'];
         }
     }
 
@@ -57,31 +59,23 @@ class StackConfig {
      * @return void
      */
     public static function set(string $key, mixed $value, ?string $category = null): void {
-        if (isset($category)) {
-            if (!isset(self::$config[$category])) {
-                self::$config[$category] = [];
-            }
-
-            self::$config[$category][$key] = $value;
-            self::$updatedPaths[] = $category . '/' . $key;
-        } else {
+        if (self::$config[$key] !== $value) {
             self::$config[$key] = $value;
-            self::$updatedPaths[] = $key;
+            self::$updated[$key] = true;
+
+            if (isset($category)) {
+                self::$categories[$key] = $category;
+            }
         }
     }
 
     /**
      * Gets the platform configuration value for a given key
      * @param string $key
-     * @param string|null $category
      * @return mixed
      */
-    public static function get(string $key, ?string $category = null): mixed {
-        if (isset($category)) {
-            return self::$config[$category][$key];
-        } else {
-            return self::$config[$key];
-        }
+    public static function get(string $key): mixed {
+        return self::$config[$key];
     }
 
     /**
@@ -91,7 +85,15 @@ class StackConfig {
      */
     public static function getAll(?string $category = null) :array {
         if (isset($category)) {
-            return self::$config[$category];
+            $result = array();
+
+            foreach (self::$categories as $key => $value) {
+                if ($value === $category) {
+                    $result[$key] = self::$config[$key];
+                }
+            }
+
+            return $result;
         } else {
             return self::$config;
         }
@@ -102,35 +104,24 @@ class StackConfig {
      * @return void
      */
     public static function save() :void {
-        foreach (self::$updatedPaths as $fullPath) {
-            $path = explode('/', $fullPath);
+        foreach (self::$updated as $key => $exist) {
+            if ($exist) {
+                $data = array();
 
-            $data = array();
+                if (is_array(self::$config[$key])) {
+                    $data['value'] = json_encode(self::$config[$key]);
+                } else {
+                    $data['value'] = self::$config[$key];
+                }
 
-            $where = array();
+                $data['group_name'] = self::$categories[$key];
 
-            if (count($path) === 1) {
-                $where['parameter_name'] = $path[0];
-                $data['value'] = self::$config[$path[0]];
-            } elseif (count($path) === 2) {
-                $where['parameter_name'] = $path[1];
-                $data['value'] = self::$config[$path[0]][$path[1]];
-                $data['category'] = $path[0];
+                StackDatabase::update('xqcas_configuration', $data, array(
+                    'parameter_name' => $key
+                ));
+
+                self::$updated[$key] = false;
             }
-
-            if (is_array($data['value'])) {
-                $data['value'] = json_encode($data['value']);
-            }
-
-            StackDatabase::update(
-                'xqcas_configuration',
-                $data,
-                $where
-            );
-
-            // This eliminates one by one, in case in any case the execution of save() fails,
-            // those that have not been saved will be saved in the next execution
-            self::$updatedPaths[$fullPath] = null;
         }
     }
 }
