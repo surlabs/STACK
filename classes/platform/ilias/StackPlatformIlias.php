@@ -27,7 +27,6 @@ use classes\platform\StackPlatform;
  *********************************************************************/
 class StackPlatformIlias extends StackPlatform
 {
-    private array $config = [];
     private ilLanguage $language;
 
     public function __construct()
