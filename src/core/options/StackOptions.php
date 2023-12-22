@@ -81,7 +81,7 @@ class StackOptions
         $this->data = StackOptionsDefault::getDefaultOptions();
 
         //Overwrite default with given options
-        if (isset($array_options) && is_array($array_options)) {
+        if (isset($array_options)) {
             foreach ($array_options as $option_key => $option_value) {
                 if (!array_key_exists($option_key, $this->data)) {
                     //TODO: Log error, invalid option name
