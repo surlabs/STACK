@@ -36,8 +36,6 @@ use classes\core\security\StackException;
 use classes\platform\StackPlatform;
 
 class stack_cas_keyval {
-
-    /** @var Holds the raw text as entered by a question author. */
     private $raw;
 
     /** @var array of stack_ast_container_silent */
@@ -215,34 +213,6 @@ class stack_cas_keyval {
             $this->validate($inputs);
         }
         return $this->valid;
-    }
-
-    public function get_errors($casdebug = false, $raw = 'strings') {
-        if (null === $this->valid) {
-            $this->validate(null);
-        }
-        $errors = [];
-        if ($raw === 'objects') {
-            $errors = array_merge([], $this->errors);
-            if ($casdebug) {
-                $errors[] = new $this->errclass($this->session->get_debuginfo(), $this->context);
-            }
-            return $this->errors;
-        } else {
-            foreach ($this->errors as $err) {
-                if ($err instanceof stack_cas_error) {
-                    $errors[] = $err->get_legacy_error();
-                } else {
-                    $errors[] = $err;
-                }
-            }
-            $errors = array_unique($errors);
-        }
-
-        if ($casdebug) {
-            $errors[] = $this->session->get_debuginfo();
-        }
-        return $errors;
     }
 
     public function instantiate() {

@@ -20,6 +20,7 @@ use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_Identifier;
 use classes\core\external\maximaparser\MP_Indexing;
 use classes\core\external\maximaparser\MP_Node;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**
@@ -40,7 +41,7 @@ class stack_ast_filter_031_no_trig_brackets implements stack_cas_astfilter {
                 if (array_key_exists($node->value, $selectednames)) {
 
                     $errors[] = StackPlatform::getTranslation('stackCas_trigparens',
-                            array('forbid' => stack_maxima_format_casstring($node->value.'(x)')));
+                            array('forbid' => StackParser::stackMaximaFormatCasString($node->value.'(x)')));
                     if (array_search('trigparens', $answernotes) === false) {
                         $answernotes[] = 'trigparens';
                     }

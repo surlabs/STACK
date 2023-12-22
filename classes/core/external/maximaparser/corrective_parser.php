@@ -339,12 +339,12 @@ class maxima_corrective_parser {
             if ($inline === 'left') {
                 $answernote[] = 'missingLeftBracket';
                 $errors[] = StackPlatform::getTranslation('stackCas_missingLeftBracket',
-                    array('bracket' => '(', 'cmd' => stack_maxima_format_casstring($string)));
+                    array('bracket' => '(', 'cmd' => StackParser::stackMaximaFormatCasString($string)));
                 return;
             } else if ($inline === 'right') {
                 $answernote[] = 'missingRightBracket';
                 $errors[] = StackPlatform::getTranslation('stackCas_missingRightBracket',
-                  array('bracket' => ')', 'cmd' => stack_maxima_format_casstring($string)));
+                  array('bracket' => ')', 'cmd' => StackParser::stackMaximaFormatCasString($string)));
                 return;
             }
         }
@@ -354,12 +354,12 @@ class maxima_corrective_parser {
             if ($inline === 'left') {
                 $answernote[] = 'missingLeftBracket';
                 $errors[] = StackPlatform::getTranslation('stackCas_missingLeftBracket',
-                    array('bracket' => '[', 'cmd' => stack_maxima_format_casstring($string)));
+                    array('bracket' => '[', 'cmd' => StackParser::stackMaximaFormatCasString($string)));
                 return;
             } else if ($inline === 'right') {
                 $answernote[] = 'missingRightBracket';
                 $errors[] = StackPlatform::getTranslation('stackCas_missingRightBracket',
-                    array('bracket' => ']', 'cmd' => stack_maxima_format_casstring($string)));
+                    array('bracket' => ']', 'cmd' => StackParser::stackMaximaFormatCasString($string)));
                 return;
             }
         }
@@ -369,12 +369,12 @@ class maxima_corrective_parser {
             if ($inline === 'left') {
                 $answernote[] = 'missingLeftBracket';
                 $errors[] = StackPlatform::getTranslation('stackCas_missingLeftBracket',
-                    array('bracket' => '{', 'cmd' => stack_maxima_format_casstring($string)));
+                    array('bracket' => '{', 'cmd' => StackParser::stackMaximaFormatCasString($string)));
                 return;
             } else if ($inline === 'right') {
                 $answernote[] = 'missingRightBracket';
                 $errors[] = StackPlatform::getTranslation('stackCas_missingRightBracket',
-                    array('bracket' => '}', 'cmd' => stack_maxima_format_casstring($string)));
+                    array('bracket' => '}', 'cmd' => StackParser::stackMaximaFormatCasString($string)));
                 return;
             }
         }
@@ -382,18 +382,18 @@ class maxima_corrective_parser {
         if ($previouschar === '=' && ($foundchar === '<' || $foundchar === '>')) {
             $a = array();
             if ($foundchar === '<') {
-                $a['cmd'] = stack_maxima_format_casstring('=<');
+                $a['cmd'] = StackParser::stackMaximaFormatCasString('=<');
             } else {
-                $a['cmd'] = stack_maxima_format_casstring('=>');
+                $a['cmd'] = StackParser::stackMaximaFormatCasString('=>');
             }
             $errors[] = StackPlatform::getTranslation('stackCas_backward_inequalities', $a);
             $answernote[] = 'backward_inequalities';
         } else if ($foundchar === '=' && ($nextchar === '<' || $nextchar === '>')) {
             $a = array();
             if ($nextchar === '<') {
-                $a['cmd'] = stack_maxima_format_casstring('=<');
+                $a['cmd'] = StackParser::stackMaximaFormatCasString('=<');
             } else {
-                $a['cmd'] = stack_maxima_format_casstring('=>');
+                $a['cmd'] = StackParser::stackMaximaFormatCasString('=>');
             }
             $errors[] = StackPlatform::getTranslation('stackCas_backward_inequalities', $a);
             $answernote[] = 'backward_inequalities';
@@ -401,32 +401,32 @@ class maxima_corrective_parser {
             $errors[] = StackPlatform::getTranslation('stackCas_apostrophe', null);
             $answernote[] = 'apostrophe';
         } else if (($foundchar === '/' && $nextchar === '*') || ($foundchar === '*' && $previouschar === '/')) {
-            $a = array('cmd' => stack_maxima_format_casstring('/*'));
+            $a = array('cmd' => StackParser::stackMaximaFormatCasString('/*'));
             $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '=' && $nextchar === '=' && $previouschar === '=') {
-            $a = array('cmd' => stack_maxima_format_casstring('==='));
+            $a = array('cmd' => StackParser::stackMaximaFormatCasString('==='));
             $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '=' && ($nextchar === '=' || $previouschar === '=')) {
-            $a = array('cmd' => stack_maxima_format_casstring('=='));
+            $a = array('cmd' => StackParser::stackMaximaFormatCasString('=='));
             $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '&') {
-            $a = array('cmd' => stack_maxima_format_casstring('&'));
+            $a = array('cmd' => StackParser::stackMaximaFormatCasString('&'));
             $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if ($foundchar === '|') {
-            $a = array('cmd' => stack_maxima_format_casstring('|'));
+            $a = array('cmd' => StackParser::stackMaximaFormatCasString('|'));
             $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
         } else if (($foundchar === '>' && $previouschar === '<') || ($foundchar === '<' && $nextchar === '>')) {
-            $a = array('cmd' => stack_maxima_format_casstring('<>'));
+            $a = array('cmd' => StackParser::stackMaximaFormatCasString('<>'));
             $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
             $answernote[] = 'spuriousop';
 
         } else if (ctype_alpha($foundchar) && ctype_digit($previouschar)) {
-            $a = array('cmd' => stack_maxima_format_casstring(mb_substr($string, 0, $exception->grammarOffset) .
+            $a = array('cmd' => StackParser::stackMaximaFormatCasString(mb_substr($string, 0, $exception->grammarOffset) .
                     '[[syntaxexamplehighlight]*[syntaxexamplehighlight]]' .
                     mb_substr($string, $exception->grammarOffset)));
             $answernote[] = 'missing_stars';
@@ -447,10 +447,10 @@ class maxima_corrective_parser {
             $cmds = str_replace('@@IS@@', '*', $cmds);
             $cmds = str_replace('@@Is@@', '[[syntaxexamplehighlight]_[syntaxexamplehighlight]]', $cmds);
             $answernote[] = 'spaces';
-            $errors[] = StackPlatform::getTranslation('stackCas_spaces', array('expr' => stack_maxima_format_casstring($cmds)));
+            $errors[] = StackPlatform::getTranslation('stackCas_spaces', array('expr' => StackParser::stackMaximaFormatCasString($cmds)));
         } else if ($foundchar === ':' && (strpos($string, ':lisp') !== false)) {
             $errors[] = StackPlatform::getTranslation('stackCas_forbiddenWord',
-                    array('forbid' => stack_maxima_format_casstring('lisp')));
+                    array('forbid' => StackParser::stackMaximaFormatCasString('lisp')));
             $answernote[] = 'forbiddenWord';
         } else if (count($exception->expected) === 6 &&
                    $exception->expected[0]['type'] === 'literal' && $exception->expected[0]['value'] === ',' &&
@@ -467,33 +467,33 @@ class maxima_corrective_parser {
         } else if ($nextchar === '' && ($foundchar !== '' && mb_strpos($disallowedfinalchars, $foundchar) !== false)) {
             $a = array();
             $a['char'] = $foundchar;
-            $a['cmd']  = stack_maxima_format_casstring($string);
+            $a['cmd']  = StackParser::stackMaximaFormatCasString($string);
             $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if ($foundchar === '' && ($previouschar !== '' &&
                 mb_strpos($disallowedfinalchars, $previouschar) !== false)) {
             $a = array();
             $a['char'] = $previouschar;
-            $a['cmd']  = stack_maxima_format_casstring($string);
+            $a['cmd']  = StackParser::stackMaximaFormatCasString($string);
             $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if ($foundchar === '!' && ($previouschar === '' ||
                 !(ctype_alpha($previouschar) || ctype_digit($previouschar) || $previouschar === ')' || $previouschar === ']'))) {
             // TODO: Localise... "Operator X without a valid target. Needs something in front of it".
-            $a = array('op' => stack_maxima_format_casstring('!'));
+            $a = array('op' => StackParser::stackMaximaFormatCasString('!'));
             $errors[] = StackPlatform::getTranslation('stackCas_badpostfixop', $a);
             $answernote[] = 'badpostfixop';
         } else if (mb_strpos($disallowedfinalchars, mb_substr(trim($string), -1)) !== false) {
             $a = array();
             $a['char'] = mb_substr(trim($original), -1);
-            $a['cmd']  = stack_maxima_format_casstring($string);
+            $a['cmd']  = StackParser::stackMaximaFormatCasString($string);
             $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if (($foundchar === '}' || $foundchar === ']' || $foundchar === ')') &&
                 mb_strpos($disallowedfinalchars, $previouschar) !== false) {
             $a = array();
             $a['char'] = $previouschar;
-            $a['cmd']  = stack_maxima_format_casstring($string);
+            $a['cmd']  = StackParser::stackMaximaFormatCasString($string);
             $errors[] = StackPlatform::getTranslation('stackCas_finalChar', $a);
             $answernote[] = 'finalChar';
         } else if ($previouschar === '"') {

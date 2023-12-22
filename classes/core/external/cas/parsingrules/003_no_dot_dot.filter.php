@@ -50,7 +50,7 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                     $node->lhs->raw !== null &&
                     substr($node->lhs->raw, -1) === '.')) {
                     $a = array();
-                    $a['cmd']  = stack_maxima_format_casstring('..');
+                    $a['cmd']  = StackParser::stackMaximaFormatCasString('..');
                     if (array_search(StackPlatform::getTranslation('stackCas_spuriousop', $a), $errors) === false) {
                         $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
                     }
@@ -68,7 +68,7 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                             substr($node->lhs->rhs->raw, -1) === '.')) {
                     $node->position['invalid'] = true;
                     $a = array();
-                    $a['cmd']  = stack_maxima_format_casstring('..');
+                    $a['cmd']  = StackParser::stackMaximaFormatCasString('..');
                     if (array_search(StackPlatform::getTranslation('stackCas_spuriousop', $a), $errors) === false) {
                         $errors[] = StackPlatform::getTranslation('stackCas_spuriousop', $a);
                     }

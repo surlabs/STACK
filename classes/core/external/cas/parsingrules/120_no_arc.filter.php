@@ -20,6 +20,7 @@ use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_FunctionCall;
 use classes\core\external\maximaparser\MP_Identifier;
 use classes\core\external\maximaparser\MP_Node;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**
@@ -52,8 +53,8 @@ class stack_ast_filter_120_no_arc implements stack_cas_astfilter {
                     $node->position['invalid'] = true;
 
                     $errors[] = StackPlatform::getTranslation('stackCas_triginv',
-                        array('badinv' => stack_maxima_format_casstring($node->name->value),
-                              'goodinv' => stack_maxima_format_casstring($selectednames[$node->name->value])));
+                        array('badinv' => StackParser::stackMaximaFormatCasString($node->name->value),
+                              'goodinv' => StackParser::stackMaximaFormatCasString($selectednames[$node->name->value])));
                     if (array_search('triginv', $answernotes) === false) {
                         $answernotes[] = 'triginv';
                     }

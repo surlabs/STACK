@@ -20,6 +20,7 @@ use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_Identifier;
 use classes\core\external\maximaparser\MP_Node;
 use classes\core\external\maximaparser\MP_Operation;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**
@@ -41,7 +42,7 @@ class stack_ast_filter_030_no_trig_space implements stack_cas_astfilter {
                 isset($node->parentnode->position['fixspaces'])) {
                 if (array_key_exists($node->value, $selectednames)) {
                     $errors[] = StackPlatform::getTranslation('stackCas_trigspace',
-                            array('trig' => stack_maxima_format_casstring($node->value.'(...)')));
+                            array('trig' => StackParser::stackMaximaFormatCasString($node->value.'(...)')));
                     if (array_search('trigspace', $answernotes) === false) {
                         $answernotes[] = 'trigspace';
                     }

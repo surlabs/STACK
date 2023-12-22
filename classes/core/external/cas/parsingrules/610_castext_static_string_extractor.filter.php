@@ -16,6 +16,7 @@
 
 namespace classes\core\external\cas\castext2\parsingrules;
 
+use classes\core\external\cas\castext2\castext2_static_replacer;
 use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_Atom;
 use classes\core\external\maximaparser\MP_FunctionCall;
@@ -30,7 +31,7 @@ use classes\core\external\maximaparser\MP_String;
 class stack_ast_filter_610_castext_static_string_extractor implements stack_cas_astfilter_parametric {
 
     // A reference to the extractor.
-    private $extractor = false;
+    private castext2_static_replacer $extractor;
 
     public function set_filter_parameters(array $parameters) {
         $this->extractor = isset($parameters['static string extractor']) ? $parameters['static string extractor'] : null;

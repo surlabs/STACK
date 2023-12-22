@@ -23,6 +23,7 @@ namespace classes\core\external\cas;
 
 use classes\core\external\maximaparser\MP_Identifier;
 use classes\core\external\maximaparser\MP_Operation;
+use classes\core\filters\StackParser;
 use classes\core\security\StackException;
 use classes\platform\StackPlatform;
 
@@ -313,10 +314,9 @@ class stack_cas_casstring_units {
             if ($cache[strtolower($key)] != $key) {
                 $fndsynonym = true;
                 $answernote = 'unitssynonym';
-                //TODO: Implement stack_maxima_format_casstring() method.
                 $synonymerr = StackPlatform::getTranslation('stackCas_unitssynonym',
-                        array('forbid' => stack_maxima_format_casstring($key),
-                                'unit' => stack_maxima_format_casstring($cache[strtolower($key)])));
+                        array('forbid' => StackParser::stackMaximaFormatCasString($key),
+                                'unit' => StackParser::stackMaximaFormatCasString($cache[strtolower($key)])));
             }
         }
 
@@ -364,7 +364,7 @@ class stack_cas_casstring_units {
         }
 
         return(StackPlatform::getTranslation('stackCas_unknownUnitsCase',
-            array('forbid' => stack_maxima_format_casstring($key),
-                'unit' => stack_maxima_format_casstring('['.implode(', ', $invalid[strtolower($key)]).']'))));
+            array('forbid' => StackParser::stackMaximaFormatCasString($key),
+                'unit' => StackParser::stackMaximaFormatCasString('['.implode(', ', $invalid[strtolower($key)]).']'))));
     }
 }

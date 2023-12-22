@@ -19,6 +19,7 @@ namespace classes\core\external\cas\castext2\parsingrules;
 use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_FunctionCall;
 use classes\core\external\maximaparser\MP_Node;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**
@@ -34,8 +35,8 @@ class stack_ast_filter_542_no_functions_at_all implements stack_cas_astfilter_ex
                 // Insert stars into the pattern.
                 // Probably not very sensible to end up with sin(x) -> sin*(x) but ho hum.
                 $errors[] = StackPlatform::getTranslation('stackCas_noFunction',
-                        array('forbid' => stack_maxima_format_casstring($node->name->toString()),
-                            'term' => stack_maxima_format_casstring($node->toString())));
+                        array('forbid' => StackParser::stackMaximaFormatCasString($node->name->toString()),
+                            'term' => StackParser::stackMaximaFormatCasString($node->toString())));
                 $node->position['invalid'] = true;
                 return false;
             }

@@ -22,6 +22,7 @@ use classes\core\external\maximaparser\MP_Group;
 use classes\core\external\maximaparser\MP_Identifier;
 use classes\core\external\maximaparser\MP_Node;
 use classes\core\external\maximaparser\MP_Operation;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**
@@ -101,7 +102,7 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                     // TODO: now that we have the whole "function call" as the $node
                     // the error message could print out it all, but without that star...
                     $errors[] = StackPlatform::getTranslation('stackCas_trigexp',
-                        array('forbid' => stack_maxima_format_casstring($node->lhs->lhs->value.'^'),
+                        array('forbid' => StackParser::stackMaximaFormatCasString($node->lhs->lhs->value.'^'),
                             'identifier' => $node->lhs->lhs->value));
                     if (array_search('trigexp', $answernotes) === false) {
                         $answernotes[] = 'trigexp';
@@ -149,7 +150,7 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                     // Those rules should not match anything else.
                     $node->position['invalid'] = true;
                     $errors[] = StackPlatform::getTranslation('stackCas_trigexp',
-                        array('forbid' => stack_maxima_format_casstring($node->lhs->value.'^'),
+                        array('forbid' => StackParser::stackMaximaFormatCasString($node->lhs->value.'^'),
                         'identifier' => $node->lhs->value));
                     if (array_search('trigexp', $answernotes) === false) {
                         $answernotes[] = 'trigexp';
@@ -181,7 +182,7 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                     // Those rules should not match anything else.
                     $node->position['invalid'] = true;
                     $errors[] = StackPlatform::getTranslation('stackCas_trigexp',
-                        array('forbid' => stack_maxima_format_casstring($node->name->value.'^'),
+                        array('forbid' => StackParser::stackMaximaFormatCasString($node->name->value.'^'),
                         'identifier' => $node->name->value));
                     if (array_search('trigexp', $answernotes) === false) {
                         $answernotes[] = 'trigexp';

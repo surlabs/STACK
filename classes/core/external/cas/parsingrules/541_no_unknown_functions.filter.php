@@ -20,6 +20,7 @@ use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_FunctionCall;
 use classes\core\external\maximaparser\MP_Identifier;
 use classes\core\external\maximaparser\MP_Node;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**
@@ -39,8 +40,8 @@ class stack_ast_filter_541_no_unknown_functions implements stack_cas_astfilter_e
                 $hasany = true;
                 // Insert stars into the pattern.
                 $errors[] = StackPlatform::getTranslation('stackCas_unknownFunction',
-                        array('forbid' => stack_maxima_format_casstring($node->name->toString()),
-                            'term' => stack_maxima_format_casstring($node->toString())));
+                        array('forbid' => StackParser::stackMaximaFormatCasString($node->name->toString()),
+                            'term' => StackParser::stackMaximaFormatCasString($node->toString())));
                 $node->position['invalid'] = true;
                 return false;
             }

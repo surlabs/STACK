@@ -24,6 +24,7 @@
 namespace classes\core\external\cas;
 
 use classes\core\external\cas\castext2\castext2_evaluatable;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 class stack_cas_healthcheck {
@@ -84,7 +85,8 @@ class stack_cas_healthcheck {
                     $this->tests[] = $test;
                 }
 
-                stack_cas_configuration::copy_maxima_bat();
+                $stack_cas_configuration = new stack_cas_configuration();
+                $stack_cas_configuration->copy_maxima_bat();
 
                 if (!is_readable($CFG->dataroot . '/stack/maxima.bat')) {
                     $this->ishealthy = false;
@@ -152,11 +154,11 @@ class stack_cas_healthcheck {
             // Intentionally use get_string for the sample CAS and plots, so we don't render
             // the maths too soon.
             $this->output_cas_text('healthcheckconnect',
-                StackPlatform::getTranslation('healthcheckconnectintro', null), get_string('healthchecksamplecas', 'qtype_stack'));
+                StackPlatform::getTranslation('healthcheckconnectintro', null), StackPlatform::getTranslation('healthchecksamplecas'));
             $this->output_cas_text('healthcheckconnectunicode',
-                StackPlatform::getTranslation('healthcheckconnectintro', null), get_string('healthchecksamplecasunicode', 'qtype_stack'));
+                StackPlatform::getTranslation('healthcheckconnectintro', null), StackPlatform::getTranslation('healthchecksamplecasunicode'));
             $this->output_cas_text('healthcheckplots',
-                StackPlatform::getTranslation('healthcheckplotsintro', null), get_string('healthchecksampleplots', 'qtype_stack'));
+                StackPlatform::getTranslation('healthcheckplotsintro', null), StackPlatform::getTranslation('healthchecksampleplots'));
         }
 
         // If we have a linux machine, and we are testing the raw connection then we should
@@ -264,7 +266,7 @@ class stack_cas_healthcheck {
             $test['details'] .= StackPlatform::getTranslation('errors', null) . $ct->get_errors();
             $test['details'] .= StackPlatform::getTranslation('debuginfo', null) . $session->get_debuginfo();
         } else {
-            $test['details'] .= StackPlatform::createTag('p', stack_ouput_castext($ct->get_rendered()));
+            $test['details'] .= StackPlatform::createTag('p', StackParser::stackOuputCastext($ct->get_rendered()));
         }
         $this->tests[] = $test;
     }

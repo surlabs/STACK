@@ -19,6 +19,7 @@ namespace classes\core\external\cas\castext2\parsingrules;
 use classes\core\external\cas\stack_cas_security;
 use classes\core\external\maximaparser\MP_Node;
 use classes\core\external\maximaparser\MP_Root;
+use classes\core\filters\StackParser;
 use classes\platform\StackPlatform;
 
 /**
@@ -49,7 +50,7 @@ class stack_ast_filter_990_no_fixing_spaces implements stack_cas_astfilter_exclu
                 $missingstring = mb_substr($missingstring, 0, -2);
             }
             $a = array();
-            $a['expr']  = stack_maxima_format_casstring($missingstring);
+            $a['expr']  = StackParser::stackMaximaFormatCasString($missingstring);
             array_unshift($errors, StackPlatform::getTranslation('stackCas_spaces', $a));
         }
 

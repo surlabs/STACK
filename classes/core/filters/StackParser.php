@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace classes\core\filters;
 
 use classes\platform\StackPlatform;
+use stdClass;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -75,9 +76,9 @@ class StackParser
     public static function maximaTranslateString(string $string): ?string {
         $fixed = $string;
         if (str_contains($string, '0 to a negative exponent')) {
-            $fixed = StackPlatform::getTranslation('Maxima_DivisionZero', null);
+            $fixed = StackPlatform::getTranslation('Maxima_DivisionZero');
         } else if (str_contains($string, 'args: argument must be a non-atomic expression;')) {
-            $fixed = StackPlatform::getTranslation('Maxima_Args', null);
+            $fixed = StackPlatform::getTranslation('Maxima_Args');
         }
         return $fixed;
     }
@@ -359,5 +360,56 @@ class StackParser
         } else {
             return 'left';
         }
+    }
+
+    /**
+     * @param string $str
+     * @return string
+     */
+    public static function stackMaximaFormatCasString(string $str) :string {
+        // Santise the output, E.g. '>' -> '&gt;'.
+        $str = StackPlatform::getTranslation($str);
+        $str = str_replace('[[syntaxexamplehighlight]', '<span class="stacksyntaxexamplehighlight">', $str);
+        $str = str_replace('[syntaxexamplehighlight]]', '</span>', $str);
+
+        return StackPlatform::createTag('span', $str, array('class' => 'stacksyntaxexample'));
+    }
+
+    /**
+     * Imported from Moodle
+     * @param string $text
+     * @param int $format
+     * @param $options
+     * @return string
+     */
+    public static function format_text(string $text, int $format, $options = null) :string {
+        if (is_null($options)) {
+            $options = new stdClass;
+        }
+        //some sensible defaults
+        if (!isset($options->para)) {
+            $options->para = false;
+        }
+        if (!isset($options->newlines)) {
+            $options->newlines = false;
+        }
+        if (!isset($options->smiley)) {
+            $options->smiley = false;
+        }
+        if (!isset($options->filter)) {
+            $options->filter = false;
+        }
+
+        return html_entity_decode(strip_tags(str_replace(array('</p>', "\n", "\r"), '   ', $text)), ENT_COMPAT);
+    }
+
+    /**
+     *
+     * @param $castext
+     * @return string
+     */
+    public static function stackOuputCastext($castext) {
+        //TODO: Class stack_maths
+        return self::format_text(stack_maths::process_display_castext($castext), StackUtils::FORMAT_HTML, array('noclean' => true));
     }
 }

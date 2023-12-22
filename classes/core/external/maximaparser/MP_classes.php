@@ -47,6 +47,10 @@ namespace classes\core\external\maximaparser;
 
 // @codingStandardsIgnoreStart
 // We ignore coding in this file, because the library is used outside Moodle.
+use classes\core\external\cas\castext2\parsingrules\stack_ast_filter_996_call_modification;
+use classes\core\external\cas\stack_cas_security;
+use classes\platform\StackPlatform;
+
 class MP_Node {
     public $parentnode  = null;
     public $position    = null;
@@ -964,7 +968,7 @@ class MP_Annotation extends MP_Node {
         $params = [];
 
         if ($params !== null && isset($params['flattree'])) {
-            return '([Annoation] ' . $this->value . ')';
+            return '([Annoation])';
         }
 
         foreach ($this->params as $value) {
@@ -1007,7 +1011,7 @@ class MP_Comment extends MP_Node {
             $annotations[] = $value->toString($params);
         }
         if ($params !== null && isset($params['flattree'])) {
-            return '([Comment] ' . $dispvalue . ')';
+            return '([Comment])';
         }
         if ($params !== null && isset($params['pretty'])) {
             return "\n/*" . $this->value . implode("\n", $annotations) . "*/\n";
@@ -2230,7 +2234,6 @@ function opLBind($op) {
         case '#pm#':
             return 100;
         case '=':
-        case '*':
         case '#':
         case '>':
         case '>=':
