@@ -33,5 +33,83 @@ class StackDatabaseIlias extends StackDatabase {
         $this->db = $DIC->database();
     }
 
-    //TODO: Add methods (insert, update, delete, etc.)
+    /**
+     * Inserts a new row in the database
+     *
+     * Usage: StackDatabase::insert('table_name', ['column1' => 'value1', 'column2' => 'value2']);
+     *
+     * @param string $table
+     * @param array $data
+     * @return void
+     */
+    public function insertInternal(string $table, array $data): void {
+        $this->db->insert($table, $data);
+    }
+
+    /**
+     * Inserts a new row in the database, if the row already exists, updates it
+     *
+     * Usage: StackDatabase::insertOnDuplicatedKey('table_name', ['column1' => 'value1', 'column2' => 'value2']);
+     *
+     * @param string $table
+     * @param array $data
+     * @return void
+     */
+    public function insertOnDuplicatedKeyInternal(string $table, array $data): void {
+        $this->db->query("INSERT INTO " . $table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . implode(", ", array_values($data)) . ") ON DUPLICATE KEY UPDATE " . implode(", ", array_map(function ($key, $value) {
+            return $key . " = " . $value;
+        }, array_keys($data), array_values($data))));
+    }
+
+    /**
+     * Updates a row/s in the database
+     *
+     * Usage: StackDatabase::update('table_name', ['column1' => 'value1', 'column2' => 'value2'], ['id' => 1]);
+     *
+     * @param string $table
+     * @param array $data
+     * @param array $where
+     * @return void
+     */
+    public function updateInternal(string $table, array $data, array $where): void {
+        $this->db->update($table, $data, $where);
+    }
+
+    /**
+     * Deletes a row/s in the database
+     *
+     * Usage: StackDatabase::delete('table_name', ['id' => 1]);
+     *
+     * @param string $table
+     * @param array $where
+     * @return void
+     */
+    public function deleteInternal(string $table, array $where): void {
+        $this->db->query("DELETE FROM " . $table . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+            return $key . " = " . $value;
+        }, array_keys($where), array_values($where))));
+    }
+
+    /**
+     * Selects a row/s in the database
+     *
+     * Usage: StackDatabase::select('table_name', ['id' => 1]);
+     *
+     * @param string $table
+     * @param array $where
+     * @return array
+     */
+    public function selectInternal(string $table, array $where): array {
+        $result = $this->db->query("SELECT * FROM " . $table . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+            return $key . " = " . $value;
+        }, array_keys($where), array_values($where))));
+
+        $rows = [];
+
+        while ($row = $this->db->fetchAssoc($result)) {
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
 }

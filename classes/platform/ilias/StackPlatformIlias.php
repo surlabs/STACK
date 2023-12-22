@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace classes\platform\ilias;
 
-use ILIAS\UI\Factory;
-use ILIAS\UI\Renderer;
+use classes\platform\StackDatabase;
 use ilLanguage;
 use classes\platform\StackPlatform;
 
@@ -29,16 +28,12 @@ use classes\platform\StackPlatform;
 class StackPlatformIlias extends StackPlatform
 {
     private array $config = [];
-    private Factory $factory;
-    private Renderer $renderer;
     private ilLanguage $language;
 
     public function __construct()
     {
         global $DIC;
 
-        $this->factory = $DIC->ui()->factory();
-        $this->renderer = $DIC->ui()->renderer();
         $this->language = $DIC->language();
     }
 
@@ -86,30 +81,51 @@ class StackPlatformIlias extends StackPlatform
      * Set the platform configuration value for a given key to a given value
      * @param string $key
      * @param mixed $value
+     * @param string|null $category
      * @return void
      */
-    public function setConfigInternal(string $key, mixed $value): void
+    public function setConfigInternal(string $key, mixed $value, ?string $category = null): void
     {
-        $this->config[$key] = $value;
+        if (isset($category)) {
+            $this->config[$category][$key] = $value;
+        } else {
+            $this->config[$key] = $value;
+        }
 
-        //TODO: Save config to database
+        StackDatabase::insertOnDuplicatedKey(
+            'xqcas_configuration',
+            array(
+                'parameter_name' => $key,
+                'value' => $value,
+                'category' => $category
+            )
+        );
     }
 
     /**
      * Gets the platform configuration value for a given key
      * @param string $key
+     * @param string|null $category
      * @return mixed
      */
-    public function getConfigInternal(string $key): mixed
-    {
-        return $this->config[$key];
+    public function getConfigInternal(string $key, ?string $category = null): mixed {
+        if (isset($category)) {
+            return $this->config[$category][$key];
+        } else {
+            return $this->config[$key];
+        }
     }
 
     /**
      * Gets all the platform configuration values
+     * @param string|null $category
      * @return array
      */
-    public function getAllConfigInternal() :array {
-        return $this->config;
+    public function getAllConfigInternal(?string $category = null) :array {
+        if (isset($category)) {
+            return $this->config[$category];
+        } else {
+            return $this->config;
+        }
     }
 }

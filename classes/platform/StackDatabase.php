@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace classes\platform;
 
+use classes\core\security\StackException;
 use classes\platform\ilias\StackDatabaseIlias;
 
 /**
@@ -26,16 +27,86 @@ use classes\platform\ilias\StackDatabaseIlias;
 abstract class StackDatabase {
     public static StackDatabase $platform;
 
+    /**
+     * Sets the platform database (this method is called automatically from StackPlatform::setPlatform)
+     * @param string $x
+     * @return void
+     * @throws StackException
+     * @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection
+     */
     public static function setPlatform(string $x): void {
         switch ($x) {
             case 'ilias':
                 self::$platform = new StackDatabaseIlias();
                 break;
             default:
-                // TODO: Error
-                break;
+                throw new StackException('Invalid platform selected to DB: ' . $x . '.');
         }
     }
 
-    //TODO: Add methods (insert, update, delete, etc.)
+    /**
+     * Inserts a new row in the database
+     *
+     * Usage: StackDatabase::insert('table_name', ['column1' => 'value1', 'column2' => 'value2']);
+     *
+     * @param string $table
+     * @param array $data
+     * @return void
+     */
+    public static function insert(string $table, array $data): void {
+        self::$platform->insertInternal($table, $data);
+    }
+
+    /**
+     * Inserts a new row in the database, if the row already exists, updates it
+     *
+     * Usage: StackDatabase::insertOnDuplicatedKey('table_name', ['column1' => 'value1', 'column2' => 'value2']);
+     *
+     * @param string $table
+     * @param array $data
+     * @return void
+     */
+    public static function insertOnDuplicatedKey(string $table, array $data): void {
+        self::$platform->insertOnDuplicatedKeyInternal($table, $data);
+    }
+
+    /**
+     * Updates a row/s in the database
+     *
+     * Usage: StackDatabase::update('table_name', ['column1' => 'value1', 'column2' => 'value2'], ['id' => 1]);
+     *
+     * @param string $table
+     * @param array $data
+     * @param array $where
+     * @return void
+     */
+    public static function update(string $table, array $data, array $where): void {
+        self::$platform->updateInternal($table, $data, $where);
+    }
+
+    /**
+     * Deletes a row/s in the database
+     *
+     * Usage: StackDatabase::delete('table_name', ['id' => 1]);
+     *
+     * @param string $table
+     * @param array $where
+     * @return void
+     */
+    public static function delete(string $table, array $where): void{
+        self::$platform->deleteInternal($table, $where);
+    }
+
+    /**
+     * Selects a row/s in the database
+     *
+     * Usage: StackDatabase::select('table_name', ['id' => 1]);
+     *
+     * @param string $table
+     * @param array $where
+     * @return array
+     */
+    public static function select(string $table, array $where): array {
+        return self::$platform->selectInternal($table, $where);
+    }
 }
