@@ -39,6 +39,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     protected Factory $factory;
     protected $request;
     protected Renderer $renderer;
+    private ilLanguage $language;
 
     /**
      * @throws StackException|ilCtrlException
@@ -54,6 +55,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         $this->factory = $DIC->ui()->factory();
         $this->request = $DIC->http()->request();
         $this->renderer = $DIC->ui()->renderer();
+        $this->language = $DIC->language();
 
         //Initialize the plugin platform
         StackPlatform::initialize('ilias');
@@ -96,23 +98,28 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                 case "configure":
                     $sections = $this->configure($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "configure");
+                    $rendered = $this->renderForm($data, $form_action, $sections);
                     break;
                 case "maxima":
                     $sections = $this->maxima($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "maxima");
+                    $rendered = $this->renderForm($data, $form_action, $sections);
                     break;
                 case "defaults":
                     $sections = $this->defaults($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "defaults");
+                    $rendered = $this->renderForm($data, $form_action, $sections);
                     break;
                 case "quality":
                     $this->quality($data);
+
                     return;
                 case "healthcheck":
                     //TODO connect with the healthcheck class
                     $data = [];
                     $sections = $this->healthcheck($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
+                    $rendered = $this->renderPanel($data, $form_action, $sections);
                     break;
                 default:
                     throw new StackException("Unknown configuration command: " . $cmd);
@@ -120,6 +127,21 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         } catch (Exception $e) {
             throw new StackException("Error at perform command: " . $e->getMessage());
         }
+
+        //sets the rendered content as the main content of the template
+        $this->tpl->setContent($rendered);
+
+    }
+
+    /**
+     * Renders the form with the given data and sections
+     * @param array $data
+     * @param string $form_action
+     * @param array $sections
+     * @return string
+     */
+    private function renderForm(array $data, string $form_action, array $sections): string
+    {
         //Create the form
         $form = $this->factory->input()->container()->form()->standard(
             $form_action,
@@ -136,9 +158,35 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
             $saving_info = "No result yet.";
         }
 
-        //actually render the form
-        $this->tpl->setContent($saving_info . $this->renderer->render($form));
+        return $saving_info . $this->renderer->render($form);
+    }
 
+    /**
+     * Renders the panel with the given data and sections
+     * @param array $data
+     * @param string $form_action
+     * @param array $sections
+     * @return string
+     */
+    private function renderPanel(array $data, string $form_action, array $sections): string
+    {
+
+        //TODO REPLACE WITH ACTUAL PANEL
+        $page = $this->factory->modal()->lightboxTextPage("LOREN IPSUM", $this->language->txt("qpl_qst_xqcas_message_question_text"));
+        $modal = $this->factory->modal()->lightbox($page);
+
+        $button = $this->factory->button()->standard($this->language->txt("qpl_qst_xqcas_ui_author_randomisation_show_question_text_action_text"), '')
+            ->withOnClick($modal->getShowSignal());
+
+        //Return the UI component
+        return $this->renderer->render($this->factory->panel()->sub(
+            "LOREN IPSUM",
+            $this->factory->legacy(
+                "LOREN IPSUM" .
+                $this->renderer->render($this->factory->divider()->horizontal()) .
+                $this->renderer->render([$button, $modal])
+            )
+        ));
     }
 
     /**
@@ -175,12 +223,13 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     private function quality(array $data): void
     {
         $this->tabs->activateTab("quality");
+        //TODO Change to use renderPanel
         $this->tpl->setContent(PluginConfigurationQualityUI::show($data, $this->getPluginObject()));
     }
 
     private function healthcheck(array $data): array
     {
-        $this->tabs->activateTab("healthcheck");
+        $this->tabs->activateTab("quality");
         return PluginConfigurationHealthcheckUI::show($data, $this->getPluginObject());
     }
 
