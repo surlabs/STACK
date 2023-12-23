@@ -24,4 +24,18 @@ namespace classes\platform\ilias;
 class StackHealthcheckIlias
 {
 
+    /**
+     * Performs a healthcheck on the maxima settings and platform requirements
+     * @return bool
+     */
+    public static function doHealthcheck(): bool
+    {
+        //TODO: Implement healthcheck
+        /*
+         * En versiones anteriores implementado en:
+         * classes/model/configuration/class.assStackQuestionHealthcheck.php
+         */
+        return true;
+    }
+
 }
