@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use classes\core\external\cas\stack_cas_healthcheck;
 use classes\core\security\StackException;
 use classes\platform\ilias\StackBulktestingIlias;
 use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
-use classes\platform\ilias\StackHealthcheckIlias;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
@@ -117,7 +117,13 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                     return;
                 case "healthcheck":
                     //TODO connect with the healthcheck class
-                    $data = StackHealthcheckIlias::doHealthcheck();
+                    try {
+                        $healthcheck = new stack_cas_healthcheck($data);
+                    } catch (Exception $e) {
+                        $rendered = $this->renderer->render($this->factory->messageBox()->failure("Error at healthcheck: " . $e->getMessage()));
+                        break;
+                    }
+                    $data = $healthcheck->get_test_results();
                     $sections = $this->healthcheck($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
                     $rendered = $this->renderPanel($data, $form_action, $sections);
@@ -162,8 +168,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
             $result = $form->getData();
             $saving_info = $this->save($result);
         } else {
-            //TODO: DEV only, delete this or set as messagebox
-            $saving_info = "No result yet.";
+            $saving_info = "";
         }
 
         return $saving_info . $this->renderer->render($form);
@@ -261,11 +266,9 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         $result = StackConfig::save();
 
         if ($result === true) {
-            //TODO: DEV only, change this to a better message
-            return "<pre> Success </pre><br/>";
+            return $this->renderer->render($this->factory->messageBox()->success($this->plugin_object->txt("ui_admin_configuration_saved")));
         } else {
-            //TODO: DEV only, change this to a better message
-            return "<pre> Error: " . $result . " </pre><br/>";
+            return $this->renderer->render($this->factory->messageBox()->failure($this->plugin_object->txt("ui_admin_configuration_not_saved")));
         }
     }
 }

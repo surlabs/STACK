@@ -2,9 +2,7 @@
 declare(strict_types=1);
 
 use ILIAS\UI\Factory;
-use ILIAS\UI\Implementation\Component\Button\Bulky;
 use ILIAS\UI\Implementation\Component\Input\Field\Section;
-use ILIAS\UI\Renderer;
 use classes\core\security\StackException;
 
 /**
@@ -29,7 +27,6 @@ class PluginConfigurationHealthcheckUI
 {
 
     private static Factory $factory;
-    private static Renderer $renderer;
     private static ilCtrlInterface $control;
 
     /**
