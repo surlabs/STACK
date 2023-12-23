@@ -25,10 +25,10 @@ class StackLog
     /**
      * Log a message
      * @param string $header
-     * @param string $message
+     * @param ?string $message en muchos sitios se ha puesto en null
      * @return void
      */
-    public function log(string $header, string $message)
+    public function log(string $header, ?string $message)
     {
         // TODO: Implement logging
     }
