@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace classes\platform\ilias;
 
+use classes\core\external\cas\stack_cas_configuration;
 use classes\platform\StackConfig;
 
 /**
@@ -35,13 +36,14 @@ class StackHealthcheckIlias
         $healthcheck_data = [];
 
         //Check if the platform config is loaded
-        $healthcheck_data['is_stack_config_loaded'] = self::isStackConfigLoaded();
+        $healthcheck_data['stack_config'] = self::isStackConfigLoaded();
 
         //Check if the mbstring extension is loaded
-        $healthcheck_data['is_mbstring_loaded'] = self::isMbstringLoaded();
+        $healthcheck_data['mbstring'] = self::isMbstringLoaded();
 
         //Checks the current supported maxima libraries
-        $healthcheck_data['is_maxima_libraries_supported'] = self::validateMaximaLibraries();
+        list($maxima_libraries_info, $message, $live_testcases) = stack_cas_configuration::validate_maximalibraries();
+        $healthcheck_data['maxima_libraries'] = self::validateMaximaLibraries($maxima_libraries_info, $message, $live_testcases);
 
         return $healthcheck_data;
     }
@@ -50,17 +52,17 @@ class StackHealthcheckIlias
      * Checks if the platform config is loaded
      * @return array
      */
-    public static function isStackConfigLoaded(): array
+    private static function isStackConfigLoaded(): array
     {
         $platform_data = StackConfig::getAll();
         if (!empty ($platform_data))
-            $data['platform'] = [
+            $data = [
                 'type' => 'success',
                 'data' => $platform_data,
                 'message' => 'Platform data retrieved successfully.'
             ];
         else {
-            $data['platform'] = [
+            $data = [
                 'type' => 'error',
                 'data' => null,
                 'message' => 'Platform data could not be retrieved.'
@@ -73,7 +75,7 @@ class StackHealthcheckIlias
      * Checks if the mbstring extension is loaded
      * @return array
      */
-    public static function isMbstringLoaded(): array
+    private static function isMbstringLoaded(): array
     {
         if (!extension_loaded('mbstring')) {
             $data = [
@@ -86,6 +88,33 @@ class StackHealthcheckIlias
                 'type' => 'success',
                 'data' => null,
                 'message' => 'The PHP mbstring extension is installed.',
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Checks the current supported maxima libraries
+     * @param array $maxima_libraries_info
+     * @param string $message
+     * @param array $live_testcases
+     * @return array
+     */
+    private static function validateMaximaLibraries(array $maxima_libraries_info, string $message, array $live_testcases): array
+    {
+        if (!empty($maxima_libraries_info)) {
+            $data = [
+                'type' => 'success',
+                'data' => $maxima_libraries_info,
+                'message' => $message,
+                'live_testcases' => $live_testcases
+            ];
+        } else {
+            $data = [
+                'type' => 'error',
+                'data' => null,
+                'message' => $message,
+                'live_testcases' => $live_testcases
             ];
         }
         return $data;
