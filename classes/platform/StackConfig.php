@@ -63,6 +63,10 @@ class StackConfig {
      */
     public static function set(string $key, mixed $value, ?string $category = null): void {
         if (isset(self::$config[$key])) {
+            if (is_bool($value)) {
+                $value = (int) $value;
+            }
+
             if (self::$config[$key] !== $value) {
                 self::$config[$key] = $value;
                 self::$updated[$key] = true;
