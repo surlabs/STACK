@@ -32,7 +32,7 @@ class stack_cas_connection_linux extends stack_cas_connection_base {
             // We are trying to use a Lisp snapshot of Maxima with all the
             // STACK libraries loaded.
             //TODO make global not ILIAS
-            $lispimage = ILIAS_DATA_DIR . '/stack/maxima-optimised';
+            $lispimage = realpath(ILIAS_DATA_DIR) . '/stack/maxima-optimised';
             if (is_readable($lispimage)) {
                 return $lispimage;
             }

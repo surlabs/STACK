@@ -65,12 +65,12 @@ class stack_cas_configuration {
 
         $this->maximacodepath = StackParser::convertSlashPaths(
             //TODO SET WEBDIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
-            ILIAS_WEB_DIR .
+            realpath(ILIAS_DATA_DIR) .
             '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/core/external/maxima');
 
         $this->logpath = StackParser::convertSlashPaths(
             //TODO SET DATADIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
-            ILIAS_DATA_DIR .
+            realpath(ILIAS_DATA_DIR) .
             '/stack/logs');
 
         //var_dump($this->settings);exit;
@@ -82,11 +82,11 @@ class stack_cas_configuration {
         $this->blocksettings['MAXIMA_PLATFORM'] = $this->settings["platform_type"];
         $this->blocksettings['maxima_tempdir'] = StackParser::convertSlashPaths(
         //TODO SET DATADIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
-            ILIAS_DATA_DIR .
+            realpath(ILIAS_DATA_DIR) .
             '/stack/tmp/');
         $this->blocksettings['IMAGE_DIR'] = StackParser::convertSlashPaths(
         //TODO SET DATADIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
-            ILIAS_DATA_DIR .
+            realpath(ILIAS_DATA_DIR) .
             '/stack/plots/');
 
         $this->blocksettings['PLOT_SIZE'] = '[450,300]';
@@ -334,8 +334,7 @@ END;
      * @return string the full path to where the maximalocal.mac file should be stored.
      */
     public static function maximalocal_location() {
-        global $CFG;
-        return StackParser::convertSlashPaths(ILIAS_DATA_DIR . '/stack/maximalocal.mac');
+        return StackParser::convertSlashPaths(realpath(ILIAS_DATA_DIR) . '/stack/maximalocal.mac');
     }
 
     /**
@@ -343,8 +342,7 @@ END;
      * @return string the full path to where the maximalocal.mac file should be stored.
      */
     public static function images_location() {
-        global $CFG;
-        return StackParser::convertSlashPaths(ILIAS_DATA_DIR . '/stack/plots');
+        return StackParser::convertSlashPaths(realpath(ILIAS_DATA_DIR) . '/stack/plots');
     }
 
     /**

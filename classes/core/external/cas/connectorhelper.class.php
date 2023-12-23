@@ -54,13 +54,16 @@ abstract class stack_connection_helper {
         $debuglog = new StackLog();
 
         //SUR $config->platform to $config['platform_type']
+        //TODO IMPORTANTE parseo chungo, lo que para ilias es unix, para core es linux
+        if(self::$config['platform_type'] == 'unix'){
+            self::$config['platform_type'] = 'linux';
+        }
         switch (self::$config['platform_type']) {
             case 'win':
                 //SUR require_once(__DIR__ . '/connector.windows.class.php');
                 $connection = new stack_cas_connection_windows(self::$config, $debuglog);
                 break;
-                //SUR linux to unix
-            case 'unix':
+            case 'linux':
             case 'linux-optimised':
                 //SUR require_once(__DIR__ . '/connector.linux.class.php');
                 $connection = new stack_cas_connection_linux(self::$config, $debuglog);

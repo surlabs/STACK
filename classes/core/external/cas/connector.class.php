@@ -171,7 +171,7 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
     public function __construct($settings, StackLog $debuglog) {
 
         //TODO make global not use ILIAS
-        $path = ILIAS_DATA_DIR . '/stack';
+        $path = realpath(ILIAS_DATA_DIR) . '/stack';
 
         $initcommand = 'load("' . $path . '/maximalocal.mac");' . "\n";
         $initcommand = str_replace("\\", "/", $initcommand);
