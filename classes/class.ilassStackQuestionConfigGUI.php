@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use classes\core\security\StackException;
+use classes\platform\ilias\StackBulktestingIlias;
 use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 use classes\platform\ilias\StackHealthcheckIlias;
@@ -121,6 +122,13 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
                     $rendered = $this->renderPanel($data, $form_action, $sections);
                     break;
+                case "bulktesting":
+                    //TODO connect with the bulktesting class
+                    $data = StackBulktestingIlias::doBulktesting();
+                    $sections = $this->bulktesting($data);
+                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "bulktesting");
+                    $rendered = $this->renderPanel($data, $form_action, $sections);
+                    break;
                 default:
                     throw new StackException("Unknown configuration command: " . $cmd);
             }
@@ -231,6 +239,12 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     {
         $this->tabs->activateTab("quality");
         return PluginConfigurationHealthcheckUI::show($data, $this->getPluginObject());
+    }
+
+    private function bulktesting(array $data): array
+    {
+        $this->tabs->activateTab("quality");
+        return PluginConfigurationBulktestingUI::show($data, $this->getPluginObject());
     }
 
     /**

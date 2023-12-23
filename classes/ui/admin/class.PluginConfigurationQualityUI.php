@@ -86,7 +86,7 @@ class PluginConfigurationQualityUI
                 'medium'
             ),
             $plugin_object->txt('ui_admin_configuration_bulktesting_button_label'),
-            self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "doBulktesting")
+            self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "bulktesting")
         );
     }
 }
