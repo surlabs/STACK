@@ -249,18 +249,18 @@ class PluginConfigurationDefaultsUI
 
         return self::$factory->input()->field()->section(
             [
-                'question_level_simplify' => $options_question_level_simplify,
-                'assume_positive' => $options_assume_positive,
-                'assume_real' => $options_assume_real,
-                'feedback_fully_correct' => $options_feedback_fully_correct,
-                'feedback_partially_correct' => $options_feedback_partially_correct,
-                'feedback_fully_incorrect' => $options_feedback_fully_incorrect,
-                'multiplication_sign' => $options_multiplication_sign,
-                'surd_for_sqrt' => $options_surd_for_sqrt,
-                'complex_numbers' => $options_complex_numbers,
-                'inverse_trigonometric' => $options_inverse_trigonometric,
-                'logic_symbols' => $options_logic_symbols,
-                'matrix_parentheses' => $options_matrix_parentheses
+                'options_question_level_simplify' => $options_question_level_simplify,
+                'options_assume_positive' => $options_assume_positive,
+                'options_assume_real' => $options_assume_real,
+                'options_feedback_fully_correct' => $options_feedback_fully_correct,
+                'options_feedback_partially_correct' => $options_feedback_partially_correct,
+                'options_feedback_fully_incorrect' => $options_feedback_fully_incorrect,
+                'options_multiplication_sign' => $options_multiplication_sign,
+                'options_surd_for_sqrt' => $options_surd_for_sqrt,
+                'options_complex_numbers' => $options_complex_numbers,
+                'options_inverse_trigonometric' => $options_inverse_trigonometric,
+                'options_logic_symbols' => $options_logic_symbols,
+                'options_matrix_parentheses' => $options_matrix_parentheses
             ],
             $plugin_object->txt("ui_admin_configuration_defaults_options_title"),
             $plugin_object->txt("ui_admin_configuration_defaults_options_description")
