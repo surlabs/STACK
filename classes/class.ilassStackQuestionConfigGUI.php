@@ -109,6 +109,8 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                     $this->quality($data);
                     return;
                 case "healthcheck":
+                    //TODO connect with the healthcheck class
+                    $data = [];
                     $sections = $this->healthcheck($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
                     break;
@@ -118,7 +120,6 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         } catch (Exception $e) {
             throw new StackException("Error at perform command: " . $e->getMessage());
         }
-
         //Create the form
         $form = $this->factory->input()->container()->form()->standard(
             $form_action,
