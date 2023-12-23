@@ -69,7 +69,7 @@ class PluginConfigurationQualityUI
                 'medium'
             ),
             $plugin_object->txt('ui_admin_configuration_security_button_label'),
-            self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "doHealthCheck")
+            self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck")
         );
     }
 

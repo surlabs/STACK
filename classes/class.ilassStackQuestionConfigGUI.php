@@ -108,6 +108,10 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                 case "quality":
                     $this->quality($data);
                     return;
+                case "healthcheck":
+                    $sections = $this->healthcheck($data);
+                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
+                    break;
                 default:
                     throw new StackException("Unknown configuration command: " . $cmd);
             }
@@ -171,6 +175,12 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     {
         $this->tabs->activateTab("quality");
         $this->tpl->setContent(PluginConfigurationQualityUI::show($data, $this->getPluginObject()));
+    }
+
+    private function healthcheck(array $data): array
+    {
+        $this->tabs->activateTab("healthcheck");
+        return PluginConfigurationHealthcheckUI::show($data, $this->getPluginObject());
     }
 
     /**
