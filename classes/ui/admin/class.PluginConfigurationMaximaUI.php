@@ -34,8 +34,9 @@ class PluginConfigurationMaximaUI
 
     /**
      * Shows the plugin configuration Maxima settings form
+     * @throws StackException
      */
-    public static function show(array $data, ilPlugin $plugin_object): string
+    public static function show(array $data, ilPlugin $plugin_object): array
     {
         global $DIC;
 
@@ -43,32 +44,29 @@ class PluginConfigurationMaximaUI
         self::$renderer = $DIC->ui()->renderer();
         self::$control = $DIC->ctrl();
 
-        try {
+        //control parameters
+        self::$control->setParameterByClass(
+            'ilassStackQuestionConfigGUI',
+            'maxima',
+            'saveConnection'
+        );
 
-            //Form action
-            $form_action = self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "save");
-
-            if ($data["platform_type"] == "server") {
-                $content = self::$factory->input()->container()->form()->standard($form_action, [
-                        self::getMaximaCommonSection($data, $plugin_object),
-                        self::getMaximaServerSection($data, $plugin_object)
-                    ]
-                );
-            } elseif ($data["platform_type"] == "unix") {
-                $content = self::$factory->input()->container()->form()->standard($form_action, [
-                        self::getMaximaCommonSection($data, $plugin_object),
-                        self::getMaximaLocalSection($data, $plugin_object)
-                    ]
-                );
-            } else {
-                throw new StackException("Error: Platform type not valid: " . $data["platform_type"]);
-            }
-
-        } catch (Exception $e) {
-            $content = self::$factory->messageBox()->failure($e->getMessage());
+        //get sections
+        if ($data["platform_type"] == "server") {
+            $content = [
+                'common' => self::getMaximaCommonSection($data, $plugin_object),
+                'server' => self::getMaximaServerSection($data, $plugin_object)
+            ];
+        } elseif ($data["platform_type"] == "unix") {
+            $content = [
+                'common' => self::getMaximaCommonSection($data, $plugin_object),
+                'server' => self::getMaximaLocalSection($data, $plugin_object)
+            ];
+        } else {
+            throw new StackException("Error: Platform type not valid: " . $data["platform_type"]);
         }
 
-        return self::$renderer->render($content);
+        return $content;
     }
 
     /**
@@ -162,12 +160,12 @@ class PluginConfigurationMaximaUI
 
         return self::$factory->input()->field()->section(
             [
-                $maxima_version,
-                $cas_connection_timeout,
-                $cas_result_caching,
-                $preparse_all,
-                $cas_debugging,
-                $cache_parsed_expressions_longer_than,
+                'maxima_version' => $maxima_version,
+                'cas_connection_timeout' => $cas_connection_timeout,
+                'cas_result_caching' => $cas_result_caching,
+                'preparse_all' => $preparse_all,
+                //'cas_debugging' => $cas_debugging,
+                'cache_parsed_expressions_longer_than' => $cache_parsed_expressions_longer_than,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_common_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_common_description")
@@ -184,21 +182,33 @@ class PluginConfigurationMaximaUI
     private static function getMaximaServerSection(array $data, ilPlugin $plugin_object): Section
     {
         //URL of the maxima pool
-        $maxima_pool_url_value = $data["maxima_pool_url"] ?? "";
+        if (isset($data["maxima_pool_url"]) && is_string($data["maxima_pool_url"])) {
+            $maxima_pool_url_value = $data["maxima_pool_url"];
+        } else {
+            $maxima_pool_url_value = "";
+        }
         $maxima_pool_url = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_connection_maxima_pool_url_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_pool_url_description")
         )->withValue($maxima_pool_url_value);
 
         //Server/username:password of the maxima pool
-        $maxima_pool_server_username_password_value = $data["maxima_pool_server_username_password"] ?? "";
+        if (isset($data["maxima_pool_server_username_password"]) && is_string($data["maxima_pool_server_username_password"])) {
+            $maxima_pool_server_username_password_value = $data["maxima_pool_server_username_password"];
+        } else {
+            $maxima_pool_server_username_password_value = "";
+        }
         $maxima_pool_server_username_password = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_connection_maxima_pool_server_username_password_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_pool_server_username_password_description")
         )->withValue($maxima_pool_server_username_password_value);
 
         //Cache parsed expressions longer than
-        $cache_parsed_expressions_longer_than_value = $data["cache_parsed_expressions_longer_than"] ?? "50";
+        if (isset($data["cache_parsed_expressions_longer_than"]) && is_string($data["cache_parsed_expressions_longer_than"])) {
+            $cache_parsed_expressions_longer_than_value = $data["cache_parsed_expressions_longer_than"];
+        } else {
+            $cache_parsed_expressions_longer_than_value = "";
+        }
         $cache_parsed_expressions_longer_than = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_connection_cache_parsed_expressions_longer_than_title"),
             $plugin_object->txt("ui_admin_configuration_connection_cache_parsed_expressions_longer_than_description")
@@ -217,10 +227,10 @@ class PluginConfigurationMaximaUI
 
         return self::$factory->input()->field()->section(
             [
-                $maxima_pool_url,
-                $maxima_pool_server_username_password,
-                $cache_parsed_expressions_longer_than,
-                $maxima_uses_proxy,
+                'maxima_pool_url' => $maxima_pool_url,
+                'maxima_pool_server_username_password' => $maxima_pool_server_username_password,
+                'cache_parsed_expressions_longer_than' => $cache_parsed_expressions_longer_than,
+                //'maxima_uses_proxy' => $maxima_uses_proxy,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_description")
@@ -281,7 +291,7 @@ class PluginConfigurationMaximaUI
                 $optimized_maxima_command,
                 $plot_command,
                 $maxima_libraries,
-                $maxima_uses_proxy,
+                //$maxima_uses_proxy,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_description")

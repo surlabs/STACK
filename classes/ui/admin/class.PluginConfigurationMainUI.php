@@ -32,9 +32,9 @@ class PluginConfigurationMainUI
     private static ilCtrlInterface $control;
 
     /**
-     * Shows the plugin configuration overview
+     * Shows the plugin configuration overview sections
      */
-    public static function show(array $data, ilPlugin $plugin_object): string
+    public static function show(array $data, ilPlugin $plugin_object): array
     {
         global $DIC;
 
@@ -44,21 +44,24 @@ class PluginConfigurationMainUI
 
         try {
 
-            //Form action
-            $form_action = self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "save");
-
-            //try to show a composed form
-            $content = self::$factory->input()->container()->form()->standard($form_action, [
-                    self::getMaximaConnectionSection($data, $plugin_object),
-                    self::getDisplayOptionsSection($data, $plugin_object)
-                ]
+            //control parameters
+            self::$control->setParameterByClass(
+                'ilassStackQuestionConfigGUI',
+                'configure',
+                'saveMain'
             );
 
+            //get sections
+            $content = [
+                'connection' => self::getMaximaConnectionSection($data, $plugin_object),
+                'display' => self::getDisplayOptionsSection($data, $plugin_object)
+            ];
+
         } catch (Exception $e) {
-            $content = self::$factory->messageBox()->failure($e->getMessage());
+            $content = [self::$factory->messageBox()->failure($e->getMessage())];
         }
 
-        return self::$renderer->render($content);
+        return $content;
     }
 
     /**
@@ -91,7 +94,7 @@ class PluginConfigurationMainUI
 
         return self::$factory->input()->field()->section(
             [
-                $maxima_connection_options
+                'platform_type' => $maxima_connection_options
             ],
             $plugin_object->txt("ui_admin_configuration_maxima_connection_title"),
             $plugin_object->txt("ui_admin_configuration_maxima_connection_description")
@@ -155,8 +158,8 @@ class PluginConfigurationMainUI
 
         return self::$factory->input()->field()->section(
             [
-                $validation_options,
-                $allow_jsxgraph_options
+                'instant_validation' => $validation_options,
+                'allow_jsx_graph' => $allow_jsxgraph_options
             ],
             $plugin_object->txt("ui_admin_configuration_defaults_display_title"),
             $plugin_object->txt("ui_admin_configuration_defaults_display_description")
