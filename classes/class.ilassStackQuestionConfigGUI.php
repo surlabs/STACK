@@ -112,7 +112,6 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                     break;
                 case "quality":
                     $this->quality($data);
-
                     return;
                 case "healthcheck":
                     //TODO connect with the healthcheck class
