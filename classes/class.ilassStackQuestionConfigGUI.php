@@ -4,6 +4,7 @@ declare(strict_types=1);
 use classes\core\security\StackException;
 use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
+use classes\platform\ilias\StackHealthcheckIlias;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
@@ -115,7 +116,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                     return;
                 case "healthcheck":
                     //TODO connect with the healthcheck class
-                    $data = [];
+                    $data = StackHealthcheckIlias::doHealthcheck();
                     $sections = $this->healthcheck($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
                     $rendered = $this->renderPanel($data, $form_action, $sections);

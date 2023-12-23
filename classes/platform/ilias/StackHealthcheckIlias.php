@@ -26,16 +26,19 @@ class StackHealthcheckIlias
 
     /**
      * Performs a healthcheck on the maxima settings and platform requirements
-     * @return bool
+     * @return array
      */
-    public static function doHealthcheck(): bool
+    public static function doHealthcheck(): array
     {
         //TODO: Implement healthcheck
         /*
          * En versiones anteriores implementado en:
          * classes/model/configuration/class.assStackQuestionHealthcheck.php
+         * En ese caso solo hay que devolver los datos a mostrar en la vista
+         * provenientes de maxima o que se hayan obtenido en el healthcheck
+         * la vista se encaragará de mostrarlos
          */
-        return true;
+        return [];
     }
 
 }
