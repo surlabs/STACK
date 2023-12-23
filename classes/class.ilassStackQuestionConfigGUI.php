@@ -105,13 +105,12 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "maxima");
                     break;
                 case "defaults":
-                    $this->defaults($data);
+                    $sections = $this->defaults($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "defaults");
                     break;
                 case "quality":
                     $this->quality($data);
-                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "quality");
-                    break;
+                    return;
                 default:
                     throw new StackException("Unknown configuration command: " . $cmd);
             }
@@ -161,10 +160,10 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     /**
      * Shows the UI Form of the defaults values for the plugin
      */
-    private function defaults(array $data): void
+    private function defaults(array $data): array
     {
         $this->tabs->activateTab("defaults");
-        $this->tpl->setContent(PluginConfigurationDefaultsUI::show($data, $this->getPluginObject()));
+        return PluginConfigurationDefaultsUI::show($data, $this->getPluginObject());
     }
 
     /**

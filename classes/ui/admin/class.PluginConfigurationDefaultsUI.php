@@ -28,36 +28,38 @@ class PluginConfigurationDefaultsUI
 {
 
     private static Factory $factory;
-    private static Renderer $renderer;
     private static ilCtrlInterface $control;
 
     /**
      * Shows the plugin configuration Maxima settings form
      */
-    public static function show(array $data, ilPlugin $plugin_object): string
+    public static function show(array $data, ilPlugin $plugin_object): array
     {
         global $DIC;
 
         self::$factory = $DIC->ui()->factory();
-        self::$renderer = $DIC->ui()->renderer();
         self::$control = $DIC->ctrl();
 
         try {
 
-            //Form action
-            $form_action = self::$control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "save");
+            //control parameters
+            self::$control->setParameterByClass(
+                'ilassStackQuestionConfigGUI',
+                'defaults',
+                'saveDefaults'
+            );
 
-            //try to show a composed form
-            $content = self::$factory->input()->container()->form()->standard($form_action, [
-                self::getOptionsDefaultsSection($data, $plugin_object),
-                self::getInputsDefaultsSection($data, $plugin_object)
-            ]);
+            //get sections
+            $content = [
+                'options' => self::getOptionsDefaultsSection($data, $plugin_object),
+                'inputs' => self::getInputsDefaultsSection($data, $plugin_object)
+            ];
 
         } catch (Exception $e) {
-            $content = self::$factory->messageBox()->failure($e->getMessage());
+            $content = [self::$factory->messageBox()->failure($e->getMessage())];
         }
 
-        return self::$renderer->render($content);
+        return $content;
     }
 
     /**
