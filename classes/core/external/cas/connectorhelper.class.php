@@ -56,20 +56,21 @@ abstract class stack_connection_helper {
         //SUR $config->platform to $config['platform_type']
         switch (self::$config['platform_type']) {
             case 'win':
-                require_once(__DIR__ . '/connector.windows.class.php');
+                //SUR require_once(__DIR__ . '/connector.windows.class.php');
                 $connection = new stack_cas_connection_windows(self::$config, $debuglog);
                 break;
-            case 'linux':
+                //SUR linux to unix
+            case 'unix':
             case 'linux-optimised':
-                require_once(__DIR__ . '/connector.linux.class.php');
+                //SUR require_once(__DIR__ . '/connector.linux.class.php');
                 $connection = new stack_cas_connection_linux(self::$config, $debuglog);
                 break;
             case 'server':
-                require_once(__DIR__ . '/connector.server.class.php');
+                //SUR require_once(__DIR__ . '/connector.server.class.php');
                 $connection = new stack_cas_connection_server(self::$config, $debuglog);
                 break;
             case 'server-proxy':
-                require_once(__DIR__ . '/connector.server_proxy.class.php');
+                //SUR require_once(__DIR__ . '/connector.server_proxy.class.php');
                 $connection = new stack_cas_connection_server_proxy(self::$config, $debuglog);
                 break;
             case 'tomcat':
@@ -79,7 +80,8 @@ abstract class stack_connection_helper {
                     ' Please choose "server" setting instead.');
 
             default:
-                throw new StackException('stack_cas_connection: Unknown platform ' . self::$config->platform);
+                //SUR $config->platform to $config['platform_type']
+                throw new StackException('stack_cas_connection: Unknown platform ' . self::$config['platform_type']);
         }
 
         return $connection;
@@ -265,8 +267,10 @@ abstract class stack_connection_helper {
         $connection = self::make();
         $results = $connection->compute($command);
 
-        self::$config->casresultscache = $configcache;
-        self::$config->casdebugging = $casdebugging;
+        //SUR $config->casresultscache to $config['cas_result_caching']
+        self::$config['cas_result_caching'] = $configcache;
+        //SUR $config->casdebugging to $config['cas_debugging']
+        self::$config['cas_debugging'] = $casdebugging;
 
         $debug = $connection->get_debuginfo();
         return array($results, $debug);

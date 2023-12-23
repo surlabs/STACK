@@ -28,17 +28,20 @@ use classes\core\security\StackException;
 class stack_cas_connection_linux extends stack_cas_connection_base {
 
     protected function guess_maxima_command($path) {
-        global $CFG;
         if (stack_connection_helper::get_platform() == 'linux-optimised') {
             // We are trying to use a Lisp snapshot of Maxima with all the
             // STACK libraries loaded.
-            $lispimage = $CFG->dataroot . '/stack/maxima-optimised';
+            //TODO make global not ILIAS
+            $lispimage = ILIAS_DATA_DIR . '/stack/maxima-optimised';
             if (is_readable($lispimage)) {
                 return $lispimage;
             }
         }
 
-        if (is_readable('/Applications/Maxima.app/Contents/Resources/maxima.sh')) {
+        //TODO Cambiar tremenda chapuza y hacerlo bien,
+        //deberia ser
+        //if (is_readable('/Applications/Maxima.app/Contents/Resources/maxima.sh')) {
+        if (is_readable(ILIAS_DATA_DIR)) {
             // This is the path on Macs, if Maxima has been installed following
             // the instructions on Sourceforge.
             return '/Applications/Maxima.app/Contents/Resources/maxima.sh';
