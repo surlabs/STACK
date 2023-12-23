@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace classes\platform\ilias;
 
+use classes\core\security\StackException;
 use classes\platform\StackDatabase;
+use Exception;
 use ilDBInterface;
 
 /**
@@ -41,9 +43,16 @@ class StackDatabaseIlias extends StackDatabase {
      * @param string $table
      * @param array $data
      * @return void
+     * @throws StackException
      */
     public function insertInternal(string $table, array $data): void {
-        $this->db->insert($table, $data);
+        try {
+            $this->db->query("INSERT INTO " . $table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . implode(", ", array_map(function ($value) {
+                    return $this->db->quote($value);
+            }, array_values($data))) . ")");
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -54,11 +63,20 @@ class StackDatabaseIlias extends StackDatabase {
      * @param string $table
      * @param array $data
      * @return void
+     * @throws StackException
      */
     public function insertOnDuplicatedKeyInternal(string $table, array $data): void {
-        $this->db->query("INSERT INTO " . $table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . implode(", ", array_values($data)) . ") ON DUPLICATE KEY UPDATE " . implode(", ", array_map(function ($key, $value) {
-            return $key . " = " . $value;
-        }, array_keys($data), array_values($data))));
+        try {
+            $this->db->query("INSERT INTO " . $table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . implode(", ", array_map(function ($value) {
+                    return $this->db->quote($value);
+                }, array_values($data))) . ") ON DUPLICATE KEY UPDATE " . implode(", ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($data), array_map(function ($value) {
+                    return $this->db->quote($value);
+                }, array_values($data)))));
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -70,9 +88,22 @@ class StackDatabaseIlias extends StackDatabase {
      * @param array $data
      * @param array $where
      * @return void
+     * @throws StackException
      */
     public function updateInternal(string $table, array $data, array $where): void {
-        $this->db->update($table, $data, $where);
+        try {
+            $this->db->query("UPDATE " . $table . " SET " . implode(", ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($data), array_map(function ($value) {
+                    return $this->db->quote($value);
+                }, array_values($data)))) . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($where), array_map(function ($value) {
+                    return $this->db->quote($value);
+                }, array_values($where)))));
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -83,11 +114,18 @@ class StackDatabaseIlias extends StackDatabase {
      * @param string $table
      * @param array $where
      * @return void
+     * @throws StackException
      */
     public function deleteInternal(string $table, array $where): void {
-        $this->db->query("DELETE FROM " . $table . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
-            return $key . " = " . $value;
-        }, array_keys($where), array_values($where))));
+        try {
+            $this->db->query("DELETE FROM " . $table . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+                return $key . " = " . $value;
+            }, array_keys($where), array_map(function ($value) {
+                return $this->db->quote($value);
+            }, array_values($where)))));
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -98,24 +136,31 @@ class StackDatabaseIlias extends StackDatabase {
      * @param string $table
      * @param array|null $where
      * @return array
+     * @throws StackException
      */
     public function selectInternal(string $table, ?array $where = null): array {
-        $query = "SELECT * FROM " . $table;
+        try {
+            $query = "SELECT * FROM " . $table;
 
-        if (isset($where)) {
-            $query .= " WHERE " . implode(" AND ", array_map(function ($key, $value) {
-                return $key . " = " . $value;
-            }, array_keys($where), array_values($where)));
+            if (isset($where)) {
+                $query .= " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($where), array_map(function ($value) {
+                    return $this->db->quote($value);
+                }, array_values($where))));
+            }
+
+            $result = $this->db->query($query);
+
+            $rows = [];
+
+            while ($row = $this->db->fetchAssoc($result)) {
+                $rows[] = $row;
+            }
+
+            return $rows;
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
         }
-
-        $result = $this->db->query($query);
-
-        $rows = [];
-
-        while ($row = $this->db->fetchAssoc($result)) {
-            $rows[] = $row;
-        }
-
-        return $rows;
     }
 }

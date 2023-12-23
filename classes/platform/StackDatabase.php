@@ -52,6 +52,7 @@ abstract class StackDatabase {
      * @param string $table
      * @param array $data
      * @return void
+     * @throws StackException
      */
     public static function insert(string $table, array $data): void {
         self::$platform->insertInternal($table, $data);
@@ -65,6 +66,7 @@ abstract class StackDatabase {
      * @param string $table
      * @param array $data
      * @return void
+     * @throws StackException
      */
     public static function insertOnDuplicatedKey(string $table, array $data): void {
         self::$platform->insertOnDuplicatedKeyInternal($table, $data);
@@ -79,6 +81,7 @@ abstract class StackDatabase {
      * @param array $data
      * @param array $where
      * @return void
+     * @throws StackException
      */
     public static function update(string $table, array $data, array $where): void {
         self::$platform->updateInternal($table, $data, $where);
@@ -92,6 +95,7 @@ abstract class StackDatabase {
      * @param string $table
      * @param array $where
      * @return void
+     * @throws StackException
      */
     public static function delete(string $table, array $where): void{
         self::$platform->deleteInternal($table, $where);
@@ -105,6 +109,7 @@ abstract class StackDatabase {
      * @param string $table
      * @param array|null $where
      * @return array
+     * @throws StackException
      */
     public static function select(string $table, ?array $where = null): array {
         return self::$platform->selectInternal($table, $where);

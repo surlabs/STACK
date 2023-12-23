@@ -252,7 +252,20 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
      */
     private function save(array $form_data): string
     {
-        //TODO: Save the configuration and return a success or failure message
-        return "<pre>" . print_r($form_data, true) . "</pre><br/>";
+        foreach ($form_data as $category => $input) {
+            foreach ($input as $key => $value) {
+                StackConfig::set($key, $value, $category);
+            }
+        }
+
+        $result = StackConfig::save();
+
+        if ($result === true) {
+            //TODO: DEV only, change this to a better message
+            return "<pre> Success </pre><br/>";
+        } else {
+            //TODO: DEV only, change this to a better message
+            return "<pre> Error: " . $result . " </pre><br/>";
+        }
     }
 }

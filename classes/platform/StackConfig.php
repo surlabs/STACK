@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace classes\platform;
 
+use classes\core\security\StackException;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -101,9 +103,9 @@ class StackConfig {
 
     /**
      * Save the platform configuration if the parameter is updated
-     * @return void
+     * @return bool|string
      */
-    public static function save() :void {
+    public static function save() : bool | string {
         foreach (self::$updated as $key => $exist) {
             if ($exist) {
                 $data = array();
@@ -116,12 +118,21 @@ class StackConfig {
 
                 $data['group_name'] = self::$categories[$key];
 
-                StackDatabase::update('xqcas_configuration', $data, array(
-                    'parameter_name' => $key
-                ));
+                try {
+                    StackDatabase::update('xqcas_configuration', $data, array(
+                        'parameter_name' => $key
+                    ));
 
-                self::$updated[$key] = false;
+                    self::$updated[$key] = false;
+
+                    return true;
+                } catch (StackException $e) {
+                    return $e->getMessage();
+                }
             }
         }
+
+        // In case there is nothing to update, return true to avoid error messages
+        return true;
     }
 }
