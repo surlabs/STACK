@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use classes\core\security\StackException;
 use ILIAS\UI\Factory;
-use ILIAS\UI\Renderer;
 use ILIAS\UI\Implementation\Component\Input\Field\Section;
 
 /**

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use ILIAS\UI\Factory;
 use ILIAS\UI\Implementation\Component\Input\Field\Section;
-use ILIAS\UI\Renderer;
 use classes\core\security\StackException;
 
 /**
@@ -28,20 +27,18 @@ class PluginConfigurationMaximaUI
 {
 
     private static Factory $factory;
-    private static Renderer $renderer;
     private static ilCtrlInterface $control;
 
 
     /**
      * Shows the plugin configuration Maxima settings form
-     * @throws StackException
+     * @throws StackException|ilCtrlException
      */
     public static function show(array $data, ilPlugin $plugin_object): array
     {
         global $DIC;
 
         self::$factory = $DIC->ui()->factory();
-        self::$renderer = $DIC->ui()->renderer();
         self::$control = $DIC->ctrl();
 
         //control parameters
@@ -164,7 +161,7 @@ class PluginConfigurationMaximaUI
                 'cas_connection_timeout' => $cas_connection_timeout,
                 'cas_result_caching' => $cas_result_caching,
                 'preparse_all' => $preparse_all,
-                //'cas_debugging' => $cas_debugging,
+                'cas_debugging' => $cas_debugging,
                 'cache_parsed_expressions_longer_than' => $cache_parsed_expressions_longer_than,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_common_title"),
@@ -230,7 +227,7 @@ class PluginConfigurationMaximaUI
                 'maxima_pool_url' => $maxima_pool_url,
                 'maxima_pool_server_username_password' => $maxima_pool_server_username_password,
                 'cache_parsed_expressions_longer_than' => $cache_parsed_expressions_longer_than,
-                //'maxima_uses_proxy' => $maxima_uses_proxy,
+                'maxima_uses_proxy' => $maxima_uses_proxy,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_description")
@@ -291,7 +288,7 @@ class PluginConfigurationMaximaUI
                 $optimized_maxima_command,
                 $plot_command,
                 $maxima_libraries,
-                //$maxima_uses_proxy,
+                $maxima_uses_proxy,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_description")

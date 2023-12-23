@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use ILIAS\UI\Factory;
 use ILIAS\UI\Implementation\Component\Input\Field\Section;
-use ILIAS\UI\Renderer;
 use classes\core\security\StackException;
 
 /**
@@ -28,7 +27,6 @@ class PluginConfigurationMainUI
 {
 
     private static Factory $factory;
-    private static Renderer $renderer;
     private static ilCtrlInterface $control;
 
     /**
@@ -39,7 +37,6 @@ class PluginConfigurationMainUI
         global $DIC;
 
         self::$factory = $DIC->ui()->factory();
-        self::$renderer = $DIC->ui()->renderer();
         self::$control = $DIC->ctrl();
 
         try {
