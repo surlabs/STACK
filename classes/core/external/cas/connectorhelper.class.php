@@ -342,10 +342,13 @@ abstract class stack_connection_helper {
             }
         }
 
+
+        //TODO añadir failed to load
+        /*
         if (strpos($debug, 'failed to load') !== false) {
             $message[] = StackPlatform::getTranslation('settingmaximalibraries_failed', null);
             $success = false;
-        }
+        }*/
 
         if ($success) {
             $message[] = StackPlatform::getTranslation('healthuncachedstack_CAS_ok', null);

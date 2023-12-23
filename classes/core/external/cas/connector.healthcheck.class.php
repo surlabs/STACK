@@ -139,11 +139,14 @@ class stack_cas_healthcheck {
             $this->tests[] = $test;
         }
 
+        var_dump($test);exit;
+
         // Test an *uncached* call to the CAS.  I.e. a genuine call to the process.
         if ($this->ishealthy) {
             list($message, $genuinedebug, $result) = stack_connection_helper::stackmaxima_genuine_connect();
             $this->ishealthy = $result;
 
+            var_dump($message, $genuinedebug, $result);exit;
             $test = array();
             $test['tag'] = 'healthuncached';
             $test['result'] = $result;
