@@ -22,6 +22,7 @@ use classes\core\filters\StackParser;
 use classes\core\security\StackException;
 use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
+use ilUtil;
 
 class stack_cas_configuration {
     protected static $instance = null;
@@ -63,16 +64,30 @@ class stack_cas_configuration {
         $this->date = date("F j, Y, g:i a");
 
         $this->maximacodepath = StackParser::convertSlashPaths(
-                $CFG->dirroot . '/question/type/stack/stack/maxima');
+            //TODO SET WEBDIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
+            ILIAS_WEB_DIR .
+            '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/core/external/maxima');
 
-        $this->logpath = StackParser::convertSlashPaths($CFG->dataroot . '/stack/logs');
+        $this->logpath = StackParser::convertSlashPaths(
+            //TODO SET DATADIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
+            ILIAS_DATA_DIR .
+            '/stack/logs');
 
-        $this->vnum = (float) substr($this->settings["maximaversion"], 2);
+        //var_dump($this->settings);exit;
+        //SUR maximaversion to maxima_version
+        $this->vnum = (float) substr($this->settings["maxima_version"], 2);
 
         $this->blocksettings = array();
-        $this->blocksettings['MAXIMA_PLATFORM'] = $this->settings["platform"];
-        $this->blocksettings['maxima_tempdir'] = StackParser::convertSlashPaths($CFG->dataroot . '/stack/tmp/');
-        $this->blocksettings['IMAGE_DIR']     = StackParser::convertSlashPaths($CFG->dataroot . '/stack/plots/');
+        //SUR platform to platform_type
+        $this->blocksettings['MAXIMA_PLATFORM'] = $this->settings["platform_type"];
+        $this->blocksettings['maxima_tempdir'] = StackParser::convertSlashPaths(
+        //TODO SET DATADIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
+            ILIAS_DATA_DIR .
+            '/stack/tmp/');
+        $this->blocksettings['IMAGE_DIR'] = StackParser::convertSlashPaths(
+        //TODO SET DATADIR + PATH COMO GLOBAL EN LUGAR DE USAR ILIAS EN CORE
+            ILIAS_DATA_DIR .
+            '/stack/plots/');
 
         $this->blocksettings['PLOT_SIZE'] = '[450,300]';
         // These are used by the GNUplot "set terminal" command. Currently no user interface...
@@ -82,39 +97,52 @@ class stack_cas_configuration {
         // Note, the quotes need to be protected below.
         $this->blocksettings['PLOT_TERM_OPT'] = 'dynamic font \",11\" linewidth 1.2';
 
-        if ($this->settings["platform"] === 'win') {
+        //SUR platformtype to platform_type
+        if ($this->settings["platform_type"] === 'win') {
+            /*
+             * SUR no windows option in ilias
             $this->blocksettings['DEL_CMD']     = 'del';
-            $this->blocksettings['GNUPLOT_CMD'] = $this->get_plotcommand_win();
+            $this->blocksettings['GNUPLOT_CMD'] = $this->get_plotcommand_win();*/
         } else {
             $this->blocksettings['DEL_CMD']     = 'rm';
-            if ((trim($this->settings["plotcommand"])) != '') {
-                $this->blocksettings['GNUPLOT_CMD'] = $this->settings["plotcommand"];
-            } else if (is_readable('/Applications/Gnuplot.app/Contents/Resources/bin/gnuplot')) {
-                $this->blocksettings['GNUPLOT_CMD'] = '/Applications/Gnuplot.app/Contents/Resources/bin/gnuplot';
-            } else {
+            //SUR plotcommand to plot_command
+            if ((trim($this->settings["plot_command"])) != '') {
+                $this->blocksettings['GNUPLOT_CMD'] = $this->settings["plot_command"];
+            }
+            //SUR in ilias not possible
+            //else if (is_readable('/Applications/Gnuplot.app/Contents/Resources/bin/gnuplot')) {
+            //    $this->blocksettings['GNUPLOT_CMD'] = '/Applications/Gnuplot.app/Contents/Resources/bin/gnuplot';
+            //}
+            else {
                 $this->blocksettings['GNUPLOT_CMD'] = 'gnuplot';
             }
         }
         // Loop over this array to format them correctly...
+        /*
+         * SUR no windows option in ilias
         if ($this->settings["platform"] === 'win') {
             foreach ($this->blocksettings as $var => $val) {
                 if ($var != 'PLOT_TERM_OPT') {
                     $this->blocksettings[$var] = addslashes(str_replace( '/', '\\', $val));
                 }
             }
-        }
+        }*/
 
-        $this->blocksettings['MAXIMA_VERSION_EXPECTED'] = $this->settings["maximaversion"];
+        //SUR maximaversion to maxima_version
+        $this->blocksettings['MAXIMA_VERSION_EXPECTED'] = $this->settings["maxima_version"];
         $this->blocksettings['URL_BASE']       = '!ploturl!';
+        /*
+         * SUR no windows option in ilias
+
         if ($this->settings["platform"] === 'win') {
             $this->blocksettings['URL_BASE']       = '!ploturl!/';
-        }
+        }*/
     }
 
-    /**
+    /*
+     * SUR no windows option in ilias
      * Try to guess the gnuplot command on Windows.
      * @return string the command.
-     */
     public function get_plotcommand_win() {
         global $CFG;
         if ($this->settings["plotcommand"] && $this->settings["plotcommand"] != 'gnuplot') {
@@ -146,8 +174,10 @@ class stack_cas_configuration {
             }
         }
         throw new StackException('Could not locate GNUPlot.');
-    }
+    }*/
 
+    /*
+     * SUR no windows option in ilias
     public function maxima_win_location() {
         if ($this->settings["platform"] != 'win') {
             return '';
@@ -188,8 +218,10 @@ class stack_cas_configuration {
 
         throw new StackException('Could not locate the directory into which Maxima is installed. Tried the following:' .
                 implode(', ', $locations));
-    }
+    }*/
 
+    /*
+     * SUR no windows option in ilias
     public function copy_maxima_bat() {
         global $CFG;
 
@@ -209,8 +241,12 @@ class stack_cas_configuration {
                     ' to location ' . $CFG->dataroot . '/stack/maxima.bat');
         }
         return true;
-    }
+    }*/
 
+    /**
+     * SUR all $this->settings calls has been changed to ILIAS Style database fields
+     * @return string
+     */
     public function get_maximalocal_contents() {
         $contents = <<<END
 /* ***********************************************************************/
@@ -251,7 +287,7 @@ END;
 
 END;
 
-        if ($this->settings["platform"] == 'linux-optimised') {
+        if ($this->settings["platform_type"] == 'linux-optimised') {
             $contents .= <<<END
 /* We are using an optimised lisp image with maxima and the stack libraries
    pre-loaded. That is why you don't see the familiar load("stackmaxima.mac")$ here.
@@ -266,7 +302,7 @@ END;
 load("stackmaxima.mac")$
 
 END;
-            $maximalib = $this->settings["maximalibraries"];
+            $maximalib = $this->settings["cas_maxima_libraries"];
             $maximalib = explode(',', $maximalib);
             foreach ($maximalib as $lib) {
                 $lib = trim($lib);
@@ -299,7 +335,7 @@ END;
      */
     public static function maximalocal_location() {
         global $CFG;
-        return StackParser::convertSlashPaths($CFG->dataroot . '/stack/maximalocal.mac');
+        return StackParser::convertSlashPaths(ILIAS_DATA_DIR . '/stack/maximalocal.mac');
     }
 
     /**
@@ -308,17 +344,20 @@ END;
      */
     public static function images_location() {
         global $CFG;
-        return StackParser::convertSlashPaths($CFG->dataroot . '/stack/plots');
+        return StackParser::convertSlashPaths(ILIAS_DATA_DIR . '/stack/plots');
     }
 
     /**
      * Create the maximalocal.mac file, overwriting it if it already exists.
      */
     public static function create_maximalocal() {
-        make_upload_directory('stack');
-        make_upload_directory('stack/logs');
-        make_upload_directory('stack/plots');
-        make_upload_directory('stack/tmp');
+        //TODO make global not ILIAS
+        if (!is_dir(ILIAS_DATA_DIR . '/stack')) {
+            mkdir(ILIAS_DATA_DIR . '/stack', 0700, true);
+            mkdir(ILIAS_DATA_DIR . '/stack/logs');
+            mkdir(ILIAS_DATA_DIR . '/stack/plots');
+            mkdir(ILIAS_DATA_DIR . '/stack/tmp');
+        }
 
         if (!file_put_contents(self::maximalocal_location(), self::generate_maximalocal_contents())) {
             throw new StackException('Failed to write Maxima configuration file.');
@@ -351,7 +390,9 @@ END;
         $livetestcases = array();
         $message = '';
         $permittedlibraries = array_keys(self::$maximalibraries);
-        $maximalib = $this->settings["maximalibraries"];
+        //        var_dump($this->settings);exit;
+        //SUR maximalibraries to cas_maxima_libraries
+        $maximalib = $this->settings["cas_maxima_libraries"];
 
         if (is_string($maximalib)) {
             $maximalib = explode(',', $maximalib);

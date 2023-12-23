@@ -67,7 +67,8 @@ class stack_cas_healthcheck {
         stack_cas_configuration::create_maximalocal();
 
         // Make sure we are in a position to call maxima.
-        switch ($config->platform) {
+        //SUR $config->platform to $config['platform_type']
+        switch ($config['platform_type']) {
             case 'win':
                 $maximalocation = stack_cas_configuration::confirm_maxima_win_location();
                 if ('' != $maximalocation) {
