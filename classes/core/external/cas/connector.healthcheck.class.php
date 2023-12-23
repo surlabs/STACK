@@ -44,7 +44,7 @@ class stack_cas_healthcheck {
         $test = array();
         $test['tag'] = 'platform';
         $test['result'] = null;
-        $test['summary'] = $config->platform;
+        $test['summary'] = StackConfig::getAll();
         $test['details'] = null;
         $this->tests[] = $test;
 
