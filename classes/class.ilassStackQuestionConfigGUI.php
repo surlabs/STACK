@@ -92,9 +92,6 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
             //Get stored settings from the platform database
             $data = StackConfig::getAll();
 
-            //Get form sections to render depending on the command
-            $sections = [];
-
             switch ($cmd) {
                 case "configure":
                     $sections = $this->configure($data);
