@@ -635,14 +635,6 @@ if ($db->tableExists('xqcas_configuration')) {
 ?>
 <#39>
 <?php
-//Script only step
-?>
-<#40>
-<?php
-
-?>
-<#41>
-<?php
 //add new columns to xqcas question tables.
 global $DIC;
 $db = $DIC->database();
@@ -713,7 +705,7 @@ if ($db->tableExists('xqcas_configuration')) {
 	}
 }
 ?>
-<#42>
+<#40>
 <?php
 /*
  * New Test Seed Management
@@ -740,7 +732,7 @@ if (!$db->tableExists('xqcas_test_seeds')) {
 	}
 }
 ?>
-<#43>
+<#41>
 <?php
 global $DIC;
 $db = $DIC->database();
@@ -759,7 +751,7 @@ if ($db->tableExists('xqcas_configuration')) {
     }
 }
 ?>
-<#44>
+<#42>
 <?php
 global $DIC;
 $db = $DIC->database();
@@ -863,7 +855,7 @@ if ($db->tableExists("xqcas_configuration")) {
     }
 }
 ?>
-<#45>
+<#43>
 <?php
 global $DIC;
 $db = $DIC->database();
