@@ -6,6 +6,7 @@ use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\UI\Factory;
+use ILIAS\UI\Renderer;
 
 
 /**
@@ -37,7 +38,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     protected GlobalHttpState $http;
     protected Factory $factory;
     protected $request;
-    protected $renderer;
+    protected Renderer $renderer;
 
     /**
      * @throws StackException|ilCtrlException
@@ -96,22 +97,18 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
 
             switch ($cmd) {
                 case "configure":
-                case "saveMain":
                     $sections = $this->configure($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "configure");
                     break;
                 case "maxima":
-                case "saveConnection":
                     $sections = $this->maxima($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "maxima");
                     break;
                 case "defaults":
-                case "saveDefaults":
                     $this->defaults($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "defaults");
                     break;
                 case "quality":
-                case "saveQuality":
                     $this->quality($data);
                     $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "quality");
                     break;
@@ -121,8 +118,6 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         } catch (Exception $e) {
             throw new StackException($e->getMessage());
         }
-
-        //Step 0: Declare dependencies
 
         //Create the form
         $form = $this->factory->input()->container()->form()->standard(
@@ -134,15 +129,14 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         if ($this->request->getMethod() == "POST") {
             $form = $form->withRequest($this->request);
             $result = $form->getData();
+            $saving_info = $this->save($result);
         } else {
-            $result = "No result yet.";
+            //TODO: DEV only, delete this or set as messagebox
+            $saving_info = "No result yet.";
         }
 
-        //Step 7: Render the form and the result of the data processing
-        $this->tpl->setContent(
-            "<pre>" . print_r($result, true) . "</pre><br/>" .
-            $this->renderer->render($form));
-
+        //actually render the form
+        $this->tpl->setContent($saving_info . $this->renderer->render($form));
 
     }
 
@@ -153,19 +147,6 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     {
         $this->tabs->activateTab("configure");
         return PluginConfigurationMainUI::show($data, $this->getPluginObject());
-    }
-
-    /**
-     * @throws ilCtrlException
-     * @throws StackException
-     */
-    private function saveMain(): void
-    {
-        //TODO SAVE MAIN CONFIGURATION
-        exit;
-        //Saul's magic
-        //perform command to show the configuration overview
-        $this->performCommand("configure");
     }
 
     /**
@@ -198,9 +179,9 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     /**
      * Saves the configuration
      */
-    private function save(): void
+    private function save(array $form_data): string
     {
-        $this->tabs->activateTab("configure");
-
+        //TODO: Save the configuration
+        return "<pre>" . print_r($form_data, true) . "</pre><br/>";
     }
 }
