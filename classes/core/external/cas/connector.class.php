@@ -169,19 +169,25 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
      * @param StackLog $debuglog the debug log to use.
      */
     public function __construct($settings, StackLog $debuglog) {
-        global $CFG;
 
-        $path = $CFG->dataroot . '/stack';
+        //TODO make global not use ILIAS
+        $path = ILIAS_DATA_DIR . '/stack';
 
         $initcommand = 'load("' . $path . '/maximalocal.mac");' . "\n";
         $initcommand = str_replace("\\", "/", $initcommand);
         $initcommand .= "\n";
 
-        $cmd = $settings->maximacommand;
-        if ($settings->platform == 'linux-optimised') {
+        //dump($settings);exit;
+        //SUR $settings->maximacommand to $settings['maxima_command']
+        $cmd = $settings['maxima_command'];
+        //SUR $settings->platform to $settings['platform_type']
+        if ($settings['platform_type'] == 'linux-optimised') {
+            //SUR in ILIAS not available
             $cmd = $settings->maximacommandopt;
-        } else if (in_array($settings->platform, ['server', 'server-proxy'])) {
-            $cmd = $settings->maximacommandserver;
+            //SUR $settings->platform to $settings['platform_type']
+        } else if (in_array(['platform_type'], ['server', 'server-proxy'])) {
+            //SUR $settings->maximacommandserver to $settings['maxima_pool_url']
+            $cmd = $settings['maxima_pool_url'];
         }
         if ('' === trim($cmd)) {
             $cmd = $this->guess_maxima_command($path);
@@ -190,16 +196,21 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
         $this->logs           = $path;
         $this->command        = $cmd;
         $this->initcommand    = $initcommand;
-        $this->timeout        = $settings->castimeout;
-        $this->serveruserpass = $settings->serveruserpass;
+        //SUR $settings->castimeout to $settings['cas_connection_timeout']
+        $this->timeout        = $settings['cas_connection_timeout'];
+        //SUR $settings->serveruserpass to $settings['maxima_pool_server_username_password']
+        $this->serveruserpass = $settings['maxima_pool_server_username_password'];
         $this->debug          = $debuglog;
+        //TODO al parecer esto comprueba si hay _ en la url por algun motivo
+        //DA FALLO EN MAXIMA, COMENTAMOS DE MOMENTO
+        /*
         if (strpos($CFG->wwwroot, '_') !== false) {
             $this->wwwroothasunderscores = true;
             $this->wwwrootfixupfind = str_replace('_', '\_', $CFG->wwwroot);
             $this->wwwrootfixupreplace = $CFG->wwwroot;
         } else {
             $this->wwwroothasunderscores = false;
-        }
+        }*/
     }
 
     /**

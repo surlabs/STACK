@@ -70,6 +70,7 @@ class stack_cas_healthcheck {
         //SUR $config->platform to $config['platform_type']
         switch ($config['platform_type']) {
             case 'win':
+                /* SUR no windows support
                 $maximalocation = stack_cas_configuration::confirm_maxima_win_location();
                 if ('' != $maximalocation) {
                     $test = array();
@@ -98,7 +99,7 @@ class stack_cas_healthcheck {
                     $test['summary'] = StackPlatform::getTranslation('healthcheckmaximabatinfo', $CFG->dataroot);
                     $test['details'] = StackPlatform::createTag('p', StackPlatform::getTranslation('healthcheckmaximabatinfo', $CFG->dataroot));
                     $this->tests[] = $test;
-                }
+                }*/
 
                 break;
             case 'linux':
@@ -112,7 +113,7 @@ class stack_cas_healthcheck {
                 $this->tests[] = $test;
                 break;
             case 'server':
-                // TODO: Check is_proxybypass function
+                // TODO: Cambiar is_proxybypass que es de moodle y usar el de ILIAS
                 if (!empty($CFG->proxyhost) && !is_proxybypass(StackConfig::get('maximacommandserver'))) {
                     $test = [];
                     $test['tag'] = 'healthcheckproxysettings';

@@ -53,7 +53,8 @@ abstract class stack_connection_helper {
 
         $debuglog = new StackLog();
 
-        switch (self::$config->platform) {
+        //SUR $config->platform to $config['platform_type']
+        switch (self::$config['platform_type']) {
             case 'win':
                 require_once(__DIR__ . '/connector.windows.class.php');
                 $connection = new stack_cas_connection_windows(self::$config, $debuglog);
@@ -89,7 +90,8 @@ abstract class stack_connection_helper {
      */
     public static function get_platform() {
         self::ensure_config_loaded();
-        return self::$config->platform;
+        //SUR $config->platform to $config['platform_type']
+        return self::$config['platform_type'];
     }
 
     /**
@@ -97,7 +99,8 @@ abstract class stack_connection_helper {
      */
     public static function get_maximaversion() {
         self::ensure_config_loaded();
-        return self::$config->maximaversion;
+        //SUR $config->maximaversion to $config['maxima_version']
+        return self::$config['maxima_version'];
     }
 
     /**
@@ -166,7 +169,9 @@ abstract class stack_connection_helper {
      */
     public static function get_required_stackmaxima_version() {
         self::ensure_config_loaded();
-        return self::$config->stackmaximaversion;
+        //TODO stackmaximaversion cambia cada vez que cambia el core de moodle
+        //de momento estatico pero habria que hacerlo de otro modo
+        return '2023121100';
     }
 
     /**
@@ -247,10 +252,15 @@ abstract class stack_connection_helper {
     private static function stackmaxima_nocache_call($command) {
         self::ensure_config_loaded();
 
-        $configcache = self::$config->casresultscache;
-        $casdebugging = self::$config->casdebugging;
-        self::$config->casresultscache = 'none';
-        self::$config->casdebugging = true;
+        //var_dump(self::$config);exit;
+        //SUR $config->casresultscache to $config['cas_result_caching']
+        $configcache = self::$config['cas_result_caching'];
+        //SUR $config->casdebugging to $config['cas_debugging']
+        $casdebugging = self::$config['cas_debugging'];
+        //SUR $config->casresultscache to $config['cas_result_caching']
+        self::$config['cas_result_caching'] = 'none';
+        //SUR $config->casdebugging to $config['cas_debugging']
+        self::$config['cas_debugging'] = true;
 
         $connection = self::make();
         $results = $connection->compute($command);
