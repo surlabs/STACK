@@ -32,6 +32,7 @@ class StackConfig {
     /**
      * Load the platform configuration
      * @return void
+     * @throws StackException
      */
     public static function load() :void {
         $config = StackDatabase::select('xqcas_configuration');
@@ -61,12 +62,14 @@ class StackConfig {
      * @return void
      */
     public static function set(string $key, mixed $value, ?string $category = null): void {
-        if (self::$config[$key] !== $value) {
-            self::$config[$key] = $value;
-            self::$updated[$key] = true;
+        if (isset(self::$config[$key])) {
+            if (self::$config[$key] !== $value) {
+                self::$config[$key] = $value;
+                self::$updated[$key] = true;
 
-            if (isset($category)) {
-                self::$categories[$key] = $category;
+                if (isset($category)) {
+                    self::$categories[$key] = $category;
+                }
             }
         }
     }
@@ -108,26 +111,26 @@ class StackConfig {
     public static function save() : bool | string {
         foreach (self::$updated as $key => $exist) {
             if ($exist) {
-                $data = array();
+                if (isset(self::$config[$key])) {
+                    $data = array();
 
-                if (is_array(self::$config[$key])) {
-                    $data['value'] = json_encode(self::$config[$key]);
-                } else {
-                    $data['value'] = self::$config[$key];
-                }
+                    if (is_array(self::$config[$key])) {
+                        $data['value'] = json_encode(self::$config[$key]);
+                    } else {
+                        $data['value'] = self::$config[$key];
+                    }
 
-                $data['group_name'] = self::$categories[$key];
+                    $data['group_name'] = self::$categories[$key];
 
-                try {
-                    StackDatabase::update('xqcas_configuration', $data, array(
-                        'parameter_name' => $key
-                    ));
+                    try {
+                        StackDatabase::update('xqcas_configuration', $data, array(
+                            'parameter_name' => $key
+                        ));
 
-                    self::$updated[$key] = false;
-
-                    return true;
-                } catch (StackException $e) {
-                    return $e->getMessage();
+                        self::$updated[$key] = false;
+                    } catch (StackException $e) {
+                        return $e->getMessage();
+                    }
                 }
             }
         }
