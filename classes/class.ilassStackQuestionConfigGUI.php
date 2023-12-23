@@ -150,6 +150,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
 
     /**
      * Shows the UI for the Maxima Connection settings
+     * @throws StackException|ilCtrlException
      */
     private function maxima(array $data): array
     {
@@ -180,7 +181,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
      */
     private function save(array $form_data): string
     {
-        //TODO: Save the configuration
+        //TODO: Save the configuration and return a success or failure message
         return "<pre>" . print_r($form_data, true) . "</pre><br/>";
     }
 }
