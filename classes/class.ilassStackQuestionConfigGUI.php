@@ -63,84 +63,79 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         StackPlatform::initialize('ilias');
 
         //Set tabs
-        try {
+        //try {
 
-            $this->tabs->addTab(
-                "configure",
-                $this->getPluginObject()->txt("ui_admin_configuration_overview_title"),
-                $this->control->getLinkTarget($this, "configure")
-            );
+        $this->tabs->addTab(
+            "configure",
+            $this->getPluginObject()->txt("ui_admin_configuration_overview_title"),
+            $this->control->getLinkTarget($this, "configure")
+        );
 
-            $this->tabs->addTab(
-                "maxima",
-                $this->getPluginObject()->txt("ui_admin_configuration_maxima_title"),
-                $this->control->getLinkTarget($this, "maxima")
-            );
+        $this->tabs->addTab(
+            "maxima",
+            $this->getPluginObject()->txt("ui_admin_configuration_maxima_title"),
+            $this->control->getLinkTarget($this, "maxima")
+        );
 
-            $this->tabs->addTab(
-                "defaults",
-                $this->getPluginObject()->txt("ui_admin_configuration_defaults_title"),
-                $this->control->getLinkTarget($this, "defaults")
-            );
+        $this->tabs->addTab(
+            "defaults",
+            $this->getPluginObject()->txt("ui_admin_configuration_defaults_title"),
+            $this->control->getLinkTarget($this, "defaults")
+        );
 
-            $this->tabs->addTab(
-                "quality",
-                $this->getPluginObject()->txt("ui_admin_configuration_quality_title"),
-                $this->control->getLinkTarget($this, "quality")
-            );
+        $this->tabs->addTab(
+            "quality",
+            $this->getPluginObject()->txt("ui_admin_configuration_quality_title"),
+            $this->control->getLinkTarget($this, "quality")
+        );
 
-            //Add plugin title and description
-            $this->tpl->setTitle($this->getPluginObject()->txt('ui_admin_configuration_title'));
-            $this->tpl->setDescription($this->getPluginObject()->txt('ui_admin_configuration_description'));
+        //Add plugin title and description
+        $this->tpl->setTitle($this->getPluginObject()->txt('ui_admin_configuration_title'));
+        $this->tpl->setDescription($this->getPluginObject()->txt('ui_admin_configuration_description'));
 
-            //Get stored settings from the platform database
-            $data = StackConfig::getAll();
+        //Get stored settings from the platform database
+        $data = StackConfig::getAll();
 
-            switch ($cmd) {
-                case "configure":
-                    $sections = $this->configure($data);
-                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "configure");
-                    $rendered = $this->renderForm($data, $form_action, $sections);
-                    break;
-                case "maxima":
-                    $sections = $this->maxima($data);
-                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "maxima");
-                    $rendered = $this->renderForm($data, $form_action, $sections);
-                    break;
-                case "defaults":
-                    $sections = $this->defaults($data);
-                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "defaults");
-                    $rendered = $this->renderForm($data, $form_action, $sections);
-                    break;
-                case "quality":
-                    $this->quality($data);
-                    return;
-                case "healthcheck":
-                    //TODO connect with the healthcheck class
-                    try {
-                        $healthcheck = new stack_cas_healthcheck($data);
-                    } catch (Exception $e) {
-                        $rendered = $this->renderer->render($this->factory->messageBox()->failure("Error at healthcheck: " . $e->getMessage()));
-                        break;
-                    }
-                    $data = $healthcheck->get_test_results();
-                    $sections = $this->healthcheck($data);
-                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
-                    $rendered = $this->renderPanel($data, $form_action, $sections);
-                    break;
-                case "bulktesting":
-                    //TODO connect with the bulktesting class
-                    $data = StackBulktestingIlias::doBulktesting();
-                    $sections = $this->bulktesting($data);
-                    $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "bulktesting");
-                    $rendered = $this->renderPanel($data, $form_action, $sections);
-                    break;
-                default:
-                    throw new StackException("Unknown configuration command: " . $cmd);
-            }
-        } catch (Exception $e) {
-            throw new StackException("Error at perform command: " . $e->getMessage());
+        switch ($cmd) {
+            case "configure":
+                $sections = $this->configure($data);
+                $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "configure");
+                $rendered = $this->renderForm($data, $form_action, $sections);
+                break;
+            case "maxima":
+                $sections = $this->maxima($data);
+                $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "maxima");
+                $rendered = $this->renderForm($data, $form_action, $sections);
+                break;
+            case "defaults":
+                $sections = $this->defaults($data);
+                $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "defaults");
+                $rendered = $this->renderForm($data, $form_action, $sections);
+                break;
+            case "quality":
+                $this->quality($data);
+                return;
+            case "healthcheck":
+                //TODO connect with the healthcheck class
+                $healthcheck = new stack_cas_healthcheck($data);
+                $data = $healthcheck->get_test_results();
+                $sections = $this->healthcheck($data);
+                $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
+                $rendered = $this->renderPanel($data, $form_action, $sections);
+                break;
+            case "bulktesting":
+                //TODO connect with the bulktesting class
+                $data = StackBulktestingIlias::doBulktesting();
+                $sections = $this->bulktesting($data);
+                $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "bulktesting");
+                $rendered = $this->renderPanel($data, $form_action, $sections);
+                break;
+            default:
+                throw new StackException("Unknown configuration command: " . $cmd);
         }
+        //} catch (Exception $e) {
+        //    throw new StackException("Error at perform command: " . $e->getMessage());
+        //}
 
         //sets the rendered content as the main content of the template
         $this->tpl->setContent($rendered);
