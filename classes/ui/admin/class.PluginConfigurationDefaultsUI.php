@@ -250,18 +250,18 @@ class PluginConfigurationDefaultsUI
 
         return self::$factory->input()->field()->section(
             [
-                $options_question_level_simplify,
-                $options_assume_positive,
-                $options_assume_real,
-                $options_feedback_fully_correct,
-                $options_feedback_partially_correct,
-                $options_feedback_fully_incorrect,
-                $options_surd_for_sqrt,
-                $options_complex_numbers,
-                $options_multiplication_sign,
-                $options_inverse_trigonometric,
-                $options_logic_symbols,
-                $options_matrix_parentheses
+                'question_level_simplify' => $options_question_level_simplify,
+                'assume_positive' => $options_assume_positive,
+                'assume_real' => $options_assume_real,
+                'feedback_fully_correct' => $options_feedback_fully_correct,
+                'feedback_partially_correct' => $options_feedback_partially_correct,
+                'feedback_fully_incorrect' => $options_feedback_fully_incorrect,
+                'multiplication_sign' => $options_multiplication_sign,
+                'surd_for_sqrt' => $options_surd_for_sqrt,
+                'complex_numbers' => $options_complex_numbers,
+                'inverse_trigonometric' => $options_inverse_trigonometric,
+                'logic_symbols' => $options_logic_symbols,
+                'matrix_parentheses' => $options_matrix_parentheses
             ],
             $plugin_object->txt("ui_admin_configuration_defaults_options_title"),
             $plugin_object->txt("ui_admin_configuration_defaults_options_description")
@@ -409,16 +409,16 @@ class PluginConfigurationDefaultsUI
 
         return self::$factory->input()->field()->section(
             [
-                $inputs_default_type,
-                $input_box_size,
-                $input_strict_syntax,
-                $input_insert_stars,
-                $input_forbidden_words,
-                $input_forbid_float,
-                $input_require_lowest_terms,
-                $input_check_answer_type,
-                $input_must_verify_type,
-                $input_show_validation
+                'default_type' => $inputs_default_type,
+                'box_size' => $input_box_size,
+                'strict_syntax' => $input_strict_syntax,
+                'insert_stars' => $input_insert_stars,
+                'forbidden_words' => $input_forbidden_words,
+                'forbid_float' => $input_forbid_float,
+                'require_lowest_terms' => $input_require_lowest_terms,
+                'check_answer_type' => $input_check_answer_type,
+                'must_verify' => $input_must_verify_type,
+                'show_validation' => $input_show_validation
             ],
             $plugin_object->txt("ui_admin_configuration_defaults_inputs_title"),
             $plugin_object->txt("ui_admin_configuration_defaults_inputs_description")
