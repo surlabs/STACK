@@ -762,9 +762,14 @@ if ($db->tableExists('xqcas_configuration')) {
 <#44>
 <?php
 //TODO add new entries to xqcas_config for the new fields in the plugin configuration
-//TODO allow_jsx_graph no está en StackConfig::getAll();
 ?>
 <#45>
 <?php
-//TODO add question_description (longtext) and question_description_format (tinyint 2) to xqcas_options
+global $DIC;
+$db = $DIC->database();
+
+if ($db->tableExists('xqcas_options')) {
+    $db->addTableColumn("xqcas_options", "question_description", array('type' => 'clob', 'notnull' => false, 'default' => null));
+    $db->addTableColumn("xqcas_options", "question_description_format", array('type' => 'integer', 'length' => 2, 'notnull' => false, 'default' => null));
+}
 ?>
