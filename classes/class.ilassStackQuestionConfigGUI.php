@@ -112,7 +112,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                     throw new StackException("Unknown configuration command: " . $cmd);
             }
         } catch (Exception $e) {
-            throw new StackException($e->getMessage());
+            throw new StackException("Error at perform command: " . $e->getMessage());
         }
 
         //Create the form
