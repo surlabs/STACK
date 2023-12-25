@@ -206,7 +206,6 @@ class stack_cas_healthcheck {
             if ($session->get_valid()) {
                 $session->instantiate();
             }
-            dump($session);exit;
 
             $result = true;
             $message = 'healthchecksstacklibrariesworkingok';
@@ -243,7 +242,8 @@ class stack_cas_healthcheck {
         $test = array();
         $test['tag'] = 'settingmaximalibraries';
         $test['result'] = null;
-        $test['summary'] = $config->maximalibraries;
+        //SUR $config->maximalibraries to $config['maxima_libraries']
+        $test['summary'] = $config['cas_maxima_libraries'];
         $test['details'] = null;
         $this->tests[] = $test;
 
@@ -251,7 +251,8 @@ class stack_cas_healthcheck {
         $test = array();
         $test['tag'] = 'settingcasresultscache';
         $test['result'] = null;
-        $test['summary'] = StackPlatform::getTranslation('healthcheckcache_' . $config->casresultscache, null);
+        //SUR $config->casresultscache to $config['cas_result_caching']
+        $test['summary'] = StackPlatform::getTranslation('healthcheckcache_' . $config['cas_result_caching'], null);
         $test['details'] = null;
         $this->tests[] = $test;
     }
