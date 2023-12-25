@@ -149,7 +149,11 @@ class PluginConfigurationMaximaUI
         )->withValue($cas_debugging_value);
 
         //Cache parsed expressions longer than
-        $cache_parsed_expressions_longer_than_value = $data["cache_parsed_expressions_longer_than"] ?? "50";
+        if (isset($data["cache_parsed_expressions_longer_than"]) && is_string($data["cache_parsed_expressions_longer_than"])) {
+            $cache_parsed_expressions_longer_than_value = $data["cache_parsed_expressions_longer_than"];
+        } else {
+            $cache_parsed_expressions_longer_than_value = "";
+        }
         $cache_parsed_expressions_longer_than = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_connection_cache_parsed_expressions_longer_than_title"),
             $plugin_object->txt("ui_admin_configuration_connection_cache_parsed_expressions_longer_than_description")
