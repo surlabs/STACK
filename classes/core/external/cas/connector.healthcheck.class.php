@@ -62,6 +62,7 @@ class stack_cas_healthcheck {
             $test['details'] .= StackPlatform::createTag('p', StackPlatform::getTranslation('settingmaximalibraries_desc', null));
             $this->tests[] = $test;
         }
+        var_dump($this->tests);exit;
 
         // Try to connect to create maxima local.
         stack_cas_configuration::create_maximalocal();

@@ -392,6 +392,7 @@ END;
         //SUR maximalibraries to cas_maxima_libraries
         $maximalib = $this->settings["cas_maxima_libraries"];
 
+        var_dump($maximalib);exit;
         if (is_string($maximalib)) {
             $maximalib = explode(',', $maximalib);
         }
