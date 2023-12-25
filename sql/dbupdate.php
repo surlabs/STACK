@@ -865,3 +865,7 @@ if ($db->tableExists('xqcas_options')) {
     $db->addTableColumn("xqcas_options", "question_description_format", array('type' => 'integer', 'length' => 2, 'notnull' => false, 'default' => null));
 }
 ?>
+<#44>
+<?php
+//TODO if connection config set to 'unix' change it to 'linux' to match the new syntax
+?>

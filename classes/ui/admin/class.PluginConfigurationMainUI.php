@@ -68,7 +68,7 @@ class PluginConfigurationMainUI
     private static function getMaximaConnectionSection(array $data, ilPlugin $plugin_object): Section
     {
 
-        if (isset($data['platform_type']) && $data['platform_type'] == 'unix') {
+        if (isset($data['platform_type']) && $data['platform_type'] == 'linux') {
             $maxima_connection_value = $data['platform_type'];
         } elseif (isset($data['platform_type']) && $data['platform_type'] == 'server') {
             $maxima_connection_value = $data['platform_type'];
@@ -80,7 +80,7 @@ class PluginConfigurationMainUI
             "",
             ""
         )
-            ->withOption('unix',
+            ->withOption('linux',
                 $plugin_object->txt("ui_admin_configuration_maxima_connection_unix_title"),
                 $plugin_object->txt("ui_admin_configuration_defaults_maxima_connection_unix_description"))
             ->withOption('server',

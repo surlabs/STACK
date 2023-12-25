@@ -388,11 +388,10 @@ END;
         $livetestcases = array();
         $message = '';
         $permittedlibraries = array_keys(self::$maximalibraries);
-        //        var_dump($this->settings);exit;
+        //var_dump($this->settings);exit;
         //SUR maximalibraries to cas_maxima_libraries
         $maximalib = $this->settings["cas_maxima_libraries"];
 
-        var_dump($maximalib);exit;
         if (is_string($maximalib)) {
             $maximalib = explode(',', $maximalib);
         }

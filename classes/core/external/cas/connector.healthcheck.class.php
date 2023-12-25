@@ -62,7 +62,6 @@ class stack_cas_healthcheck {
             $test['details'] .= StackPlatform::createTag('p', StackPlatform::getTranslation('settingmaximalibraries_desc', null));
             $this->tests[] = $test;
         }
-        var_dump($this->tests);exit;
 
         // Try to connect to create maxima local.
         stack_cas_configuration::create_maximalocal();
@@ -115,14 +114,15 @@ class stack_cas_healthcheck {
                 break;
             case 'server':
                 // TODO: Cambiar is_proxybypass que es de moodle y usar el de ILIAS
-                if (!empty($CFG->proxyhost) && !is_proxybypass(StackConfig::get('maximacommandserver'))) {
+                //  if (!empty($CFG->proxyhost) && !is_proxybypass(StackConfig::get('maximacommandserver'))) {
+                /*if (!empty($CFG->proxyhost) && !is_proxybypass(StackConfig::get('maximacommandserver'))) {
                     $test = [];
                     $test['tag'] = 'healthcheckproxysettings';
                     $test['result'] = null;
                     $test['summary'] =
                     $this->tests[] = $test;
                     break;
-                }
+                }*/
             default:
                 // Server-proxy/optimised.
                 // TODO: add in any specific tests for these setups?

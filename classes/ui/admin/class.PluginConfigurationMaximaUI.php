@@ -54,10 +54,10 @@ class PluginConfigurationMaximaUI
                 'common' => self::getMaximaCommonSection($data, $plugin_object),
                 'server' => self::getMaximaServerSection($data, $plugin_object)
             ];
-        } elseif ($data["platform_type"] == "unix") {
+        } elseif ($data["platform_type"] == "linux") {
             $content = [
                 'common' => self::getMaximaCommonSection($data, $plugin_object),
-                'server' => self::getMaximaLocalSection($data, $plugin_object)
+                'linux' => self::getMaximaLocalSection($data, $plugin_object)
             ];
         } else {
             throw new StackException("Error: Platform type not valid: " . $data["platform_type"]);
@@ -159,6 +159,13 @@ class PluginConfigurationMaximaUI
             $plugin_object->txt("ui_admin_configuration_connection_cache_parsed_expressions_longer_than_description")
         )->withValue($cache_parsed_expressions_longer_than_value);
 
+        //Maxima libraries
+        $maxima_libraries_value = $data["cas_maxima_libraries"] ?? "";
+        $maxima_libraries = self::$factory->input()->field()->text(
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_title"),
+            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_description")
+        )->withValue($maxima_libraries_value);
+
         return self::$factory->input()->field()->section(
             [
                 'maxima_version' => $maxima_version,
@@ -167,6 +174,7 @@ class PluginConfigurationMaximaUI
                 'preparse_all' => $preparse_all,
                 'cas_debugging' => $cas_debugging,
                 'cache_parsed_expressions_longer_than' => $cache_parsed_expressions_longer_than,
+                'cas_maxima_libraries' => $maxima_libraries,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_common_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_common_description")
@@ -268,13 +276,6 @@ class PluginConfigurationMaximaUI
             $plugin_object->txt("ui_admin_configuration_connection_plot_command_description")
         )->withValue($plot_command_value);
 
-        //Maxima libraries
-        $maxima_libraries_value = $data["cas_maxima_libraries"] ?? "";
-        $maxima_libraries = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_libraries_description")
-        )->withValue($maxima_libraries_value);
-
         //Maxima uses proxy
         if (isset($data["maxima_uses_proxy"]) && $data["maxima_uses_proxy"] == "1") {
             $maxima_uses_proxy_value = true;
@@ -291,7 +292,6 @@ class PluginConfigurationMaximaUI
                 $maxima_command,
                 $optimized_maxima_command,
                 $plot_command,
-                $maxima_libraries,
                 $maxima_uses_proxy,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_title"),
