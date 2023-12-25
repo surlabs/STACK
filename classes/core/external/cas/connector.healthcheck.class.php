@@ -140,24 +140,25 @@ class stack_cas_healthcheck {
             $this->tests[] = $test;
         }
 
-        var_dump($test);exit;
-
         // Test an *uncached* call to the CAS.  I.e. a genuine call to the process.
         if ($this->ishealthy) {
             list($message, $genuinedebug, $result) = stack_connection_helper::stackmaxima_genuine_connect();
             $this->ishealthy = $result;
 
-            var_dump($message, $genuinedebug, $result);exit;
             $test = array();
             $test['tag'] = 'healthuncached';
             $test['result'] = $result;
             $test['summary'] = $message;
             $test['details'] = StackPlatform::createTag('p', StackPlatform::getTranslation('healthuncachedintro', null)) . $message;
-            $test['details'] .= $genuinedebug;
+            if (is_string($genuinedebug)) {
+                $test['details'] .= $genuinedebug;
+            }
             $this->tests[] = $test;
         }
 
         // Test Maxima connection.
+        //TODO ADD PLOTS AND STUFF
+        /*
         if ($this->ishealthy) {
             // Intentionally use get_string for the sample CAS and plots, so we don't render
             // the maths too soon.
@@ -167,11 +168,12 @@ class stack_cas_healthcheck {
                 StackPlatform::getTranslation('healthcheckconnectintro', null), StackPlatform::getTranslation('healthchecksamplecasunicode'));
             $this->output_cas_text('healthcheckplots',
                 StackPlatform::getTranslation('healthcheckplotsintro', null), StackPlatform::getTranslation('healthchecksampleplots'));
-        }
+        }*/
 
         // If we have a linux machine, and we are testing the raw connection then we should
         // attempt to automatically create an optimized maxima image on the system.
-        if ($this->ishealthy && $config->platform === 'linux') {
+        //SUR $config->platform to $config['platform_type']
+        if ($this->ishealthy && $config['platform_type'] === 'linux') {
             list($message, $debug, $result, $commandline, $rawcommand)
                 = stack_connection_helper::stackmaxima_auto_maxima_optimise($genuinedebug);
             $test = array();
@@ -258,6 +260,7 @@ class stack_cas_healthcheck {
      */
     private function output_cas_text($title, $intro, $castext) {
         $ct = castext2_evaluatable::make_from_source($castext, 'healthcheck');
+            var_dump($castext);exit;
         $session = new stack_cas_session2([$ct]);
         $session->instantiate();
 

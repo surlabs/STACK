@@ -224,6 +224,7 @@ class PluginConfigurationMaximaUI
         )->withValue($cache_parsed_expressions_longer_than_value);
 
         //Maxima uses proxy
+        //TODO Proxy option
         if (isset($data["maxima_uses_proxy"]) && $data["maxima_uses_proxy"] == "1") {
             $maxima_uses_proxy_value = true;
         } else {
@@ -267,7 +268,7 @@ class PluginConfigurationMaximaUI
         $optimized_maxima_command = self::$factory->input()->field()->text(
             $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_title"),
             $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_description")
-        )->withValue($optimized_maxima_command_value);
+        )->withValue("TODO no se guarda aun");
 
         //Plot command
         $plot_command_value = $data["plot_command"] ?? "";
@@ -289,10 +290,10 @@ class PluginConfigurationMaximaUI
 
         return self::$factory->input()->field()->section(
             [
-                $maxima_command,
-                $optimized_maxima_command,
-                $plot_command,
-                $maxima_uses_proxy,
+                'maxima_command' => $maxima_command,
+                'optimized_maxima_command' => $optimized_maxima_command,
+                'plot_command' => $plot_command,
+                'maxima_uses_proxy' => $maxima_uses_proxy,
             ],
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_description")

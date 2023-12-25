@@ -48,7 +48,6 @@ class stack_cas_connection_server extends stack_cas_connection_base {
                 '&timeout=' . ($this->timeout * 1000) .
                 '&ploturlbase=!ploturl!' .
                 '&version=' . stack_connection_helper::get_required_stackmaxima_version();
-
         curl_setopt($request, CURLOPT_POST, true);
         curl_setopt($request, CURLOPT_POSTFIELDS, $postdata);
         curl_setopt($request, CURLOPT_RETURNTRANSFER, true);
