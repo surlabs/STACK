@@ -31,6 +31,7 @@ use classes\core\options\StackOptions;
 use classes\core\security\StackException;
 use classes\core\version\MaximaVersion;
 use classes\platform\StackPlatform;
+use classes\core\external\cas\stack_cas_error;
 
 class stack_cas_session2 {
     /**
@@ -72,13 +73,16 @@ class stack_cas_session2 {
      */
     public $errclass = 'stack_cas_error';
 
+    /**
+     * @throws StackException
+     */
     public function __construct(array $statements, $options = null, $seed = null) {
 
         $this->instantiated = false;
         $this->statements = $statements;
 
         foreach ($statements as $statement) {
-            if (!is_subclass_of($statement, 'cas_evaluatable')) {
+            if (!($statement instanceof cas_evaluatable)) {
                 throw new StackException('stack_cas_session: items in $statements must be cas_evaluatable.');
             }
         }
@@ -394,7 +398,7 @@ class stack_cas_session2 {
                 $this->timeoutdebug = $results['timeoutdebug'];
             }
             foreach ($this->statements as $num => $statement) {
-                $errors = array(new $this->errclass(StackPlatform::getTranslation('stackCas_failedtimeout', null), ''));
+                $errors = array(new stack_cas_error(StackPlatform::getTranslation('stackCas_failedtimeout', null), ''));
                 $statement->set_cas_status($errors, array(), array());
             }
             return false;
@@ -443,7 +447,7 @@ class stack_cas_session2 {
                         // There can be multiple errors from multiple positions.
                         // The second element is the position.
                         foreach ($errs[0] as $er) {
-                            $err[] = new $this->errclass(StackParser::maximaTranslateString($er), $errs[1]);
+                            $err[] = new stack_cas_error(StackParser::maximaTranslateString($er), $errs[1]);
                         }
                     }
                 }

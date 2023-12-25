@@ -459,7 +459,7 @@ class stack_ast_container_silent implements cas_evaluatable {
                 if ($value->get_legacy_error() !== '' && $value->get_legacy_error() !== null) {
                     $this->valid = false;
                     // Hmm what is the point of this? Maybe do this filtering in the error class?
-                    $this->errors[] = new $this->errclass($this->decode_maxima_errors($value->get_legacy_error(), false),
+                    $this->errors[] = new stack_cas_error($this->decode_maxima_errors($value->get_legacy_error(), false),
                         $value->get_context());
                 }
             }

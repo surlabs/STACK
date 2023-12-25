@@ -185,7 +185,7 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
             //SUR in ILIAS not available
             $cmd = $settings->maximacommandopt;
             //SUR $settings->platform to $settings['platform_type']
-        } else if (in_array(['platform_type'], ['server', 'server-proxy'])) {
+        } else if (in_array($settings['platform_type'], ['server', 'server-proxy'])) {
             //SUR $settings->maximacommandserver to $settings['maxima_pool_url']
             $cmd = $settings['maxima_pool_url'];
         }

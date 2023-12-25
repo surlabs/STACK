@@ -12,6 +12,7 @@ namespace classes\core\external\maximaparser;
 /* chr_unicode - get unicode character from its char code */
 
 use Exception;
+use stdClass;
 
 if (!function_exists("chr_unicode")) {
     function chr_unicode($code) {
