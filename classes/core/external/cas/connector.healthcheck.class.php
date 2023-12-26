@@ -25,6 +25,7 @@ namespace classes\core\external\cas;
 
 use classes\core\external\cas\castext2\castext2_evaluatable;
 use classes\core\filters\StackParser;
+use classes\core\security\StackException;
 use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 
@@ -36,6 +37,9 @@ class stack_cas_healthcheck {
 
     protected $tests = array();
 
+    /**
+     * @throws StackException
+     */
     public function __construct($config) {
         global $CFG;
         $this->config = $config;
