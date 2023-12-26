@@ -99,19 +99,40 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         parent::__construct($title, $comment, $author, $owner, $question);
 
         try{
+            //Initialize Stack platform settings
             StackPlatform::initialize('ilias');
+
             //Set plugin object
             $this->setPlugin(StackPlatformIlias::getPlugin());
+
             //Get stored settings from the platform database
             $this->setPlatformData(StackConfig::getAll());
+
             //Get stack version from question_id
             $stack_version = new StackVersion($this->getId());
+
             //Creates and sets stack question object with minimal data
             $stack_question = new StackQuestion($stack_version);
             $this->setStackQuestion($stack_question);
+
+            //initializes the question without external data
+            $this->getStackQuestion()->generate();
         } catch (Exception $e) {
             //TODO ERROR MESSAGE
         }
+    }
+
+
+    /**
+     * Gets all the data of an assStackQuestion from the DB
+     * Called by assStackQuestionGUI Constructor
+     * For new questions, loads the standard values from xqcas_configuration.
+     *
+     * @param integer $question_id A unique key which defines the question in the database
+     */
+    public function loadFromDb(int $question_id): void
+    {
+        //TODO 300 lineas fuera, mucho de esto ahora se hace en StackQuestion
     }
 
     //TEST
@@ -293,20 +314,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         //TODO Esto tiene que rehacerse entero mágicamente
         //mientras tanto
         return 1;
-    }
-
-    //assQuestion
-
-    /**
-     * Gets all the data of an assStackQuestion from the DB
-     * Called by assStackQuestionGUI Constructor
-     * For new questions, loads the standard values from xqcas_configuration.
-     *
-     * @param integer $question_id A unique key which defines the question in the database
-     */
-    public function loadFromDb(int $question_id): void
-    {
-        //TODO 300 lineas fuera, mucho de esto ahora se hace en StackQuestion
     }
 
     //Import and Export
