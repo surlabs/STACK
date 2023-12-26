@@ -3,8 +3,13 @@ declare(strict_types=1);
 
 namespace classes\platform\ilias;
 
+use classes\core\security\StackException;
+use ilComponentFactory;
+use ilComponentRepository;
 use ilLanguage;
 use classes\platform\StackPlatform;
+use ilPlugin;
+use ilQuestionsPlugin;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -61,7 +66,8 @@ class StackPlatformIlias extends StackPlatform
      * @param array $attributes
      * @return string
      */
-    public function createTagInternal(string $tag, string $contents, array $attributes = []): string {
+    public function createTagInternal(string $tag, string $contents, array $attributes = []): string
+    {
         // TODO: Check this to use $this->factory and $this->renderer instead of pure HTML
 
         $html = "<" . $tag;
@@ -81,7 +87,8 @@ class StackPlatformIlias extends StackPlatform
      * @param string $command
      * @return bool
      */
-    public static function isProxyBypassInternal(string $command): bool {
+    public static function isProxyBypassInternal(string $command): bool
+    {
         // TODO: Implement isProxyBypassInternal() method.
         return true;
     }
@@ -91,8 +98,35 @@ class StackPlatformIlias extends StackPlatform
      *
      * @return bool
      */
-    public static function isProxySettingsOkInternal(): bool {
+    public static function isProxySettingsOkInternal(): bool
+    {
         // TODO: Implement isProxySettingsOkInternal() method.
         return true;
+    }
+
+    /**
+     * Called at ilias question object creation
+     * @return ilPlugin|null
+     */
+    public static function initIliasPlugin(): ?ilPlugin
+    {
+        global $DIC;
+
+        /** @var ilComponentRepository $component_repository */
+        $component_repository = $DIC["component.repository"];
+
+        try {
+            $plugin_name = 'assStackQuestion';
+            $info = $component_repository->getPluginByName($plugin_name);
+        } catch (StackException $e) {
+            //TODO log error
+            return null;
+        }
+
+        /** @var ilComponentFactory $component_factory */
+        $component_factory = $DIC["component.factory"];
+
+        /** @var ilQuestionsPlugin $plugin_obj */
+        return $component_factory->getPlugin($info->getId());
     }
 }
