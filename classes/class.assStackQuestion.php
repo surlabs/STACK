@@ -122,6 +122,46 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         }
     }
 
+    // CRUD
+
+    /**
+     * Checks if question has minimum requirements
+     * @return bool
+     */
+    function isComplete(): bool
+    {
+        //TODO Esto tiene que rehacerse entero mágicamente
+        return true;
+    }
+
+    /**
+     * Saves a assStackQuestion object to the database
+     *
+     * @param string $original_id
+     *
+     */
+    public function saveToDb(string $original_id = ""): void
+    {
+        //TODO Esto tiene que rehacerse entero mágicamente
+    }
+
+    /**
+     * Saves the STACK related parameters of the questions
+     * @return void
+     */
+    public function saveAdditionalQuestionDataToDb()
+    {
+        //TODO Esto tiene que rehacerse entero mágicamente
+    }
+
+    /**
+     * Deletes the question from the DB
+     * @param int $question_id
+     */
+    public function delete(int $question_id): void
+    {
+        //TODO Esto tiene que rehacerse entero mágicamente
+    }
 
     /**
      * Gets all the data of an assStackQuestion from the DB
@@ -226,49 +266,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         //mientras tanto
         return 1.0;
     }
-
-    //Save to DB
-    //Authoring Interface
-
-    /**
-     * Saves a assStackQuestion object to the database
-     *
-     * @param string $original_id
-     *
-     */
-    public function saveToDb(string $original_id = ""): void
-    {
-        //TODO Esto tiene que rehacerse entero mágicamente
-    }
-
-    /**
-     * Saves the STACK related parameters of the questions
-     * @return void
-     */
-    public function saveAdditionalQuestionDataToDb()
-    {
-        //TODO Esto tiene que rehacerse entero mágicamente
-    }
-
-    /**
-     * Checks if question has minimum requirements
-     * @return bool
-     */
-    function isComplete(): bool
-    {
-        //TODO Esto tiene que rehacerse entero mágicamente
-        return true;
-    }
-
-    /**
-     * Deletes the question from the DB
-     * @param int $question_id
-     */
-    public function delete(int $question_id): void
-    {
-        //TODO Esto tiene que rehacerse entero mágicamente
-    }
-
 
     //COPY, MOVE, DUPLICATE
     //These methods are called when transferring questions within the platform
