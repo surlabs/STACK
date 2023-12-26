@@ -162,7 +162,7 @@ class StackQuestion
      * @param bool $with_external_data_from_teacher
      * @return bool
      */
-    protected function generate(bool $with_external_data_from_user = false, bool $with_external_data_from_teacher = false): bool
+    public function generate(bool $with_external_data_from_user = false, bool $with_external_data_from_teacher = false): bool
     {
         //Ensure that the object is in the correct status
         if ($this->getStatus() === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
