@@ -8,7 +8,7 @@ use classes\platform\StackPlatform;
 use classes\platform\ilias\StackPlatformIlias;
 
 /**
- * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
+ *  This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  *  This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
  *  originally created by Chris Sangwin.
  *
@@ -133,6 +133,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     public function loadFromDb(int $question_id): void
     {
         //TODO 300 lineas fuera, mucho de esto ahora se hace en StackQuestion
+        parent::loadFromDb($question_id);
     }
 
     //TEST
