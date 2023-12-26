@@ -73,7 +73,7 @@ class maxima_parser_utils {
      * @return MP_Node the AST.
      */
     protected static function do_parse(string $code, array $parseoptions, string $cachekey): MP_Node {
-        $muccachelimit = StackConfig::get('parsercacheinputlength');
+        $muccachelimit = 50;
 
         $cache = null;
         if ($cachekey && $muccachelimit && strlen($code) >= $muccachelimit && mb_strpos($code, 'stack_include') === false) {
