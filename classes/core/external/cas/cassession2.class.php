@@ -243,6 +243,7 @@ class stack_cas_session2 {
      * Executes this session and returns the values to the statements that
      * request them.
      * Returns true if everything went well.
+     * @throws StackException
      */
     public function instantiate(): bool {
         if (!$this->get_valid()) {
