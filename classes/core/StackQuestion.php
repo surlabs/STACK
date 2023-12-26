@@ -245,7 +245,8 @@ class StackQuestion
                 $this->hint = new StackText($array_internal['hint']);
 
                 foreach ($array_internal['inputs'] as $input_identifier => $input_data) {
-                    $this->inputs[$input_identifier] = new StackInput($input_data);
+                    //TODO FACTORIA DE INPUTS
+                    //$this->inputs[$input_identifier] = new StackInput($input_data);
                 }
 
                 foreach ($array_internal['potential_response_trees'] as $prt_identifier => $potential_response_tree_data) {
