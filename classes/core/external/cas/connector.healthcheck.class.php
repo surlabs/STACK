@@ -166,11 +166,11 @@ class stack_cas_healthcheck {
             // Intentionally use get_string for the sample CAS and plots, so we don't render
             // the maths too soon.
             $this->output_cas_text('healthcheckconnect',
-                StackPlatform::getTranslation('healthcheckconnectintro', null), StackPlatform::getTranslation('healthchecksamplecas'));
+                StackPlatform::getTranslation('healthcheckconnectintro'), StackPlatform::getTranslation('healthchecksamplecas'));
             $this->output_cas_text('healthcheckconnectunicode',
-                StackPlatform::getTranslation('healthcheckconnectintro', null), StackPlatform::getTranslation('healthchecksamplecasunicode'));
+                StackPlatform::getTranslation('healthcheckconnectintro'), StackPlatform::getTranslation('healthchecksamplecasunicode'));
             $this->output_cas_text('healthcheckplots',
-                StackPlatform::getTranslation('healthcheckplotsintro', null), StackPlatform::getTranslation('healthchecksampleplots'));
+                StackPlatform::getTranslation('healthcheckplotsintro'), StackPlatform::getTranslation('healthchecksampleplots'));
         }*/
 
         // If we have a linux machine, and we are testing the raw connection then we should
@@ -263,9 +263,12 @@ class stack_cas_healthcheck {
     /*
      * Try and evaluate the raw castext and build a result entry.
      */
-    private function output_cas_text($title, $intro, $castext) {
+    /**
+     * @throws StackException
+     */
+    private function output_cas_text($title, $intro, $castext): void
+    {
         $ct = castext2_evaluatable::make_from_source($castext, 'healthcheck');
-            var_dump($castext);exit;
         $session = new stack_cas_session2([$ct]);
         $session->instantiate();
 
@@ -290,7 +293,8 @@ class stack_cas_healthcheck {
     /*
      * This function returns a summary of the status of the healthcheck.
      */
-    public function get_test_results() {
+    public function get_test_results(): array
+    {
         return $this->tests;
     }
 
