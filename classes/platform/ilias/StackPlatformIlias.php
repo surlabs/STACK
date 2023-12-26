@@ -108,7 +108,7 @@ class StackPlatformIlias extends StackPlatform
      * Called at ilias question object creation
      * @return ilPlugin|null
      */
-    public static function initIliasPlugin(): ?ilPlugin
+    public static function getPlugin(): ?ilPlugin
     {
         global $DIC;
 
