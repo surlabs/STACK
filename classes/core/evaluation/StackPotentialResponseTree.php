@@ -111,7 +111,7 @@ class StackPotentialResponseTree
      */
     public function isFormative(): bool
     {
-        return $this->feedbackStyle === 0;
+        return $this->feedback_style === 0;
     }
 
     /**
@@ -200,11 +200,11 @@ class StackPotentialResponseTree
         $order = [];
         $visited = [];
 
-        if ($this->firstNode === '') {
-            $this->firstNode = array_keys($this->nodes)[0];
+        if ($this->first_node === '') {
+            $this->first_node = array_keys($this->nodes)[0];
         }
 
-        $this->poRecurse($this->nodes[$this->firstNode], $order, $visited);
+        $this->poRecurse($this->nodes[$this->first_node], $order, $visited);
         return array_reverse($order);
     }
 
@@ -219,16 +219,16 @@ class StackPotentialResponseTree
      */
     private function poRecurse(object $node, array &$postorder, array &$visited): void
     {
-        $truenode = $this->getNode($node->truenextnode);
-        $falsenode = $this->getNode($node->falsenextnode);
+        $true_node = $this->getNode($node->truenextnode);
+        $false_node = $this->getNode($node->falsenextnode);
         $visited[$node->nodename] = $node;
 
-        if ($truenode != null && !array_key_exists($truenode->nodename, $visited)) {
-            $this->poRecurse($truenode, $postorder, $visited);
+        if ($true_node != null && !array_key_exists($true_node->nodename, $visited)) {
+            $this->poRecurse($true_node, $postorder, $visited);
         }
 
-        if ($falsenode != null && !array_key_exists($falsenode->nodename, $visited)) {
-            $this->poRecurse($falsenode, $postorder, $visited);
+        if ($false_node != null && !array_key_exists($false_node->nodename, $visited)) {
+            $this->poRecurse($false_node, $postorder, $visited);
         }
 
         $postorder[] = $node;
