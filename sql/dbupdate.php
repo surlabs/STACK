@@ -867,5 +867,10 @@ if ($db->tableExists('xqcas_options')) {
 ?>
 <#44>
 <?php
-//TODO if connection config set to 'unix' change it to 'linux' to match the new syntax
+global $DIC;
+$db = $DIC->database();
+
+if ($db->tableExists('xqcas_configuration')) {
+    $db->update("xqcas_configuration", array("value" => array("clob", "linux")), array("parameter_name" => array("text", "platform_type"), "value" => array("clob", "unix")));
+}
 ?>
