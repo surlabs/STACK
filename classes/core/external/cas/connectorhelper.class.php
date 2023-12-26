@@ -364,7 +364,8 @@ abstract class stack_connection_helper {
      * This function is in this class, rather than installhelper.class.php, to
      * ensure the lowest level connection to the CAS, without caching.
      */
-    public static function stackmaxima_auto_maxima_optimise($genuinedebug) {
+    public static function stackmaxima_auto_maxima_optimise($genuinedebug): array
+    {
         global $CFG;
         self::ensure_config_loaded();
 
@@ -372,13 +373,13 @@ abstract class stack_connection_helper {
 
         $lisp = '1';
         // Try to guess the lisp version.
-        if (!(false === strpos($genuinedebug, 'GNU Common Lisp (GCL)'))) {
+        if (!(!str_contains($genuinedebug, 'GNU Common Lisp (GCL)'))) {
             $lisp = 'GCL';
         }
-        if (!(false === strpos($genuinedebug, 'Lisp SBCL'))) {
+        if (!(!str_contains($genuinedebug, 'Lisp SBCL'))) {
             $lisp = 'SBCL';
         }
-        if (!(false === strpos($genuinedebug, 'Lisp CLISP'))) {
+        if (!(!str_contains($genuinedebug, 'Lisp CLISP'))) {
             $lisp = 'CLISP';
         }
 

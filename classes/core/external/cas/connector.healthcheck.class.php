@@ -31,17 +31,16 @@ use classes\platform\StackPlatform;
 
 class stack_cas_healthcheck {
     /* This variable holds the state of the healthcheck. */
-    protected $ishealthy = true;
+    protected bool $ishealthy = true;
 
-    protected $config = null;
+    protected array $config = array();
 
-    protected $tests = array();
+    protected array $tests = array();
 
     /**
      * @throws StackException
      */
     public function __construct($config) {
-        global $CFG;
         $this->config = $config;
 
         // Record the platform in the summary.
@@ -62,8 +61,8 @@ class stack_cas_healthcheck {
             $test['result'] = $result;
             $test['summary'] = $message;
             $test['details'] = StackPlatform::createTag('p', $message);
-            $test['details'] .= StackPlatform::createTag('p', StackPlatform::getTranslation('settingmaximalibraries_failed', null));
-            $test['details'] .= StackPlatform::createTag('p', StackPlatform::getTranslation('settingmaximalibraries_desc', null));
+            $test['details'] .= StackPlatform::createTag('p', StackPlatform::getTranslation('settingmaximalibraries_failed'));
+            $test['details'] .= StackPlatform::createTag('p', StackPlatform::getTranslation('settingmaximalibraries_desc'));
             $this->tests[] = $test;
         }
 
@@ -153,7 +152,7 @@ class stack_cas_healthcheck {
             $test['tag'] = 'healthuncached';
             $test['result'] = $result;
             $test['summary'] = $message;
-            $test['details'] = StackPlatform::createTag('p', StackPlatform::getTranslation('healthuncachedintro', null)) . $message;
+            $test['details'] = StackPlatform::createTag('p', StackPlatform::getTranslation('healthuncachedintro')) . $message;
             if (is_string($genuinedebug)) {
                 $test['details'] .= $genuinedebug;
             }
@@ -178,13 +177,13 @@ class stack_cas_healthcheck {
         // attempt to automatically create an optimized maxima image on the system.
         //SUR $config->platform to $config['platform_type']
         if ($this->ishealthy && $config['platform_type'] === 'linux') {
-            list($message, $debug, $result, $commandline, $rawcommand)
-                = stack_connection_helper::stackmaxima_auto_maxima_optimise($genuinedebug);
+            list($message, $debug, $result)
+                = stack_connection_helper::stackmaxima_auto_maxima_optimise($genuinedebug ?? '');
             $test = array();
             $test['tag'] = 'healthautomaxopt';
             $test['result'] = $result;
             $test['summary'] = $message;
-            $test['details'] = StackPlatform::createTag('p', StackPlatform::getTranslation('healthautomaxoptintro', null));
+            $test['details'] = StackPlatform::createTag('p', StackPlatform::getTranslation('healthautomaxoptintro'));
             $test['details'] .= StackPlatform::createTag('pre', $debug);
             $this->tests[] = $test;
         }
@@ -232,7 +231,7 @@ class stack_cas_healthcheck {
                 $this->ishealthy = false;
                 $result = false;
                 $message = 'healthchecksstacklibrariesworkingsession';
-                $details = array('err' => $session->get_errors(true));
+                $details = array('err' => $session->get_errors());
             }
 
             $test = array();
@@ -256,7 +255,7 @@ class stack_cas_healthcheck {
         $test['tag'] = 'settingcasresultscache';
         $test['result'] = null;
         //SUR $config->casresultscache to $config['cas_result_caching']
-        $test['summary'] = StackPlatform::getTranslation('healthcheckcache_' . $config['cas_result_caching'], null);
+        $test['summary'] = StackPlatform::getTranslation('healthcheckcache_' . $config['cas_result_caching']);
         $test['details'] = null;
         $this->tests[] = $test;
     }
@@ -279,9 +278,9 @@ class stack_cas_healthcheck {
         if ($session->get_errors()) {
             $this->ishealthy = false;
             $test['result'] = false;
-            $test['summary'] = StackPlatform::getTranslation('errors', null) . $ct->get_errors();
-            $test['details'] .= StackPlatform::getTranslation('errors', null) . $ct->get_errors();
-            $test['details'] .= StackPlatform::getTranslation('debuginfo', null) . $session->get_debuginfo();
+            $test['summary'] = StackPlatform::getTranslation('errors') . $ct->get_errors();
+            $test['details'] .= StackPlatform::getTranslation('errors') . $ct->get_errors();
+            $test['details'] .= StackPlatform::getTranslation('debuginfo') . $session->get_debuginfo();
         } else {
             $test['details'] .= StackPlatform::createTag('p', StackParser::stackOuputCastext($ct->get_rendered()));
         }
