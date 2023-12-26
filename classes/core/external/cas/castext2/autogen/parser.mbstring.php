@@ -8,6 +8,11 @@
 
 namespace classes\core\external\cas\castext2\autogen;
 
+use classes\core\external\cas\castext2\CTP_Block;
+use classes\core\external\cas\castext2\CTP_Raw;
+use classes\core\external\cas\castext2\CTP_Root;
+use stdClass;
+
 /* Useful functions: */
 
 /* chr_unicode - get unicode character from its char code */
@@ -15,13 +20,15 @@ namespace classes\core\external\cas\castext2\autogen;
 use Exception;
 
 if (!function_exists("chr_unicode")) {
-    function chr_unicode($code) {
+    function chr_unicode($code): string
+    {
         return html_entity_decode("&#$code;", ENT_QUOTES, "UTF-8");
     }
 }
 /* ord_unicode - get unicode char code from string */
 if (!function_exists("ord_unicode")) {
-    function ord_unicode($character) {
+    function ord_unicode($character): float|int
+    {
         if (strlen($character) === 1) {
             return ord($character);
         }
@@ -37,8 +44,9 @@ if (!function_exists("ord_unicode")) {
 }
 /* peg_regex_test - multibyte regex test */
 if (!function_exists("peg_regex_test")) {
-    function peg_regex_test($pattern, $string) {
-        if (substr($pattern, -1) == "i") {
+    function peg_regex_test($pattern, $string): bool
+    {
+        if (str_ends_with($pattern, "i")) {
             return mb_eregi(substr($pattern, 1, -2), $string);
         } else {
             return mb_ereg(substr($pattern, 1, -1), $string);
@@ -56,7 +64,7 @@ if (!class_exists("SyntaxError", false)) {
         public $grammarColumn;
         public $name;
         public function __construct($message, $expected, $found, $offset, $line, $column) {
-            parent::__construct($message, 0);
+            parent::__construct($message);
             $this->expected = $expected;
             $this->found = $found;
             $this->grammarOffset = $offset;

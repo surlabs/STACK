@@ -84,7 +84,39 @@ class StackConfig {
      * @return mixed
      */
     public static function get(string $key): mixed {
-        return self::$config[$key];
+        return self::$config[$key] ?? self::getFromDB($key);
+    }
+
+    /**
+     * Gets the platform configuration value for a given key from the database
+     * @param string $key
+     * @return mixed
+     * @throws StackException
+     */
+    public static function getFromDB(string $key): mixed {
+        $config = StackDatabase::select('xqcas_configuration', array(
+            'parameter_name' => $key
+        ));
+
+        if (count($config) > 0) {
+            $json_decoded = json_decode($config[0]['value'], true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $config[0]['value'] = $json_decoded;
+            }
+
+            self::$config[$key] = $config[0]['value'];
+
+            if (!isset(self::$categories[$config[0]['group_name']])) {
+                self::$categories[$config[0]['group_name']] = array();
+            }
+
+            self::$categories[$key] = $config[0]['group_name'];
+
+            return $config[0]['value'];
+        } else {
+            return null;
+        }
     }
 
     /**

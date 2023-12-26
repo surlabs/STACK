@@ -31,10 +31,11 @@ use classes\core\external\maximaparser\MP_String;
 class stack_ast_filter_610_castext_static_string_extractor implements stack_cas_astfilter_parametric {
 
     // A reference to the extractor.
-    private castext2_static_replacer $extractor;
+    private ?castext2_static_replacer $extractor;
 
-    public function set_filter_parameters(array $parameters) {
-        $this->extractor = isset($parameters['static string extractor']) ? $parameters['static string extractor'] : null;
+    public function set_filter_parameters(array $parameters): void
+    {
+        $this->extractor = $parameters['static string extractor'] ?? null;
     }
 
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {

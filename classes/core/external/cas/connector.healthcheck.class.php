@@ -160,8 +160,6 @@ class stack_cas_healthcheck {
         }
 
         // Test Maxima connection.
-        //TODO ADD PLOTS AND STUFF
-        /*
         if ($this->ishealthy) {
             // Intentionally use get_string for the sample CAS and plots, so we don't render
             // the maths too soon.
@@ -171,7 +169,7 @@ class stack_cas_healthcheck {
                 StackPlatform::getTranslation('healthcheckconnectintro'), StackPlatform::getTranslation('healthchecksamplecasunicode'));
             $this->output_cas_text('healthcheckplots',
                 StackPlatform::getTranslation('healthcheckplotsintro'), StackPlatform::getTranslation('healthchecksampleplots'));
-        }*/
+        }
 
         // If we have a linux machine, and we are testing the raw connection then we should
         // attempt to automatically create an optimized maxima image on the system.
@@ -285,7 +283,7 @@ class stack_cas_healthcheck {
             $test['details'] .= StackPlatform::getTranslation('errors') . $ct->get_errors();
             $test['details'] .= StackPlatform::getTranslation('debuginfo') . $session->get_debuginfo();
         } else {
-            $test['details'] .= StackPlatform::createTag('p', StackParser::stackOuputCastext($ct->get_rendered()));
+            $test['details'] .= StackPlatform::createTag('p', StackParser::stackOutputCastext($ct->get_rendered()));
         }
         $this->tests[] = $test;
     }

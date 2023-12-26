@@ -498,7 +498,7 @@ abstract class StackInput
     public function renderValidation()
     {
         //TODO: Implement renderValidation() method.
-        // First we have to implement static methods stack_ast_container::make_from_teacher_source, stack_maths::process_lang_string
+        // First we have to implement static methods stack_ast_container::make_from_teacher_source, StackMaths::processLangString
     }
 
     /**

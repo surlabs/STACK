@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace classes\core\filters;
 
+use classes\core\maths\StackMaths;
+use classes\core\security\StackException;
 use classes\platform\StackPlatform;
 use stdClass;
 
@@ -185,36 +187,49 @@ class StackParser
      * not the quotes.
      *
      * @param string $string
+     * @param string $left
+     * @param string|null $right
+     * @param bool $skipempty
      * @return array
      */
-    public static function allSubstringStrings(string $string): array
-    {
-        $strings = array();
-        $i = 0;
-        $lastslash = false;
-        $instring = false;
-        $stringentry = -1;
-        while ($i < strlen($string)) {
-            $c = $string[$i];
-            $i++;
-            if ($instring) {
-                if ($c == '"' && !$lastslash) {
-                    $instring = false;
-                    // Last -1 to drop the quote.
-                    $s = substr($string, $stringentry, ($i - $stringentry) - 1);
-                    $strings[] = $s;
-                } else if ($c == "\\") {
-                    $lastslash = !$lastslash;
-                } else if ($lastslash) {
-                    $lastslash = false;
-                }
-            } else if ($c == '"') {
-                $instring = true;
-                $lastslash = false;
-                $stringentry = $i;
-            }
+    public static function allSubstringStrings(string $string, string $left, ?string $right = null, bool $skipempty = false): array {
+        if ($right == null) {
+            $right = $left;
         }
-        return $strings;
+
+        $char = str_split($string);
+        $length = count($char);
+        $var = array();
+        $j = 0;
+        $i = 0;
+        $start = false;
+        $found = '';
+        while ($i < $length) {
+            if (!$start) {
+                // Find starting @.
+                if ($char[$i] == $left) {
+                    $start = true;
+                    $found .= $char[$i];
+                }
+            } else {
+                // We have the first @ find ending @.
+                $found .= $char[$i];
+                if ($char[$i] == $right) {
+                    // End of cas command found.
+                    $found = str_replace($left, '', $found);
+                    $found = str_replace($right, '', $found);
+                    $found = trim($found);
+                    if (!$skipempty || $found) {
+                        $var[$j] = $found;
+                    }
+                    $j++;
+                    $found = '';
+                    $start = false;
+                }
+            }
+            $i++;
+        }
+        return $var;
     }
 
     /**
@@ -378,14 +393,16 @@ class StackParser
     /**
      * Imported from Moodle
      * @param string $text
-     * @param int $format
-     * @param $options
+     * @param null $options
      * @return string
      */
-    public static function format_text(string $text, int $format, $options = null) :string {
+    public static function formatText(string $text, $options = null) :string {
         if (is_null($options)) {
             $options = new stdClass;
+        } elseif (is_array($options)) {
+            $options = (object) $options;
         }
+
         //some sensible defaults
         if (!isset($options->para)) {
             $options->para = false;
@@ -407,9 +424,9 @@ class StackParser
      *
      * @param $castext
      * @return string
+     * @throws StackException
      */
-    public static function stackOuputCastext($castext) {
-        //TODO: Class stack_maths
-        return self::format_text(stack_maths::process_display_castext($castext), StackUtils::FORMAT_HTML, array('noclean' => true));
+    public static function stackOutputCastext($castext): string {
+        return self::formatText(StackMaths::processDisplayCastext($castext), array('noclean' => true));
     }
 }
