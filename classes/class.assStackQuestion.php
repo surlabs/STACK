@@ -1,329 +1,115 @@
 <?php
-/**
- * Copyright (c) Laboratorio de Soluciones del Sur, Sociedad Limitada
- * GPLv3, see LICENSE
- */
+declare(strict_types=1);
 
-require_once /** @lang text */
-'./Modules/TestQuestionPool/classes/class.assQuestion.php';
-
-// Interface for FormATest
-include_once /** @lang text */
-'./Modules/TestQuestionPool/interfaces/interface.iQuestionCondition.php';
+use classes\core\StackQuestion;
+use classes\platform\StackConfig;
+use classes\platform\StackPlatform;
+use classes\platform\ilias\StackPlatformIlias;
 
 /**
- * STACK Question OBJECT
+ * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
+ *  This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
+ *  originally created by Chris Sangwin.
  *
- * @author Jesús Copado Mejías <stack@surlabs.es>
- * @version $Id: 8.0$
- * @ingroup    ModulesTestQuestionPool
+ *  The STACK Question plugin for ILIAS is open-source and licensed under GPL-3.0.
+ *  For license details, visit https://www.gnu.org/licenses/gpl-3.0.en.html.
+ *
+ *  To report bugs or participate in discussions, visit the Mantis system and filter by
+ *  the category "STACK Question" at https://mantis.ilias.de.
+ *
+ *  More information and source code are available at:
+ *  https://github.com/surlabs/STACK
+ *
+ *  If you need support, please contact the maintainer of this software at:
+ *  stack@surlabs.es
  *
  */
 class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQuestionScoringAdjustable
 {
-    /* ILIAS CORE ATTRIBUTES BEGIN */
-
-    //plugin attributes
-
     /**
-     * @var ilPlugin
+     * @var ilPlugin Contains ilPlugin derived object
+     * like ilLanguage
      */
     private ilPlugin $plugin;
-
-    /* ILIAS CORE ATTRIBUTES END */
-
-    /* ILIAS VERSION SPECIFIC ATTRIBUTES BEGIN */
-
-    //plugin attributes
-
-    /**
-     * @var float|null
-     */
-    private ?float $reached_points = null;
-
-    /**
-     * @var int
-     */
-    private int $hidden = 0;
-
-    /**
-     * @var float
-     */
-    private float $penalty = 0.0;
-
-    /**
-     * @var array The user answer given in each input
-     */
-    private array $user_response = array();
-
-    /**
-     * @var bool true when question has been instantiated with a seed
-     */
-    private bool $instantiated = false;
-
-    /**
-     * @var array
-     */
-    private array $evaluation = array();
-
-    /* ILIAS VERSION SPECIFIC ATTRIBUTES END */
-
-    /* STACK CORE ATTRIBUTES BEGIN */
-
-    //question attributes
-
-    /**
-     * @var string STACK specific: Holds the version of the question when it was last saved.
-     */
-    public string $stack_version;
-
-    /**
-     * @var string|null STACK specific: variables, as authored by the teacher.
-     */
-    public ?string $question_variables;
-
-    /**
-     * @var string|null STACK specific: variables, as authored by the teacher.
-     */
-    public ?string $question_note;
-
-    /**
-     * @var string|null Any specific feedback for this question. This is displayed
-     * in the 'yellow' feedback area of the question. It can contain PRT_feedback
-     * tags, but not IE_feedback.
-     */
-    public ?string $specific_feedback;
-
-    /** @var int|null one of the FORMAT_... constants */
-    public ?int $specific_feedback_format;
-
-    /** @var string|null Feedback that is displayed for any PRT that returns a score of 1. */
-    public ?string $prt_correct;
-
-    /** @var int|null one of the FORMAT_... constants */
-    public ?int $prt_correct_format;
-
-    /** @var string|null Feedback that is displayed for any PRT that returns a score between 0 and 1. */
-    public ?string $prt_partially_correct;
-
-    /** @var int|null one of the FORMAT_... constants */
-    public ?int $prt_partially_correct_format;
-
-    /** @var string|null Feedback that is displayed for any PRT that returns a score of 0. */
-    public ?string $prt_incorrect;
-
-    /** @var int|null one of the FORMAT_... constants */
-    public ?int $prt_incorrect_format;
-
-    /** @var string|null if set, this is used to control the pseudo-random generation of the seed. */
-    public ?string $variants_selection_seed;
-
-    /**
-     * @var stack_input[] STACK specific: string name as it appears in the question text => stack_input
-     */
-    public array $inputs = array();
-
-    /**
-     * @var stack_potentialresponse_tree[] STACK specific: responses tree number => ...
-     */
-    public array $prts = array();
-
-    /**
-     * @var stack_options STACK specific: question-level options.
-     */
-    public stack_options $options;
-
-    /**
-     * @var int[] of seed values that have been deployed.
-     */
-    public array $deployed_seeds;
-
-    /**
-     * @var int|null STACK specific: seeds Maxima's random number generator.
-     */
-    public ?int $seed = null;
-
-    /**
-     * @var array Question Unit Tests.
-     */
-    public array $unit_tests = array();
-
-    /**
-     * @var stack_cas_session2 STACK specific: session of variables.
-     */
-    protected stack_cas_session2 $session;
-
-    /**
-     * @var stack_ast_container[] STACK specific: the teacher's answers for each input.
-     */
-    private array $tas;
-
-    /**
-     * @var stack_cas_security the question level common security
-     * settings, i.e. forbidden keys and whether units are in play.
-     * Note that the security-object is used to enforce read-only
-     * identifiers and therefore whether we are dealing with units
-     * is important to it, as obviously one should not redefine units.
-     */
-    private stack_cas_security $security;
-
-    /**
-     * Sometimes as cas session sometimes string no type declaration
-     * @var stack_cas_session2|string|bool STACK specific: session of variables.
-     */
-    protected $question_note_instantiated;
-
-    /**
-     * @var string|null instantiated version of question_text.
-     * Initialised in start_attempt / apply_attempt_state.
-     */
-    public ?string $question_text_instantiated;
-
-    /**
-     * @var string|null instantiated version of specific_feedback.
-     * Initialised in start_attempt / apply_attempt_state.
-     */
-    public ?string $specific_feedback_instantiated;
-
-    /**
-     * @var string|null instantiated version of prt_correct.
-     * Initialised in start_attempt / apply_attempt_state.
-     */
-    public ?string $prt_correct_instantiated;
-
-    /**
-     * @var string|null instantiated version of prt_partially_correct.
-     * Initialised in start_attempt / apply_attempt_state.
-     */
-    public ?string $prt_partially_correct_instantiated;
-
-    /**
-     * @var string|null instantiated version of prt_incorrect.
-     * Initialised in start_attempt / apply_attempt_state.
-     */
-    public ?string $prt_incorrect_instantiated;
-
-    /**
-     * @var array Errors generated at runtime.
-     * Any errors are stored as the keys to prevent duplicates.  Values are ignored.
-     */
-    public array $runtime_errors = array();
-
-    /**
-     * The next three fields cache the results of some expensive computations.
-     * The cache is only valid for a particular response, so we store the current
-     * response, so that we can learn the cached information in the result changes.
-     * See {@link validate_cache()}.
-     * @var array|null
-     */
-    protected ?array $last_response = null;
-
-    /**
-     * @var bool|null like $last_response, but for the $accept_valid argument to {@link validate_cache()}.
-     */
-    protected ?bool $last_accept_valid = null;
-
-    /**
-     * @var stack_input_state[] input name => stack_input_state.
-     * This caches the results of validate_student_response for $last_response.
-     */
-    protected array $input_states = array();
-
-    /**
-     * @var array prt name => result of evaluate_response, if known.
-     */
-    protected array $prt_results = array();
-
-    /**
-     * @var array set of expensive to evaluate but static things.
-     */
-    public array $compiled_cache = [];
-
-    //questionbase attributes
-
-    /**
-     * @var string|null question general feedback.
-     */
-    public $general_feedback;
-
-    /* STACK CORE ATTRIBUTES END */
-
-    /* ILIAS REQUIRED METHODS BEGIN */
-
-    /**
-     * @return string ILIAS question type name
-     */
-    public function getQuestionType(): string
+    public function getPlugin(): ilPlugin
     {
-        return "assStackQuestion";
+        return $this->plugin;
     }
-
-    /*Used in Feedback Button on Question List at non started Test*/
-    public function getAnswers()
+    public function setPlugin(ilPlugin $plugin): void
     {
-        return array();
+        $this->plugin = $plugin;
     }
 
     /**
-     * CONSTRUCTOR.
+     * @var array Contains the platform data
+     */
+    private array $platform_data = [];
+    public function getPlatformData(): array
+    {
+        return $this->platform_data;
+    }
+    public function setPlatformData(array $platform_data): void
+    {
+        $this->platform_data = $platform_data;
+    }
+
+    /**
+     * @var array Contains the question data
+     */
+    private array $stack_question_data = [];
+    public function getStackQuestionData(): array
+    {
+        return $this->stack_question_data;
+    }
+    public function setStackQuestionData(array $stack_question_data): void
+    {
+        $this->stack_question_data = $stack_question_data;
+    }
+
+    /**
+     * @var StackQuestion Contains the stack question object
+     */
+    private StackQuestion $stack_question;
+    public function getStackQuestion(): StackQuestion
+    {
+        return $this->stack_question;
+    }
+    public function setStackQuestion(StackQuestion $stack_question): void
+    {
+        $this->stack_question = $stack_question;
+    }
+
+    /**
+     * ILIAS STACK QUESTION CONSTRUCTOR
      * @param string $title
      * @param string $comment
      * @param string $author
      * @param int $owner
      * @param string $question
      */
-    function __construct($title = "", $comment = "", $author = "", $owner = -1, $question = "")
+    function __construct(
+        string $title = "",
+        string $comment = "",
+        string $author = "",
+        int    $owner = -1,
+        string $question = ""
+    )
     {
         parent::__construct($title, $comment, $author, $owner, $question);
 
-        // init the plugin object
-        try {
-            global $DIC;
-
-            /** @var ilComponentRepository $component_repository */
-            $component_repository = $DIC["component.repository"];
-
-            $info = null;
-            try {
-                $plugin_name = 'assStackQuestion';
-                $info = $component_repository->getPluginByName($plugin_name);
-            } catch (InvalidArgumentException $e) {
-            }
-
-            /** @var ilComponentFactory $component_factory */
-            $component_factory = $DIC["component.factory"];
-
-            /** @var ilQuestionsPlugin $plugin_obj */
-            $plugin_obj = $component_factory->getPlugin($info->getId());
-
-            if (!is_null($info) && $info->isActive()) {
-                $this->setPlugin($plugin_obj);
-            }else{
-                echo "plugin obj";exit;
-            }
-        } catch (ilPluginException $e) {
-            global $tpl;
-            $tpl->setOnScreenMessage('failure', $e->getMessage(), true);
+        try{
+            StackPlatform::initialize('ilias');
+            //Set plugin object
+            $this->setPlugin(StackPlatformIlias::getPlugin());
+            //Get stored settings from the platform database
+            $this->setPlatformData(StackConfig::getAll());
+            //Get static data of the current question
+            //TODO traer efectivamente los datos de la pregunta la id nos la trae la clase padre
+            $this->setStackQuestionData(StackQuestion::getAll($this->getId()));
+        } catch (Exception $e) {
+            //TODO ERROR MESSAGE
         }
-
-        //Initialise some parameters
-        $this->tas = array();
-        //For some reason we should initialize lasttime for new questions, it seems not been donE in assQuestion Constructor
-        $this->setLastChange(time());
-
-        //Initialize some STACK required parameters
-        /*
-        require_once __DIR__ . '/utils/class.assStackQuestionInitialization.php';
-        require_once(__DIR__ . '/stack/input/factory.class.php');
-        require_once(__DIR__ . '/stack/cas/keyval.class.php');
-        require_once(__DIR__ . '/stack/cas/castext.class.php');
-        require_once(__DIR__ . '/stack/cas/cassecurity.class.php');
-        require_once(__DIR__ . '/stack/potentialresponsetree.class.php');
-        require_once(__DIR__ . '/utils/locallib.php');
-        require_once(__DIR__ . '/stack/cas/secure_loader.class.php');*/
     }
-
-    //assQuestion abstract methods
 
     /**
      * Saves evaluation to user response in Test into tst_solutions
@@ -332,61 +118,10 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param bool $authorized
      * @return bool
      */
-    public function saveWorkingData($active_id, $pass = null, $authorized = true): bool
+    public function saveWorkingData(int $active_id, $pass = null, bool $authorized = true): bool
     {
-        /** @var $ilDB ilDBInterface */
-        global $DIC;
-        $db = $DIC->database();
-
-        if (is_null($pass)) {
-            include_once /** @lang text */
-            "./Modules/Test/classes/class.ilObjTest.php";
-            $pass = ilObjTest::_getPass($active_id);
-        }
-
-        //Determine seed for current test run
-        $seed = assStackQuestionDB::_getSeedForTestPass($this, $active_id, $pass);
-
-        $entered_values = 0;
-        $user_solution = $this->getSolutionSubmit();
-
-        //debug
-        if (isset($user_solution['test_player_navigation_url'])) {
-            $navigation_url = $user_solution['test_player_navigation_url'];
-            unset($user_solution['test_player_navigation_url']);
-        }
-
-        //Instantiate Question if not.
-        if (!$this->isInstantiated()) {
-            $this->questionInitialisation($seed, true);
-        }
-
-        //Evaluate Question if not.
-        if (empty($this->getEvaluation())) {
-            $this->evaluateQuestion($user_solution);
-        }
-
-        //Save user test solution
-        $this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function () use (&$entered_values, $active_id, $pass, $authorized) {
-            //Remove previous solution
-            $this->removeCurrentSolution($active_id, $pass, $authorized);
-            //Add current solution
-            $entered_values = assStackQuestionDB::_saveUserTestSolution($this, $active_id, $pass, $authorized);
-        });
-
-        include_once/** @lang text */
-        ('./Modules/Test/classes/class.ilObjAssessmentFolder.php');
-
-        if ($entered_values) {
-            if (ilObjAssessmentFolder::_enabledAssessmentLogging()) {
-                assQuestion::logAction($this->lng->txtlng('assessment', 'log_user_entered_values', ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-            }
-        } else {
-            if (ilObjAssessmentFolder::_enabledAssessmentLogging()) {
-                assQuestion::logAction($this->lng->txtlng('assessment', 'log_user_not_entered_values', ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-            }
-        }
-
+        //TODO Esto tiene que rehacerse entero mágicamente
+        //mientras tanto
         return true;
     }
 
@@ -394,34 +129,15 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * Calculates points reached in Test
      * @param int $active_id
      * @param null $pass
-     * @param bool $authorized_solution
-     * @param false $return_details
+     * @param bool $authorizedSolution
+     * @param false $returndetails
      * @return float|int
      */
-    public function calculateReachedPoints($active_id, $pass = null, $authorized_solution = true, $return_details = false)
+    public function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): float|int
     {
-        global $DIC;
-        $db = $DIC->database();
-
-
-        if (is_null($pass)) {
-            $pass = $this->getSolutionMaxPass($active_id);
-        }
-
-        // get all saved part solutions with points assigned
-        $result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorized_solution);
-
-        // in some cases points may have been saved twice (see saveWorkingDataValue())
-        // so collect them by the part result (value1)
-        // and summarize them afterwards
-        $points = array();
-
-        if (!empty($result)) {
-            while ($row = $db->fetchAssoc($result)) {
-                $points[$row['value1']] = (float)$row['points'];
-            }
-        }
-        return array_sum($points);
+        //TODO Esto tiene que rehacerse entero mágicamente
+        //mientras tanto
+        return 1;
     }
 
 
@@ -814,7 +530,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
                             $input_data['type'], $input_data['name'], $input_data['tans'], $this->options, $parameters
                         );
                     }
-                }else{
+                } else {
                     $new_inputs[$name] = '';
                 }
             }
@@ -888,7 +604,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
                                     //Create Node and add it to the
                                     $node = new stack_potentialresponse_node(
                                         $sans, $tans, $node_data['answer_test'], $node_data['test_options'],
-                                        (bool) $node_data['quiet'], '', (int) $node_name, $node_data['sans'],
+                                        (bool)$node_data['quiet'], '', (int)$node_name, $node_data['sans'],
                                         $node_data['tans']
                                     );
 
@@ -934,8 +650,8 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
 
                         try {
                             $this->prts[$prt_name] = new stack_potentialresponse_tree(
-                                $prt_name, '', (bool) $prt_data['auto_simplify'], $prt_value, $feedback_variables,
-                                $nodes, (string) $prt_data['first_node_name'], 1
+                                $prt_name, '', (bool)$prt_data['auto_simplify'], $prt_value, $feedback_variables,
+                                $nodes, (string)$prt_data['first_node_name'], 1
                             );
                         } catch (stack_exception $e) {
                             global $tpl;
@@ -1018,7 +734,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         return $parsed_user_response_from_db;
     }
 
-    public function getOldTestOutputSolutions ($activeId, $pass): array
+    public function getOldTestOutputSolutions($activeId, $pass): array
     {
         $solution = parent::getTestOutputSolutions($activeId, $pass);
 
@@ -1048,74 +764,55 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $question_id = $this->getId();
         }*/
 
-        foreach ($db_values as $index => $value)
-        {
+        foreach ($db_values as $index => $value) {
             //if ($value['value1'] == 'xqcas_text_' . $question_id)
-            if ($value['value1'] == 'xqcas_text_' . $value['question_fi'])
-            {
+            if ($value['value1'] == 'xqcas_text_' . $value['question_fi']) {
                 $results['question_text'] = $value['value2'];
                 $results['id'] = $value['question_fi'];
                 $results['points'] = (float)$value['points'];
 
                 unset($db_values[$index]);
-            } elseif ($value['value1'] == 'xqcas_solution_' . $value['question_fi'])
-            {
+            } elseif ($value['value1'] == 'xqcas_solution_' . $value['question_fi']) {
                 $results['question_note'] = $value['value2'];
                 unset($db_values[$index]);
-            } elseif ($value['value1'] == 'xqcas_general_feedback_' . $value['question_fi'])
-            {
+            } elseif ($value['value1'] == 'xqcas_general_feedback_' . $value['question_fi']) {
                 $results['general_feedback'] = $value['value2'];
                 unset($db_values[$index]);
-            } elseif ($value['value1'] == 'xqcas_question_' . $value['question_fi']. '_seed')
-            {
+            } elseif ($value['value1'] == 'xqcas_question_' . $value['question_fi'] . '_seed') {
                 $results['seed'] = $value['value2'];
                 unset($db_values[$index]);
-            } else
-            {
-                foreach ($this->prts as $prt_name => $prt)
-                {
-                    if ($value['value1'] == 'xqcas_prt_' . $prt_name . '_name')
-                    {
+            } else {
+                foreach ($this->prts as $prt_name => $prt) {
+                    if ($value['value1'] == 'xqcas_prt_' . $prt_name . '_name') {
                         $results['prt'][$prt_name]['points'] = $value['points'];
                         unset($db_values[$index]);
-                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_errors')
-                    {
+                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_errors') {
                         $results['prt'][$prt_name]['errors'] = $value['value2'];
                         unset($db_values[$index]);
-                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_feedback')
-                    {
+                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_feedback') {
                         $results['prt'][$prt_name]['feedback'] = $value['value2'];
                         unset($db_values[$index]);
-                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_status')
-                    {
+                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_status') {
                         $results['prt'][$prt_name]['status']['value'] = $value['value2'];
                         unset($db_values[$index]);
-                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_status_message')
-                    {
+                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_status_message') {
                         $results['prt'][$prt_name]['status']['message'] = $value['value2'];
                         unset($db_values[$index]);
-                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_answernote')
-                    {
+                    } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_answernote') {
                         $results['prt'][$prt_name]['answernote'] = $value['value2'];
                         unset($db_values[$index]);
-                    } else
-                    {
-                        foreach ($this->inputs as $input_name => $input)
-                        {
-                            if ($value['value1'] == 'xqcas_prt_' . $prt_name . '_value_' . $input_name)
-                            {
+                    } else {
+                        foreach ($this->inputs as $input_name => $input) {
+                            if ($value['value1'] == 'xqcas_prt_' . $prt_name . '_value_' . $input_name) {
                                 $results['prt'][$prt_name]['response'][$input_name]['value'] = $value['value2'];
                                 unset($db_values[$index]);
-                            } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_display_' . $input_name)
-                            {
+                            } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_display_' . $input_name) {
                                 $results['prt'][$prt_name]['response'][$input_name]['display'] = $value['value2'];
                                 unset($db_values[$index]);
-                            } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_model_answer_' . $input_name)
-                            {
+                            } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_model_answer_' . $input_name) {
                                 $results['prt'][$prt_name]['response'][$input_name]['model_answer'] = $value['value2'];
                                 unset($db_values[$index]);
-                            } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_model_answer_display_' . $input_name)
-                            {
+                            } elseif ($value['value1'] == 'xqcas_prt_' . $prt_name . '_model_answer_display_' . $input_name) {
                                 $results['prt'][$prt_name]['response'][$input_name]['model_answer_display'] = $value['value2'];
                                 unset($db_values[$index]);
                             }
@@ -1128,7 +825,8 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         return $results;
     }
 
-    function oldTestImportIdFinder($string, $starts_with) {
+    function oldTestImportIdFinder($string, $starts_with)
+    {
         if (substr($string, 0, strlen($starts_with)) === $starts_with) {
             return substr($string, strlen($starts_with));
         }
@@ -2296,20 +1994,15 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * Enable the renderer to access the teacher's answer in the session.
      * TODO: should we give the whole thing?
      * @param string $input_name
-     * @return string|bool|stack_ast_container[]|stack_ast_container
      */
     public function getTeacherAnswerForInput(string $input_name): string
     {
-        try {
-            if ($this->getTas($input_name)->is_correctly_evaluated()) {
-                return $this->getTas($input_name);
-            }
-            return true;
-        } catch (stack_exception $e) {
-            global $tpl;
-            $tpl->setOnScreenMessage('failure', $e->getMessage(), true);
-            return false;
+        if (array_key_exists($input_name, $this->getTas())) {
+            return $this->getTas($input_name)->get_value();
+        } else {
+            return '';
         }
+
     }
 
     /* classify_response(array $response) not required as it is only Moodle relevant */
@@ -2380,21 +2073,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
 
     /* GETTERS AND SETTERS BEGIN */
 
-    /**
-     * @return ilPlugin
-     */
-    public function getPlugin(): ilPlugin
-    {
-        return $this->plugin;
-    }
 
-    /**
-     * @param ilPlugin $plugin
-     */
-    public function setPlugin(ilPlugin $plugin): void
-    {
-        $this->plugin = $plugin;
-    }
 
 
     /**
@@ -3285,5 +2964,14 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     public function getAnswerTableName()
     {
         // TODO: Implement getAnswerTableName() method.
+    }
+
+    /**
+     * Now uses ilassStackQuestionPlugin getQuestionType() method
+     * @return string ILIAS question type name
+     */
+    public function getQuestionType(): string
+    {
+        return $this->plugin->getQuestionType();
     }
 }
