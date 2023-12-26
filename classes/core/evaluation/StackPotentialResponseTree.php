@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace classes\core\evaluation;
+
 use classes\core\maxima\StackSession;
 use classes\core\StackQuestion;
 use classes\platform\StackPlatform;
@@ -30,36 +31,38 @@ class StackPotentialResponseTree
     private int $id;
     private string $name;
     private bool $simplify;
-    private int $feedbackStyle;
+    private int $feedback_style;
     private float $value;
-    private StackSession $feedbackVariables;
+    private StackSession $feedback_variables;
     private object $nodes;
-    private string $firstNode;
+    private string $first_node;
     private ?StackQuestion $question;
     private array $trace;
 
-    public function __construct(stdClass $prtdata, float $value, StackQuestion $question = null)
+    public function __construct(array $prt_data, float $value, StackQuestion $question = null)
     {
-        if (property_exists($prtdata, 'id')) {
-            $this->id = $prtdata->id;
+        if (!isset($prt_data['id'])) {
+            $this->id = -1;
+        } else {
+            $this->id = (int)$prt_data['id'];
         }
 
-        $this->name = $prtdata->name;
-        $this->simplify = (bool)$prtdata->autosimplify;
-        $this->feedbackStyle = (int)$prtdata->feedbackstyle;
+        $this->name = $prt_data['name'];
+        $this->simplify = (bool)$prt_data['simplify'];
+        $this->feedback_style = (int)$prt_data['feedback_style'];
 
         $this->value = $value;
 
-        $this->feedbackVariables = $prtdata->feedbackvariables;
+        $this->feedback_variables = $prt_data['feedback_variables'];
 
-        $this->nodes = $prtdata->nodes;
+        $this->nodes = $prt_data['nodes'];
         foreach ($this->nodes as $node) {
             if (!property_exists($node, 'id')) {
                 $node->id = null;
             }
         }
 
-        $this->firstNode = (string)$prtdata->firstnodename;
+        $this->first_node = (string)$prt_data['first_node'];
 
         $this->question = $question;
 
@@ -90,15 +93,15 @@ class StackPotentialResponseTree
      */
     public function getFeedbackStyle(): int
     {
-        return $this->feedbackStyle;
+        return $this->feedback_style;
     }
 
     /**
      * @return mixed The keyval-bit for some version changes.
      */
-    public function getFeedbackVariablesKeyvals(): mixed
+    public function getFeedbackVariablesKeyvals(): string
     {
-        return $this->feedbackVariables ?? '';
+        return $this->feedback_variables ?? '';
     }
 
     /**
@@ -138,7 +141,8 @@ class StackPotentialResponseTree
     /**
      * Return all the "sans" strings used in the nodes with test requiring a raw input.
      */
-    public function getRawSansUsed() {
+    public function getRawSansUsed()
+    {
         //TODO: Implement getRawSansUsed() method.
         // First we need to implement static method stack_ans_test_controller::required_raw()
     }
@@ -147,7 +151,8 @@ class StackPotentialResponseTree
      * Return all the non-trivial strings used in the node arguments
      * @return array
      */
-    public function getRawArgumentsUsed() :array {
+    public function getRawArgumentsUsed(): array
+    {
         $ans = array();
 
         foreach ($this->nodes as $key => $node) {
@@ -168,16 +173,17 @@ class StackPotentialResponseTree
      * This lists all possible answer notes, used for question testing.
      * @return array string Of all the answer notes this tree might produce.
      */
-    public function getAllAnswerNotes() :array {
-        $nodenotes = array();
+    public function getAllAnswerNotes(): array
+    {
+        $node_notes = array();
 
         foreach ($this->nodes as $node) {
-            $nodenotes = array_merge($nodenotes, [$node->trueanswernote, $node->falseanswernote]);
+            $node_notes = array_merge($node_notes, [$node->trueanswernote, $node->falseanswernote]);
         }
 
         $notes = array('NULL' => 'NULL');
 
-        foreach ($nodenotes as $note) {
+        foreach ($node_notes as $note) {
             $notes[$note] = $note;
         }
 
@@ -185,11 +191,13 @@ class StackPotentialResponseTree
     }
 
     /**
-     * That is to say, list the nodes in the order they are last visited to allow simple guard clauses nice feature of acyclic graphs drops the orphans too.
+     * That is to say, list the nodes in the order they are last visited
+     * to allow simple guard clauses nice feature of acyclic graphs drops the orphans too.
      * @return array
      */
-    private function getReversePostOrderNodes(): array {
-        $order   = [];
+    private function getReversePostOrderNodes(): array
+    {
+        $order = [];
         $visited = [];
 
         if ($this->firstNode === '') {
@@ -200,6 +208,8 @@ class StackPotentialResponseTree
         return array_reverse($order);
     }
 
+
+
     /**
      * This is a recursive function to find the postorder of the nodes.
      * @param object $node
@@ -207,9 +217,10 @@ class StackPotentialResponseTree
      * @param array $visited
      * @return void
      */
-    private function poRecurse(object $node, array &$postorder, array &$visited): void {
-        $truenode                 = $this->getNode($node->truenextnode);
-        $falsenode                = $this->getNode($node->falsenextnode);
+    private function poRecurse(object $node, array &$postorder, array &$visited): void
+    {
+        $truenode = $this->getNode($node->truenextnode);
+        $falsenode = $this->getNode($node->falsenextnode);
         $visited[$node->nodename] = $node;
 
         if ($truenode != null && !array_key_exists($truenode->nodename, $visited)) {
@@ -228,7 +239,8 @@ class StackPotentialResponseTree
      * @param $name
      * @return object|null
      */
-    private function getNode($name) :?object {
+    private function getNode($name): ?object
+    {
         if (isset($this->nodes[$name])) {
             return $this->nodes[$name];
         }
@@ -239,7 +251,8 @@ class StackPotentialResponseTree
     /**
      * Summary of the nodes, for use in various logics that track answernotes and scores.
      */
-    public function getNodesSummary() {
+    public function getNodesSummary()
+    {
         //TODO: Implement getNodesSummary() method.
         // First we need to implement method compileNodeAnswertests();
     }
@@ -248,7 +261,8 @@ class StackPotentialResponseTree
      * Return the options for the show validation select menu
      * @return array.
      */
-    public function getFeedbackStyleOptions() :array {
+    public function getFeedbackStyleOptions(): array
+    {
         return array(
             '0' => StackPlatform::getTranslation('feedbackstyle0', null),
             '1' => StackPlatform::getTranslation('feedbackstyle1', null),
@@ -262,7 +276,8 @@ class StackPotentialResponseTree
      *
      * @return string Raw feedback text as a single blob for checking.
      */
-    public function getFeedbackTest() :string {
+    public function getFeedbackTest(): string
+    {
         $text = '';
 
         foreach ($this->nodes as $node) {
@@ -277,22 +292,26 @@ class StackPotentialResponseTree
         return $text;
     }
 
-    public function compile() {
+    public function compile()
+    {
         //TODO: Implement compile() method.
         // First we need to implement stack_cas_keyval class
     }
 
-    public static function compileNodeAnswerTest() {
+    public static function compileNodeAnswerTest()
+    {
         //TODO: Implement compileNodeAnswerTest() method.
         // First we need to implement stack_ans_test_controller class
     }
 
-    public static function compileNode() {
+    public static function compileNode()
+    {
         //TODO: Implement compileNode() method.
         // First we need to implement stack_ans_test_controller class
     }
 
-    public function getPrtGraph() {
+    public function getPrtGraph()
+    {
         //TODO: Implement getPrtGraph() method.
         // First we need to implement stack_abstract_graph class & getNodesSummary() method
     }
@@ -301,7 +320,8 @@ class StackPotentialResponseTree
      * Returns the trace of the PRT.
      * @return array
      */
-    public function getTrace() :array {
+    public function getTrace(): array
+    {
         return $this->trace;
     }
 }
