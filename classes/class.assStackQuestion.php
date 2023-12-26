@@ -44,27 +44,14 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     /**
      * @var array Contains the platform data
      */
-    private array $platform_data = [];
-    public function getPlatformData(): array
+    private array $platform_configuration = [];
+    public function getPlatformConfiguration(): array
     {
-        return $this->platform_data;
+        return $this->platform_configuration;
     }
-    public function setPlatformData(array $platform_data): void
+    public function setPlatformConfiguration(array $platform_configuration): void
     {
-        $this->platform_data = $platform_data;
-    }
-
-    /**
-     * @var array Contains the question data
-     */
-    private array $stack_question_data = [];
-    public function getStackQuestionData(): array
-    {
-        return $this->stack_question_data;
-    }
-    public function setStackQuestionData(array $stack_question_data): void
-    {
-        $this->stack_question_data = $stack_question_data;
+        $this->platform_configuration = $platform_configuration;
     }
 
     /**
@@ -106,7 +93,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $this->setPlugin(StackPlatformIlias::getPlugin());
 
             //Get stored settings from the platform database
-            $this->setPlatformData(StackConfig::getAll());
+            $this->setPlatformConfiguration(StackConfig::getAll());
 
             //Get stack version from question_id
             $stack_version = new StackVersion($this->getId());
@@ -114,9 +101,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             //Creates and sets stack question object with minimal data
             $stack_question = new StackQuestion($stack_version);
             $this->setStackQuestion($stack_question);
-
-            //initializes the question without external data
-            $this->getStackQuestion()->generate();
         } catch (Exception $e) {
             //TODO ERROR MESSAGE
         }
