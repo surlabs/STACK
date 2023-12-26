@@ -82,6 +82,7 @@ class StackConfig {
      * Gets the platform configuration value for a given key
      * @param string $key
      * @return mixed
+     * @throws StackException
      */
     public static function get(string $key): mixed {
         return self::$config[$key] ?? self::getFromDB($key);
