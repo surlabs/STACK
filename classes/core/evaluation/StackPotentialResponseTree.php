@@ -6,7 +6,6 @@ namespace classes\core\evaluation;
 use classes\core\maxima\StackSession;
 use classes\core\StackQuestion;
 use classes\platform\StackPlatform;
-use stdClass;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -39,7 +38,7 @@ class StackPotentialResponseTree
     private ?StackQuestion $question;
     private array $trace;
 
-    public function __construct(array $prt_data, float $value, StackQuestion $question = null)
+    public function __construct(array $prt_data, StackQuestion $question = null)
     {
         if (!isset($prt_data['id'])) {
             $this->id = -1;
@@ -47,11 +46,11 @@ class StackPotentialResponseTree
             $this->id = (int)$prt_data['id'];
         }
 
-        $this->name = $prt_data['name'];
+        $this->name = (string)$prt_data['name'];
         $this->simplify = (bool)$prt_data['simplify'];
         $this->feedback_style = (int)$prt_data['feedback_style'];
 
-        $this->value = $value;
+        $this->value = (float)$prt_data['value'];
 
         $this->feedback_variables = $prt_data['feedback_variables'];
 
@@ -264,10 +263,10 @@ class StackPotentialResponseTree
     public function getFeedbackStyleOptions(): array
     {
         return array(
-            '0' => StackPlatform::getTranslation('feedbackstyle0', null),
-            '1' => StackPlatform::getTranslation('feedbackstyle1', null),
-            '2' => StackPlatform::getTranslation('feedbackstyle2', null),
-            '3' => StackPlatform::getTranslation('feedbackstyle3', null),
+            '0' => StackPlatform::getTranslation('feedbackstyle0'),
+            '1' => StackPlatform::getTranslation('feedbackstyle1'),
+            '2' => StackPlatform::getTranslation('feedbackstyle2'),
+            '3' => StackPlatform::getTranslation('feedbackstyle3'),
         );
     }
 
