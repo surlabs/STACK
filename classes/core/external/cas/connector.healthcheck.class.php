@@ -106,6 +106,7 @@ class stack_cas_healthcheck {
 
                 break;
             case 'linux':
+            case 'linux-optimised':
                 // On a raw linux server list the versions of Maxima available.
                 $connection = stack_connection_helper::make();
                 $test = array();
@@ -116,19 +117,28 @@ class stack_cas_healthcheck {
                 $this->tests[] = $test;
                 break;
             case 'server':
-                // TODO: Cambiar is_proxybypass que es de moodle y usar el de ILIAS
-                //  if (!empty($CFG->proxyhost) && !is_proxybypass(StackConfig::get('maximacommandserver'))) {
-                /*if (!empty($CFG->proxyhost) && !is_proxybypass(StackConfig::get('maximacommandserver'))) {
-                    $test = [];
+                if (StackConfig::get('proxy_host') != null && StackPlatform::isProxyBypass(StackConfig::get('maximacommandserver'))) {
+                    $test = array();
                     $test['tag'] = 'healthcheckproxysettings';
                     $test['result'] = null;
-                    $test['summary'] =
+                    $test['summary'] = StackPlatform::getTranslation('healthcheckproxysettings');
+                    $test['details'] = StackPlatform::getTranslation('healthcheckproxysettings');
                     $this->tests[] = $test;
                     break;
-                }*/
+                }
+                break;
+            case 'server-proxy':
+                if (StackPlatform::isProxySettingsOk()) {
+                    $test = array();
+                    $test['tag'] = 'healthcheckproxysettings';
+                    $test['result'] = null;
+                    $test['summary'] = StackPlatform::getTranslation('healthcheckproxysettings');
+                    $test['details'] = StackPlatform::getTranslation('healthcheckproxysettings');
+                    $this->tests[] = $test;
+                    break;
+                }
+                break;
             default:
-                // Server-proxy/optimised.
-                // TODO: add in any specific tests for these setups?
                 break;
         }
 

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace classes\platform\ilias;
 
-use classes\platform\StackDatabase;
 use ilLanguage;
 use classes\platform\StackPlatform;
 
@@ -74,5 +73,26 @@ class StackPlatformIlias extends StackPlatform
         $html .= ">" . $contents . "</" . $tag . ">";
 
         return $html;
+    }
+
+    /**
+     * Check if the command is the proxy bypass command
+     *
+     * @param string $command
+     * @return bool
+     */
+    public static function isProxyBypassInternal(string $command): bool {
+        // TODO: Implement isProxyBypassInternal() method.
+        return true;
+    }
+
+    /**
+     * Check if the proxy settings are ok
+     *
+     * @return bool
+     */
+    public static function isProxySettingsOkInternal(): bool {
+        // TODO: Implement isProxySettingsOkInternal() method.
+        return true;
     }
 }

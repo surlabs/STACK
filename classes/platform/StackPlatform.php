@@ -93,4 +93,23 @@ abstract class StackPlatform
     {
         return self::$platform->createTagInternal($tag, $contents, $attributes);
     }
+
+    /**
+     * Check if the command is the proxy bypass command
+     *
+     * @param string $command
+     * @return bool
+     */
+    public static function isProxyBypass(string $command) :bool {
+        return self::$platform->isProxyBypassInternal($command);
+    }
+
+    /**
+     * Check if the proxy settings are ok for the platform
+     *
+     * @return bool
+     */
+    public static function isProxySettingsOk() :bool {
+        return self::$platform->isProxySettingsOkInternal();
+    }
 }
