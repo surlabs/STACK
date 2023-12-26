@@ -22,6 +22,44 @@ namespace classes\core\version;
  *********************************************************************/
 class StackVersion
 {
+    /**
+     * @var string question version by default last
+     */
+    private string $version = 'last';
+
+    public function getVersion(): string
+    {
+        return $this->version;
+    }
+
+    public function setVersion(string $version)
+    {
+        $this->version = $version;
+    }
+
+
+    /**
+     * @var int|null question_id
+     */
+    private ?int $id = null;
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+    public function setId(?int $id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * StackVersion constructor.
+     * @param int $id
+     */
+    public function __construct(int $id)
+    {
+        $this->setVersion('last');
+        $this->setId($id);
+    }
 
     /**
      * @return bool

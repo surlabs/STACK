@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use classes\core\StackQuestion;
+use classes\core\version\StackVersion;
 use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
 use classes\platform\ilias\StackPlatformIlias;
@@ -103,16 +104,19 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $this->setPlugin(StackPlatformIlias::getPlugin());
             //Get stored settings from the platform database
             $this->setPlatformData(StackConfig::getAll());
-            //Get static data of the current question
-            //TODO traer efectivamente los datos de la pregunta la id nos la trae la clase padre
-            $this->setStackQuestionData(StackQuestion::getAll($this->getId()));
+            //Get stack version from question_id
+            $stack_version = new StackVersion($this->getId());
+            //Creates and sets stack question object with minimal data
+            $stack_question = new StackQuestion($stack_version);
+            $this->setStackQuestion($stack_question);
         } catch (Exception $e) {
             //TODO ERROR MESSAGE
         }
     }
 
     /**
-     * Saves evaluation to user response in Test into tst_solutions
+     * Saves user data, evaluates the question and stores the results
+     * in the tst_solutions table
      * @param int $active_id
      * @param null $pass
      * @param bool $authorized
@@ -123,6 +127,20 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         //TODO Esto tiene que rehacerse entero mágicamente
         //mientras tanto
         return true;
+    }
+
+    /**
+     * Saves user data, evaluates the question and stores the results
+     *  in the tst_solutions table
+     * @param ilAssQuestionPreviewSession $previewSession
+     * @return void
+     */
+    protected function savePreviewData(ilAssQuestionPreviewSession $previewSession): void
+    {
+        $submittedAnswer = $this->getSolutionSubmit();
+        if (!empty($submittedAnswer)) {
+            $previewSession->setParticipantsSolution($submittedAnswer);
+        }
     }
 
     /**
@@ -146,87 +164,30 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param bool $for_test
      * @param string $title
      * @param string $author
-     * @param string $owner
-     * @param null $test_obj_id
-     * @return int|null the duplicated question id
+     * @param string|int $owner
+     * @param null $testObjId
+     * @return int the duplicated question id
      */
     public function duplicate(bool $for_test = true, string $title = "", string $author = "", string|int $owner = "", $testObjId = null): int
     {
-        if ($this->id <= 0) {
-            // The question has not been saved. It cannot be duplicated
-            return -1;
-        }
-        // duplicate the question in database
-        $this_id = $this->getId();
-        $thisObjId = $this->getObjId();
-
-        $clone = $this;
-        include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
-        $original_id = assQuestion::_getOriginalId($this->id);
-        $clone->id = -1;
-
-        if ((int)$testObjId > 0) {
-            $clone->setObjId($testObjId);
-        }
-
-        if ($title) {
-            $clone->setTitle($title);
-        }
-        if ($author) {
-            $clone->setAuthor($author);
-        }
-        if ($owner) {
-            $clone->setOwner($owner);
-        }
-        if ($for_test) {
-            $clone->saveToDb($original_id);
-        } else {
-            $clone->saveToDb();
-        }
-        // copy question page content
-        $clone->copyPageOfQuestion($this_id);
-        // copy XHTML media objects
-        $clone->copyXHTMLMediaObjectsOfQuestion($this_id);
-
-        $clone->onDuplicate($thisObjId, $this_id, $clone->getObjId(), $clone->getId());
-
-        return $clone->getId();
+        //TODO Esto tiene que rehacerse entero mágicamente
+        //mientras tanto
+        return 1;
     }
 
     /**
      * Copies an assStackQuestion object into the Clipboard
      *
-     * @param integer $target_questionpool_id
+     * @param int $target_questionpool_id
      * @param string $title
      *
-     * @return void|integer Id of the clone or nothing.
+     * @return int Id of the clone or nothing.
      */
-    function copyObject(int $target_questionpool_id, string $title = "")
+    function copyObject(int $target_questionpool_id, string $title = ""): int
     {
-        if ($this->id <= 0) {
-            // The question has not been saved. It cannot be duplicated
-            return;
-        }
-        // duplicate the question in database
-        $clone = $this;
-        include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
-
-        $original_id = assQuestion::_getOriginalId($this->id);
-        $clone->id = -1;
-        $source_questionpool_id = $this->getObjId();
-        $clone->setObjId($target_questionpool_id);
-        if ($title) {
-            $clone->setTitle($title);
-        }
-        $clone->saveToDb("", TRUE);
-        // copy question page content
-        $clone->copyPageOfQuestion($original_id);
-        // copy XHTML media objects
-        $clone->copyXHTMLMediaObjectsOfQuestion($original_id);
-
-        $clone->onCopy($source_questionpool_id, $original_id, $clone->getObjId(), $clone->getId());
-
-        return $clone->id;
+        //TODO Esto tiene que rehacerse entero mágicamente
+        //mientras tanto
+        return 1;
     }
 
     /**
@@ -235,136 +196,23 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param string $targetQuestionTitle
      * @return int
      */
-    public function createNewOriginalFromThisDuplicate($targetParentId, $targetQuestionTitle = "")
+    public function createNewOriginalFromThisDuplicate($targetParentId, $targetQuestionTitle = ""): int
     {
-        if ($this->id <= 0) {
-            // The question has not been saved. It cannot be duplicated
-            return;
-        }
-
-        include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
-
-        $sourceQuestionId = $this->id;
-        $sourceParentId = $this->getObjId();
-
-        // duplicate the question in database
-        $clone = $this;
-        $clone->id = -1;
-
-        $clone->setObjId($targetParentId);
-
-        if ($targetQuestionTitle) {
-            $clone->setTitle($targetQuestionTitle);
-        }
-
-        $clone->saveToDb();
-        // copy question page content
-        $clone->copyPageOfQuestion($sourceQuestionId);
-        // copy XHTML media objects
-        $clone->copyXHTMLMediaObjectsOfQuestion($sourceQuestionId);
-
-        $clone->onCopy($sourceParentId, $sourceQuestionId, $clone->getObjId(), $clone->getId());
-
-        return $clone->id;
+        //TODO Esto tiene que rehacerse entero mágicamente
+        //mientras tanto
+        return 1;
     }
 
-    //iQuestionCondition methods
 
     /**
-     * Get all available operations for a specific question
-     *
-     * @param $expression
-     *
-     * @return array
-     * @internal param string $expression_type
-     */
-    public function getOperators($expression): array
-    {
-        require_once "./Modules/TestQuestionPool/classes/class.ilOperatorsExpressionMapping.php";
-
-        return ilOperatorsExpressionMapping::getOperatorsByExpression($expression);
-    }
-
-    /**
-     * Get all available expression types for a specific question
-     *
-     * @return array
-     */
-    public function getExpressionTypes(): array
-    {
-        return array(iQuestionCondition::PercentageResultExpression);
-    }
-
-    /**
-     * Get the user solution for a question by active_id and the test pass
-     *
-     * @param int $active_id
-     * @param int $pass
-     *
-     * @return ilUserQuestionResult
-     */
-    public function getUserQuestionResult($active_id, $pass): ilUserQuestionResult
-    {
-        require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php';
-
-        $result = new ilUserQuestionResult($this, $active_id, $pass);
-        $points = (float)$this->calculateReachedPoints($active_id, $pass);
-        $max_points = (float)$this->getMaximumPoints();
-        $result->setReachedPercentage(($points / $max_points) * 100);
-
-        return $result;
-    }
-
-    /**
-     * If index is null, the function returns an array with all anwser options
-     * Else it returns the specific answer option
-     *
-     * @param null|int $index
-     *
-     * @return array|ASS_AnswerSimple
-     */
-    public function getAvailableAnswerOptions($index = null)
-    {
-        return array();
-    }
-
-    /**
-     * @param ilAssQuestionPreviewSession $previewSession
-     * @return void
-     */
-    protected function savePreviewData(ilAssQuestionPreviewSession $previewSession): void
-    {
-        $submittedAnswer = $this->getSolutionSubmit();
-        if (!empty($submittedAnswer)) {
-            $previewSession->setParticipantsSolution($submittedAnswer);
-        }
-    }
-
-    /**
-     * @param array $valuePairs
-     * @return array $indexedValues
-     */
-    public function fetchIndexedValuesFromValuePairs(array $valuePairs): array
-    {
-        return $valuePairs;
-    }
-
-    /**
-     * @return bool
-     */
-    public function validateSolutionSubmit(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Removes an existing solution without removing the variables (specific for STACK question: don't delete seeds)
-     * Called by resetting user answer
+     * Removes an existing solution without removing the variables
+     * (specific for STACK question: don't delete seeds)
+     * Called at resetting user answer
      * @param int $activeId
      * @param int $pass
      * @return int
      */
-    public function removeExistingSolutions($activeId, $pass): int
+    public function removeExistingSolutions(int $activeId, int $pass): int
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -2974,4 +2822,66 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     {
         return $this->plugin->getQuestionType();
     }
+
+    //iQuestionCondition methods
+
+    /**
+     * Get all available operations for a specific question
+     *
+     * @param $expression
+     *
+     * @return array
+     * @internal param string $expression_type
+     */
+    public function getOperators($expression): array
+    {
+        //TODO Esto hay que saber donde se usa
+        //mientras tanto
+        return [];
+    }
+
+    /**
+     * Get all available expression types for a specific question
+     *
+     * @return array
+     */
+    public function getExpressionTypes(): array
+    {
+        //TODO Esto hay que saber donde se usa
+        //mientras tanto
+        return [];
+    }
+
+    /**
+     * Get the user solution for a question by active_id and the test pass
+     *
+     * @param int $active_id
+     * @param int $pass
+     *
+     * @return ilUserQuestionResult
+     */
+    public function getUserQuestionResult($active_id, $pass): ilUserQuestionResult
+    {
+        //TODO Modificar esto a como se hace en otras clases, buscar directamente en tst_solutions
+        //mientras tanto
+
+        $result = new ilUserQuestionResult($this, $active_id, $pass);
+        $points = (float)$this->calculateReachedPoints($active_id, $pass);
+        $max_points = (float)$this->getMaximumPoints();
+        $result->setReachedPercentage(($points / $max_points) * 100);
+
+        return $result;
+    }
+
+    /**
+     * If index is null, the function returns an array with all anwser options
+     * Else it returns the specific answer option
+     *
+     * @param null|int $index
+     */
+    public function getAvailableAnswerOptions($index = null): array
+    {
+        return array();
+    }
+
 }

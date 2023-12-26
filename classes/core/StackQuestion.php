@@ -188,7 +188,7 @@ class StackQuestion
                 if ($with_external_data_from_teacher) {
                     //Correct solution from teacher
                     $json_external = $this->getSecurity()->getQuestionExternalJSONFromTeacher($this);
-                } else {
+                } elseif ($with_external_data_from_user) {
                     //Student answer
                     $json_external = $this->getSecurity()->getQuestionExternalJSONFromStudent($this);
                 }
