@@ -120,8 +120,8 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                 $healthcheck = new stack_cas_healthcheck($data);
                 $data = $healthcheck->get_test_results();
                 //Objetivo final, que este var_dump sea true
-                var_dump($data);
-                var_dump($healthcheck->get_overall_result());exit;
+                dump($data);
+                dump($healthcheck->get_overall_result());exit;
                 $sections = $this->healthcheck($data);
                 $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
                 $rendered = $this->renderPanel($data, $form_action, $sections);
