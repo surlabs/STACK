@@ -174,6 +174,16 @@ class assStackQuestionGUI extends assQuestionGUI
         parent::populateTaxonomyFormSection($form);
     }
 
+    //UI Functionalities
+
+    /**
+     * Try to avoid use of tabs
+     * @return void
+     */
+    public function setQuestionTabs(): void
+    {
+        $this->addBackTab($this->tabs);
+    }
 
     /**
      * Creates an output of the edit form for the question
@@ -194,15 +204,6 @@ class assStackQuestionGUI extends assQuestionGUI
         }
         $this->tpl->setContent($rendered);
         return true;
-    }
-
-    /**
-     * Sets the ILIAS tabs for this question type
-     * called from ilObjTestGUI and ilObjQuestionPoolGUI
-     */
-    public function setQuestionTabs(): void
-    {
-        //TODO REDO
     }
 
     /**
