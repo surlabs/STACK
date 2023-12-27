@@ -20,6 +20,8 @@ declare(strict_types=1);
  *
  */
 
+use ILIAS\UI\Implementation\Component\MessageBox\MessageBox;
+
 /**
  * @ilCtrl_isCalledBy assStackQuestionGUI: ilObjQuestionPoolGUI, ilObjTestGUI, ilQuestionEditGUI, ilTestExpressPageObjectGUI
  * @ilCtrl_Calls assStackQuestionGUI: ilFormPropertyDispatchGUI
@@ -193,16 +195,20 @@ class assStackQuestionGUI extends assQuestionGUI
      * @param bool $check_only
      *
      * @return bool
+     * @throws ilCtrlException
      */
     public function editQuestion(bool $check_only = false): bool
     {
         //TODO REDO
+        //Render error message as default
+        $rendered = $this->renderer->render(new MessageBox('failure',
+            $this->object->getPlugin()->txt("ui_author_main_failure")
+        ));
+
         if($this->object->getId()==-1){
             //New question, show creation selection menu
             $sections = AuthorMainUI::show($this->object->getPlugin());
-            $form_action = $this->control->getLinkTargetByClass("assStackQuestionGUI", "configure");
-            $rendered = $this->renderPanel($this->object->getStackQuestion()->getInternalData(), $form_action, $sections);
-
+            $rendered = $this->renderPanel($this->object->getPlugin()->txt('ui_author_main_title'), $sections);
         }
         $this->tpl->setContent($rendered);
         return true;
@@ -211,10 +217,12 @@ class assStackQuestionGUI extends assQuestionGUI
     /**
      * Actually runs the Importing of questions
      * @return void
+     * @throws ilCtrlException
      */
-    public function importQuestionFromMoodle()
+    public function importQuestionFromMoodleXML()
     {
-        //TODO REDO
+        $rendered = AuthorImportMoodleXmlUI::show($this, $this->object->getPlugin());
+        $this->tpl->setContent($rendered);
     }
 
     /**
@@ -255,29 +263,16 @@ class assStackQuestionGUI extends assQuestionGUI
 
     /**
      * Renders the panel with the given data and sections
-     * @param array $data
-     * @param string $form_action
+     * @param string $name
      * @param array $sections
      * @return string
      */
-    private function renderPanel(array $data, string $form_action, array $sections): string
+    private function renderPanel(string $name, array $sections): string
     {
-
-        //TODO REPLACE WITH ACTUAL PANEL
-        $page = $this->factory->modal()->lightboxTextPage("LOREN IPSUM", $this->lng->txt("qpl_qst_xqcas_message_question_text"));
-        $modal = $this->factory->modal()->lightbox($page);
-
-        $button = $this->factory->button()->standard($this->lng->txt("qpl_qst_xqcas_ui_author_randomisation_show_question_text_action_text"), '')
-            ->withOnClick($modal->getShowSignal());
-
         //Return the UI component
         return $this->renderer->render($this->factory->panel()->sub(
-            "LOREN IPSUM",
-            $this->factory->legacy(
-                "LOREN IPSUM" .
-                $this->renderer->render($this->factory->divider()->horizontal()) .
-                $this->renderer->render([$button, $modal])
-            )
+            $name,
+            $sections
         ));
     }
 

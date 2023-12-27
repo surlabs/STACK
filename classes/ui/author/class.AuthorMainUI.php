@@ -56,12 +56,12 @@ class AuthorMainUI
     {
         return self::$factory->button()->bulky(
             self::$factory->symbol()->icon()->standard(
-                'nota',
-                $plugin_object->txt('ui_admin_configuration_security_button_label'),
+                'import',
+                $plugin_object->txt('ui_author_import_from_moodle_xml_button_label'),
                 'medium'
             ),
-            $plugin_object->txt('ui_admin_configuration_security_button_label'),
-            self::$control->getLinkTargetByClass("assStackQuestionGUI", "importFromMoodleXML")
+            $plugin_object->txt('ui_author_import_from_moodle_xml_button_label'),
+            self::$control->getLinkTargetByClass("assStackQuestionGUI", "importQuestionFromMoodleXML")
         );
     }
 
@@ -73,10 +73,10 @@ class AuthorMainUI
         return self::$factory->button()->bulky(
             self::$factory->symbol()->icon()->standard(
                 'nota',
-                $plugin_object->txt('ui_admin_configuration_bulktesting_button_label'),
+                $plugin_object->txt('ui_author_create_blank_question_button_label'),
                 'medium'
             ),
-            $plugin_object->txt('ui_admin_configuration_bulktesting_button_label'),
+            $plugin_object->txt('ui_author_create_blank_question_button_label'),
             self::$control->getLinkTargetByClass("assStackQuestionGUI", "editQuestionForm")
         );
     }
