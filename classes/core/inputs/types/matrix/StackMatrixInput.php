@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 namespace classes\core\inputs\types\matrix;
+use classes\core\inputs\StackInput;
+use classes\core\inputs\StackInputState;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  * This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -20,7 +23,10 @@ namespace classes\core\inputs\types\matrix;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackMatrixInput
+class StackMatrixInput extends StackInput
 {
-
+    public function render(StackInputState $state, string $fieldname, bool $readonly, array $tavalue)
+    {
+        // TODO: Implement render() method.
+    }
 }

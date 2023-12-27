@@ -3,6 +3,17 @@ declare(strict_types=1);
 
 namespace classes\core\inputs;
 use classes\core\filters\StackParser;
+use classes\core\inputs\types\choices\StackBooleanInput;
+use classes\core\inputs\types\choices\StackMultipleChoiceInput;
+use classes\core\inputs\types\choices\StackSingleChoiceInput;
+use classes\core\inputs\types\input\StackAlgebraicInput;
+use classes\core\inputs\types\input\StackNumericalInput;
+use classes\core\inputs\types\input\StackScientificUnitsInput;
+use classes\core\inputs\types\input\StackStringInput;
+use classes\core\inputs\types\matrix\StackMatrixInput;
+use classes\core\inputs\types\matrix\StackVariableMatrixInput;
+use classes\core\inputs\types\textarea\StackEquivalenceReasoningInput;
+use classes\core\inputs\types\textarea\StackTextAreaInput;
 use classes\core\options\StackOptions;
 use classes\core\security\StackException;
 use classes\core\security\StackQuestionSecurity;
@@ -62,7 +73,8 @@ abstract class StackInput
      * StackInput constructor
      * @throws StackException
      */
-    public function __construct(string $name, ?string $teacherAnswer, StackOptions $options, ?array $parameters = null, bool $runtime = true) {
+    public function __construct(string $name, ?string $teacherAnswer, StackOptions $options, ?array $parameters = null, bool $runtime = true)
+    {
         if (trim($name) === '') {
             throw new StackException('StackInput: $name must be non-empty.');
         }
@@ -77,7 +89,7 @@ abstract class StackInput
             throw new StackException('StackInput: __construct: 3rd argument, $parameters, ' . 'must be null or an array of parameters.');
         }
 
-        if ($parameters)  {
+        if ($parameters) {
             foreach ($parameters as $name => $value) {
                 $this->setParameter($name, $value);
             }
@@ -146,7 +158,7 @@ abstract class StackInput
      * @param string $value
      * @return int
      */
-    private function convertLegacyInsertStars(string $value) : int
+    private function convertLegacyInsertStars(string $value): int
     {
         $map = [
             // Don't insert stars.
@@ -243,13 +255,13 @@ abstract class StackInput
         }
 
         if (array_key_exists('mindp', $this->extraOptions) && array_key_exists('maxdp', $this->extraOptions)) {
-            if ((float) $this->extraOptions['mindp'] > (float) $this->extraOptions['maxdp']) {
+            if ((float)$this->extraOptions['mindp'] > (float)$this->extraOptions['maxdp']) {
                 $this->errors[] = StackPlatform::getTranslation('numericalinputminmaxerr', null);
             }
         }
 
         if (array_key_exists('minsf', $this->extraOptions) && array_key_exists('maxsf', $this->extraOptions)) {
-            if ((float) $this->extraOptions['minsf'] > (float) $this->extraOptions['maxsf']) {
+            if ((float)$this->extraOptions['minsf'] > (float)$this->extraOptions['maxsf']) {
                 $this->errors[] = StackPlatform::getTranslation('numericalinputminmaxerr', null);
             }
         }
@@ -264,7 +276,8 @@ abstract class StackInput
      * @param array|null $contextSession
      * @return void
      */
-    public function setContextSession(?array $contextSession) :void {
+    public function setContextSession(?array $contextSession): void
+    {
         $this->$contextSession = $contextSession;
     }
 
@@ -281,7 +294,7 @@ abstract class StackInput
             throw new StackException('StackInput: setting parameter ' . $key . ' which does not exist for inputs of type ' . get_class($this));
         }
 
-        switch($key) {
+        switch ($key) {
             case 'strictSyntax':
             case 'forbidFloats':
             case 'lowestTerms':
@@ -348,7 +361,8 @@ abstract class StackInput
      * @param string $display
      * @return string
      */
-    public function getTeacherAnswerDisplay(string $value, string $display) :string {
+    public function getTeacherAnswerDisplay(string $value, string $display): string
+    {
         if (!$this->getExtraOption('hideanswer')) {
             return '';
         }
@@ -357,7 +371,7 @@ abstract class StackInput
             return StackPlatform::getTranslation('teacheranswerempty', null);
         }
 
-        return StackPlatform::getTranslation('teacheranswershow_disp', array('\( '.$display.' \)'));
+        return StackPlatform::getTranslation('teacheranswershow_disp', array('\( ' . $display . ' \)'));
     }
 
     /**
@@ -365,7 +379,8 @@ abstract class StackInput
      * @param array $response
      * @return bool
      */
-    protected function isBlankResponse(array $response): bool {
+    protected function isBlankResponse(array $response): bool
+    {
         foreach ($response as $value) {
             if (trim($value) != '' || $value == 'EMPTYANSWER') {
                 return false;
@@ -385,7 +400,8 @@ abstract class StackInput
      * Allow different input types to change the CAS method used
      * @return string
      */
-    protected function getValidationMethod() :string {
+    protected function getValidationMethod(): string
+    {
         return $this->getParameter('sameType', false) ? 'checktype' : 'typeless';
     }
 
@@ -395,7 +411,8 @@ abstract class StackInput
      * @param StackQuestionSecurity $basesecurity
      * @return array
      */
-    protected function validateContentsFilters(StackQuestionSecurity $basesecurity) :array {
+    protected function validateContentsFilters(StackQuestionSecurity $basesecurity): array
+    {
         $secrules = clone $basesecurity;
 
         $secrules->setAllowedWords(explode(',', $this->getParameter('allowWords', '')));
@@ -457,17 +474,20 @@ abstract class StackInput
         return array($secrules, $filterstoapply);
     }
 
-    protected function validateContents() {
+    protected function validateContents()
+    {
         //TODO: Implement validateContents() method.
         // First we have to implement static method stack_ast_container::make_from_student_source
     }
 
-    protected function extraOptionVariables() {
+    protected function extraOptionVariables()
+    {
         //TODO: Implement extraOptionVariables() method.
         // First we have to implement static method stack_ast_container::make_from_teacher_source & class stack_secure_loader
     }
 
-    protected function validationDisplay() {
+    protected function validationDisplay()
+    {
         //TODO: Implement validationDisplay() method.
         // First we have to implement static methods castext2_parser_utils::postprocess_mp_parsed & class MP_Node and child classes
     }
@@ -506,7 +526,8 @@ abstract class StackInput
      * @param string $vars
      * @return string
      */
-    protected function tagListOfVariables(string $vars) :string {
+    protected function tagListOfVariables(string $vars): string
+    {
         return StackPlatform::getTranslation('studentValidation_listofvariables', array($vars));
     }
 
@@ -515,7 +536,8 @@ abstract class StackInput
      * @param array $response
      * @return array
      */
-    protected function responseToContents(array $response) :array {
+    protected function responseToContents(array $response): array
+    {
         $contents = array();
 
         if (array_key_exists($this->name, $response)) {
@@ -537,7 +559,8 @@ abstract class StackInput
      * @return string
      * @throws StackException
      */
-    protected function casLinesToAnswer(array $caslines) :string {
+    protected function casLinesToAnswer(array $caslines): string
+    {
         if (array_key_exists(0, $caslines)) {
             return $caslines[0];
         }
@@ -548,7 +571,8 @@ abstract class StackInput
      * @param array $contents
      * @return string
      */
-    public function contentsToMaxima(array $contents) :string {
+    public function contentsToMaxima(array $contents): string
+    {
         if (array_key_exists(0, $contents)) {
             return $contents[0];
         } else {
@@ -570,7 +594,8 @@ abstract class StackInput
      * @param array $in
      * @return array
      */
-    public function maximaToResponseArray(array $in) :array {
+    public function maximaToResponseArray(array $in): array
+    {
         $response[$this->name] = $in;
 
         if ($this->getParameter('mustVerify', true)) {
@@ -579,7 +604,8 @@ abstract class StackInput
         return $response;
     }
 
-    public function replaceValidationTags() {
+    public function replaceValidationTags()
+    {
         //TODO: Implement replaceValidationTags() method.
         // First we have to implement renderValidation()
     }
@@ -594,7 +620,8 @@ abstract class StackInput
      * @param string $in
      * @return array
      */
-    public function ajaxToResponseArray(string $in) :array {
+    public function ajaxToResponseArray(string $in): array
+    {
         return array($this->name => $in);
     }
 
@@ -602,7 +629,8 @@ abstract class StackInput
      * Return the list of errors
      * @return array
      */
-    public function getErrors(): array {
+    public function getErrors(): array
+    {
         $errors = array();
 
         foreach ($this->errors as $err) {
@@ -619,7 +647,44 @@ abstract class StackInput
      * @param StackInputState $state
      * @return string
      */
-    public function summariseResponse(string $name, StackInputState $state): string {
+    public function summariseResponse(string $name, StackInputState $state): string
+    {
         return $name . ': ' . $this->contentsToMaxima($state->getContents()) . ' [' . $state->getStatus() . ']';
+    }
+
+    /**
+     * Create a new input for a given input type
+     * This method replace old factory class
+     *
+     * @param array $data
+     * @return StackInput
+     * @throws StackException
+     */
+    public static function create(array $data): StackInput
+    {
+        if (!array_key_exists('type', $data)) {
+            throw new StackException('StackInput::create: $data must contain a \'type\' key.');
+        }
+
+        $type = $data['type'];
+
+        if (!is_string($type)) {
+            throw new StackException('StackInput::create: $data[\'type\'] must be a string.');
+        }
+
+        return match ($type) {
+            'boolean' => new StackBooleanInput($data['name'], null, $data['options']),
+            'multriplechoice' => new StackMultipleChoiceInput($data['name'], null, $data['options']),
+            'singlechoice' => new StackSingleChoiceInput($data['name'], null, $data['options']),
+            'algebraic' => new StackAlgebraicInput($data['name'], null, $data['options']),
+            'numerical' => new StackNumericalInput($data['name'], null, $data['options']),
+            'scientificunits' => new StackScientificUnitsInput($data['name'], null, $data['options']),
+            'string' => new StackStringInput($data['name'], null, $data['options']),
+            'matrix' => new StackMatrixInput($data['name'], null, $data['options']),
+            'variablematrix' => new StackVariableMatrixInput($data['name'], null, $data['options']),
+            'equiv' => new StackEquivalenceReasoningInput($data['name'], null, $data['options']),
+            'textarea' => new StackTextAreaInput($data['name'], null, $data['options']),
+            default => throw new StackException('StackInput::create: Unknown input type: ' . $type),
+        };
     }
 }
