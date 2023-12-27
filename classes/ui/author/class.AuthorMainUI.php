@@ -45,6 +45,7 @@ class AuthorMainUI
 
         return [
             self::getImportFromMoodleXML($plugin_object),
+            self::$factory->divider()->horizontal(),
             self::getEditQuestionForm($plugin_object)
         ];
     }
