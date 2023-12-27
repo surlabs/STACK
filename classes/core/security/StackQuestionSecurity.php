@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace classes\core\security;
 
+use classes\core\maxima\StackSession;
+use classes\core\options\StackOptions;
 use classes\core\StackQuestion;
 use classes\core\version\StackVersion;
 use classes\platform\StackDatabase;
+use stdClass;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -58,10 +61,91 @@ class StackQuestionSecurity
             return false;
         }
     }
-    
+
+    /**
+     * @throws StackException
+     */
     public function getQuestionInternalFromDB(StackVersion $version): array
     {
-        return array();
+        $question = StackDatabase::select('qpl_questions', ['question_id' => $version->getId()], array('question_text', 'description'));
+
+        if (empty($question)) {
+            throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: Question not found for question id ' . $version->getId());
+        } else {
+            $question = $question[0];
+        }
+
+        $options = StackDatabase::select('xqcas_options', ['question_id' => $version->getId()]);
+
+        if (empty($options)) {
+            throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: Options not found for question id ' . $version->getId());
+        } else {
+            $options = $options[0];
+        }
+
+        $extra_info = StackDatabase::select('xqcas_extra_info', ['question_id' => $version->getId()], array('general_feedback'));
+
+        if (empty($extra_info)) {
+            throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: Extra info not found for question id ' . $version->getId());
+        } else {
+            $extra_info = $extra_info[0];
+        }
+
+        $inputs = StackDatabase::select('xqcas_inputs', ['question_id' => $version->getId()]);
+
+        if (empty($inputs)) {
+            throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: Inputs not found for question id ' . $version->getId());
+        } else {
+            $tmp_inputs = array();
+
+            foreach ($inputs as $input) {
+                $tmp_inputs[$input['id']] = $input;
+
+                $tmp_inputs[$input['id']]['options'] = new StackOptions(null);  //TODO
+            }
+
+            $inputs = $tmp_inputs;
+        }
+
+        $prts = StackDatabase::select('xqcas_prts', ['question_id' => $version->getId()]);
+
+        if (empty($prts)) {
+            throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: PRTs not found for question id ' . $version->getId());
+        } else {
+            $tmp_prts = array();
+
+            foreach ($prts as $prt) {
+                $tmp_prts[$prt['id']] = [
+                    'id' => $prt['id'],
+                    'name' => $prt['name'],
+                    'simplify' => $prt['auto_simplify'],
+                    'feedback_style' => 1, //TODO
+                    'value' => $prt['value'],
+                    'feedback_variables' => new StackSession($version), //TODO
+                    'nodes' => new stdClass(), //TODO
+                    'first_node' => $prt['first_node_name'],
+                ];
+            }
+
+            $prts = $tmp_prts;
+        }
+
+        return array(
+            'text' => $question['question_text'],
+            'description' => $question['description'],
+            'specific_feedback' => $options['specific_feedback'],
+            'options' => array(
+                //TODO
+            ),
+            'variables' => $options['question_variables'],
+            'default_feedback_for_fully_correct_prt' => $options['prt_correct'],
+            'default_feedback_for_partially_correct_prt' => $options['prt_partially_correct'],
+            'default_feedback_for_fully_incorrect_prt' => $options['prt_incorrect'],
+            'general_feedback_text' => $extra_info['general_feedback'],
+            'hint' => '',
+            'inputs' => $inputs,
+            'potential_response_trees' => $prts,
+        );
     }
 
     public function getQuestionExternalJSONFromStudent(StackQuestion $question): string

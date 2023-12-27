@@ -139,6 +139,7 @@ class StackQuestion
     /**
      * StackQuestion constructor.
      * @param StackVersion $version
+     * @throws StackException
      */
     public function __construct(StackVersion $version)
     {
@@ -149,6 +150,8 @@ class StackQuestion
 
             $this->version = $version;
             $this->status = self::STACK_QUESTION_STATUS_UNINITIALIZED;
+
+            $this->generate();
         } else {
             //TODO: Log error, invalid version
             $this->status = self::STACK_QUESTION_STATUS_ERROR;
@@ -161,14 +164,15 @@ class StackQuestion
      * @param bool $with_external_data_from_user
      * @param bool $with_external_data_from_teacher
      * @return bool
+     * @throws StackException
      */
     public function generate(bool $with_external_data_from_user = false, bool $with_external_data_from_teacher = false): bool
     {
         //Ensure that the object is in the correct status
         if ($this->getStatus() === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
-            //Get the JSON data of the question from the DB
+            //Get the data of the question from the DB
             $array_internal = $this->getSecurity()->getQuestionInternalFromDB($this->getVersion());
-            //Check JSON format and security for internal data of the question
+            //Check format and security for internal data of the question
             if (!StackQuestionSecurity::checkInternal($array_internal)) {
                 //TODO: Log error, internal data is not secure
                 $this->status = self::STACK_QUESTION_STATUS_ERROR;
@@ -242,8 +246,7 @@ class StackQuestion
                 $this->hint = new StackText($array_internal['hint']);
 
                 foreach ($array_internal['inputs'] as $input_identifier => $input_data) {
-                    //TODO FACTORIA DE INPUTS
-                    //$this->inputs[$input_identifier] = new StackInput($input_data);
+                    $this->inputs[$input_identifier] = StackInput::create($input_data);
                 }
 
                 foreach ($array_internal['potential_response_trees'] as $prt_identifier => $potential_response_tree_data) {
