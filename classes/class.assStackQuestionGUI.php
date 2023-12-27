@@ -205,7 +205,7 @@ class assStackQuestionGUI extends assQuestionGUI
             $this->object->getPlugin()->txt("ui_author_main_failure")
         ));
 
-        if($this->object->getId()==-1){
+        if ($this->object->getId() == -1) {
             //New question, show creation selection menu
             $sections = AuthorMainUI::show($this->object->getPlugin());
             $rendered = $this->renderPanel($this->object->getPlugin()->txt('ui_author_main_title'), $sections);
@@ -219,10 +219,48 @@ class assStackQuestionGUI extends assQuestionGUI
      * @return void
      * @throws ilCtrlException
      */
-    public function importQuestionFromMoodleXML()
+    public function importQuestionFromMoodleXmlRenderUI(): void
     {
+        //TODO Asegurarnos de estar en un question pool y no en un test
+        if ($this->global_request->getMethod() == "POST") {
+            $this->importQuestionFromMoodleXmlDoImport();
+        }
         $rendered = AuthorImportMoodleXmlUI::show($this, $this->object->getPlugin());
         $this->tpl->setContent($rendered);
+    }
+
+    /**
+     * Actually runs the Importing of questions
+     * @return void
+     * @throws ilCtrlException
+     */
+    public function importQuestionFromMoodleXmlDoImport()
+    {
+
+        if (isset($_FILES["questions_xml"]["tmp_name"]) && file_exists($_FILES["questions_xml"]["tmp_name"])) {
+            $xml_file = $_FILES["questions_xml"]["tmp_name"];
+            $import_object = new MoodleXmlImport($this->object->getPlugin(), (int)$_GET['q_id'], $this->object);
+
+            //DO IMPORT
+            if ($import_object->import($xml_file)) {
+                $message = $this->factory->messageBox()->success(
+                    $this->object->getPlugin()->txt('ui_author_import_moodle_xml_success')
+                );
+            } else {
+                $message = $this->factory->messageBox()->failure(
+                    $this->object->getPlugin()->txt('ui_author_import_moodle_xml_failure_at_parsing')
+                );
+            }
+        } else {
+            $message = $this->factory->messageBox()->failure(
+                $this->object->getPlugin()->txt('ui_author_import_moodle_xml_failure_no_file')
+            );
+        }
+
+        //Show message
+        $this->tpl->setContent($this->renderer->render($message));
+
+        $this->importQuestionFromMoodleXmlRenderUI();
     }
 
     /**

@@ -61,7 +61,7 @@ class AuthorMainUI
                 'medium'
             ),
             $plugin_object->txt('ui_author_import_from_moodle_xml_button_label'),
-            self::$control->getLinkTargetByClass("assStackQuestionGUI", "importQuestionFromMoodleXML")
+            self::$control->getLinkTargetByClass("assStackQuestionGUI", "importQuestionFromMoodleXmlRenderUI")
         );
     }
 

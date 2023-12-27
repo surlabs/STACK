@@ -74,8 +74,9 @@ class MoodleXmlImport
      * ### MAIN METHOD OF THIS CLASS ###
      * This method is called from assStackQuestion to import the questions from an MoodleXML file.
      * @param $xml_file
+     * @return bool
      */
-    public function import($xml_file)
+    public function import($xml_file): bool
     {
         //Step 1: Get data from XML.
         //LIBXML_NOCDATA Merge CDATA as Textnodes
@@ -84,13 +85,21 @@ class MoodleXmlImport
         //Step 2: Initialize question in ILIAS
         $number_of_questions_created = 0;
 
-
         foreach ($xml->question as $question) {
 
+            if($this->loadFromMoodleXML($question)) {
+                $number_of_questions_created++;
+            }
             var_dump($xml);
             exit;
             $type = (string)$question->attributes()['type'];
 
+        }
+
+        if($number_of_questions_created > 0) {
+            return true;
+        } else {
+            return false;
         }
     }
 

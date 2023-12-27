@@ -46,41 +46,39 @@ class AuthorImportMoodleXmlUI
         self::$control = $DIC->ctrl();
         self::$request = $DIC->http()->request();
 
+        /*
         $upload_handler = new \ilObjFileUploadHandlerGUI();
         $file = self::$factory->input()->field()->file(
             $upload_handler,
             $plugin_object->txt('ui_author_import_from_moodle_xml_title'),
             $plugin_object->txt('ui_author_import_from_moodle_xml_description')
-        );
-        $form_action = self::$control->getFormAction($gui_object, "importQuestionFromMoodleXML");
+        )->withAcceptedMimeTypes(['text/xml'])->withMaxFiles(1);
+
 
         $form = self::$factory->input()->container()->form()->standard(
             $form_action,
             ['moodle_xml' => $file]);
+        */
 
-        if (self::$request->getMethod() == "POST") {
-            $form = $form->withRequest(self::$request);
-            $result = $form->getData();
-            $moodle_xml_import = new MoodleXmlImport($plugin_object, 100, $gui_object->object);
-            var_dump($upload_handler->getUploadResult());exit;
-            $moodle_xml_import->import($result['moodle_xml']);
-            exit;
-        }
+        $form_action = self::$control->getFormAction($gui_object, "importQuestionFromMoodleXML");
 
-        return self::$renderer->render($form);
-    }
+        $form = new ilPropertyFormGUI();
+        $form->setFormAction($form_action);
+        $form->setTitle($plugin_object->txt('ui_author_import_moodle_xml_title'));
 
-    /**
-     */
-    private static function getImportFromMoodleXML(ilPlugin $plugin_object): Section
-    {
-        $file = self::$factory->input()->field()->file(new \ilUIDemoFileUploadHandlerGUI(), "File Upload", "You can drop your files here");
+        //Upload XML file
+        $item = new ilFileInputGUI($plugin_object->txt('ui_author_import_moodle_xml_file'), 'questions_xml');
+        $item->setSuffixes(array('xml'));
+        $form->addItem($item);
 
-        return self::$factory->input()->field()->section(
-            $file,
-            $plugin_object->txt('ui_author_import_from_moodle_xml_button_label'),
-            $plugin_object->txt('ui_author_import_from_moodle_xml_button_description'),
-        );
+        $hiddenFirstId = new ilHiddenInputGUI('first_question_id');
+        $hiddenFirstId->setValue($_GET['q_id']);
+        $form->addItem($hiddenFirstId);
+
+        $form->addCommandButton("importQuestionFromMoodleXmlDoImport", $plugin_object->txt("ui_author_import_moodle_xml_import_button"));
+        $form->addCommandButton("importQuestionFromMoodleXmlRenderUI", $plugin_object->txt("ui_author_import_moodle_xml_cancel_import_button"));
+
+        return self::$renderer->render(self::$factory->legacy($form->getHTML()));
     }
 
 
