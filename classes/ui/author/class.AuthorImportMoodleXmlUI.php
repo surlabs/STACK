@@ -76,7 +76,7 @@ class AuthorImportMoodleXmlUI
         $form->addItem($hiddenFirstId);
 
         $form->addCommandButton("importQuestionFromMoodleXmlDoImport", $plugin_object->txt("ui_author_import_moodle_xml_import_button"));
-        $form->addCommandButton("importQuestionFromMoodleXmlRenderUI", $plugin_object->txt("ui_author_import_moodle_xml_cancel_import_button"));
+        $form->addCommandButton("editQuestion", $plugin_object->txt("ui_author_import_moodle_xml_cancel_import_button"));
 
         return self::$renderer->render(self::$factory->legacy($form->getHTML()));
     }
