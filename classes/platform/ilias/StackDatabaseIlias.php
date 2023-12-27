@@ -135,12 +135,13 @@ class StackDatabaseIlias extends StackDatabase {
      *
      * @param string $table
      * @param array|null $where
+     * @param array|null $columns
      * @return array
      * @throws StackException
      */
-    public function selectInternal(string $table, ?array $where = null): array {
+    public function selectInternal(string $table, ?array $where = null, ?array $columns = null): array {
         try {
-            $query = "SELECT * FROM " . $table;
+            $query = "SELECT " . (isset($columns) ? implode(", ", $columns) : "*") . " FROM " . $table;
 
             if (isset($where)) {
                 $query .= " WHERE " . implode(" AND ", array_map(function ($key, $value) {

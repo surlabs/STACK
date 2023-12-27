@@ -108,10 +108,11 @@ abstract class StackDatabase {
      *
      * @param string $table
      * @param array|null $where
+     * @param array|null $columns
      * @return array
      * @throws StackException
      */
-    public static function select(string $table, ?array $where = null): array {
-        return self::$platform->selectInternal($table, $where);
+    public static function select(string $table, ?array $where = null, ?array $columns = null): array {
+        return self::$platform->selectInternal($table, $where, $columns);
     }
 }
