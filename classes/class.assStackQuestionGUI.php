@@ -26,6 +26,12 @@ declare(strict_types=1);
  */
 class assStackQuestionGUI extends assQuestionGUI
 {
+    private ilTabsGUI $tabs;
+    private ilCtrlInterface $control;
+    private \ILIAS\HTTP\Services $http;
+    private \ILIAS\UI\Factory $factory;
+    private \ILIAS\UI\Renderer $renderer;
+    private $global_request;
 
     /**
      * assStackQuestionGUI constructor.
@@ -33,6 +39,15 @@ class assStackQuestionGUI extends assQuestionGUI
      */
     public function __construct($id = -1)
     {
+        global $DIC;
+
+        $this->tabs = $DIC->tabs();
+        $this->control = $DIC->ctrl();
+        $this->http = $DIC->http();
+        $this->factory = $DIC->ui()->factory();
+        $this->renderer = $DIC->ui()->renderer();
+        $this->global_request = $DIC->http()->request();
+
         parent::__construct();
         $this->object = new assStackQuestion();
         if ($id >= 0) {
@@ -170,6 +185,14 @@ class assStackQuestionGUI extends assQuestionGUI
     public function editQuestion(bool $check_only = false): bool
     {
         //TODO REDO
+        if($this->object->getId()==-1){
+            //New question, show creation selection menu
+            $sections = AuthorMainUI::show($this->object->getPlugin());
+            $form_action = $this->control->getLinkTargetByClass("assStackQuestionGUI", "configure");
+            $rendered = $this->renderPanel($this->object->getStackQuestion()->getInternalData(), $form_action, $sections);
+
+        }
+        $this->tpl->setContent($rendered);
         return true;
     }
 
@@ -198,6 +221,61 @@ class assStackQuestionGUI extends assQuestionGUI
     public function exportQuestionToMoodle()
     {
         //TODO REDO
+    }
+
+    /**
+     * Renders the form with the given data and sections
+     * @param array $data
+     * @param string $form_action
+     * @param array $sections
+     * @return string
+     */
+    private function renderForm(array $data, string $form_action, array $sections): string
+    {
+        //Create the form
+        $form = $this->factory->input()->container()->form()->standard(
+            $form_action,
+            $sections
+        );
+
+        //Check if the form has been submitted
+        if ($this->global_request->getMethod() == "POST") {
+            $form = $form->withRequest($this->global_request);
+            $result = $form->getData();
+            $saving_info = "ok";
+        } else {
+            $saving_info = "";
+        }
+
+        return $saving_info . $this->renderer->render($form);
+    }
+
+    /**
+     * Renders the panel with the given data and sections
+     * @param array $data
+     * @param string $form_action
+     * @param array $sections
+     * @return string
+     */
+    private function renderPanel(array $data, string $form_action, array $sections): string
+    {
+
+        //TODO REPLACE WITH ACTUAL PANEL
+        $page = $this->factory->modal()->lightboxTextPage("LOREN IPSUM", $this->lng->txt("qpl_qst_xqcas_message_question_text"));
+        $modal = $this->factory->modal()->lightbox($page);
+
+        $button = $this->factory->button()->standard($this->lng->txt("qpl_qst_xqcas_ui_author_randomisation_show_question_text_action_text"), '')
+            ->withOnClick($modal->getShowSignal());
+
+        //Return the UI component
+        return $this->renderer->render($this->factory->panel()->sub(
+            "LOREN IPSUM",
+            $this->factory->legacy(
+                "LOREN IPSUM" .
+                $this->renderer->render($this->factory->divider()->horizontal()) .
+                $this->renderer->render([$button, $modal])
+            )
+        ));
     }
 
 }
