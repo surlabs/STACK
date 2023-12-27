@@ -32,7 +32,7 @@ class StackVersion
         return $this->version;
     }
 
-    public function setVersion(string $version)
+    public function setVersion(string $version): void
     {
         $this->version = $version;
     }
@@ -46,7 +46,7 @@ class StackVersion
     {
         return $this->id;
     }
-    public function setId(?int $id)
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }

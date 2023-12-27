@@ -167,15 +167,15 @@ class StackQuestion
         //Ensure that the object is in the correct status
         if ($this->getStatus() === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
             //Get the JSON data of the question from the DB
-            $json_internal = $this->getSecurity()->getQuestionInternalJSONFromDB($this->getVersion());
+            $array_internal = $this->getSecurity()->getQuestionInternalFromDB($this->getVersion());
             //Check JSON format and security for internal data of the question
-            if (!StackQuestionSecurity::checkInternal($json_internal)) {
+            if (!StackQuestionSecurity::checkInternal($array_internal)) {
                 //TODO: Log error, internal data is not secure
                 $this->status = self::STACK_QUESTION_STATUS_ERROR;
                 return false;
             } else {
                 //Initialise the object with the internal data of the question from the JSON
-                if (!$this->internalInitialization($json_internal)) {
+                if (!$this->internalInitialization($array_internal)) {
                     //TODO: Log error, internal data could not be initialized
                     $this->status = self::STACK_QUESTION_STATUS_ERROR;
                     return false;
@@ -219,17 +219,14 @@ class StackQuestion
 
     /**
      * Initialises indeed the object with the internal data of the question from the DB
-     * @param string $json_internal
+     * @param array $array_internal
      * @return bool
      */
-    private function internalInitialization(string $json_internal): bool
+    private function internalInitialization(array $array_internal): bool
     {
         //Ensure that the object is in the correct status
         if ($this->getStatus() === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
             try {
-                //Decode the JSON string to an array
-                $array_internal = json_decode($json_internal, true);
-
                 $this->text = new StackText($array_internal['text']);
                 $this->description = new StackText($array_internal['description']);
                 $this->specific_feedback = new StackText($array_internal['specific_feedback']);

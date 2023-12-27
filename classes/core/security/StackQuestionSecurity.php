@@ -33,19 +33,12 @@ class StackQuestionSecurity
     /**
      * Checks the internal security of the question
      * Called at StackQuestion::initialise()
-     * @param string $json
+     * @param mixed $data
      * @return bool
      */
-    public static function checkInternal(string $json): bool
+    public static function checkInternal(mixed $data): bool
     {
-        $decoded = json_decode($json, true);
-        //JSON coding checks
-        if ($decoded !== null && json_last_error() === JSON_ERROR_NONE) {
-            //TODO: Check internal status of the json values
-            return true;
-        } else {
-            return false;
-        }
+        return is_array($data);
     }
 
     /**
@@ -65,16 +58,16 @@ class StackQuestionSecurity
             return false;
         }
     }
-
-    public function getQuestionInternalJSONFromDB(StackVersion $version): string
+    
+    public function getQuestionInternalFromDB(StackVersion $version): array
     {
-        return '';
+        return array();
     }
 
     public function getQuestionExternalJSONFromStudent(StackQuestion $question): string
     {
         if ($question->getStatus() === StackQuestion::STACK_QUESTION_STATUS_EVALUATED) {
-            return StackDatabase::getQuestionExternalJSON($question->getVersion());
+            return '';
         } else {
             return StackQuestionStudentAnswer::getQuestionExternalJSON($question->getVersion());
         }
