@@ -28,12 +28,8 @@ class assStackQuestionGUI extends assQuestionGUI
 {
 
     /**
-     * @var assStackQuestion
-     */
-    public assQuestion $object;
-
-    /**
      * assStackQuestionGUI constructor.
+     * Works as any other ILIAS Question GUI constructor
      */
     public function __construct($id = -1)
     {
