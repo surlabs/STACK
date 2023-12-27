@@ -182,6 +182,8 @@ class assStackQuestionGUI extends assQuestionGUI
      */
     public function setQuestionTabs(): void
     {
+        //Instead of the usual tabs for questions, stack uses a single tab
+        // and a panel with the different sections on top
         $this->addBackTab($this->tabs);
     }
 
