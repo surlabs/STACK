@@ -7,6 +7,7 @@ use classes\core\maxima\StackSession;
 use classes\core\options\StackOptions;
 use classes\core\StackQuestion;
 use classes\core\version\StackVersion;
+use classes\platform\StackConfig;
 use classes\platform\StackDatabase;
 use stdClass;
 
@@ -135,7 +136,15 @@ class StackQuestionSecurity
             'description' => $question['description'],
             'specific_feedback' => $options['specific_feedback'],
             'options' => array(
-                //TODO
+                'multiplicationsign' => $options['multiplication_sign'],
+                'complexno' => $options['complex_no'],
+                'inversetrig' => $options['inverse_trig'],
+                'logicsymbol' => $options['logic_symbol'],
+                'sqrtsign' => $options['sqrt_sign'],
+                'simplify' => $options['question_simplify'],
+                'assumepos' => $options['assume_positive'],
+                'assumereal' => $options['assume_real'],
+                'matrixparens' => $options['matrix_parens'],
             ),
             'variables' => $options['question_variables'],
             'default_feedback_for_fully_correct_prt' => $options['prt_correct'],
