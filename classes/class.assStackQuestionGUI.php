@@ -214,6 +214,17 @@ class assStackQuestionGUI extends assQuestionGUI
         return true;
     }
 
+    private function editQuestionForm(): bool
+    {
+        //TODO Asegurarnos de estar en un question pool y no en un test
+        if ($this->global_request->getMethod() == "POST") {
+            $this->save();
+        }
+        $rendered = AuthorEditQuestionUI::show($this, $this->object->getPlugin());
+        $this->tpl->setContent($rendered);
+        return true;
+    }
+
     /**
      * Actually runs the Importing of questions
      * @return void
