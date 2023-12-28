@@ -162,6 +162,7 @@ class StackQuestionSecurity
             'hint' => '',
             'inputs' => $inputs,
             'potential_response_trees' => $prts,
+            'stackversion' => $options['stack_version'],
         );
     }
 
