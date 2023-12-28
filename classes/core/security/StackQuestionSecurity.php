@@ -138,6 +138,55 @@ class StackQuestionSecurity
             }
         }
 
+        $deployedseeds = StackDatabase::select('xqcas_deployed_seeds', ['question_id' => $version->getId()], array('seed'));
+
+        if (empty($deployedseeds)) {
+            throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: Deployed seeds not found for question id ' . $version->getId());
+        } else {
+            $tmp_seeds = array();
+
+            foreach ($deployedseeds as $deployedseed) {
+                $tmp_seeds[] = $deployedseed['seed'];
+            }
+
+            $deployedseeds = $tmp_seeds;
+        }
+
+        $quests = StackDatabase::select('xqcas_qtests', ['question_id' => $version->getId()], array('test_case'));
+
+        if (empty($quests)) {
+            throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: QTests not found for question id ' . $version->getId());
+        } else {
+            $tmp_quests = array();
+
+            foreach ($quests as $quest) {
+                $tmp_quests[$quest['test_case']] = [
+                    'id' => $quest['id'],
+                    'test_case' => $quest['test_case'],
+                    'inputs' => array(),
+                    'expected' => array(),
+                ];
+            }
+
+            $quests = $tmp_quests;
+
+            $qtest_inputs = StackDatabase::select('xqcas_qtest_inputs', ['question_id' => $version->getId()]);
+
+            foreach ($qtest_inputs as $qtest_input) {
+                $quests[$qtest_input['test_case']]['inputs'][$qtest_input['input_name']] = $qtest_input['input_value'];
+            }
+
+            $qtest_expected = StackDatabase::select('xqcas_qtest_expected', ['question_id' => $version->getId()]);
+
+            foreach ($qtest_expected as $qtest_expect) {
+                $quests[$qtest_expect['test_case']]['expected'][$qtest_expect['prt_name']] = [
+                    'score' => $qtest_expect['expected_score'],
+                    'penalty' => $qtest_expect['expected_penalty'],
+                    'answernote' => $qtest_expect['expected_answer_note'],
+                ];
+            }
+        }
+
         return array(
             'title' => $question['title'],
             'text' => $question['question_text'],
@@ -163,6 +212,8 @@ class StackQuestionSecurity
             'inputs' => $inputs,
             'potential_response_trees' => $prts,
             'stackversion' => $options['stack_version'],
+            'deployedseeds' => $deployedseeds,
+            'qtests' => $quests,
         );
     }
 
@@ -268,7 +319,43 @@ class StackQuestionSecurity
                 }
             }
 
-            dump($data);
+            foreach ($data['deployedseeds'] as $key => $value) {
+                StackDatabase::insert('xqcas_deployed_seeds', array(
+                    'id' => StackDatabase::nextId('xqcas_deployed_seeds'),
+                    'question_id' => $data['question_id'],
+                    'seed' => $value,
+                ));
+            }
+
+            foreach ($data['qtests'] as $key => $value) {
+                StackDatabase::insert('xqcas_qtests', array(
+                    'id' => StackDatabase::nextId('xqcas_qtests'),
+                    'question_id' => $data['question_id'],
+                    'test_case' => $key,
+                ));
+
+                foreach ($value['inputs'] as $input_name => $input_value) {
+                    StackDatabase::insert('xqcas_qtest_inputs', array(
+                        'id' => StackDatabase::nextId('xqcas_qtest_inputs'),
+                        'question_id' => $data['question_id'],
+                        'test_case' => $key,
+                        'input_name' => $input_name,
+                        'value' => $input_value,
+                    ));
+                }
+
+                foreach ($value['expected'] as $prt_name => $expected) {
+                    StackDatabase::insert('xqcas_qtest_expected', array(
+                        'id' => StackDatabase::nextId('xqcas_qtest_expected'),
+                        'question_id' => $data['question_id'],
+                        'test_case' => $key,
+                        'prt_name' => $prt_name,
+                        'expected_score' => $expected['score'],
+                        'expected_penalty' => $expected['penalty'],
+                        'expected_answer_note' => $expected['answer_note'],
+                    ));
+                }
+            }
 
             return true;
         } catch (StackException $e) {
@@ -285,7 +372,13 @@ class StackQuestionSecurity
 
             StackDatabase::delete('xqcas_prt_nodes', ['question_id' => $data['question_id']]);
 
-            dump($e->getMessage());
+            StackDatabase::delete('xqcas_deployed_seeds', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_qtests', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_qtest_inputs', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_qtest_expected', ['question_id' => $data['question_id']]);
 
             return false;
         }

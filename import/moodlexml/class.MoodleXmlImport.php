@@ -245,11 +245,11 @@ class MoodleXmlImport
                     );
                 }
 
-                //seeds
-                $raw_data["seeds"] = array();
+                //deployedseeds
+                $raw_data["deployedseeds"] = array();
                 if (isset($xmlQuestion->deployedseed)) {
                     foreach ($xmlQuestion->deployedseed as $seed) {
-                        $raw_data["seeds"][] = (int) $seed;
+                        $raw_data["deployedseeds"][] = (int) $seed;
                     }
                 }
 
@@ -270,32 +270,22 @@ class MoodleXmlImport
 
                 //Unit tests
                 if (isset($xmlQuestion->qtest)) {
-                    $raw_data["qtest"] = array();
+                    $raw_data["qtests"] = array();
 
                     foreach ($xmlQuestion->qtest as $testcase) {
                         $testcase_name = (string)$testcase->testcase;
-                        $raw_data["qtest"][$testcase_name] = array();
+                        $raw_data["qtests"][$testcase_name] = array();
 
                         foreach ($testcase->testinput as $testcase_input) {
-
-                            $input_name = (string)$testcase_input->name;
-                            $input_value = (string)$testcase_input->value;
-
-                            $raw_data["qtest"][$testcase_name]['inputs'][$input_name]['value'] = $input_value;
-
+                            $raw_data["qtests"][$testcase_name]['inputs'][(string)$testcase_input->name] = (string) $testcase_input->value;;
                         }
 
                         foreach ($testcase->expected as $testcase_expected) {
-
                             $prt_name = (string)$testcase_expected->name;
-                            $expected_score = (string)$testcase_expected->expectedscore;
-                            $expected_penalty = (string)$testcase_expected->expectedpenalty;
-                            $expected_answer_note = (string)$testcase_expected->expectedanswernote;
 
-                            $raw_data["qtest"][$testcase_name]['expected'][$prt_name]['score'] = $expected_score;
-                            $raw_data["qtest"][$testcase_name]['expected'][$prt_name]['penalty'] = $expected_penalty;
-                            $raw_data["qtest"][$testcase_name]['expected'][$prt_name]['answer_note'] = $expected_answer_note;
-
+                            $raw_data["qtests"][$testcase_name]['expected'][$prt_name]['score'] = (string) $testcase_expected->expectedscore;
+                            $raw_data["qtests"][$testcase_name]['expected'][$prt_name]['penalty'] = (string) $testcase_expected->expectedpenalty;
+                            $raw_data["qtests"][$testcase_name]['expected'][$prt_name]['answer_note'] = (string) $testcase_expected->expectedanswernote;
                         }
                     }
                 }
@@ -313,16 +303,11 @@ class MoodleXmlImport
 
                 if ($this->getQuestion()->getStackQuestion()->getSecurity()->setQuestionInternalToDB($raw_data)) {
                     $number_of_questions_created++;
-                    dump("STACK Question imported successfully, count: " . $number_of_questions_created);
-                } else {
-                    //TODO: Error logging
                 }
             } else {
                 throw new StackException("MoodleXmlImport: Question type not supported: " . $type . ", expected: stack");
             }
         }
-
-        exit;
 
         return $number_of_questions_created > 0;
     }
