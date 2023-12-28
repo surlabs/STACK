@@ -615,4 +615,21 @@ class StackQuestion
         return $this->external_data;
     }
 
+    /**
+     * @param array $new_inputs
+     * @return void
+     */
+    public function setInputs(array $new_inputs): void
+    {
+        $this->inputs = $new_inputs;
+    }
+
+    /**
+     * @param array $new_prts
+     * @return void
+     */
+    public function setPotentialResponseTrees(array $new_prts): void
+    {
+        $this->potential_response_trees = $new_prts;
+    }
 }
