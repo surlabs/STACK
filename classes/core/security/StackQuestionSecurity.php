@@ -116,19 +116,25 @@ class StackQuestionSecurity
             $tmp_prts = array();
 
             foreach ($prts as $prt) {
-                $tmp_prts[$prt['id']] = [
+                $tmp_prts[$prt['name']] = [
                     'id' => $prt['id'],
                     'name' => $prt['name'],
                     'simplify' => $prt['auto_simplify'],
-                    'feedback_style' => 1, //TODO
+                    'feedback_style' => 1,
                     'value' => $prt['value'],
                     'feedback_variables' => new StackSession($version), //TODO
-                    'nodes' => new stdClass(), //TODO
+                    'nodes' => array(),
                     'first_node' => $prt['first_node_name'],
                 ];
             }
 
             $prts = $tmp_prts;
+
+            $nodes = StackDatabase::select('xqcas_prt_nodes', ['question_id' => $version->getId()]);
+
+            foreach ($nodes as $node) {
+                $prts[$node['prt_name']]['nodes'][$node['node_name']] = $node;
+            }
         }
 
         return array(
