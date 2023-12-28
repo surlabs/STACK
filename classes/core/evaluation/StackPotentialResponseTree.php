@@ -33,7 +33,7 @@ class StackPotentialResponseTree
     private int $feedback_style;
     private float $value;
     private StackSession $feedback_variables;
-    private object $nodes;
+    private array $nodes;
     private string $first_node;
     private ?StackQuestion $question;
     private array $trace;
@@ -55,11 +55,6 @@ class StackPotentialResponseTree
         $this->feedback_variables = $prt_data['feedback_variables'];
 
         $this->nodes = $prt_data['nodes'];
-        foreach ($this->nodes as $node) {
-            if (!property_exists($node, 'id')) {
-                $node->id = null;
-            }
-        }
 
         $this->first_node = (string)$prt_data['first_node'];
 
@@ -122,7 +117,7 @@ class StackPotentialResponseTree
         $tests = array();
 
         foreach ($this->nodes as $node) {
-            $tests[$node->answertest] = true;
+            $tests[$node["answertest"]] = true;
         }
 
         return $tests;
@@ -157,11 +152,11 @@ class StackPotentialResponseTree
         foreach ($this->nodes as $key => $node) {
             $name = $this->getName() . '-' . ($key + 1);
 
-            if (trim($node->sans) != '') {
-                $ans[$name . '-sans'] = $node->sans;
+            if (trim($node["sans"]) != '') {
+                $ans[$name . '-sans'] = $node["sans"];
             }
-            if (trim($node->tans) != '') {
-                $ans[$name . '-tans'] = $node->tans;
+            if (trim($node["tans"]) != '') {
+                $ans[$name . '-tans'] = $node["tans"];
             }
         }
 
@@ -177,7 +172,7 @@ class StackPotentialResponseTree
         $node_notes = array();
 
         foreach ($this->nodes as $node) {
-            $node_notes = array_merge($node_notes, [$node->trueanswernote, $node->falseanswernote]);
+            $node_notes = array_merge($node_notes, [$node["trueanswernote"], $node["falseanswernote"]]);
         }
 
         $notes = array('NULL' => 'NULL');
@@ -218,15 +213,15 @@ class StackPotentialResponseTree
      */
     private function poRecurse(object $node, array &$postorder, array &$visited): void
     {
-        $true_node = $this->getNode($node->truenextnode);
-        $false_node = $this->getNode($node->falsenextnode);
-        $visited[$node->nodename] = $node;
+        $true_node = $this->getNode($node["truenextnode"]);
+        $false_node = $this->getNode($node["falsenextnode"]);
+        $visited[$node["nodename"]] = $node;
 
-        if ($true_node != null && !array_key_exists($true_node->nodename, $visited)) {
+        if ($true_node != null && !array_key_exists($true_node["nodename"], $visited)) {
             $this->poRecurse($true_node, $postorder, $visited);
         }
 
-        if ($false_node != null && !array_key_exists($false_node->nodename, $visited)) {
+        if ($false_node != null && !array_key_exists($false_node["nodename"], $visited)) {
             $this->poRecurse($false_node, $postorder, $visited);
         }
 
@@ -280,11 +275,11 @@ class StackPotentialResponseTree
         $text = '';
 
         foreach ($this->nodes as $node) {
-            if ($node->truefeedback !== null) {
-                $text .= $node->truefeedback;
+            if ($node["truefeedback"] !== null) {
+                $text .= $node["truefeedback"];
             }
-            if ($node->falsefeedback !== null) {
-                $text .= $node->falsefeedback;
+            if ($node["falsefeedback"] !== null) {
+                $text .= $node["falsefeedback"];
             }
         }
 
