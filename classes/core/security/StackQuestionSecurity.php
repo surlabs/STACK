@@ -71,7 +71,7 @@ class StackQuestionSecurity
      */
     public function getQuestionInternalFromDB(StackVersion $version): array
     {
-        $question = StackDatabase::select('qpl_questions', ['question_id' => $version->getId()], array('question_text', 'description'));
+        $question = StackDatabase::select('qpl_questions', ['question_id' => $version->getId()], array('title', 'question_text', 'description'));
 
         if (empty($question)) {
             throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: Question not found for question id ' . $version->getId());
@@ -139,6 +139,7 @@ class StackQuestionSecurity
         }
 
         return array(
+            'title' => $question['title'],
             'text' => $question['question_text'],
             'description' => $question['description'],
             'specific_feedback' => $options['specific_feedback'],
