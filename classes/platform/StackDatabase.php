@@ -115,4 +115,15 @@ abstract class StackDatabase {
     public static function select(string $table, ?array $where = null, ?array $columns = null): array {
         return self::$platform->selectInternal($table, $where, $columns);
     }
+
+    /**
+     * Returns the next id for a table
+     *
+     * @param string $string
+     * @return int
+     * @throws StackException
+     */
+    public static function nextId(string $string) :int {
+        return self::$platform->nextIdInternal($string);
+    }
 }

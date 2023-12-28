@@ -171,9 +171,123 @@ class StackQuestionSecurity
      * @throws StackException
      */
     public function setQuestionInternalToDB(array $data) :bool {
-        dump($data);
+        try {
+            StackDatabase::insert('xqcas_options', array(
+                'id' => StackDatabase::nextId('xqcas_options'),
+                'question_id' => $data['question_id'],
+                'question_variables' => $data['question_variables'],
+                'specific_feedback' => $data['specific_feedback'],
+                'specific_feedback_format' => $data['specific_feedback_format'],
+                'question_note' => $data['question_note'],
+                'question_simplify' => $data['options']['simplify'],
+                'assume_positive' => $data['options']['assumepos'],
+                'prt_correct' => $data['prt_correct'],
+                'prt_correct_format' => $data['prt_correct_format'],
+                'prt_partially_correct' => $data['prt_partially_correct'],
+                'prt_partially_correct_format' => $data['prt_partially_correct_format'],
+                'prt_incorrect' => $data['prt_incorrect'],
+                'prt_incorrect_format' => $data['prt_incorrect_format'],
+                'multiplication_sign' => $data['options']['multiplicationsign'],
+                'sqrt_sign' => $data['options']['sqrtsign'],
+                'complex_no' => $data['options']['complexno'],
+                'inverse_trig' => $data['options']['inversetrig'],
+                'variants_selection_seed' => $data['variants_selection_seed'],
+                'matrix_parens' => $data['options']['matrixparens'],
+                'assume_real' => $data['options']['assumereal'],
+                'logic_symbol' => $data['options']['logicsymbol'],
+                'stack_version' => $data['stackversion'],
+            ));
 
-        return true;
+            StackDatabase::insert('xqcas_extra_info', array(
+                'id' => StackDatabase::nextId('xqcas_extra_info'),
+                'question_id' => $data['question_id'],
+                'general_feedback' => $data['general_feedback'],
+                'penalty' => $data['penalty'],
+                'hidden' => $data['hidden'],
+            ));
+
+            foreach ($data['inputs'] as $key => $value) {
+                StackDatabase::insert('xqcas_inputs', array(
+                    'id' => StackDatabase::nextId('xqcas_inputs'),
+                    'question_id' => $data['question_id'],
+                    'name' => $key,
+                    'tans' => $value['tans'],
+                    'box_size' => $value['boxWidth'],
+                    'strict_syntax' => $value['strictSyntax'],
+                    'insert_stars' => $value['insertStars'],
+                    'syntax_hint' => $value['syntaxHint'],
+                    'forbid_words' => $value['forbidWords'],
+                    'require_lowest_terms' => $value['lowestTerms'],
+                    'check_answer_type' => $value['checkanswertype'],
+                    'must_verify' => $value['mustVerify'],
+                    'show_validation' => $value['showValidation'],
+                    'options' => $value['options'],
+                    'allow_words' => $value['allowWords'],
+                    'syntax_attribute' => $value['syntaxAttribute'],
+                ));
+            }
+
+            foreach ($data['prts'] as $key => $value) {
+                StackDatabase::insert('xqcas_prts', array(
+                    'id' => StackDatabase::nextId('xqcas_prts'),
+                    'question_id' => $data['question_id'],
+                    'name' => $key,
+                    'value' => $value['value'],
+                    'auto_simplify' => $value['simplify'],
+                    'feedback_variables' => $value['feedback_variables'],
+                    'first_node_name' => $value['first_node'],
+                ));
+
+                foreach ($value['nodes'] as $node_name => $node) {
+                    StackDatabase::insert('xqcas_prt_nodes', array(
+                        'id' => StackDatabase::nextId('xqcas_prt_nodes'),
+                        'question_id' => $data['question_id'],
+                        'prt_name' => $key,
+                        'node_name' => $node_name,
+                        'answer_test' => $node['answertest'],
+                        'sans' => $node['sans'],
+                        'tans' => $node['tans'],
+                        'test_options' => $node['testoptions'],
+                        'quiet' => $node['quiet'],
+                        'true_score_mode' => $node['truescoremode'],
+                        'true_score' => $node['truescore'],
+                        'true_penalty' => $node['truepenalty'],
+                        'true_next_node' => $node['truenextnode'],
+                        'true_answer_note' => $node['trueanswernote'],
+                        'true_feedback' => $node['truefeedback'],
+                        'true_feedback_format' => $node['truefeedback_format'],
+                        'false_score_mode' => $node['falsescoremode'],
+                        'false_score' => $node['falsescore'],
+                        'false_penalty' => $node['falsepenalty'],
+                        'false_next_node' => $node['falsenextnode'],
+                        'false_answer_note' => $node['falseanswernote'],
+                        'false_feedback' => $node['falsefeedback'],
+                        'false_feedback_format' => $node['falsefeedback_format'],
+                    ));
+                }
+            }
+
+            dump($data);
+
+            return true;
+        } catch (StackException $e) {
+            // If the question could not be saved to xqcas tables, delete the inserted data
+            StackDatabase::delete('qpl_questions', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_options', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_extra_info', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_inputs', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_prts', ['question_id' => $data['question_id']]);
+
+            StackDatabase::delete('xqcas_prt_nodes', ['question_id' => $data['question_id']]);
+
+            dump($e->getMessage());
+
+            return false;
+        }
     }
 
     public function getQuestionExternalJSONFromStudent(StackQuestion $question): string

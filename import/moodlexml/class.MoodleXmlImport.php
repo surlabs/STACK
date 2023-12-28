@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use classes\core\security\StackException;
+use classes\platform\StackDatabase;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -132,12 +133,15 @@ class MoodleXmlImport
 
                 //prt correct feedback
                 $raw_data["prt_correct"] = (string) $xmlQuestion->prtcorrect->text;
+                $raw_data["prt_correct_format"] = 1;
 
                 //prt partially correct
                 $raw_data["prt_partially_correct"] = (string) $xmlQuestion->prtpartiallycorrect->text;
+                $raw_data["prt_partially_correct_format"] = 1;
 
                 //prt incorrect
                 $raw_data["prt_incorrect"] = (string) $xmlQuestion->prtincorrect->text;
+                $raw_data["prt_incorrect_format"] = 1;
 
                 //variants selection seeds
                 $raw_data["variants_selection_seed"] = (string) $xmlQuestion->variantsselectionseed;
@@ -154,15 +158,22 @@ class MoodleXmlImport
                 $raw_data["options"]['matrixparens'] = (string) $xmlQuestion->matrixparens;
                 $raw_data["options"]['logicsymbol'] = (string) $xmlQuestion->logicsymbol;
 
+                if (isset($xmlQuestion->stackversion->text)) {
+                    $raw_data["stackversion"] = (string) $xmlQuestion->stackversion->text;
+                } else {
+                    $raw_data["stackversion"] = "";
+                }
+
                 //Step 5: Set the xqcas_inputs fields
                 $raw_data["inputs"] = array();
 
                 foreach ($xmlQuestion->input as $input) {
                     $raw_data["inputs"][(string) $input->name] = array(
+                        'tans' => (string) $input->tans,
                         'inputType' => (string) $input->type,
                         'boxWidth' => (string) $input->boxsize,
                         'strictSyntax' => (string) $input->strictsyntax,
-                        'insertStars' => (string) $input->insertstars,
+                        'insertStars' => (int) $input->insertstars,
                         'syntaxHint' => (string) $input->syntaxhint,
                         'syntaxAttribute' => (string) $input->syntaxattribute,
                         'forbidWords' => (string) $input->forbidwords,
@@ -173,6 +184,7 @@ class MoodleXmlImport
                         'mustVerify' => (string) $input->mustverify,
                         'showValidation' => (string) $input->showvalidation,
                         'options' => (string) $input->options,
+                        'checkanswertype' => (int) $input->checkanswertype,
                     );
                 }
 
@@ -195,7 +207,11 @@ class MoodleXmlImport
                     $first_node = false;
 
                     foreach ($prt->node as $xml_node) {
-                        $nodes[(string) $xml_node->name->text] = array(
+                        if (!$first_node) {
+                            $first_node = (string) $xml_node->name;
+                        }
+
+                        $nodes[(string) $xml_node->name] = array(
                             'sans' => (string) $xml_node->sans,
                             'tans' => (string) $xml_node->tans,
                             'falsepenalty' => (string) $xml_node->falsepenalty,
@@ -204,7 +220,9 @@ class MoodleXmlImport
                             'testoptions' => (string) $xml_node->testoptions,
                             'quiet' => (string) $xml_node->quiet,
                             'falsefeedback' => (string) $xml_node->falsefeedback->text,
+                            'falsefeedback_format' => 1,
                             'truefeedback' => (string) $xml_node->truefeedback->text,
+                            'truefeedback_format' => 1,
                             'truenextnode' => (string) $xml_node->truenextnode,
                             'falsenextnode' => (string) $xml_node->falsenextnode,
                             'trueanswernote' => (string) $xml_node->trueanswernote,
@@ -223,7 +241,7 @@ class MoodleXmlImport
                         'value' => (float) $prt->value,
                         'feedback_variables' => (string) $prt->feedbackvariables->text,
                         'nodes' => $nodes,
-                        'first_node' => (string) $prt->firstnode,
+                        'first_node' => $first_node,
                     );
                 }
 
@@ -282,10 +300,22 @@ class MoodleXmlImport
                     }
                 }
 
-                // $this->getQuestion()->saveQuestionDataToDb();
+                //Step 9: Set basic data for the question.
+                $this->getQuestion()->setTitle($raw_data['question_title']);
+                $this->getQuestion()->setPoints($raw_data['points']);
+
+                $this->getQuestion()->setQuestion($raw_data['question_text']);
+                $this->getQuestion()->setLifecycle(ilAssQuestionLifecycle::getDraftInstance());
+
+                $this->getQuestion()->saveQuestionDataToDb();
+
+                $raw_data['question_id'] = $this->getQuestion()->getId();
 
                 if ($this->getQuestion()->getStackQuestion()->getSecurity()->setQuestionInternalToDB($raw_data)) {
                     $number_of_questions_created++;
+                    dump("STACK Question imported successfully, count: " . $number_of_questions_created);
+                } else {
+                    //TODO: Error logging
                 }
             } else {
                 throw new StackException("MoodleXmlImport: Question type not supported: " . $type . ", expected: stack");

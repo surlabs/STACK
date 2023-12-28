@@ -164,4 +164,21 @@ class StackDatabaseIlias extends StackDatabase {
             throw new StackException($e->getMessage());
         }
     }
+
+    /**
+     * Returns the next id for a table
+     *
+     * Usage: StackDatabase::nextId('table_name');
+     *
+     * @param string $table
+     * @return int
+     * @throws StackException
+     */
+    public function nextIdInternal(string $table) :int {
+        try {
+            return $this->db->nextId($table);
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
+    }
 }
