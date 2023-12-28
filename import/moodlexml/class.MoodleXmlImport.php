@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use classes\core\security\StackException;
+
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  *  This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -60,7 +62,7 @@ class MoodleXmlImport
      * @param int $first_question_id the question_id for the first question to import.
      * @param assStackQuestion $question
      */
-    function __construct(ilPlugin $plugin, int $first_question_id, assQuestion $question)
+    function __construct(ilPlugin $plugin, int $first_question_id, assStackQuestion $question)
     {
         //Set Plugin and first question id.
         $this->setPlugin($plugin);
@@ -75,6 +77,7 @@ class MoodleXmlImport
      * This method is called from assStackQuestion to import the questions from an MoodleXML file.
      * @param $xml_file
      * @return bool
+     * @throws StackException
      */
     public function import($xml_file): bool
     {
@@ -82,41 +85,223 @@ class MoodleXmlImport
         //LIBXML_NOCDATA Merge CDATA as Textnodes
         $xml = simplexml_load_file($xml_file, null, LIBXML_NOCDATA);
 
-        //Step 2: Initialize question in ILIAS
         $number_of_questions_created = 0;
 
-        foreach ($xml->question as $question) {
 
-            if($this->loadFromMoodleXML($question)) {
-                $number_of_questions_created++;
+        //Step 2: Iterate over all questions in the XML file.
+        foreach ($xml->question as $xmlQuestion) {
+            $type = (string) $xmlQuestion->attributes()['type'];
+
+            if ($type == "stack") {
+                //New list of media objects for each question
+                $this->media_objects = array();
+
+                //Set current question Id to -1 if we have created already one question, to ensure creation of the others
+                if ($number_of_questions_created > 0) {
+                    $this->getQuestion()->setId(-1);
+                }
+
+                //Delete predefined inputs and prts
+                $this->getQuestion()->getStackQuestion()->setInputs(array());
+                $this->getQuestion()->getStackQuestion()->setPotentialResponseTrees(array());
+
+                //Step 3: Set the basic data for the question.
+                $raw_data = array(
+                    'question_title' => (string) $xmlQuestion->name->text,
+                    'question_text' => (string) $xmlQuestion->questiontext->text,
+                    'points' => (float) $xmlQuestion->defaultgrade,
+                );
+
+                //Step 4: Set the xqcas_options fields
+
+                //question variables
+                if (isset($xmlQuestion->questionvariables->text)) {
+                    $raw_data["question_variables"] = (string)$xmlQuestion->questionvariables->text;
+                }
+
+                //specific feedback
+                if (isset($xmlQuestion->specificfeedback->text)) {
+                    $raw_data["specific_feedback"] = (string)$xmlQuestion->specificfeedback->text;
+                    $raw_data["specific_feedback_format"] = 1;
+                }
+
+                //question note
+                if (isset($xmlQuestion->questionnote->text)) {
+                    $raw_data["question_note"] = (string)$xmlQuestion->questionnote->text;
+                }
+
+                //prt correct feedback
+                $raw_data["prt_correct"] = (string) $xmlQuestion->prtcorrect->text;
+
+                //prt partially correct
+                $raw_data["prt_partially_correct"] = (string) $xmlQuestion->prtpartiallycorrect->text;
+
+                //prt incorrect
+                $raw_data["prt_incorrect"] = (string) $xmlQuestion->prtincorrect->text;
+
+                //variants selection seeds
+                $raw_data["variants_selection_seed"] = (string) $xmlQuestion->variantsselectionseed;
+
+                //options
+                $raw_data["options"] = array();
+                $raw_data["options"]['simplify'] = (int) $xmlQuestion->questionsimplify;
+                $raw_data["options"]['assumepos'] = (int) $xmlQuestion->assumepositive;
+                $raw_data["options"]['assumereal'] = (int) $xmlQuestion->assumereal;
+                $raw_data["options"]['multiplicationsign'] = (string) $xmlQuestion->multiplicationsign;
+                $raw_data["options"]['sqrtsign'] = (int) $xmlQuestion->sqrtsign;
+                $raw_data["options"]['complexno'] = (string) $xmlQuestion->complexno;
+                $raw_data["options"]['inversetrig'] = (string) $xmlQuestion->inversetrig;
+                $raw_data["options"]['matrixparens'] = (string) $xmlQuestion->matrixparens;
+                $raw_data["options"]['logicsymbol'] = (string) $xmlQuestion->logicsymbol;
+
+                //Step 5: Set the xqcas_inputs fields
+                $raw_data["inputs"] = array();
+
+                foreach ($xmlQuestion->input as $input) {
+                    $raw_data["inputs"][(string) $input->name] = array(
+                        'inputType' => (string) $input->type,
+                        'boxWidth' => (string) $input->boxsize,
+                        'strictSyntax' => (string) $input->strictsyntax,
+                        'insertStars' => (string) $input->insertstars,
+                        'syntaxHint' => (string) $input->syntaxhint,
+                        'syntaxAttribute' => (string) $input->syntaxattribute,
+                        'forbidWords' => (string) $input->forbidwords,
+                        'allowWords' => (string) $input->allowwords,
+                        'forbidFloats' => (string) $input->forbidfloat,
+                        'lowestTerms' => (string) $input->requirelowestterms,
+                        'sameType' => (string) $input->checkanswertype,
+                        'mustVerify' => (string) $input->mustverify,
+                        'showValidation' => (string) $input->showvalidation,
+                        'options' => (string) $input->options,
+                    );
+                }
+
+                //Step 6: Set the xqcas_prt & xqcas_prt_nodes fields
+                $raw_data["prts"] = array();
+
+                $total_value = 0;
+
+                foreach ($xmlQuestion->prt as $prt_data) {
+                    $total_value += (float) $prt_data->value;
+                }
+
+                if ($total_value < 0.0000001) {
+                    $total_value = 1.0;
+                }
+
+                foreach ($xmlQuestion->prt as $prt) {
+                    $prt_name = (string) $prt->name;
+                    $nodes = array();
+                    $first_node = false;
+
+                    foreach ($prt->node as $xml_node) {
+                        $nodes[(string) $xml_node->name->text] = array(
+                            'sans' => (string) $xml_node->sans,
+                            'tans' => (string) $xml_node->tans,
+                            'falsepenalty' => (string) $xml_node->falsepenalty,
+                            'truepenalty' => (string) $xml_node->truepenalty,
+                            'answertest' => (string) $xml_node->answertest,
+                            'testoptions' => (string) $xml_node->testoptions,
+                            'quiet' => (string) $xml_node->quiet,
+                            'falsefeedback' => (string) $xml_node->falsefeedback->text,
+                            'truefeedback' => (string) $xml_node->truefeedback->text,
+                            'truenextnode' => (string) $xml_node->truenextnode,
+                            'falsenextnode' => (string) $xml_node->falsenextnode,
+                            'trueanswernote' => (string) $xml_node->trueanswernote,
+                            'falseanswernote' => (string) $xml_node->falseanswernote,
+                            'truescoremode' => (string) $xml_node->truescoremode,
+                            'falsescoremode' => (string) $xml_node->falsescoremode,
+                            'truescore' => (string) $xml_node->truescore,
+                            'falsescore' => (string) $xml_node->falsescore,
+                        );
+                    }
+
+                    $raw_data["prts"][$prt_name] = array(
+                        'name' => $prt_name,
+                        'simplify' => (int) $prt->autosimplify,
+                        'feedback_style' => 1,
+                        'value' => (float) $prt->value,
+                        'feedback_variables' => (string) $prt->feedbackvariables->text,
+                        'nodes' => $nodes,
+                        'first_node' => (string) $prt->firstnode,
+                    );
+                }
+
+                //seeds
+                $raw_data["seeds"] = array();
+                if (isset($xmlQuestion->deployedseed)) {
+                    foreach ($xmlQuestion->deployedseed as $seed) {
+                        $raw_data["seeds"][] = (int) $seed;
+                    }
+                }
+
+                //Step 7: Set the xqcas_extra_info fields
+                if (isset($xmlQuestion->generalfeedback->text)) {
+                    $raw_data["general_feedback"] = (string) $xmlQuestion->generalfeedback->text;
+                }
+
+                //Penalty
+                if (isset($xmlQuestion->penalty)) {
+                    $raw_data["penalty"] = (float) $xmlQuestion->penalty;
+                }
+
+                //Hidden
+                if (isset($xmlQuestion->hidden)) {
+                    $raw_data["hidden"] = (int) $xmlQuestion->hidden;
+                }
+
+                //Unit tests
+                if (isset($xmlQuestion->qtest)) {
+                    $raw_data["qtest"] = array();
+
+                    foreach ($xmlQuestion->qtest as $testcase) {
+                        $testcase_name = (string)$testcase->testcase;
+                        $raw_data["qtest"][$testcase_name] = array();
+
+                        foreach ($testcase->testinput as $testcase_input) {
+
+                            $input_name = (string)$testcase_input->name;
+                            $input_value = (string)$testcase_input->value;
+
+                            $raw_data["qtest"][$testcase_name]['inputs'][$input_name]['value'] = $input_value;
+
+                        }
+
+                        foreach ($testcase->expected as $testcase_expected) {
+
+                            $prt_name = (string)$testcase_expected->name;
+                            $expected_score = (string)$testcase_expected->expectedscore;
+                            $expected_penalty = (string)$testcase_expected->expectedpenalty;
+                            $expected_answer_note = (string)$testcase_expected->expectedanswernote;
+
+                            $raw_data["qtest"][$testcase_name]['expected'][$prt_name]['score'] = $expected_score;
+                            $raw_data["qtest"][$testcase_name]['expected'][$prt_name]['penalty'] = $expected_penalty;
+                            $raw_data["qtest"][$testcase_name]['expected'][$prt_name]['answer_note'] = $expected_answer_note;
+
+                        }
+                    }
+                }
+
+                // $this->getQuestion()->saveQuestionDataToDb();
+
+                if ($this->getQuestion()->getStackQuestion()->getSecurity()->setQuestionInternalToDB($raw_data)) {
+                    $number_of_questions_created++;
+                }
+            } else {
+                throw new StackException("MoodleXmlImport: Question type not supported: " . $type . ", expected: stack");
             }
-            var_dump($xml);
-            exit;
-            $type = (string)$question->attributes()['type'];
-
         }
 
-        if($number_of_questions_created > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+        exit;
 
-    /**
-     * Initializes $this->getQuestion with the values from the XML object.
-     * @param SimpleXMLElement $question
-     * @return bool
-     */
-    public function loadFromMoodleXML(SimpleXMLElement $question): bool
-    {
-        return true;
+        return $number_of_questions_created > 0;
     }
 
     /**
      * @param ilassStackQuestionPlugin $plugin
      */
-    public function setPlugin(ilassStackQuestionPlugin $plugin)
+    public
+    function setPlugin(ilassStackQuestionPlugin $plugin): void
     {
         $this->plugin = $plugin;
     }
@@ -124,7 +309,8 @@ class MoodleXmlImport
     /**
      * @return ilassStackQuestionPlugin
      */
-    public function getPlugin(): ilassStackQuestionPlugin
+    public
+    function getPlugin(): ilassStackQuestionPlugin
     {
         return $this->plugin;
     }
@@ -132,7 +318,8 @@ class MoodleXmlImport
     /**
      * @param assStackQuestion $question
      */
-    public function setQuestion(assStackQuestion $question)
+    public
+    function setQuestion(assStackQuestion $question): void
     {
         $this->question = $question;
     }
@@ -140,7 +327,8 @@ class MoodleXmlImport
     /**
      * @return assStackQuestion
      */
-    public function getQuestion(): assStackQuestion
+    public
+    function getQuestion(): assStackQuestion
     {
         return $this->question;
     }
@@ -148,7 +336,8 @@ class MoodleXmlImport
     /**
      * @param int $first_question
      */
-    public function setFirstQuestion(int $first_question)
+    public
+    function setFirstQuestion(int $first_question): void
     {
         $this->first_question = $first_question;
     }
@@ -156,7 +345,8 @@ class MoodleXmlImport
     /**
      * @return int
      */
-    public function getFirstQuestion(): int
+    public
+    function getFirstQuestion(): int
     {
         return $this->first_question;
     }
@@ -164,7 +354,8 @@ class MoodleXmlImport
     /**
      * @param $tags
      */
-    public function setRTETags($tags)
+    public
+    function setRTETags($tags): void
     {
         $this->rte_tags = $tags;
     }
@@ -172,11 +363,11 @@ class MoodleXmlImport
     /**
      * @return string    allowed html tags, e.g. "<em><strong>..."
      */
-    public function getRTETags(): string
+    public
+    function getRTETags(): string
     {
         return $this->rte_tags;
     }
 
     /* GETTERS AND SETTERS END */
-
 }

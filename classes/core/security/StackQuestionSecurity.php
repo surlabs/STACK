@@ -65,6 +65,8 @@ class StackQuestionSecurity
     }
 
     /**
+     * Get a raw array of the question from the database
+     *
      * @throws StackException
      */
     public function getQuestionInternalFromDB(StackVersion $version): array
@@ -160,6 +162,17 @@ class StackQuestionSecurity
             'inputs' => $inputs,
             'potential_response_trees' => $prts,
         );
+    }
+
+    /**
+     * Set a raw array of the question to the database
+     *
+     * @throws StackException
+     */
+    public function setQuestionInternalToDB(array $data) :bool {
+        dump($data);
+
+        return true;
     }
 
     public function getQuestionExternalJSONFromStudent(StackQuestion $question): string
