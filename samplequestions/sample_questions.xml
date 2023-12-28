@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
-<!-- question: 2034  -->
+  <!-- question: 2034  -->
   <question type="stack">
     <name>
       <text>test_1_integration</text>
@@ -19,10 +19,10 @@
     </stackversion>
     <questionvariables>
       <text>n:rand(5)+3;
-a:rand(5)+3;
-v:rand([x,t]);
-p:(v-a)^n;
-ta:(v-a)^(n+1)/(n+1);</text>
+        a:rand(5)+3;
+        v:rand([x,t]);
+        p:(v-a)^n;
+        ta:(v-a)^(n+1)/(n+1);</text>
     </questionvariables>
     <specificfeedback format="html">
       <text><![CDATA[<p>[[feedback:prt1]]</p>]]></text>
@@ -154,7 +154,7 @@ ta:(v-a)^(n+1)/(n+1);</text>
     </qtest>
   </question>
 
-<!-- question: 2035  -->
+  <!-- question: 2035  -->
   <question type="stack">
     <name>
       <text>test_2_rectangle</text>
@@ -176,13 +176,13 @@ ta:(v-a)^(n+1)/(n+1);</text>
     </stackversion>
     <questionvariables>
       <text>rn:-1*(rand(4)+2);
-rp:9+rand(6);
-ar:rn*rp;
-sg:rn+rp;
-ta1:x*(x+sg)=-ar;
-ta2:x*(x-sg)=-ar;
-tas1:setify(map(rhs,solve(ta1,x)));
-tas2:setify(map(rhs,solve(ta2,x)));</text>
+        rp:9+rand(6);
+        ar:rn*rp;
+        sg:rn+rp;
+        ta1:x*(x+sg)=-ar;
+        ta2:x*(x-sg)=-ar;
+        tas1:setify(map(rhs,solve(ta1,x)));
+        tas2:setify(map(rhs,solve(ta2,x)));</text>
     </questionvariables>
     <specificfeedback format="html">
       <text></text>
@@ -356,7 +356,7 @@ tas2:setify(map(rhs,solve(ta2,x)));</text>
       <autosimplify>1</autosimplify>
       <feedbackvariables>
         <text>v1:first(listofvars(ans1));
- ftm:setify(map(rhs,solve(ans1,v1)));</text>
+          ftm:setify(map(rhs,solve(ans1,v1)));</text>
       </feedbackvariables>
       <node>
         <name>0</name>
@@ -584,7 +584,7 @@ tas2:setify(map(rhs,solve(ta2,x)));</text>
     </qtest>
   </question>
 
-<!-- question: 2036  -->
+  <!-- question: 2036  -->
   <question type="stack">
     <name>
       <text>test_3_matrix</text>
@@ -793,7 +793,7 @@ C:C;]]></text>
     </qtest>
   </question>
 
-<!-- question: 2037  -->
+  <!-- question: 2037  -->
   <question type="stack">
     <name>
       <text>test_5_cubic_spline</text>
@@ -1074,7 +1074,7 @@ ta : matrix([1,x,x^2,x^3]).CS2;]]></text>
     </qtest>
   </question>
 
-<!-- question: 2038  -->
+  <!-- question: 2038  -->
   <question type="stack">
     <name>
       <text>text_4_complex-De Moivre's</text>
@@ -1100,10 +1100,10 @@ ta : matrix([1,x,x^2,x^3]).CS2;]]></text>
     </stackversion>
     <questionvariables>
       <text>a : ev(2+rand(15),simp);
-b : ev((-1)^rand(2)*((1+rand(10)))/(2+rand(15)),simp);
-n : ev(3+rand(20),simp);
-q : a*%e^(b*%i*%pi);
-p : ev(mod(b*n,2),simp);</text>
+        b : ev((-1)^rand(2)*((1+rand(10)))/(2+rand(15)),simp);
+        n : ev(3+rand(20),simp);
+        q : a*%e^(b*%i*%pi);
+        p : ev(mod(b*n,2),simp);</text>
     </questionvariables>
     <specificfeedback format="html">
       <text></text>
@@ -1300,7 +1300,7 @@ p : ev(mod(b*n,2),simp);</text>
     </qtest>
   </question>
 
-<!-- question: 2039  -->
+  <!-- question: 2039  -->
   <question type="stack">
     <name>
       <text>text_6_odd_even</text>
@@ -1489,7 +1489,7 @@ p : ev(mod(b*n,2),simp);</text>
       <autosimplify>1</autosimplify>
       <feedbackvariables>
         <text>sa1:subst(x=-x,ans3)+ans3;
-sa2:ans3-subst(x=-x,ans3);</text>
+          sa2:ans3-subst(x=-x,ans3);</text>
       </feedbackvariables>
       <node>
         <name>0</name>
@@ -1660,7 +1660,7 @@ sa2:ans3-subst(x=-x,ans3);</text>
     </qtest>
   </question>
 
-<!-- question: 2040  -->
+  <!-- question: 2040  -->
   <question type="stack">
     <name>
       <text>text_7_solve_quadratic</text>
@@ -1679,11 +1679,11 @@ sa2:ans3-subst(x=-x,ans3);</text>
     </stackversion>
     <questionvariables>
       <text>n1:2
-n2:n1+3
-v:x
-p:expand((v-n1)*(v-n2))
-simp:false
-ta:[p=0,(v-n1)*(v-n2)=0,v-n1=0 nounor v-n2=0,v=n1 nounor v=n2]</text>
+        n2:n1+3
+        v:x
+        p:expand((v-n1)*(v-n2))
+        simp:false
+        ta:[p=0,(v-n1)*(v-n2)=0,v-n1=0 nounor v-n2=0,v=n1 nounor v=n2]</text>
     </questionvariables>
     <specificfeedback format="html">
       <text>[[feedback:prt1]]</text>
@@ -1733,7 +1733,7 @@ ta:[p=0,(v-n1)*(v-n2)=0,v-n1=0 nounor v-n2=0,v=n1 nounor v=n2]</text>
       <autosimplify>0</autosimplify>
       <feedbackvariables>
         <text>foundfac1:ev(sublist(ans1,lambda([ex], equationp(ex) and is(rhs(ex)=0))),simp);
-foundfac2:ev(any_listp(lambda([ex], second(ATFacForm(lhs(ex),lhs(ex),x))), foundfac1),simp);</text>
+          foundfac2:ev(any_listp(lambda([ex], second(ATFacForm(lhs(ex),lhs(ex),x))), foundfac1),simp);</text>
       </feedbackvariables>
       <node>
         <name>0</name>
@@ -1851,7 +1851,7 @@ foundfac2:ev(any_listp(lambda([ex], second(ATFacForm(lhs(ex),lhs(ex),x))), found
       <testcase>4</testcase>
       <testinput>
         <name>ans1</name>
-        <value>[p=0,(x-(n1+n2)/2)^2-ev((n1+n2)^2/4-n1*n2,simp)=0,(x-(n1+n2)/2)^2=ev((n1+n2)^2/4-n1*n2,simp),(x-(n1+n2)/2)=+-ev(sqrt((n1+n2)^2/4-n1*n2),simp),x=ev((n1+n2)/2+sqrt((n1+n2)^2/4-n1*n2),simp) nounor x=ev((n1+n2)/2-sqrt((n1+n2)^2/4-n1*n2),simp)]  </value>
+        <value>[p=0,(x-(n1+n2)/2)^2-ev((n1+n2)^2/4-n1*n2,simp)=0,(x-(n1+n2)/2)^2=ev((n1+n2)^2/4-n1*n2,simp),(x-(n1+n2)/2)=#pm#ev(sqrt((n1+n2)^2/4-n1*n2),simp),x=ev((n1+n2)/2+sqrt((n1+n2)^2/4-n1*n2),simp) nounor x=ev((n1+n2)/2-sqrt((n1+n2)^2/4-n1*n2),simp)]  </value>
       </testinput>
       <expected>
         <name>prt1</name>
