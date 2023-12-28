@@ -139,7 +139,6 @@ class StackQuestion
     /**
      * StackQuestion constructor.
      * @param StackVersion $version
-     * @throws StackException
      */
     public function __construct(StackVersion $version)
     {
@@ -150,8 +149,6 @@ class StackQuestion
 
             $this->version = $version;
             $this->status = self::STACK_QUESTION_STATUS_UNINITIALIZED;
-
-            $this->generate();
         } else {
             //TODO: Log error, invalid version
             $this->status = self::STACK_QUESTION_STATUS_ERROR;
