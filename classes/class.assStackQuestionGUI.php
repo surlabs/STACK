@@ -20,6 +20,7 @@ declare(strict_types=1);
  *
  */
 
+use classes\core\security\StackException;
 use ILIAS\UI\Implementation\Component\MessageBox\MessageBox;
 
 /**
@@ -218,6 +219,7 @@ class assStackQuestionGUI extends assQuestionGUI
      * Actually runs the Importing of questions
      * @return void
      * @throws ilCtrlException
+     * @throws StackException
      */
     public function importQuestionFromMoodleXmlRenderUI(): void
     {
@@ -233,8 +235,9 @@ class assStackQuestionGUI extends assQuestionGUI
      * Actually runs the Importing of questions
      * @return void
      * @throws ilCtrlException
+     * @throws StackException
      */
-    public function importQuestionFromMoodleXmlDoImport()
+    public function importQuestionFromMoodleXmlDoImport(): void
     {
 
         if (isset($_FILES["questions_xml"]["tmp_name"]) && file_exists($_FILES["questions_xml"]["tmp_name"])) {
