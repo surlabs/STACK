@@ -22,30 +22,30 @@ use classes\platform\StackConfig;
  *  stack@surlabs.es
  *
  */
-class assStackQuestionAuthoringGUI
+class AuthorEditQuestionUI
 {
 
     /**
      * Plugin instance for templates and language management
      * @var ilassStackQuestionPlugin
      */
-    private $plugin;
+    private ilPlugin $plugin;
 
     /**
      * The question already evaluated
      * @var assStackQuestionGUI
      */
-    private $question_gui;
+    private assQuestionGUI $question_gui;
 
     /**
      * @var ilPropertyFormGUI
      */
-    private $form;
+    private ilPropertyFormGUI $form;
 
     /**
      * @var ilTemplate the global template
      */
-    private $template;
+    private ilTemplate $template;
 
     private array $default;
 
@@ -54,8 +54,9 @@ class assStackQuestionAuthoringGUI
      * Object constructor
      * @param $plugin ilassStackQuestionPlugin
      * @param $question assStackQuestionGUI
+     * @throws ilCtrlException
      */
-    function __construct($plugin, $question)
+    function __construct(ilPlugin $plugin, assQuestionGUI $question)
     {
         global $DIC;
 
