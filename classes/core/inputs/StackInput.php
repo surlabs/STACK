@@ -59,7 +59,7 @@ abstract class StackInput
         'allowempty' => false
     );
 
-    private StackOptions $options;
+    private string $options;
 
     private array $parameters = array();
 
@@ -73,7 +73,7 @@ abstract class StackInput
      * StackInput constructor
      * @throws StackException
      */
-    public function __construct(string $name, ?string $teacherAnswer, StackOptions $options, ?array $parameters = null, bool $runtime = true)
+    public function __construct(string $name, ?string $teacherAnswer, string $options, ?array $parameters = null, bool $runtime = true)
     {
         if (trim($name) === '') {
             throw new StackException('StackInput: $name must be non-empty.');

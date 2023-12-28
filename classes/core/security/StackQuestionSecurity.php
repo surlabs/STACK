@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace classes\core\security;
 
+use classes\core\external\cas\stack_cas_session2;
 use classes\core\maxima\StackSession;
 use classes\core\options\StackOptions;
 use classes\core\StackQuestion;
@@ -101,8 +102,6 @@ class StackQuestionSecurity
 
             foreach ($inputs as $input) {
                 $tmp_inputs[$input['id']] = $input;
-
-                $tmp_inputs[$input['id']]['options'] = new StackOptions(null);  //TODO
             }
 
             $inputs = $tmp_inputs;
@@ -122,7 +121,7 @@ class StackQuestionSecurity
                     'simplify' => $prt['auto_simplify'],
                     'feedback_style' => 1,
                     'value' => $prt['value'],
-                    'feedback_variables' => new StackSession($version), //TODO
+                    'feedback_variables' => $prt['feedback_variables'],
                     'nodes' => array(),
                     'first_node' => $prt['first_node_name'],
                 ];

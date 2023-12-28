@@ -32,7 +32,7 @@ class StackPotentialResponseTree
     private bool $simplify;
     private int $feedback_style;
     private float $value;
-    private StackSession $feedback_variables;
+    private string $feedback_variables;
     private array $nodes;
     private string $first_node;
     private ?StackQuestion $question;
@@ -52,7 +52,7 @@ class StackPotentialResponseTree
 
         $this->value = (float)$prt_data['value'];
 
-        $this->feedback_variables = $prt_data['feedback_variables'];
+        $this->feedback_variables = (string)$prt_data['feedback_variables'];
 
         $this->nodes = $prt_data['nodes'];
 
