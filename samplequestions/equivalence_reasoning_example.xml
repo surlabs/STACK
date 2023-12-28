@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
-<!-- question: 702  -->
+  <!-- question: 702  -->
   <question type="stack">
     <name>
       <text>stack_equiv_find_step(ex, ex1) example</text>
@@ -40,6 +40,7 @@
     <prtincorrect format="html">
       <text><![CDATA[<span style="font-size: 1.5em; color:red;"><i class="fa fa-times"></i></span> Incorrect answer.]]></text>
     </prtincorrect>
+    <decimals>.</decimals>
     <multiplicationsign>cross</multiplicationsign>
     <sqrtsign>1</sqrtsign>
     <complexno>i</complexno>

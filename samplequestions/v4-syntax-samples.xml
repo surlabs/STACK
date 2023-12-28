@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quiz>
-<!-- question: 37  -->
+  <!-- question: 37  -->
   <question type="stack">
     <name>
       <text>Blocks</text>
@@ -135,7 +135,7 @@
     <variantsselectionseed></variantsselectionseed>
   </question>
 
-<!-- question: 36  -->
+  <!-- question: 36  -->
   <question type="stack">
     <name>
       <text><![CDATA[Presenting "strings"]]></text>
