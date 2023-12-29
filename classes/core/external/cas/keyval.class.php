@@ -32,6 +32,7 @@ use classes\core\external\maximaparser\MP_Operation;
 use classes\core\external\maximaparser\MP_Root;
 use classes\core\external\maximaparser\MP_Statement;
 use classes\core\filters\StackParser;
+use classes\core\options\StackOptions;
 use classes\core\security\StackException;
 use classes\platform\StackPlatform;
 
@@ -76,7 +77,7 @@ class stack_cas_keyval {
             throw new StackException('stack_cas_keyval: raw must be a string.');
         }
 
-        if (!is_null($options) && !is_a($options, 'StackOptions')) {
+        if (!is_null($options) && !$options instanceof StackOptions) {
             throw new StackException('stack_cas_keyval: options must be null or StackOptions.');
         }
 
