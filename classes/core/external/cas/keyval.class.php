@@ -215,6 +215,29 @@ class stack_cas_keyval {
         return $this->valid;
     }
 
+    public function get_errors($casdebug = false, $raw = 'strings') {
+        if (null === $this->valid) {
+            $this->validate(null);
+        }
+
+
+        if ($raw === 'objects') {
+            return $this->errors;
+        } else {
+            $errors = [];
+
+            foreach ($this->errors as $err) {
+                if ($err instanceof stack_cas_error) {
+                    $errors[] = $err->get_legacy_error();
+                } else {
+                    $errors[] = $err;
+                }
+            }
+
+            return array_unique($errors);
+        }
+    }
+
     public function instantiate() {
         if (null === $this->valid) {
             $this->validate(null);
