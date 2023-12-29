@@ -76,13 +76,15 @@ class maxima_parser_utils {
         $muccachelimit = 50;
 
         $cache = null;
-        if ($cachekey && $muccachelimit && strlen($code) >= $muccachelimit && mb_strpos($code, 'stack_include') === false) {
+        //fau: comment this cache section until we find a solution
+        /*
+        if ($cachekey && $muccachelimit && strlen($code) >= $muccachelimit) {
             $cache = cache::make('qtype_stack', 'parsercache');
             $ast = $cache->get($cachekey);
             if ($ast) {
                 return $ast;
             }
-        }
+        }*/
 
         $parser = new MP_Parser();
         $ast = $parser->parse($code, $parseoptions);
