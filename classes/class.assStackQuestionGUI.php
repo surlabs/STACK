@@ -273,8 +273,6 @@ class assStackQuestionGUI extends assQuestionGUI
 
         //Show message
         $this->tpl->setContent($this->renderer->render($message));
-
-        $this->importQuestionFromMoodleXmlRenderUI();
     }
 
     /**
