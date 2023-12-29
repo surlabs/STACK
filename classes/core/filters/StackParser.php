@@ -192,7 +192,7 @@ class StackParser
      * @param bool $skipempty
      * @return array
      */
-    public static function allSubstringStrings(string $string, string $left, ?string $right = null, bool $skipempty = false): array {
+    public static function allSubstringStrings(string $string, string $left = "@", ?string $right = null, bool $skipempty = false): array {
         if ($right == null) {
             $right = $left;
         }
