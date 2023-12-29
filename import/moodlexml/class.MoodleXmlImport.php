@@ -191,16 +191,6 @@ class MoodleXmlImport
                 //Step 6: Set the xqcas_prt & xqcas_prt_nodes fields
                 $raw_data["prts"] = array();
 
-                $total_value = 0;
-
-                foreach ($xmlQuestion->prt as $prt_data) {
-                    $total_value += (float) $prt_data->value;
-                }
-
-                if ($total_value < 0.0000001) {
-                    $total_value = 1.0;
-                }
-
                 foreach ($xmlQuestion->prt as $prt) {
                     $prt_name = (string) $prt->name;
                     $nodes = array();
