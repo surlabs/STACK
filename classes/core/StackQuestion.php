@@ -3,17 +3,20 @@ declare(strict_types=1);
 
 namespace classes\core;
 
+use classes\core\external\cas\castext2\castext2_evaluatable;
+use classes\core\external\cas\castext2\castext2_static_replacer;
+use classes\core\external\cas\stack_cas_keyval;
 use classes\core\version\StackVersion;
 use classes\core\security\StackQuestionSecurity;
 use classes\core\security\StackException;
 
-use classes\core\options\StackVariables;
 use classes\core\maxima\StackSession;
 
 use classes\core\text\StackText;
 use classes\core\options\StackOptions;
 use classes\core\inputs\StackInput;
 use classes\core\evaluation\StackPotentialResponseTree;
+use Exception;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -55,49 +58,49 @@ class StackQuestion
     private StackVersion $version;
 
     /**
-     * @var ?StackText The text of the current STACK Question.
+     * @var ?castext2_evaluatable The text of the current STACK Question.
      */
-    private ?StackText $text = null;
+    private ?castext2_evaluatable $text = null;
 
     /**
-     * @var ?StackText The description of the current STACK Question.
+     * @var ?castext2_evaluatable The description of the current STACK Question.
      */
-    private ?StackText $description = null;
+    private ?castext2_evaluatable $description = null;
 
     /**
-     * @var ?StackVariables
+     * @var ?string
      */
-    private ?StackVariables $variables = null;
+    private ?string $variables = null;
 
     /**
-     * @var ?StackText The not inline feedback of the current STACK Question.
+     * @var ?castext2_evaluatable The not inline feedback of the current STACK Question.
      */
-    private ?StackText $specific_feedback = null;
+    private ?castext2_evaluatable $specific_feedback = null;
 
     /**
-     * @var StackText|null Default feedback Text for fully correct PRTs
+     * @var castext2_evaluatable|null Default feedback Text for fully correct PRTs
      */
-    private ?StackText $default_feedback_for_fully_correct_prt = null;
+    private ?castext2_evaluatable $default_feedback_for_fully_correct_prt = null;
 
     /**
-     * @var ?StackText The default feedback Text for partially correct PRTs.
+     * @var ?castext2_evaluatable The default feedback Text for partially correct PRTs.
      */
-    private ?StackText $default_feedback_for_partially_correct_prt = null;
+    private ?castext2_evaluatable $default_feedback_for_partially_correct_prt = null;
 
     /**
-     * @var ?StackText The default feedback Text for fully incorrect PRTs.
+     * @var ?castext2_evaluatable The default feedback Text for fully incorrect PRTs.
      */
-    private ?StackText $default_feedback_for_fully_incorrect_prt = null;
+    private ?castext2_evaluatable $default_feedback_for_fully_incorrect_prt = null;
 
     /**
-     * @var ?StackText The general feedback (how to solve) Text of the current STACK Question.
+     * @var ?castext2_evaluatable The general feedback (how to solve) Text of the current STACK Question.
      */
-    private ?StackText $general_feedback_text = null;
+    private ?castext2_evaluatable $general_feedback_text = null;
 
     /**
-     * @var ?StackText The hint Text of the current STACK Question.
+     * @var ?castext2_evaluatable The hint Text of the current STACK Question.
      */
-    private ?StackText $hint = null;
+    private ?castext2_evaluatable $hint = null;
 
     /**
      * @var ?StackOptions The options of the current STACK Question.
@@ -228,19 +231,31 @@ class StackQuestion
         //Ensure that the object is in the correct status
         if ($this->getStatus() === self::STACK_QUESTION_STATUS_UNINITIALIZED) {
             try {
-                $this->text = new StackText($array_internal['text']);
-                $this->description = new StackText($array_internal['description']);
-                $this->specific_feedback = new StackText($array_internal['specific_feedback']);
+                $static = new castext2_static_replacer(array());
+
+                $this->text = castext2_evaluatable::make_from_compiled($array_internal['text'], "/qt", $static);
+                $this->description = castext2_evaluatable::make_from_compiled($array_internal['description'], "/qd", $static);
+                $this->specific_feedback = castext2_evaluatable::make_from_compiled($array_internal['specific_feedback'], "/sf", $static);
 
                 $this->options = new StackOptions($array_internal['options']);
-                $this->variables = new StackVariables($array_internal['variables']);
 
-                $this->default_feedback_for_fully_correct_prt = new StackText($array_internal['default_feedback_for_fully_correct_prt']);
-                $this->default_feedback_for_partially_correct_prt = new StackText($array_internal['default_feedback_for_partially_correct_prt']);
-                $this->default_feedback_for_fully_incorrect_prt = new StackText($array_internal['default_feedback_for_fully_incorrect_prt']);
+                $kv = new stack_cas_keyval($array_internal['variables'], $this->options);
 
-                $this->general_feedback_text = new StackText($array_internal['general_feedback_text']);
-                $this->hint = new StackText($array_internal['hint']);
+                if (!$kv->get_valid()) {
+                    throw new StackException('Error(s) in question-variables: ' . implode('; ', $kv->get_errors()));
+                }
+
+                $compiled_vars = $kv->compile('/qv', $static);
+
+                $this->variables = $compiled_vars["statement"];
+
+                $this->default_feedback_for_fully_correct_prt = castext2_evaluatable::make_from_compiled($array_internal['default_feedback_for_fully_correct_prt'], "/pc", $static);
+                $this->default_feedback_for_partially_correct_prt = castext2_evaluatable::make_from_compiled($array_internal['default_feedback_for_partially_correct_prt'], "/pp", $static);
+                $this->default_feedback_for_fully_incorrect_prt = castext2_evaluatable::make_from_compiled($array_internal['default_feedback_for_fully_incorrect_prt'], "/pi", $static);
+
+                $this->general_feedback_text = castext2_evaluatable::make_from_compiled($array_internal['general_feedback_text'], "/gf", $static);
+
+                $this->hint = castext2_evaluatable::make_from_source($array_internal['hint'], "hint");
 
                 foreach ($array_internal['inputs'] as $input_identifier => $input_data) {
                     $this->inputs[$input_identifier] = StackInput::create($input_data);
@@ -256,8 +271,14 @@ class StackQuestion
                 //Only here must be the status  set to internally initialized
                 $this->status = self::STACK_QUESTION_STATUS_INTERNALLY_INITIALIZED;
 
+                dump($array_internal);
+                dump($this);
+                exit();
+
                 return true;
-            } catch (StackException $e) {
+            } catch (Exception $e) {
+                dump($e->getMessage());
+                exit();
                 //TODO: Log error, invalid internal data
                 $this->status = self::STACK_QUESTION_STATUS_ERROR;
                 return false;
@@ -484,74 +505,74 @@ class StackQuestion
     }
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable
      */
-    public function getText(): ?StackText
+    public function getText(): castext2_evaluatable
     {
         return $this->text;
     }
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable|null
      */
-    public function getDescription(): ?StackText
+    public function getDescription(): ?castext2_evaluatable
     {
         return $this->description;
     }
 
     /**
-     * @return StackVariables|null
+     * @return string|null
      */
-    public function getVariables(): ?StackVariables
+    public function getVariables(): ?string
     {
         return $this->variables;
     }
 
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable|null
      */
-    public function getSpecificFeedback(): ?StackText
+    public function getSpecificFeedback(): ?castext2_evaluatable
     {
         return $this->specific_feedback;
     }
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable|null
      */
-    public function getDefaultFeedbackForFullyCorrectPrt(): ?StackText
+    public function getDefaultFeedbackForFullyCorrectPrt(): ?castext2_evaluatable
     {
         return $this->default_feedback_for_fully_correct_prt;
     }
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable|null
      */
-    public function getDefaultFeedbackForPartiallyCorrectPrt(): ?StackText
+    public function getDefaultFeedbackForPartiallyCorrectPrt(): ?castext2_evaluatable
     {
         return $this->default_feedback_for_partially_correct_prt;
     }
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable|null
      */
-    public function getDefaultFeedbackForFullyIncorrectPrt(): ?StackText
+    public function getDefaultFeedbackForFullyIncorrectPrt(): ?castext2_evaluatable
     {
         return $this->default_feedback_for_fully_incorrect_prt;
     }
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable|null
      */
-    public function getGeneralFeedbackText(): ?StackText
+    public function getGeneralFeedbackText(): ?castext2_evaluatable
     {
         return $this->general_feedback_text;
     }
 
     /**
-     * @return StackText|null
+     * @return castext2_evaluatable|null
      */
-    public function getHint(): ?StackText
+    public function getHint(): ?castext2_evaluatable
     {
         return $this->hint;
     }
