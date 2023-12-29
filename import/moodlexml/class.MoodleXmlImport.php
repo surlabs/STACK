@@ -292,7 +292,11 @@ class MoodleXmlImport
                 $raw_data['question_id'] = $this->getQuestion()->getId();
 
                 if ($this->getQuestion()->getStackQuestion()->getSecurity()->setQuestionInternalToDB($raw_data)) {
-                    $number_of_questions_created++;
+                    $this->getQuestion()->getStackQuestion()->getVersion()->setId($raw_data['question_id']);
+
+                    if ($this->getQuestion()->getStackQuestion()->generate()) {
+                        $number_of_questions_created++;
+                    }
                 }
             } else {
                 throw new StackException("MoodleXmlImport: Question type not supported: " . $type . ", expected: stack");
