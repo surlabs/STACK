@@ -261,6 +261,7 @@ class StackQuestionSecurity
                 StackDatabase::insert('xqcas_inputs', array(
                     'id' => StackDatabase::nextId('xqcas_inputs'),
                     'question_id' => $data['question_id'],
+                    'type' => $value['type'],
                     'name' => $key,
                     'tans' => $value['tans'],
                     'box_size' => $value['boxWidth'],

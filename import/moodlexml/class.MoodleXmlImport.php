@@ -169,6 +169,7 @@ class MoodleXmlImport
 
                 foreach ($xmlQuestion->input as $input) {
                     $raw_data["inputs"][(string) $input->name] = array(
+                        'type' => (string) $input->type,
                         'tans' => (string) $input->tans,
                         'inputType' => (string) $input->type,
                         'boxWidth' => (string) $input->boxsize,
