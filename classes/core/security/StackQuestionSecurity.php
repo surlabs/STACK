@@ -152,34 +152,33 @@ class StackQuestionSecurity
             $deployedseeds = $tmp_seeds;
         }
 
-        $quests = StackDatabase::select('xqcas_qtests', ['question_id' => $version->getId()], array('test_case'));
+        $qtests = StackDatabase::select('xqcas_qtests', ['question_id' => $version->getId()], array('test_case'));
 
-        if (empty($quests)) {
+        if (empty($qtests)) {
             throw new StackException('StackQuestionSecurity->getQuestionInternalFromDB: QTests not found for question id ' . $version->getId());
         } else {
-            $tmp_quests = array();
+            $tmp_qtests = array();
 
-            foreach ($quests as $quest) {
-                $tmp_quests[$quest['test_case']] = [
-                    'id' => $quest['id'],
-                    'test_case' => $quest['test_case'],
+            foreach ($qtests as $qtest) {
+                $qtests[$qtest['test_case']] = [
+                    'test_case' => $qtest['test_case'],
                     'inputs' => array(),
                     'expected' => array(),
                 ];
             }
 
-            $quests = $tmp_quests;
+            $qtests = $tmp_qtests;
 
             $qtest_inputs = StackDatabase::select('xqcas_qtest_inputs', ['question_id' => $version->getId()]);
 
             foreach ($qtest_inputs as $qtest_input) {
-                $quests[$qtest_input['test_case']]['inputs'][$qtest_input['input_name']] = $qtest_input['input_value'];
+                $qtests[$qtest_input['test_case']]['inputs'][$qtest_input['input_name']] = $qtest_input['value'];
             }
 
             $qtest_expected = StackDatabase::select('xqcas_qtest_expected', ['question_id' => $version->getId()]);
 
             foreach ($qtest_expected as $qtest_expect) {
-                $quests[$qtest_expect['test_case']]['expected'][$qtest_expect['prt_name']] = [
+                $qtests[$qtest_expect['test_case']]['expected'][$qtest_expect['prt_name']] = [
                     'score' => $qtest_expect['expected_score'],
                     'penalty' => $qtest_expect['expected_penalty'],
                     'answernote' => $qtest_expect['expected_answer_note'],
@@ -213,7 +212,7 @@ class StackQuestionSecurity
             'potential_response_trees' => $prts,
             'stackversion' => $options['stack_version'],
             'deployedseeds' => $deployedseeds,
-            'qtests' => $quests,
+            'qtests' => $qtests,
         );
     }
 
