@@ -270,7 +270,7 @@ class StackRenderIlias extends StackRender
             }
             $prt = $question->prts[$prt_name];
             $feedback = '';
-            if (!$show_correct_solution || ($_GET["cmd"] == "post" && $_GET["fallbackCmd"] == "print")) {
+            if (!$show_correct_solution || ($_GET["cmd"] == "post" && $_GET["fallbackCmd"] == "print") || ($_GET["cmd"] == "print")) {
                 if ($display_options['feedback'] && !empty($response)) {
                     $attempt_data['prt_name'] = $prt->get_name();
                     $feedback = self::renderPRTFeedback($attempt_data, $display_options);
