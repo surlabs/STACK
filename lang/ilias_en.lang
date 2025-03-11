@@ -294,6 +294,14 @@ options_assume_real_info#:#This option sets the value of Maxima's assume_real va
 options_prt_correct#:#Feedback for correct answers
 options_prt_partially_correct#:#Feedback for partially correct answers
 options_prt_incorrect#:#Feedback for incorrect answers
+options_multiplication_sign#:#Multiplication sign
+options_multiplication_sign_info#:#Controls how multiplication signs are displayed.
+options_mult_sign_dot#:#Dot
+options_mult_sign_cross#:#Cross
+options_mult_sign_only_numbers#:#Only numbers
+options_mult_sign_none#:#None
+options_sqrt_sign#:#Surd for square root
+options_sqrt_sign_info#:#Controls how surds are displayed.
 options_complex_numbers#:#Meaning and display of sqrt(-1)
 options_complex_numbers_info#:#Controls the meaning and display of the symbol i and sqrt(-1)
 options_complex_numbers_i#:#i
@@ -608,6 +616,7 @@ input_type_numerical#:#Numerical
 show_validation_no#:#No
 show_validation_yes_with_vars#:#Yes, with variable list
 show_validation_yes_without_vars#:#Yes, without variable list
+show_validation_yes_compact#:#Yes, compact
 notes_best_solution_message#:#Notes inputs have no best solution
 show_default_prts_settings#:#Default values for Potential response Trees and First nodes
 default_prts_settings#:#Default values for Potential response Trees
@@ -687,3 +696,9 @@ debug_info_message#:#Debug information (not shown to the students in Tests)
 debug_info_question_variables#:#Question variables
 debug_info_feedback_variables#:#Feedback variables
 error_inputs_missing#:#Some entries are still missing
+prt_node_feedback#:#Node Feedback
+input_delete#:#Delete input
+actions#:#Actions
+ui_admin_configuration_defaults_feedback_styles_title#:#Feedback styles
+ui_admin_configuration_defaults_feedback_styles_name#:#Style name
+ui_admin_configuration_defaults_feedback_styles_style#:#Style

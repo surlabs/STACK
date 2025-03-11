@@ -8,7 +8,7 @@ $(".panel .panel-heading.ilHeader").click(function() {
 
 $(".viewcontrol-expand").each(function() {
   // Poner el boton como primer elemento del div
-  $(this).parent().prepend($(this));
+  $(this).parent().parent().prepend($(this));
 
   $(this).parent().css("justify-content", "normal").css("align-items", "center");
 
