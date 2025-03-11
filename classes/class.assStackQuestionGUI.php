@@ -162,7 +162,7 @@ class assStackQuestionGUI extends assQuestionGUI
 
         $display_options = [];
         $display_options['readonly'] = false;
-        $display_options['feedback'] = false;
+        $display_options['feedback'] = $show_specific_inline_feedback;
 
         //Render question
         $question = StackRenderIlias::renderQuestion($attempt_data, $display_options);
