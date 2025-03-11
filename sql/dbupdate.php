@@ -1181,8 +1181,41 @@ global $DIC;
 $db = $DIC->database();
 
 for ($i = 1; $i <= 6; $i++) {
-    $db->insert("xqcas_configuration", array('parameter_name' => array('text', "feedback_styles_name_$i"), 'value' => array('clob', "Style $i"), 'group_name' => array('text', 'feedback_styles')));
-    $db->insert("xqcas_configuration", array('parameter_name' => array('text', "feedback_styles_style_$i"), 'value' => array('clob', ""), 'group_name' => array('text', 'feedback_styles')));
+    $res = $db->queryF(
+        "SELECT parameter_name 
+         FROM xqcas_configuration 
+         WHERE parameter_name = %s",
+        ["text"],
+        ["feedback_styles_name_$i"]
+    );
+    if ($res->numRows() === 0) {
+        $db->insert(
+            "xqcas_configuration",
+            [
+                'parameter_name' => ['text', "feedback_styles_name_$i"],
+                'value'          => ['clob', "Style $i"],
+                'group_name'     => ['text', 'feedback_styles']
+            ]
+        );
+    }
+
+    $res = $db->queryF(
+        "SELECT parameter_name 
+         FROM xqcas_configuration 
+         WHERE parameter_name = %s",
+        ["text"],
+        ["feedback_styles_style_$i"]
+    );
+    if ($res->numRows() === 0) {
+        $db->insert(
+            "xqcas_configuration",
+            [
+                'parameter_name' => ['text', "feedback_styles_style_$i"],
+                'value'          => ['clob', ""],
+                'group_name'     => ['text', 'feedback_styles']
+            ]
+        );
+    }
 }
 
 $db->update("xqcas_configuration", ["group_name" => ["text", "feedback_styles"]], ["parameter_name" => ["text", "feedback_stylesheet_id"]]);
