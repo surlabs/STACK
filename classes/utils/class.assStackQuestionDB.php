@@ -2078,7 +2078,7 @@ class assStackQuestionDB
 			"true_next_node" => array("text", "-1"),
 			"true_answer_note" => array("text", $new_prt_name . '-' . $new_node_name . '-T'),
 			"true_feedback" => array("clob", $db_original_node->truefeedback),
-			"true_feedback_format" => array("integer", 0),
+			"true_feedback_format" => array("integer", $db_original_node->truefeedbackformat),
 			"false_score_mode" => array("text", $db_original_node->falsescoremode),
 			"false_score" => array("text", $db_original_node->falsescore),
 			"false_penalty" => array("text", $db_original_node->falsepenalty),
