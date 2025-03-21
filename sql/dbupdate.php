@@ -1180,6 +1180,13 @@ if (!$db->fetchAssoc($result)) {
 global $DIC;
 $db = $DIC->database();
 
+$db->update("qpl_qst_type", ["plugin_name" => ["text", "assStackQuestion"]], ["type_tag" => ["text", "assStackQuestion"]]);
+?>
+<#57>
+<?php
+global $DIC;
+$db = $DIC->database();
+
 for ($i = 1; $i <= 6; $i++) {
     $res = $db->queryF(
         "SELECT parameter_name 
