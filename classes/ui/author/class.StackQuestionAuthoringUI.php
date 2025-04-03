@@ -517,7 +517,7 @@ class StackQuestionAuthoringUI
         ])->withRequired(true)
             ->withValue($input->get_parameter('syntaxAttribute'));
         $inputs["forbidWords"] = $this->factory->input()->field()->text($this->plugin->txt("input_forbidden_words"), $this->plugin->txt("input_forbidden_words_info"))
-            ->withValue($input->get_parameter('forbidWords', ""));
+            ->withValue((string) $input->get_parameter('forbidWords', ""));
         $inputs["forbidFloats"] = $this->factory->input()->field()->checkbox($this->plugin->txt("input_forbid_float"), $this->plugin->txt("input_forbid_float_info"))
             ->withValue(boolval($input->get_parameter('forbidFloats')));
         $inputs["allowWords"] = $this->factory->input()->field()->text($this->plugin->txt("input_allow_words"), $this->plugin->txt("input_allow_words_info"))
