@@ -28,6 +28,7 @@ use assStackQuestionDB;
 use assStackQuestionUtils;
 use classes\platform\StackConfig;
 use classes\ui\Component\CustomFactory;
+use ilAssQuestionLifecycle;
 use ilassStackQuestionPlugin;
 use ilCtrlException;
 use ilCtrlInterface;
@@ -35,6 +36,7 @@ use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
 use ilLanguage;
+use ilTestQuestionPoolInvalidArgumentException;
 use stack_abstract_graph_svg_renderer;
 use stack_ans_test_controller;
 use stack_exception;
@@ -140,6 +142,7 @@ class StackQuestionAuthoringUI
 
     /**
      * @throws stack_exception
+     * @throws ilTestQuestionPoolInvalidArgumentException
      */
     private function save(array $result): ?string
     {
@@ -154,6 +157,7 @@ class StackQuestionAuthoringUI
         $this->question->setTitle($basic["title"]);
         $this->question->setAuthor($basic["author"]);
         $this->question->setComment($basic["description"]);
+        $this->question->setLifecycle(ilAssQuestionLifecycle::getInstance($basic["lifecycle"]));
 
         $this->question->setQuestion($basic["question"]);
 
@@ -347,6 +351,8 @@ class StackQuestionAuthoringUI
             ->withValue($this->question->getAuthor());
         $inputs["description"] = $this->factory->input()->field()->text($this->lng->txt("description"))
             ->withValue($this->question->getComment());
+        $inputs["lifecycle"] = $this->factory->input()->field()->select($this->lng->txt("qst_lifecycle"), $this->question->getLifecycle()->getSelectOptions($this->lng))->withRequired(true)
+            ->withValue($this->question->getLifecycle()->getIdentifier());
         $inputs["question"] = $this->customFactory->textareaRTE($this->question->getId(), $this->lng->txt("question"), $this->plugin->txt("authoring_input_creation_info"))->withRequired(true)
             ->withValue($this->question->getQuestion());
         $inputs["points"] = $this->factory->input()->field()->numeric($this->plugin->txt("preview_points_message_p3"), $this->plugin->txt("authoring_points_info"))->withRequired(true)
