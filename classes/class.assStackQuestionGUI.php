@@ -417,7 +417,7 @@ class assStackQuestionGUI extends assQuestionGUI
      */
     public function writePostData($always = FALSE): int
 	{
-        $authoring_ui = new StackQuestionAuthoringUI($this->plugin, $this->object);
+        $authoring_ui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
 
         $authoring_ui->writePostData();
 
@@ -470,7 +470,7 @@ class assStackQuestionGUI extends assQuestionGUI
 
 		$this->getQuestionTemplate();
 
-		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object);
+		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
 
         $this->tpl->setVariable("QUESTION_DATA", $authoring_gui->showAuthoringPanel());
 	}

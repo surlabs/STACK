@@ -28,7 +28,9 @@ use ui\Component\Input\Field\ColumnSection;
 use ui\Component\Input\Field\ExpandableSection;
 use ui\Component\Input\Field\Legacy;
 use ui\Component\Input\Field\TabSection;
+use ui\Component\Input\Field\TaxonomySelect;
 use ui\Component\Input\Field\TextareaRTE;
+use ilObjTaxonomy;
 
 /**
  * Class CustomFactory
@@ -69,5 +71,10 @@ class CustomFactory
     public function buttonSection(array $buttons, string $label, ?string $by_line = null): ButtonSection
     {
         return new ButtonSection($buttons, $label, $by_line);
+    }
+
+    public function taxonomySelect(ilObjTaxonomy $taxonomy): TaxonomySelect
+    {
+        return new TaxonomySelect($taxonomy);
     }
 }

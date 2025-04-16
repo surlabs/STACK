@@ -38,6 +38,8 @@ use ilTinyMCE;
  */
 class Renderer extends RendererILIAS
 {
+    private \ILIAS\UI\Renderer $default_renderer;
+
     protected function getComponentInterfaceName(): array
     {
         return [
@@ -49,12 +51,18 @@ class Renderer extends RendererILIAS
     /**
      * @throws ilTemplateException
      */
-    public function render(Component $component, \ILIAS\UI\Renderer $default_renderer): string
+    public function render(Component $component, ?\ILIAS\UI\Renderer $default_renderer = null): string
     {
         global $DIC;
 
         $DIC->ui()->mainTemplate()->addJavaScript('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.js');
         $DIC->ui()->mainTemplate()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.css');
+
+        if (isset($default_renderer)) {
+            $this->default_renderer = $default_renderer;
+        } else if (!isset($this->default_renderer)) {
+            $this->default_renderer = $DIC->ui()->renderer();
+        }
 
         switch (true) {
             case $component instanceof TextareaRTE:
@@ -65,6 +73,9 @@ class Renderer extends RendererILIAS
                 break;
             case $component instanceof TabSection:
                 $component_rendered = $this->renderTabSection($component, $default_renderer);
+                break;
+            case $component instanceof TaxonomySelect:
+                $component_rendered = $this->renderTaxonomySelect($component, $default_renderer);
                 break;
             case $component instanceof ColumnSection:
                 $component_rendered = $this->renderColumnSection($component, $default_renderer);
@@ -226,14 +237,14 @@ class Renderer extends RendererILIAS
     /**
      * @throws ilTemplateException
      */
-    private function renderExpandableSection(ExpandableSection $component, \ILIAS\UI\Renderer $default_renderer): string
+    private function renderExpandableSection(ExpandableSection $component): string
     {
         $section_tpl = $this->getTemplateCustom("tpl.expandableSection.html");
 
         $inputs_html = "";
 
         foreach ($component->getInputs() as $input) {
-            $inputs_html .= $default_renderer->render($input);
+            $inputs_html .= $this->render($input);
         }
 
         $section_tpl->setVariable("INPUTS", $inputs_html);
@@ -247,7 +258,7 @@ class Renderer extends RendererILIAS
 
         $expand = new Expand($component->isExpandedByDefault());
 
-        $section_tpl->setVariable("VIEW_CONTROL", $default_renderer->render($expand));
+        $section_tpl->setVariable("VIEW_CONTROL", $this->render($expand));
 
         return $section_tpl->get();
     }
@@ -255,7 +266,7 @@ class Renderer extends RendererILIAS
     /**
      * @throws ilTemplateException
      */
-    private function renderTabSection(TabSection $component, \ILIAS\UI\Renderer $default_renderer): string
+    private function renderTabSection(TabSection $component): string
     {
         $section_tpl = $this->getTemplateCustom("tpl.tabSection.html");
 
@@ -280,7 +291,7 @@ class Renderer extends RendererILIAS
             $inputs_html = "";
 
             foreach ($tab as $input) {
-                $inputs_html .= $default_renderer->render($input);
+                $inputs_html .= $this->render($input);
             }
 
             $tabs_panels .= "<div class='tab-panel$isFirst' data-tab-panel='$tab_name' data-section-id='$uid'>$inputs_html</div>";
@@ -297,7 +308,7 @@ class Renderer extends RendererILIAS
     /**
      * @throws ilTemplateException
      */
-    private function renderColumnSection(ColumnSection $component, \ILIAS\UI\Renderer $default_renderer): string
+    private function renderColumnSection(ColumnSection $component): string
     {
         $section_tpl = $this->getTemplateCustom("tpl.columnSection.html");
 
@@ -315,7 +326,7 @@ class Renderer extends RendererILIAS
             $inputs_html = "";
 
             foreach ($column as $input) {
-                $inputs_html .= $default_renderer->render($input);
+                $inputs_html .= $this->render($input);
             }
 
             $columns_html .= "<div class='column'";
@@ -333,18 +344,37 @@ class Renderer extends RendererILIAS
     /**
      * @throws ilTemplateException
      */
-    private function renderButtonSection(ButtonSection $component, \ILIAS\UI\Renderer $default_renderer): string
+    private function renderButtonSection(ButtonSection $component): string
     {
         $section_tpl = $this->getTemplateCustom("tpl.buttonSection.html");
 
         $buttons_html = "";
 
         foreach ($component->getButtons() as $button) {
-            $buttons_html .= $default_renderer->render($button);
+            $buttons_html .= $this->render($button);
         }
 
         $section_tpl->setVariable("INPUTS", $buttons_html);
 
         return $this->wrapInFormContext($component, $section_tpl->get(), $this->bindJSandApplyId2($component, $section_tpl));
+    }
+
+    /**
+     * @throws ilTemplateException
+     */
+    private function renderTaxonomySelect(TaxonomySelect $component): string
+    {
+        $tax_tpl = $this->getTemplateCustom("tpl.taxonomySelect.html");
+        $tax_id = "taxonomy_select_" . $component->getTaxonomy()->getId();
+
+        $tax_tpl->setVariable("ID_TAX", $tax_id);
+        $tax_tpl->setVariable("TXT_SELECT", $this->txt("select"));
+        $tax_tpl->setVariable("TXT_RESET", $this->txt("reset"));
+
+        $id = $this->bindJSandApplyId2($component, $tax_tpl);
+        $this->applyName2($component, $tax_tpl);
+        $this->applyValue2($component, $tax_tpl);
+
+        return $this->wrapInFormContext($component, $tax_tpl->get(), $id);
     }
 }

@@ -25,6 +25,7 @@ namespace classes\ui\author;
 
 use assStackQuestion;
 use assStackQuestionDB;
+use assStackQuestionGUI;
 use assStackQuestionUtils;
 use classes\platform\StackConfig;
 use classes\ui\Component\CustomFactory;
@@ -36,6 +37,7 @@ use ILIAS\UI\Component\Input\Container\Form\Standard as StandardForm;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
 use ilLanguage;
+use ilObjTaxonomy;
 use ilTestQuestionPoolInvalidArgumentException;
 use stack_abstract_graph_svg_renderer;
 use stack_ans_test_controller;
@@ -57,6 +59,7 @@ class StackQuestionAuthoringUI
 {
     private ilassStackQuestionPlugin $plugin;
     private assStackQuestion $question;
+    private assStackQuestionGUI $parent;
     private ilCtrlInterface $ctrl;
     private Factory $factory;
     private CustomFactory $customFactory;
@@ -65,7 +68,7 @@ class StackQuestionAuthoringUI
     private $request;
     private array $feedback_format_options;
 
-    public function __construct(ilassStackQuestionPlugin $plugin, assStackQuestion $question)
+    public function __construct(ilassStackQuestionPlugin $plugin, assStackQuestion $question, assStackQuestionGUI $parent)
     {
         global $DIC;
 
@@ -73,6 +76,7 @@ class StackQuestionAuthoringUI
 
         $this->plugin = $plugin;
         $this->question = $question;
+        $this->parent = $parent;
 
         $this->ctrl = $DIC->ctrl();
         $this->factory = $DIC->ui()->factory();
@@ -94,6 +98,10 @@ class StackQuestionAuthoringUI
             "inputs" => $this->factory->input()->field()->section($this->buildInputsSection(), $this->plugin->txt("inputs")),
             "prt" => $this->customFactory->tabSection($this->buildPrtSection(), $this->plugin->txt("prts"))
         ];
+
+        if (!empty($this->parent->getTaxonomyIds())) {
+            $sections["taxonomies"] = $this->customFactory->expandableSection($this->buildTaxonomySection(), $this->lng->txt("qpl_qst_edit_form_taxonomy_section"));
+        }
 
         return $this->factory->input()->container()->form()->standard(
             $this->ctrl->getLinkTargetByClass("assStackQuestionGUI", "editQuestion"),
@@ -926,5 +934,18 @@ class StackQuestionAuthoringUI
         }
 
         return "";
+    }
+
+    private function buildTaxonomySection(): array
+    {
+        $taxonomies = [];
+
+        foreach ($this->parent->getTaxonomyIds() as $taxonomyId) {
+            $taxonomy = new ilObjTaxonomy($taxonomyId);
+
+            $taxonomies[$taxonomyId] = $this->customFactory->taxonomySelect($taxonomy);
+        }
+
+        return $taxonomies;
     }
 }
