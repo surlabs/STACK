@@ -29,6 +29,7 @@ use ILIAS\UI\Component\Component;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\UI\Implementation\Component\Input\Field\Renderer as RendererILIAS;
 use ilRTE;
+use ilTaxonomyTree;
 use ilTemplate;
 use ilTemplateException;
 use ilTinyMCE;
@@ -364,6 +365,8 @@ class Renderer extends RendererILIAS
      */
     private function renderTaxonomySelect(TaxonomySelect $component): string
     {
+        global $DIC;
+
         $tax_tpl = $this->getTemplateCustom("tpl.taxonomySelect.html");
         $tax_id = "taxonomy_select_" . $component->getTaxonomy()->getId();
 
@@ -375,6 +378,31 @@ class Renderer extends RendererILIAS
         $this->applyName2($component, $tax_tpl);
         $this->applyValue2($component, $tax_tpl);
 
+        $DIC->language()->loadLanguageModule("tax");
+
+        $nodes = [];
+
+        $tree = $component->getTaxonomy()->getTree();
+
+        foreach ($tree->getChilds($tree->readRootId()) as $node) {
+            $nodes[] = [
+                "id" => $node["child"],
+                "title" => $node["title"]
+            ];
+        }
+
+        $modal = $this->getUIFactory()->modal()->lightbox($this->getUIFactory()->modal()->lightboxTextPage($this->buildTaxonomyNodes($nodes), $this->txt("tax_nodes")));
+        $modal_rendered = $this->render($modal);
+
+        $tax_tpl->setVariable("MODAL", $modal_rendered);
+        $tax_tpl->setVariable("MODAL_SIGNAL", $modal->getShowSignal());
+
         return $this->wrapInFormContext($component, $tax_tpl->get(), $id);
+    }
+
+    private function buildTaxonomyNodes(array $nodes): string
+    {
+//        dump($nodes); exit();
+        return var_export($nodes, true);
     }
 }

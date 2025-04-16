@@ -14,15 +14,21 @@ $(document).ready(function() {
     });
 
     $(".taxonomySelect").click(function (e) {
-        const taxonomy = $(this).parent().attr("taxonomy");
+        const il_signal = $(this).attr("modal-signal");
 
-        console.log("Select taxonomy: " + taxonomy);
+        $(this).trigger(il_signal,
+            {
+                'id' : il_signal, 'event' : 'click',
+                'triggerer' : $(this),
+                'options' : JSON.parse('[]')
+            }
+        );
     });
 
     $(".taxonomyReset").click(function (e) {
         const taxonomy = $(this).parent().attr("taxonomy");
 
-        console.log("Reset taxonomy: " + taxonomy);
+        $("#" + taxonomy + "_cont").find(".taxonomyResult").val(JSON.stringify([])).trigger("input");
     });
 
     $(".taxonomyResult").on("input", function (e) {
