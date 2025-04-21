@@ -27,7 +27,11 @@ use Closure;
 use ILIAS\Data\Factory;
 use ILIAS\Refinery\Constraint;
 use ILIAS\UI\Implementation\Component\Input\Field\FormInput;
+use ILIAS\UI\Implementation\Component\Input\Input;
+use ilObject;
 use ilObjTaxonomy;
+use ilTaxNodeAssignment;
+use ilTaxonomyException;
 
 /**
  * Class TaxonomySelect
@@ -56,13 +60,84 @@ class TaxonomySelect extends FormInput {
 			il.UI.input.onFieldUpdate(event, '$id', $('#$id').val());";
     }
 
+    public function withValue($value): Input
+    {
+        if (is_string($value)) {
+            $value = json_decode($value, true);
+        }
+
+        $this->checkArg("value", $this->isClientSideValueOk($value), "Display value does not match input type.");
+        $clone = clone $this;
+
+        foreach ($value as $key => $item) {
+            if (is_numeric($item)) {
+                $tree = $this->getTaxonomy()->getTree();
+
+                foreach ($tree->getChilds($tree->readRootId()) as $node) {
+                    if ((int) $node["child"] == $item) {
+                        $value[$key] = [
+                            "id" => (int) $node["child"],
+                            "title" => $node["title"]
+                        ];
+                    }
+                }
+            }
+        }
+
+        $clone->value = $value;
+        return $clone;
+    }
+
     protected function isClientSideValueOk($value): bool
     {
-        return true;
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (is_array($item)) {
+                    if (!isset($item['id']) || !is_numeric($item['id'])) {
+                        return false;
+                    }
+                } else if (!is_numeric($item)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function getTaxonomy(): ilObjTaxonomy
     {
         return $this->taxonomy;
+    }
+
+    /**
+     * @throws ilTaxonomyException
+     */
+    public static function saveTaxonomySelect(int $objId, int $id, int $taxonomy_id, $nodes): void
+    {
+        $nodes = $nodes ?? [];
+
+        $tax_node_ass = new ilTaxNodeAssignment(ilObject::_lookupType($objId), $objId, 'quest', $taxonomy_id);
+
+        $current_ass = $tax_node_ass->getAssignmentsOfItem($id);
+        $exising = array();
+
+        $new_node_ids = array_map(fn($n) => (int) $n["id"], $nodes);
+
+        foreach ($current_ass as $ca) {
+            if (!in_array((int) $ca["node_id"], $new_node_ids)) {
+                $tax_node_ass->deleteAssignment((int) $ca["node_id"], $id);
+            } else {
+                $exising[] = (int) $ca["node_id"];
+            }
+        }
+
+        foreach ($nodes as $node) {
+            if (!in_array($node["id"], $exising)) {
+                $tax_node_ass->addAssignment($node["id"], $id);
+            }
+        }
     }
 }

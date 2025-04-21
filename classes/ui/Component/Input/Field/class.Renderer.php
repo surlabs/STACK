@@ -386,12 +386,12 @@ class Renderer extends RendererILIAS
 
         foreach ($tree->getChilds($tree->readRootId()) as $node) {
             $nodes[] = [
-                "id" => $node["child"],
+                "id" => (int) $node["child"],
                 "title" => $node["title"]
             ];
         }
 
-        $modal = $this->getUIFactory()->modal()->lightbox($this->getUIFactory()->modal()->lightboxTextPage($this->buildTaxonomyNodes($nodes), $this->txt("tax_nodes")));
+        $modal = $this->getUIFactory()->modal()->lightbox($this->getUIFactory()->modal()->lightboxTextPage($this->buildTaxonomyNodes($nodes, $tax_id), $this->txt("tax_nodes")));
         $modal_rendered = $this->render($modal);
 
         $tax_tpl->setVariable("MODAL", $modal_rendered);
@@ -400,9 +400,20 @@ class Renderer extends RendererILIAS
         return $this->wrapInFormContext($component, $tax_tpl->get(), $id);
     }
 
-    private function buildTaxonomyNodes(array $nodes): string
+    private function buildTaxonomyNodes(array $nodes, string $taxonomy_id): string
     {
-//        dump($nodes); exit();
-        return var_export($nodes, true);
+        global $DIC;
+
+        $checkboxs = "";
+
+        foreach ($nodes as $node) {
+            $checkboxs .= $DIC->ui()->renderer()->render(
+                $this->getUIFactory()->input()->field()->checkbox($node["title"])->withAdditionalOnLoadCode(function ($id) use ($node, $taxonomy_id) {
+                    return "$('#$id').attr('node-id', {$node['id']}).attr('node-title', '{$node['title']}').addClass('tax-node').attr('taxonomy-id', '$taxonomy_id');";
+                })
+            );
+        }
+
+        return $checkboxs;
     }
 }
