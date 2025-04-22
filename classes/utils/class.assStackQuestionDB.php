@@ -1650,7 +1650,11 @@ class assStackQuestionDB
                 if (isset($question->inputs[$input_name]) && is_a($question->inputs[$input_name], "stack_notes_input")) {
                     $raw_input["value"] = implode('',$input_state->__get("contents"));
                 } else {
-                    $raw_input["value"] = $input_state->contentsmodified;
+                    if (stack_input::SCORE == $input_state->status || stack_input::VALID == $input_state->status) {
+                        $raw_input["value"] = $input_state->contentsmodified;
+                    } else {
+                        $raw_input["value"] = implode('', $input_state->__get("contents"));
+                    }
                 }
             }
 
