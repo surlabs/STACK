@@ -70,25 +70,25 @@ class Renderer extends RendererILIAS
                 $component_rendered = $this->renderTextareaRTE($component);
                 break;
             case $component instanceof ExpandableSection:
-                $component_rendered = $this->renderExpandableSection($component, $default_renderer);
+                $component_rendered = $this->renderExpandableSection($component);
                 break;
             case $component instanceof TabSection:
-                $component_rendered = $this->renderTabSection($component, $default_renderer);
+                $component_rendered = $this->renderTabSection($component);
                 break;
             case $component instanceof TaxonomySelect:
-                $component_rendered = $this->renderTaxonomySelect($component, $default_renderer);
+                $component_rendered = $this->renderTaxonomySelect($component);
                 break;
             case $component instanceof ColumnSection:
-                $component_rendered = $this->renderColumnSection($component, $default_renderer);
+                $component_rendered = $this->renderColumnSection($component);
                 break;
             case $component instanceof Legacy:
                 $component_rendered = $component->getHtml();
                 break;
             case $component instanceof ButtonSection:
-                $component_rendered = $this->renderButtonSection($component, $default_renderer);
+                $component_rendered = $this->renderButtonSection($component);
                 break;
             default:
-                $component_rendered = parent::render($component, $default_renderer);
+                $component_rendered = $this->default_renderer->render($component);
                 break;
         }
 
@@ -376,7 +376,7 @@ class Renderer extends RendererILIAS
 
         $id = $this->bindJSandApplyId2($component, $tax_tpl);
         $this->applyName2($component, $tax_tpl);
-        $this->applyValue2($component, $tax_tpl);
+        $tax_tpl->setVariable("VALUE", json_encode($component->getValue() ?? []));
 
         $DIC->language()->loadLanguageModule("tax");
 
