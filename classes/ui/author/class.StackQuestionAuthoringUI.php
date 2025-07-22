@@ -583,7 +583,7 @@ class StackQuestionAuthoringUI
             3 => $this->plugin->txt('show_validation_yes_compact')
         ], $this->plugin->txt("input_show_validation_info"))->withRequired(true)
             ->withValue($input->get_parameter('showValidation'));
-        $inputs["options"] = $this->factory->input()->field()->text($this->plugin->txt("input_options"), $this->plugin->txt("input_options_info"))
+        $inputs["options"] = $this->customFactory->casExpression($this->plugin->txt("input_options"), $this->plugin->txt("input_options_info"))
             ->withValue($input->get_parameter('options'));
 
         $this->ctrl->setParameterByClass("assStackQuestionGUI", "input_name", $name);
@@ -710,9 +710,9 @@ class StackQuestionAuthoringUI
 
         $inputs["answer_test"] = $this->factory->input()->field()->select($this->plugin->txt("prt_node_answer_test"), $answer_test_choices, $this->plugin->txt("prt_node_answer_test_info"))->withRequired(true)
             ->withValue($node->answertest);
-        $inputs["student_answer"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_student_answer"), $this->plugin->txt("prt_node_student_answer_info"))->withRequired(true)
+        $inputs["student_answer"] = $this->customFactory->casExpression($this->plugin->txt("prt_node_student_answer"), $this->plugin->txt("prt_node_student_answer_info"))->withRequired(true)
             ->withValue($node->sans);
-        $inputs["teacher_answer"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_teacher_answer"), $this->plugin->txt("prt_node_teacher_answer_info"))->withRequired(true)
+        $inputs["teacher_answer"] = $this->customFactory->casExpression($this->plugin->txt("prt_node_teacher_answer"), $this->plugin->txt("prt_node_teacher_answer_info"))->withRequired(true)
             ->withValue($node->tans);
         $inputs["options"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_options"), $this->plugin->txt("prt_node_options_info"))
             ->withValue($node->testoptions);
