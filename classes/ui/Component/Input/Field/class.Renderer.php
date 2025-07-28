@@ -27,6 +27,7 @@ use assStackQuestionUtils;
 use Expand;
 use ILIAS\UI\Component\Component;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
+use ILIAS\UI\Component\JavaScriptBindable;
 use ILIAS\UI\Implementation\Component\Input\Field\Renderer as RendererILIAS;
 use ILIAS\UI\Implementation\Render\Template;
 use ilRTE;
@@ -83,23 +84,30 @@ class Renderer extends RendererILIAS
      */
     protected function wrapInFormContext(
         FormInput $component,
+        string $label,
         string $input_html,
-        string $id_pointing_to_input = '',
-        string $dependant_group_html = '',
-        bool $bind_label_with_for = true
+        ?string $id_for_label = null,
+        ?string $dependant_group_html = null
     ): string {
         $tpl = new ilTemplate("src/UI/templates/default/Input/tpl.context_form.html", true, true);
 
+        $tpl->setVariable("LABEL", $label);
         $tpl->setVariable("INPUT", $input_html);
+        $tpl->setVariable("UI_COMPONENT_NAME", $this->getComponentCanonicalNameAttribute($component));
+        $tpl->setVariable("INPUT_NAME", $component->getName());
 
-        if ($id_pointing_to_input && $bind_label_with_for) {
-            $tpl->setCurrentBlock('for');
-            $tpl->setVariable("ID", $id_pointing_to_input);
-            $tpl->parseCurrentBlock();
+        if ($component->getOnLoadCode() !== null) {
+            $binding_id = $this->bindJavaScript($component) ?? $this->createId();
+            $tpl->setVariable("BINDING_ID", $binding_id);
         }
 
-        $label = $component->getLabel();
-        $tpl->setVariable("LABEL", $label);
+        if ($id_for_label) {
+            $tpl->setCurrentBlock('for');
+            $tpl->setVariable("ID", $id_for_label);
+            $tpl->parseCurrentBlock();
+        } else {
+            $tpl->touchBlock('tabindex');
+        }
 
         $byline = $component->getByline();
         if ($byline) {
@@ -108,16 +116,29 @@ class Renderer extends RendererILIAS
 
         $required = $component->isRequired();
         if ($required) {
-            $tpl->touchBlock("required");
+            $tpl->setCurrentBlock('required');
+            $tpl->setVariable("REQUIRED_ARIA", $this->txt('required_field'));
+            $tpl->parseCurrentBlock();
+        }
+
+        if ($component->isDisabled()) {
+            $tpl->touchBlock("disabled");
         }
 
         $error = $component->getError();
         if ($error) {
+            $error_id = $this->createId();
+            $tpl->setVariable("ERROR_LABEL", $this->txt("ui_error"));
+            $tpl->setVariable("ERROR_ID", $error_id);
             $tpl->setVariable("ERROR", $error);
-            $tpl->setVariable("ERROR_FOR_ID", $id_pointing_to_input);
+            if ($id_for_label) {
+                $tpl->setVariable("ERROR_FOR_ID", $id_for_label);
+            }
         }
 
-        $tpl->setVariable("DEPENDANT_GROUP", $dependant_group_html);
+        if ($dependant_group_html) {
+            $tpl->setVariable("DEPENDANT_GROUP", $dependant_group_html);
+        }
         return $tpl->get();
     }
 
@@ -133,13 +154,6 @@ class Renderer extends RendererILIAS
         $name = $component->getName();
         $tpl->setVariable("NAME", $name);
         return $name;
-    }
-
-    protected function bindJSandApplyId(FormInput $component, ilTemplate|Template $tpl): string
-    {
-        $id = $this->bindJavaScript($component) ?? $this->createId();
-        $tpl->setVariable("ID", $id);
-        return $id;
     }
 
     protected function applyValue(FormInput $component, ilTemplate|Template $tpl, callable $escape = null): void
@@ -173,9 +187,8 @@ class Renderer extends RendererILIAS
         );
 
         $tpl = $this->getPreparedTextareaRTETemplate($component);
-        $id = $this->bindJSandApplyId($component, $tpl);
 
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $component->getLabel(), $tpl->get());
     }
 
     protected function getPreparedTextareaRTETemplate(TextareaRTE $component): ilTemplate
@@ -340,7 +353,7 @@ class Renderer extends RendererILIAS
 
         $section_tpl->setVariable("INPUTS", $buttons_html);
 
-        return $this->wrapInFormContext($component, $section_tpl->get(), $this->bindJSandApplyId($component, $section_tpl));
+        return $this->wrapInFormContext($component, $component->getLabel(), $section_tpl->get());
     }
 
     /**
@@ -357,7 +370,6 @@ class Renderer extends RendererILIAS
         $tax_tpl->setVariable("TXT_SELECT", $this->txt("select"));
         $tax_tpl->setVariable("TXT_RESET", $this->txt("reset"));
 
-        $id = $this->bindJSandApplyId($component, $tax_tpl);
         $this->applyName($component, $tax_tpl);
         $tax_tpl->setVariable("VALUE", json_encode($component->getValue() ?? []));
 
@@ -380,7 +392,7 @@ class Renderer extends RendererILIAS
         $tax_tpl->setVariable("MODAL", $modal_rendered);
         $tax_tpl->setVariable("MODAL_SIGNAL", $modal->getShowSignal());
 
-        return $this->wrapInFormContext($component, $tax_tpl->get(), $id);
+        return $this->wrapInFormContext($component, $component->getLabel(), $tax_tpl->get());
     }
 
     private function buildTaxonomyNodes(array $nodes, string $taxonomy_id): string
