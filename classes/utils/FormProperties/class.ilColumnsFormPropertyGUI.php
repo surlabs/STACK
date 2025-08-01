@@ -47,7 +47,7 @@ class ilColumnsFormPropertyGUI extends ilMultipartFormPropertyGUI
 		parent::__construct($a_title, $a_postvar, $a_container_width, $a_show_title);
 
 		//Set template for columns
-		$template = new ilTemplate('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.columns_form_property.html', TRUE, TRUE);
+		$template = new ilTemplate('./public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.columns_form_property.html', TRUE, TRUE);
 		$this->setTemplate($template);
 
 		//Set columns width

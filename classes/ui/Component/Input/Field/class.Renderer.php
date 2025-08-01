@@ -58,8 +58,8 @@ class Renderer extends RendererILIAS
     {
         global $DIC;
 
-        $DIC->ui()->mainTemplate()->addJavaScript('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.js');
-        $DIC->ui()->mainTemplate()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.css');
+        $DIC->ui()->mainTemplate()->addJavaScript('public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.js');
+        $DIC->ui()->mainTemplate()->addCss('public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.css');
 
         if (isset($default_renderer)) {
             $this->default_renderer = $default_renderer;
@@ -169,7 +169,7 @@ class Renderer extends RendererILIAS
 
     private function getTemplateCustom(string $name): ilTemplate
     {
-        return new ilTemplate("Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/$name", true, true);
+        return new ilTemplate("public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/$name", true, true);
     }
 
     /**

@@ -42,8 +42,8 @@ cdn.mathjax.org or downloaded to your own web server. It has to be configured in
 3. Save
 
 ### Installation steps
-1. Create subdirectories, if necessary for Customizing/global/plugins/Modules/TestQuestionPool/Questions/
-2. In Customizing/global/plugins/Modules/TestQuestionPool/Questions/ **ensure you delete any previous assStackQuestion folder**
+1. Create subdirectories, if necessary for public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/
+2. In public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/ **ensure you delete any previous assStackQuestion folder**
 3. Then, execute:
 
 ```bash

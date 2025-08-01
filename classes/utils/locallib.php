@@ -54,17 +54,17 @@ function stack_string($key, $a = null)
     global $DIC;
     $lng = $DIC->language();
     $user_language = $lng->getUserLanguage();
+    static $string = array();
+
 	switch ($user_language) {
 		case 'en':
-			static $string = array();
 			if (empty($string)) {
-				include './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_en.php';
+				include './public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_en.php';
 			}
 			break;
 		default:
-			static $string = array();
 			if (empty($string)) {
-				include './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_de.php';
+				include './public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_de.php';
 			}
 			break;
 	}

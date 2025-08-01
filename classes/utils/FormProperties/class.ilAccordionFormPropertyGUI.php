@@ -49,7 +49,7 @@ class ilAccordionFormPropertyGUI extends ilMultipartFormPropertyGUI
 		parent::__construct($a_title, $a_postvar, $a_container_width, $a_show_title);
 
 		//Set template for accordion
-		$template = new ilTemplate('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.accordion_form_property.html', TRUE, TRUE);
+		$template = new ilTemplate('./public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.accordion_form_property.html', TRUE, TRUE);
 		$this->setTemplate($template);
 	}
 
@@ -107,7 +107,7 @@ class ilAccordionFormPropertyGUI extends ilMultipartFormPropertyGUI
 			}
 			$accordion->addItem($part->getTitle(), $this->getTemplate()->get(), TRUE);
 			//Set template for accordion
-			$template = new ilTemplate('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.accordion_form_property.html', TRUE, TRUE);
+			$template = new ilTemplate('./public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.accordion_form_property.html', TRUE, TRUE);
 			$this->setTemplate($template);
 		}
 
