@@ -722,3 +722,4 @@ ui_admin_configuration_quality_check_prt_comma_errors_fixed#:#Die folgenden Frag
 ui_admin_configuration_quality_check_prt_comma_errors_fixed_count#:#Kommafehler korrigiert:
 fix#:#Korrigieren
 fix_all_comma_errors#:#Alle Kommafehler korrigieren
+node_deleted#:#Der Knoten wurde gelöscht.

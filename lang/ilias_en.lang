@@ -716,3 +716,4 @@ ui_admin_configuration_quality_check_prt_comma_errors_fixed#:#The following ques
 ui_admin_configuration_quality_check_prt_comma_errors_fixed_count#:#Comma errors fixed:
 fix#:#Fix
 fix_all_comma_errors#:#Fix all comma errors
+node_deleted#:#Node deleted

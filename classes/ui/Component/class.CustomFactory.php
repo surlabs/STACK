@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component;
 
 use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\ButtonSection;
+use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\CasExpression;
 use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\ColumnSection;
 use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\ExpandableSection;
 use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\Legacy;
@@ -76,5 +77,22 @@ class CustomFactory
     public function taxonomySelect(ilObjTaxonomy $taxonomy): TaxonomySelect
     {
         return new TaxonomySelect($taxonomy);
+    }
+
+    public function casExpression(
+        string $label,
+        ?string $byline = null
+    ): CasExpression {
+        global $DIC;
+
+        $data_factory = new \ILIAS\Data\Factory();
+        $refinery = $DIC->refinery();
+
+        return new CasExpression(
+            $data_factory,
+            $refinery,
+            $label,
+            $byline
+        );
     }
 }
