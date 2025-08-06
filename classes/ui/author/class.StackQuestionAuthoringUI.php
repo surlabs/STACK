@@ -28,9 +28,9 @@ use assStackQuestionDB;
 use assStackQuestionGUI;
 use assStackQuestionUtils;
 use classes\platform\StackConfig;
-use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\CustomFactory;
-use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\ExpandableSection;
-use Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\TaxonomySelect;
+use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\CustomFactory;
+use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\ExpandableSection;
+use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\TaxonomySelect;
 use ilAssQuestionLifecycle;
 use ilassStackQuestionPlugin;
 use ilCtrlException;
@@ -77,7 +77,7 @@ class StackQuestionAuthoringUI
     {
         global $DIC;
 
-        $DIC->globalScreen()->layout()->meta()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/stack_graph.css');
+        $DIC->globalScreen()->layout()->meta()->addCss('public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/stack_graph.css');
 
         $this->plugin = $plugin;
         $this->question = $question;

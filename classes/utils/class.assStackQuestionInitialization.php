@@ -63,7 +63,7 @@ if (!function_exists('getLanguage')) {
 if (!function_exists('getString')) {
     function getString($identifier, $string, $a = null)
     {
-        $string = $string[$identifier];
+        $string = isset($string[$identifier]);
         if ($a !== NULL) {
             if (is_object($a) or is_array($a)) {
                 $a = (array)$a;

@@ -48,23 +48,22 @@ function stack_ouput_castext($castext)
  * @param mixed $a (optional) any values to interpolate into the string.
  * @return string the language string
  */
-function stack_string($key, $a = null)
+function stack_string($key, $a = null):string
 {
 	//require_once './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/stack/cas/installhelper.class.php';
     global $DIC;
     $lng = $DIC->language();
     $user_language = $lng->getUserLanguage();
+    static $string = array();
 	switch ($user_language) {
 		case 'en':
-			static $string = array();
 			if (empty($string)) {
-				include './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_en.php';
+				include_once ILIAS_ABSOLUTE_PATH . '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/ilias_en.lang';
 			}
 			break;
 		default:
-			static $string = array();
 			if (empty($string)) {
-				include './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_de.php';
+                include_once ILIAS_ABSOLUTE_PATH. '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_de.php';
 			}
 			break;
 	}

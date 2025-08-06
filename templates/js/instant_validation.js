@@ -109,7 +109,7 @@ il.instant_validation = new function () {
 				/*$(".ilAssQuestionRelatedNavigationContainer:first").nextUntil(".ilAssQuestionRelatedNavigationContainer").hide();*/
 
 				var img = new Image();
-				img.src = "Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/ajax-loader.gif";
+				img.src = "public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/ajax-loader.gif";
 				$('#validation_xqcas_roll_' + question_id + '_' + input_name).html(img)
 
 				return false;
@@ -140,7 +140,7 @@ il.instant_validation = new function () {
 					});
 
 				var img = new Image();
-				img.src = "Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/ajax-loader.gif";
+				img.src = "public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/ajax-loader.gif";
 				$('#validation_xqcas_roll_' + question_id + '_' + input_name).html(img)
 
 				return false;

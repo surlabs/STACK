@@ -42,7 +42,7 @@ class ilTabsFormPropertyGUI extends ilMultipartFormPropertyGUI
 
 		$this->setHiddenTitle("Title");
 		//Set template for accordion
-		$template = new ilTemplate('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.tabs_form_property.html', TRUE, TRUE);
+		$template = new ilTemplate('./public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.tabs_form_property.html', TRUE, TRUE);
 		$this->setTemplate($template);
 	}
 

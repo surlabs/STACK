@@ -134,16 +134,22 @@ class assStackQuestionGUI extends assQuestionGUI
 
     /**
      * Returns the HTML for the Test View
-     * @param $active_id
-     * @param $pass
-     * @param $is_question_postponed
-     * @param $user_post_solutions
-     * @param $show_specific_inline_feedback
+     * @param int $active_id
+     * @param int $pass
+     * @param bool $is_question_postponed
+     * @param array|bool $user_post_solutions
+     * @param bool $show_specific_inline_feedback
      * @return false|mixed|string|void|null
      * @throws StackException
      * @throws stack_exception
      */
-	public function getTestOutput($active_id, $pass, $is_question_postponed, $user_post_solutions, $show_specific_inline_feedback)
+    public function getTestOutput(
+        int $active_id,
+        int $pass,
+        bool $is_question_postponed = false,
+        array|bool $user_post_solutions = false,
+        bool $show_specific_inline_feedback = false
+    ): string
 	{
         $seed = assStackQuestionDB::_getSeed("test", $this->object, (int) $active_id, (int) $pass);
         $this->object->questionInitialisation($seed, true);
@@ -186,19 +192,20 @@ class assStackQuestionGUI extends assQuestionGUI
      * Depending on the context
      * Called multiple times at execution
      * This method is called from the test view and from the question pool view
-     * @param integer $active_id The active user id
-     * @param integer|null $pass The test pass
-     * @param boolean $graphicalOutput Show visual feedback for right/wrong answers
-     * @param boolean $result_output Show the reached points for parts of the question
-     * @param boolean $show_question_only Show the question without the ILIAS content around
-     * @param boolean $show_feedback Show the question feedback
-     * @param boolean $show_correct_solution Show the correct solution instead of the user solution
-     * @param boolean $show_manual_scoring Show specific information for the manual scoring output
+     * @param int $active_id
+     * @param null $pass
+     * @param bool $graphicalOutput
+     * @param bool $result_output
+     * @param bool $show_question_only
+     * @param bool $show_feedback
+     * @param bool $show_correct_solution
+     * @param bool $show_manual_scoring
      * @param bool $show_question_text
+     * @param bool $show_inline_feedback
      * @return string
      * @throws StackException
      */
-	public function getSolutionOutput($active_id, $pass = null, $graphicalOutput = false, $result_output = false, $show_question_only = true, $show_feedback = false, $show_correct_solution = false, $show_manual_scoring = false, $show_question_text = true): string
+	public function getSolutionOutput(int $active_id, $pass = null, bool $graphical_output = false, bool $result_output = false, bool $show_question_only = true, bool $show_feedback = false, bool $show_correct_solution = false, bool $show_manual_scoring = false, bool $show_question_text = true, bool $show_inline_feedback = true): string
     {
         global $DIC, $tpl;
 
@@ -285,7 +292,7 @@ class assStackQuestionGUI extends assQuestionGUI
      * @return string HTML
      * @throws StackException|stack_exception
      */
-	public function getPreview($show_question_only = false, $showInlineFeedback = false): string
+	public function getPreview($show_question_only = false, $show_inline_feedback = false): string
 	{
 		global $DIC, $tpl;
         $this->is_preview = true;
@@ -475,7 +482,7 @@ class assStackQuestionGUI extends assQuestionGUI
      * @throws ilTestQuestionPoolInvalidArgumentException
      * @throws stack_exception
      */
-	public function editQuestion(bool $check_only = false): bool
+    public function editQuestion(bool $checkonly = false, ?bool $is_save_cmd = null): bool
     {
 		global $DIC;
 
@@ -490,10 +497,10 @@ class assStackQuestionGUI extends assQuestionGUI
         list($errors, $form) = $authoring_gui->showAuthoringPanel();
 
         if ($errors) {
-            $check_only = false;
+            $checkonly = false;
         }
 
-        if (!$check_only) {
+        if (!$checkonly) {
             $this->tpl->setVariable("QUESTION_DATA", $form);
         }
 

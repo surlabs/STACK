@@ -42,7 +42,7 @@ class ilButtonFormProperty extends ilFormPropertyGUI
 		parent::__construct($a_title, $a_postvar);
 
 		//Set template for button
-		$template = new ilTemplate('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.button_form_property.html', TRUE, TRUE);
+		$template = new ilTemplate('./public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/tpl.button_form_property.html', TRUE, TRUE);
 		$this->setTemplate($template);
 	}
 
