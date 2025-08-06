@@ -719,3 +719,4 @@ ui_admin_configuration_quality_check_prt_comma_errors_fixed#:#Se han corregido l
 ui_admin_configuration_quality_check_prt_comma_errors_fixed_count#:#Errores de coma corregidos:
 fix#:#Corregir
 fix_all_comma_errors#:#Corregir todos los errores de coma
+node_deleted#:#El nodo ha sido eliminado.

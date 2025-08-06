@@ -42,6 +42,7 @@ use ilLanguage;
 use ilObject;
 use ilObjTaxonomy;
 use ilTaxNodeAssignment;
+use ilTaxonomyException;
 use ilTestQuestionPoolInvalidArgumentException;
 use stack_abstract_graph_svg_renderer;
 use stack_ans_test_controller;
@@ -93,6 +94,7 @@ class StackQuestionAuthoringUI
     /**
      * @throws ilCtrlException
      * @throws stack_exception
+     * @throws ilTaxonomyException
      */
     private function buildForm(): StandardForm
     {
@@ -108,56 +110,44 @@ class StackQuestionAuthoringUI
         }
 
         return $this->factory->input()->container()->form()->standard(
-            $this->ctrl->getLinkTargetByClass("assStackQuestionGUI", "editQuestion"),
+            $this->ctrl->getLinkTargetByClass("assStackQuestionGUI", "save"),
             $sections
         );
     }
 
     /**
-     * @throws ilCtrlException|stack_exception
+     * @return array
+     * @throws ilCtrlException
+     * @throws ilTaxonomyException
+     * @throws ilTestQuestionPoolInvalidArgumentException
+     * @throws stack_exception
      */
-    public function showAuthoringPanel(): string
+    public function showAuthoringPanel(): array
     {
         $form = $this->buildForm();
-
-        $saving_info = "";
+        $errors = false;
 
         if ($this->request->getMethod() == "POST") {
             $form = $form->withRequest($this->request);
             $result = $form->getData();
 
             if($result) {
-                $saving_info = $this->save($result) ?? "";
+                $errors = $this->save($result);
                 $form = $this->buildForm();
+            } else {
+                $errors = true;
             }
         }
 
-        return $saving_info . $this->renderer->render($form);
-    }
-
-    /**
-     * @throws ilCtrlException
-     * @throws stack_exception
-     */
-    public function writePostData(): ?string
-    {
-        $form = $this->buildForm()->withRequest($this->request);
-
-        $result = $form->getData();
-
-        if($result){
-            return $this->save($result);
-        }
-
-        return null;
+        return [$errors, $this->renderer->render($form)];
     }
 
     /**
      * @throws stack_exception
      * @throws ilTestQuestionPoolInvalidArgumentException
-     * @throws \ilTaxonomyException
+     * @throws ilTaxonomyException
      */
-    private function save(array $result): ?string
+    private function save(array $result): bool
     {
         global $DIC;
 
@@ -180,7 +170,8 @@ class StackQuestionAuthoringUI
         if (empty($basic["question_note"])) {
             foreach (stack_cas_security::get_all_with_feature('random') as $random) {
                 if (strpos($basic["question_variables"], $random) !== false) {
-                    return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt("error_no_question_note")));
+                    $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt("error_no_question_note"), true);
+                    return true;
                 }
             }
         }
@@ -302,7 +293,8 @@ class StackQuestionAuthoringUI
         }
 
         if ($prts_array && !$all_formative && $total_value < 0.0000001) {
-            return $this->renderer->render($this->factory->messageBox()->failure('There is an error authoring your question. The $totalvalue, the marks available for the question, must be positive'));
+            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", 'There is an error authoring your question. The $totalvalue, the marks available for the question, must be positive', true);
+            return true;
         }
 
         $prts = array();
@@ -333,13 +325,13 @@ class StackQuestionAuthoringUI
 
         $this->question->saveToDb();
 
-        return $this->renderer->render($this->factory->messageBox()->success($this->lng->txt('msg_obj_modified')));
+        return false;
     }
 
     /**
      * @throws stack_exception
      */
-    private function checkAction(array $params): string
+    private function checkAction(array $params): bool
     {
         return match ($params["action"]) {
             "copyPrt" => $this->copyPrt($params["prt_name"]),
@@ -594,7 +586,7 @@ class StackQuestionAuthoringUI
     }
 
     /**
-     * @throws stack_exception|ilCtrlException
+     * @throws stack_exception
      */
     private function buildPrtSection(): array
     {
@@ -628,7 +620,6 @@ class StackQuestionAuthoringUI
     }
 
     /**
-     * @throws ilCtrlException
      */
     private function buildPrt(stack_potentialresponse_tree_lite $prt): array
     {
@@ -649,7 +640,6 @@ class StackQuestionAuthoringUI
     }
 
     /**
-     * @throws ilCtrlException
      */
     private function buildPrtOptions(stack_potentialresponse_tree_lite $prt): array
     {
@@ -680,7 +670,6 @@ class StackQuestionAuthoringUI
     }
 
     /**
-     * @throws ilCtrlException
      */
     private function buildNodeSection(stack_potentialresponse_tree_lite $prt): array
     {
@@ -696,7 +685,6 @@ class StackQuestionAuthoringUI
     }
 
     /**
-     * @throws ilCtrlException
      */
     private function buildNode(stack_potentialresponse_tree_lite $prt, object $node): array
     {
@@ -846,18 +834,22 @@ class StackQuestionAuthoringUI
 
 
 
-    private function copyPrt(string $prt_name): string
+    private function copyPrt(string $prt_name): bool
     {
+        global $DIC;
+
         if(!isset($this->question->prts[$prt_name])) {
-            return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt('copy_error_no_prt')));
+            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('copy_error_no_prt'), true);
+            return false;
         }
 
         $_SESSION['copy_prt'] = $this->question->getId() . "_" . $prt_name;
 
-        return $this->renderer->render($this->factory->messageBox()->success($this->plugin->txt('prt_copied_to_clipboard')));
+        $DIC->ui()->mainTemplate()->setOnScreenMessage("success", $this->plugin->txt('prt_copied_to_clipboard'), true);
+        return true;
     }
 
-    private function pastePrt(): string
+    private function pastePrt(): bool
     {
         if (isset($_SESSION['copy_prt'])) {
             $raw_data = explode("_", $_SESSION['copy_prt']);
@@ -886,23 +878,28 @@ class StackQuestionAuthoringUI
             }
         }
 
-        return "";
+        return true;
     }
 
-    private function deleteNode(string $prt_name, string $node_name): string
+    private function deleteNode(string $prt_name, string $node_name): bool
     {
+        global $DIC;
+
         if(!isset($this->question->prts[$prt_name])) {
-            return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt('deletion_error_no_prt')));
+            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('deletion_error_no_prt'), true);
+            return false;
         }
 
         $prt = $this->question->prts[$prt_name];
 
         if (sizeof($prt->get_nodes()) < 2) {
-            return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt('deletion_error_first_node')));
+            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('deletion_error_first_node'), true);
+            return false;
         }
 
         if ((int)$prt->get_first_node() == (int) $node_name) {
-            return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt('deletion_error_first_node')));
+            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('deletion_error_first_node'), true);
+            return false;
         }
 
         $new_nodes = $prt->get_nodes();
@@ -924,22 +921,29 @@ class StackQuestionAuthoringUI
 
         assStackQuestionDB::_deleteStackPrtNodes($this->question->getId(), $prt_name, $node_name);
 
-        return $this->renderer->render($this->factory->messageBox()->success($this->plugin->txt('node_deleted')));
+        $DIC->ui()->mainTemplate()->setOnScreenMessage("success", $this->plugin->txt('node_deleted'), true);
+        return true;
     }
 
-    private function copyNode(string $prt_name, string $node_name): string
+    private function copyNode(string $prt_name, string $node_name): bool
     {
+        global $DIC;
+
         if(!isset($this->question->prts[$prt_name])) {
-            return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt('copy_error_no_prt')));
+            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('copy_error_no_prt'), true);
+            return false;
         }
 
         $_SESSION['copy_node'] = $this->question->getId() . "_" . $prt_name . "_" . $node_name;
 
-        return $this->renderer->render($this->factory->messageBox()->success($this->plugin->txt('node_copied_to_clipboard')));
+        $DIC->ui()->mainTemplate()->setOnScreenMessage("success", $this->plugin->txt('node_copied_to_clipboard'), true);
+        return true;
     }
 
-    private function pasteNode(string $to_prt_name): string
+    private function pasteNode(string $to_prt_name): bool
     {
+        global $DIC;
+
         if (isset($_SESSION['copy_node'])) {
             $raw_data = explode("_", $_SESSION['copy_node']);
             $original_question_id = $raw_data[0];
@@ -947,7 +951,8 @@ class StackQuestionAuthoringUI
             $original_node_name = $raw_data[2];
 
             if (!isset($this->question->prts[$to_prt_name])) {
-                return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt('paste_error_no_prt')));
+                $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('paste_error_no_prt'), true);
+                return false;
             }
 
             $prt = $this->question->prts[$to_prt_name];
@@ -955,7 +960,9 @@ class StackQuestionAuthoringUI
             $max = 0;
 
             foreach ($prt->get_nodes() as $temp_node_name => $temp_node) {
-                (int)$temp_node_name > $max ? $max = (int) $temp_node_name : "";
+                if ((int) $temp_node_name > $max) {
+                    $max = (int) $temp_node_name;
+                }
             }
 
             $new_node_name = $max + 1;
@@ -967,11 +974,11 @@ class StackQuestionAuthoringUI
             $prt->setNodes($nodes_from_db_array);
         }
 
-        return "";
+        return true;
     }
 
     /**
-     * @throws \ilTaxonomyException
+     * @throws ilTaxonomyException
      */
     private function buildTaxonomySection(): array
     {

@@ -418,16 +418,22 @@ class assStackQuestionGUI extends assQuestionGUI
     }
 
     /**
+     * @param bool $always
+     * @return int
      * @throws ilCtrlException
+     * @throws ilTaxonomyException
+     * @throws ilTestQuestionPoolInvalidArgumentException
      * @throws stack_exception
      */
-    public function writePostData($always = FALSE): int
+    public function writePostData(bool $always = FALSE): int
 	{
-        $authoring_ui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
+        $hasErrors = !$always && $this->editQuestion(true);
 
-        $authoring_ui->writePostData();
+        if (!$hasErrors) {
+            return 0;
+        }
 
-        return 0;
+        return 1;
 	}
 
 	/**
@@ -463,10 +469,13 @@ class assStackQuestionGUI extends assQuestionGUI
      * Creates an output of the edit form for the question
      *
      * @param bool $check_only
+     * @return bool
      * @throws ilCtrlException
+     * @throws ilTaxonomyException
+     * @throws ilTestQuestionPoolInvalidArgumentException
      * @throws stack_exception
      */
-	public function editQuestion(bool $check_only = false): void
+	public function editQuestion(bool $check_only = false): bool
     {
 		global $DIC;
 
@@ -478,7 +487,17 @@ class assStackQuestionGUI extends assQuestionGUI
 
 		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
 
-        $this->tpl->setVariable("QUESTION_DATA", $authoring_gui->showAuthoringPanel());
+        list($errors, $form) = $authoring_gui->showAuthoringPanel();
+
+        if ($errors) {
+            $check_only = false;
+        }
+
+        if (!$check_only) {
+            $this->tpl->setVariable("QUESTION_DATA", $form);
+        }
+
+        return $errors;
 	}
 
 	/* RTE, Javascript, Ajax, jQuery etc. METHODS BEGIN */
