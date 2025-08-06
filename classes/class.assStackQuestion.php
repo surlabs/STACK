@@ -5,6 +5,7 @@ use classes\platform\ilias\StackPlatformIlias;
 use classes\platform\StackConfig;
 use classes\platform\StackException;
 use classes\platform\StackPlatform;
+use ILIAS\Test\Logging\AdditionalInformationGenerator;
 
 /**
  *  This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -315,6 +316,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param string $author
      * @param int $owner
      * @param string $question
+     * @throws StackException
      */
     function __construct($title = "", $comment = "", $author = "", $owner = -1, $question = "")
     {
@@ -357,6 +359,15 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         //Initialize some STACK required parameters
         require_once __DIR__ . '/utils/class.assStackQuestionInitialization.php';
         require_once(__DIR__ . '/utils/locallib.php');
+
+        if($owner === -1){
+            try{
+                $this->loadStandardQuestion();
+            } catch (stack_exception $e){
+                global $tpl;
+                $tpl->setOnScreenMessage('failure', $e->getMessage(), true);
+            }
+        }
     }
 
     //assQuestion abstract methods
@@ -414,15 +425,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         });
 
 
-        if ($entered_values) {
-            if (ilObjAssessmentFolder::_enabledAssessmentLogging()) {
-                assQuestion::logAction($this->lng->txtlng('assessment', 'log_user_entered_values', ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-            }
-        } else {
-            if (ilObjAssessmentFolder::_enabledAssessmentLogging()) {
-                assQuestion::logAction($this->lng->txtlng('assessment', 'log_user_not_entered_values', ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-            }
-        }
 
         return true;
     }
@@ -435,7 +437,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param false $return_details
      * @return float|int
      */
-    public function calculateReachedPoints($active_id, $pass = null, $authorized_solution = true, $return_details = false): float|array
+    public function calculateReachedPoints($active_id, $pass = null, $authorized_solution = true, $return_details = false): float
     {
         global $DIC;
         $db = $DIC->database();
@@ -475,7 +477,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         return $points;
     }
 
-
     /**
      * Duplicates the question in the same directory
      * @param bool $for_test
@@ -485,23 +486,23 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param null $test_obj_id
      * @return int|null the duplicated question id
      */
-    public function duplicate(bool $for_test = true, string $title = "", string $author = "", int $owner = -1, $testObjId = null): int
-    {
+    public function duplicate(
+        bool $for_test = true,
+        string $title = '',
+        string $author = '',
+        int $owner = -1,
+        $test_obj_id = null
+    ): int {
         if ($this->id <= 0) {
             // The question has not been saved. It cannot be duplicated
             return -1;
         }
-        // duplicate the question in database
-        $this_id = $this->getId();
-        $thisObjId = $this->getObjId();
 
-        $clone = $this;
-        //include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
-        $original_id = $this->questioninfo->getOriginalId($this->id);
+        $clone = clone $this;
         $clone->id = -1;
 
-        if ((int)$testObjId > 0) {
-            $clone->setObjId($testObjId);
+        if ((int) $test_obj_id > 0) {
+            $clone->setObjId((int)$test_obj_id);
         }
 
         if ($title) {
@@ -511,99 +512,21 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $clone->setAuthor($author);
         }
         if ($owner) {
-            $clone->setOwner((int)$owner);
+            $clone->setOwner($owner);
         }
         if ($for_test) {
-            $clone->saveToDb($original_id);
+            $clone->saveToDb($this->id);
         } else {
             $clone->saveToDb();
         }
-        // copy question page content
-        $clone->copyPageOfQuestion($this_id);
-        // copy XHTML media objects
-        $clone->copyXHTMLMediaObjectsOfQuestion($this_id);
 
-        $clone->onDuplicate($thisObjId, $this_id, $clone->getObjId(), $clone->getId());
+        $clone->clonePageOfQuestion($this->getId());
+        $clone->cloneXHTMLMediaObjectsOfQuestion($this->getId());
 
-        return $clone->getId();
+        $clone->onDuplicate($this->getObjId(), $this->getId(), $clone->getObjId(), $clone->getId());
+
+        return $clone->id;
     }
-
-    /**
-     * Copies an assStackQuestion object into the Clipboard
-     *
-     * @param integer $target_questionpool_id
-     * @param string $title
-     *
-     * @return void|integer Id of the clone or nothing.
-     */
-    function copyObject(int $target_questionpool_id, string $title = "")
-    {
-        if ($this->id <= 0) {
-            // The question has not been saved. It cannot be duplicated
-            return;
-        }
-        // duplicate the question in database
-        $clone = $this;
-        //include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
-
-        $original_id = $this->questioninfo->getOriginalId($this->id);
-        $clone->id = -1;
-        $source_questionpool_id = $this->getObjId();
-        $clone->setObjId($target_questionpool_id);
-        if ($title) {
-            $clone->setTitle($title);
-        }
-        $clone->saveToDb("", TRUE);
-        // copy question page content
-        $clone->copyPageOfQuestion($original_id);
-        // copy XHTML media objects
-        $clone->copyXHTMLMediaObjectsOfQuestion($original_id);
-
-        $clone->onCopy($source_questionpool_id, $original_id, $clone->getObjId(), $clone->getId());
-
-        return (int)$clone->id;
-    }
-
-    /**
-     * Copies the question into a question pool
-     * @param $targetParentId
-     * @param string $targetQuestionTitle
-     * @return int
-     */
-    public function createNewOriginalFromThisDuplicate($targetParentId, string $targetQuestionTitle = ""): int
-    {
-        if ($this->id <= 0) {
-            // The question has not been saved. It cannot be duplicated
-            return -1;
-        }
-
-        //include_once("./Modules/TestQuestionPool/classes/class.assQuestion.php");
-
-        $sourceQuestionId = $this->id;
-        $sourceParentId = $this->getObjId();
-
-        // duplicate the question in database
-        $clone = $this;
-        $clone->id = -1;
-
-        $clone->setObjId($targetParentId);
-
-        if ($targetQuestionTitle) {
-            $clone->setTitle($targetQuestionTitle);
-        }
-
-        $clone->saveToDb();
-        // copy question page content
-        $clone->copyPageOfQuestion($sourceQuestionId);
-        // copy XHTML media objects
-        $clone->copyXHTMLMediaObjectsOfQuestion($sourceQuestionId);
-
-        $clone->onCopy($sourceParentId, $sourceQuestionId, $clone->getObjId(), $clone->getId());
-
-        return (int)$clone->id;
-    }
-
-    //iQuestionCondition methods
 
     /**
      * Get all available operations for a specific question
@@ -665,11 +588,11 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param ilAssQuestionPreviewSession $previewSession
      * @return void
      */
-    protected function savePreviewData(ilAssQuestionPreviewSession $previewSession): void
+    protected function savePreviewData(ilAssQuestionPreviewSession $preview_session): void
     {
         $submittedAnswer = $this->getSolutionSubmit();
         if (!empty($submittedAnswer)) {
-            $previewSession->setParticipantsSolution($submittedAnswer);
+            $preview_session->setParticipantsSolution($submittedAnswer);
 
             assStackQuestionDB::_savePreviewSolution($this, $submittedAnswer, $this->seed);
         }
@@ -679,9 +602,9 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param array $valuePairs
      * @return array $indexedValues
      */
-    public function fetchIndexedValuesFromValuePairs(array $valuePairs): array
+    public function fetchIndexedValuesFromValuePairs(array $value_pairs): array
     {
-        return $valuePairs;
+        return $value_pairs;
     }
 
     /**
@@ -761,7 +684,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         //$this->getPlugin()->includeClass('class.assStackQuestionDB.php');
 
         $options_from_db_array = assStackQuestionDB::_readOptions($this->getId());
-        if ($options_from_db_array === -1) {
+        if (!$options_from_db_array) {
 
             //NEW QUESTION, LOAD STANDARD INFORMATION FROM CONFIGURATION
             $this->loadStandardQuestion();
@@ -977,55 +900,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         return $this->getId();
     }
 
-
-    //Import and Export
-
-    /**
-     * Creates a question from a QTI file
-     *
-     * Receives parameters from a QTI parser and creates a valid ILIAS question object
-     *
-     * @param object $item The QTI item object
-     * @param integer $questionpool_id The id of the parent questionpool
-     * @param integer $tst_id The id of the parent test if the question is part of a test
-     * @param object $tst_object A reference to the parent test object
-     * @param integer $question_counter A reference to a question counter to count the questions of an imported question pool
-     * @param array $import_mapping An array containing references to included ILIAS objects
-     */
-    public function fromXML(
-        $item,
-        $questionpool_id,
-        $tst_id,
-        &$tst_object,
-        &$question_counter,
-        array $import_mapping,
-        array &$solutionhints = []
-    ): array
-    {
-        //$this->getPlugin()->includeClass('import/qti12/class.assStackQuestionImport.php');
-        $import = new assStackQuestionImport($this);
-        return $import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping);
-
-    }
-
-    /**
-     * Returns a QTI xml representation of the question and sets the internal
-     * domxml variable with the DOM XML representation of the QTI xml representation
-     * @param bool $a_include_header
-     * @param bool $a_include_binary
-     * @param bool $a_shuffle
-     * @param bool $test_output
-     * @param bool $force_image_references
-     * @return string The QTI xml representation of the question
-     */
-    public function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false): string
-    {
-        //$this->getPlugin()->includeClass('model/export/qti12/class.assStackQuestionExport.php');
-        $export = new assStackQuestionExport($this);
-
-        return $export->toXML($a_include_header, $a_include_binary, $a_shuffle, $test_output, $force_image_references);
-    }
-
     //Question Points
 
     /**
@@ -1033,7 +907,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param ilAssQuestionPreviewSession $previewSession
      * @return float
      */
-    public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $previewSession): float
+    public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $preview_session): float
     {
         $points = 0.0;
 
@@ -1055,7 +929,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     public function saveToDb($original_id = -1): void
     {
         global $tpl;
-
         $original_id = (int) $original_id;
         if ($original_id === 0) {
             $original_id = -1;
@@ -3751,7 +3624,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     /**
      * @return string|array Or Array?
      */
-    public function getAdditionalTableName(): string|array
+    public function getAdditionalTableName(): string
     {
         return '';
     }
@@ -3763,7 +3636,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     {
         return '';
     }
-    
+
     public function lookupForExistingSolutions(int $activeId, int $pass): array
     {
         $return = array(
@@ -3809,5 +3682,65 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             }
         }
         return $return;
+    }
+
+    public function toLog(AdditionalInformationGenerator $additional_info): array
+    {
+        $result = [
+            AdditionalInformationGenerator::KEY_QUESTION_TYPE => (string) $this->getQuestionType(),
+            AdditionalInformationGenerator::KEY_QUESTION_TITLE => $this->getTitleForHTMLOutput(),
+            AdditionalInformationGenerator::KEY_QUESTION_TEXT => $this->formatSAQuestion($this->getQuestion()),
+            AdditionalInformationGenerator::KEY_QUESTION_SHUFFLE_ANSWER_OPTIONS => $additional_info
+                ->getTrueFalseTagForBool($this->getShuffle()),
+            AdditionalInformationGenerator::KEY_FEEDBACK => [
+                AdditionalInformationGenerator::KEY_QUESTION_FEEDBACK_ON_INCOMPLETE => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+                AdditionalInformationGenerator::KEY_QUESTION_FEEDBACK_ON_COMPLETE => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
+            ]
+        ];
+
+        foreach ($this->getAnswers() as $key => $answer_obj) {
+            $result[AdditionalInformationGenerator::KEY_QUESTION_ANSWER_OPTIONS][$key + 1] = [
+                AdditionalInformationGenerator::KEY_QUESTION_ANSWER_OPTION => $this->formatSAQuestion($answer_obj->getAnswertext()),
+                AdditionalInformationGenerator::KEY_QUESTION_REACHABLE_POINTS => (float) $answer_obj->getPoints(),
+                AdditionalInformationGenerator::KEY_QUESTION_ANSWER_OPTION_ORDER => (int) $answer_obj->getOrder(),
+                AdditionalInformationGenerator::KEY_QUESTION_ANSWER_OPTION_IMAGE => (string) $answer_obj->getImage(),
+                AdditionalInformationGenerator::KEY_FEEDBACK => $this->formatSAQuestion(
+                    $this->feedbackOBJ->getSpecificAnswerFeedbackExportPresentation($this->getId(), 0, $key)
+                )
+            ];
+        }
+
+        return $result;
+    }
+
+    // TODO ILIAS 10: Method getAnswers is not in assStackQuestion
+
+    protected function solutionValuesToLog(
+        AdditionalInformationGenerator $additional_info,
+        array $solution_values
+    ): string {
+        if ($solution_values === []
+            || !array_key_exists(0, $solution_values)
+            || !is_array($solution_values[0])) {
+            return $additional_info->getNoneTag();
+        }
+
+        //return $this->getAnswer((int) $solution_values[0]['value1'])->getAnswertext();
+        return '';
+    }
+
+
+    // TODO ILIAS 10: Method getAnswers is not in assStackQuestion
+
+    public function solutionValuesToText(array $solution_values): string
+    {
+        if ($solution_values === []
+            || !array_key_exists(0, $solution_values)
+            || !is_array($solution_values[0])) {
+            return '';
+        }
+
+        //return $this->getAnswer((int) $solution_values[0]['value1'])->getAnswertext();
+        return '';
     }
 }

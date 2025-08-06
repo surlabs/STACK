@@ -50,15 +50,17 @@ class assStackQuestionImport extends assQuestionImport
     /**
      * Receives parameters from a QTI parser and creates a valid ILIAS question object
      *
-     * @param object $item The QTI item object
-     * @param integer $questionpool_id The id of the parent questionpool
-     * @param integer $tst_id The id of the parent test if the question is part of a test
-     * @param object $tst_object A reference to the parent test object
-     * @param integer $question_counter A reference to a question counter to count the questions of an imported question pool
-     * @param array $import_mapping An array containing references to included ILIAS objects
+     * @param string $importdirectory
+     * @param int $user_id
+     * @param ilQTIItem $item
+     * @param int $questionpool_id
+     * @param int|null $tst_id
+     * @param ilObject|null &$tst_object
+     * @param int &$question_counter
+     * @param array $import_mapping
      * @access public
      */
-    public function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
+    public function fromXML(string $importdirectory, int $user_id, ilQTIItem $item, $questionpool_id, $tst_id, &$tst_object, &$question_counter, $import_mapping): array
     {
 
         global $DIC;
