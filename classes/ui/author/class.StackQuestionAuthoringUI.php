@@ -109,6 +109,7 @@ class StackQuestionAuthoringUI
             $sections["taxonomies"] = $this->customFactory->expandableSection($this->buildTaxonomySection(), $this->lng->txt("qpl_qst_edit_form_taxonomy_section"));
         }
 
+        $this->ctrl->setParameterByClass("assStackQuestionGUI", "save_stack_question", "yes");
         return $this->factory->input()->container()->form()->standard(
             $this->ctrl->getLinkTargetByClass("assStackQuestionGUI", "save"),
             $sections
@@ -127,7 +128,7 @@ class StackQuestionAuthoringUI
         $form = $this->buildForm();
         $errors = false;
 
-        if ($this->request->getMethod() == "POST") {
+        if ($this->request->getMethod() == "POST" && array_key_exists('save_stack_question', $this->request->getQueryParams()) && $this->request->getQueryParams()['save_stack_question'] == 'yes') {
             $form = $form->withRequest($this->request);
             $result = $form->getData();
 

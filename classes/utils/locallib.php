@@ -55,18 +55,16 @@ function stack_string($key, $a = null):string
     $lng = $DIC->language();
     $user_language = $lng->getUserLanguage();
     static $string = array();
-	switch ($user_language) {
-		case 'en':
-			if (empty($string)) {
-				include_once ILIAS_ABSOLUTE_PATH . '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/ilias_en.lang';
-			}
-			break;
-		default:
-			if (empty($string)) {
-                include_once ILIAS_ABSOLUTE_PATH. '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_de.php';
-			}
-			break;
-	}
+    static $available_languages = ["en", "de", "es"];
+
+    if (!in_array($user_language, $available_languages)) {
+        $user_language = 'de';
+    }
+
+    if (empty($string)) {
+        include_once ILIAS_ABSOLUTE_PATH. "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_$user_language.php";
+    }
+
 	return stack_maths::process_lang_string(getString($key, $string, $a));
 }
 
