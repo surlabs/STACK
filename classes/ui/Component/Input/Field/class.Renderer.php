@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field;
+namespace public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field;
 
 use assStackQuestionUtils;
 use Expand;
@@ -89,7 +89,7 @@ class Renderer extends RendererILIAS
         ?string $id_for_label = null,
         ?string $dependant_group_html = null
     ): string {
-        $tpl = new ilTemplate("src/UI/templates/default/Input/tpl.context_form.html", true, true);
+        $tpl = new ilTemplate("Input/tpl.context_form.html", true, true, 'components/ILIAS/UI/src');
 
         $tpl->setVariable("LABEL", $label);
         $tpl->setVariable("INPUT", $input_html);
@@ -169,7 +169,7 @@ class Renderer extends RendererILIAS
 
     private function getTemplateCustom(string $name): ilTemplate
     {
-        return new ilTemplate("public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/$name", true, true);
+        return new ilTemplate("Component/Input/Field/$name", true, true, 'public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion');
     }
 
     /**
