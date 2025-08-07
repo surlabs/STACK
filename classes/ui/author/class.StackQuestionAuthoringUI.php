@@ -77,7 +77,7 @@ class StackQuestionAuthoringUI
     {
         global $DIC;
 
-        $DIC->globalScreen()->layout()->meta()->addCss('public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/stack_graph.css');
+        $DIC->globalScreen()->layout()->meta()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/stack_graph.css');
 
         $this->plugin = $plugin;
         $this->question = $question;

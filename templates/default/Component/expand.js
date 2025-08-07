@@ -22,7 +22,7 @@ $(".viewcontrol-expand").each(function() {
 function triggerExpand($this) {
   let new_state = $($this).attr("data-state") === "collapsed";
 
-  $($this).find("img").attr("src", `/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/tree_${new_state ? "exp" : "col"}.svg`);
+  $($this).find("img").attr("src", `Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/tree_${new_state ? "exp" : "col"}.svg`);
   $($this).find("img").attr("alt", new_state ? "Expanded" : "Collaped");
   $($this).attr("data-state", new_state ? "expanded" : "collapsed");
 

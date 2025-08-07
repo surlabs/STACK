@@ -27,8 +27,8 @@
 //require_once(__DIR__ . '/../utils.class.php');
 //require_once(__DIR__ . '/MP_classes.php');
 
-include_once './public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionInitialization.php';
-include_once './public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/locallib.php';
+include_once ILIAS_ABSOLUTE_PATH . '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionInitialization.php';
+include_once ILIAS_ABSOLUTE_PATH . '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/locallib.php';
 
 class maxima_parser_utils {
 
