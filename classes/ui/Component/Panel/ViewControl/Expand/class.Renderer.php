@@ -40,8 +40,8 @@ class Renderer extends AbstractComponentRenderer
     {
         global $DIC;
 
-        $DIC->ui()->mainTemplate()->addCss("public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/expand.css");
-        $DIC->ui()->mainTemplate()->addJavaScript("public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/expand.js");
+        $DIC->ui()->mainTemplate()->addCss("Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/expand.css");
+        $DIC->ui()->mainTemplate()->addJavaScript("Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/expand.js");
 
         $tpl = new ilTemplate("Component/tpl.expand.html", true, true , 'public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion');
 

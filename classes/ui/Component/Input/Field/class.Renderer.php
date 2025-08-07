@@ -58,8 +58,8 @@ class Renderer extends RendererILIAS
     {
         global $DIC;
 
-        $DIC->ui()->mainTemplate()->addJavaScript('public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.js');
-        $DIC->ui()->mainTemplate()->addCss('public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/Component/Input/Field/customField.css');
+        $DIC->ui()->mainTemplate()->addJavaScript('/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/Input/Field/customField.js');
+        $DIC->ui()->mainTemplate()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/Input/Field/customField.css');
 
         if (isset($default_renderer)) {
             $this->default_renderer = $default_renderer;

@@ -78,13 +78,12 @@ class ScoringUI
     public function getScoringPanelUIComponent(): string
     {
         global $DIC;
-
         $DIC->ui()->mainTemplate()->addCss(
-            $this->plugin->getDirectory() . '/templates/css/scoring.css'
+            $this->plugin->getDirectory() . '/default/templates/css/scoring.css'
         );
 
         $DIC->ui()->mainTemplate()->addJavaScript(
-            $this->plugin->getDirectory() . '/templates/js/scoring.js'
+            $this->plugin->getDirectory() . '/default/templates/js/scoring.js'
         );
 
         $form = $this->renderForm();
