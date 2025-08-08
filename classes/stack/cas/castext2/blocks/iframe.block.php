@@ -183,7 +183,7 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
         ];
 
         // As the content is large we cannot simply use the js_amd_call.
-        $DIC->globalScreen()->layout()->meta()->addJs('public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/js/stackjsvle.js');
+        $DIC->globalScreen()->layout()->meta()->addJs('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/js/stackjsvle.js');
 
         $DIC->globalScreen()->layout()->meta()->addOnloadCode(
             'create_iframe(' . implode(',', $args). ');');
