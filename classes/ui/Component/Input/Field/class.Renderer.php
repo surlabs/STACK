@@ -58,7 +58,7 @@ class Renderer extends RendererILIAS
     {
         global $DIC;
 
-        $DIC->ui()->mainTemplate()->addJavaScript('/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/Input/Field/customField.js');
+        $DIC->ui()->mainTemplate()->addJavaScript('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/Input/Field/customField.js');
         $DIC->ui()->mainTemplate()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/default/Component/Input/Field/customField.css');
 
         if (isset($default_renderer)) {
@@ -221,7 +221,7 @@ class Renderer extends RendererILIAS
         $rteSupport = $component->getRTESupport();
 
         if (!empty($rteSupport)) {
-            $rte->addRTESupport($rteSupport["obj_id"], $rteSupport["obj_type"], $rteSupport["module"], false, $rteSupport['cfg_template'], $rteSupport['hide_switch']);
+            $rte->addRTESupport($rteSupport["obj_id"], $rteSupport["obj_type"], $rteSupport["module"], false, $rteSupport['cfg_template']);
 
             $tpl->setVariable('RTE_EDITOR', "RTEditor");
         }

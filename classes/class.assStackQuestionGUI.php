@@ -601,7 +601,7 @@ class assStackQuestionGUI extends assQuestionGUI
 
 		if (strlen($q_type)) {
 			$classname = $q_type . "GUI";
-			$this->ctrl->setParameterByClass(strtolower($classname), "sel_question_types", $q_type);
+			$this->ctrl->setParameterByClass(strtolower($classname), "question_type", $q_type);
 			$this->ctrl->setParameterByClass(strtolower($classname), "q_id", $_GET["q_id"]);
 		}
 
@@ -718,7 +718,7 @@ class assStackQuestionGUI extends assQuestionGUI
 
 		if (strlen($q_type)) {
 			$classname = $q_type . "GUI";
-			$this->ctrl->setParameterByClass(strtolower($classname), "sel_question_types", $q_type);
+			$this->ctrl->setParameterByClass(strtolower($classname), "question_type", $q_type);
 			$this->ctrl->setParameterByClass(strtolower($classname), "q_id", $this->object->getId());
 		}
 
