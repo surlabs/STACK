@@ -79,11 +79,11 @@ class ScoringUI
     {
         global $DIC;
         $DIC->ui()->mainTemplate()->addCss(
-            $this->plugin->getDirectory() . '/default/templates/css/scoring.css'
+            'Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/scoring.css'
         );
 
         $DIC->ui()->mainTemplate()->addJavaScript(
-            $this->plugin->getDirectory() . '/default/templates/js/scoring.js'
+            'Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/js/scoring.js'
         );
 
         $form = $this->renderForm();
