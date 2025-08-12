@@ -532,7 +532,7 @@ class assStackQuestionMoodleImport
 	 * Clear the list of media objects
 	 * This should be called for every new question import
 	 */
-	private function clearMediaObjects()
+	private function clearMediaObjects():void
 	{
 		$this->media_objects = array();
 	}
@@ -541,7 +541,7 @@ class assStackQuestionMoodleImport
 	 * Save the usages of media objects in a question
 	 * @param integer $question_id
 	 */
-	private function saveMediaObjectUsages(int $question_id)
+	private function saveMediaObjectUsages(int $question_id):void
 	{
 		foreach ($this->media_objects as $media_object) {
 			ilObjMediaObject::_saveUsage($media_object->getId(), "qpl:html", $question_id);
@@ -552,7 +552,7 @@ class assStackQuestionMoodleImport
 	/**
 	 * Purge the media objects collected for a not imported question
 	 */
-	private function purgeMediaObjects()
+	private function purgeMediaObjects():void
 	{
 		foreach ($this->media_objects as $media_object) {
 			$media_object->delete();
@@ -567,7 +567,7 @@ class assStackQuestionMoodleImport
 	/**
 	 * @param ilassStackQuestionPlugin $plugin
 	 */
-	public function setPlugin(ilassStackQuestionPlugin $plugin)
+	public function setPlugin(ilassStackQuestionPlugin $plugin):void
 	{
 		$this->plugin = $plugin;
 	}
@@ -583,7 +583,7 @@ class assStackQuestionMoodleImport
 	/**
 	 * @param assStackQuestion $question
 	 */
-	public function setQuestion(assStackQuestion $question)
+	public function setQuestion(assStackQuestion $question):void
 	{
 		$this->question = $question;
 	}
@@ -599,7 +599,7 @@ class assStackQuestionMoodleImport
 	/**
 	 * @param int $first_question
 	 */
-	public function setFirstQuestion(int $first_question)
+	public function setFirstQuestion(int $first_question):void
 	{
 		$this->first_question = $first_question;
 	}
@@ -615,7 +615,7 @@ class assStackQuestionMoodleImport
 	/**
 	 * @param $tags
 	 */
-	public function setRTETags($tags)
+	public function setRTETags($tags):void
 	{
 		$this->rte_tags = $tags;
 	}

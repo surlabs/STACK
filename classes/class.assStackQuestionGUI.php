@@ -29,6 +29,7 @@ use classes\platform\StackUnitTest;
 use classes\ui\author\RandomisationAndSecurityUI;
 use classes\ui\author\ScoringUI;
 use classes\ui\author\StackQuestionAuthoringUI;
+use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\TaxonomySelect;
 
 
 /**
@@ -583,10 +584,11 @@ class assStackQuestionGUI extends assQuestionGUI
 		$field->setRTESupport($this->object->getId(), "qpl", $this->rte_module);
 	}
 
-	/**
-	 * Sets the ILIAS tabs for this question type
-	 * called from ilObjTestGUI and ilObjQuestionPoolGUI
-	 */
+    /**
+     * Sets the ILIAS tabs for this question type
+     * called from ilObjTestGUI and ilObjQuestionPoolGUI
+     * @throws ilCtrlException
+     */
 	public function setQuestionTabs():void
 	{
 		global $DIC, $rbacsystem;
@@ -684,7 +686,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		}
 
 		// Assessment of questions sub menu entry
-		if ($_GET["q_id"]) {
+		if (isset($_GET["q_id"])) {
 			$tabs->addTarget("statistics", $this->ctrl->getLinkTargetByClass($classname, "assessment"), array("assessment"), $classname, "");
 		}
 
@@ -820,10 +822,11 @@ class assStackQuestionGUI extends assQuestionGUI
 		$this->tpl->setContent($form->getHTML());
 	}
 
-	/**
-	 * Actually runs the Importing of questions
-	 * @return void
-	 */
+    /**
+     * Actually runs the Importing of questions
+     * @return void
+     * @throws ilCtrlException
+     */
 	public function importQuestionFromMoodle()
 	{
 		global $DIC, $tpl;
