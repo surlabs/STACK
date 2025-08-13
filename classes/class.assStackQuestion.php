@@ -378,8 +378,9 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param null $pass
      * @param bool $authorized
      * @return bool
+     * @throws stack_exception
      */
-    public function saveWorkingData($active_id, $pass = null, $authorized = true): bool
+    public function saveWorkingData(int $active_id, $pass = null, bool $authorized = true): bool
     {
         global $DIC, $tpl;
         $db = $DIC->database();
@@ -929,6 +930,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     public function saveToDb($original_id = -1): void
     {
         global $tpl;
+
         $original_id = (int) $original_id;
         if ($original_id === 0) {
             $original_id = -1;
@@ -941,6 +943,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             parent::saveToDb();
         } else {
             $tpl->setOnScreenMessage('failure', $this->getPlugin()->txt('error_fields_missing'), true);
+            return;
         }
     }
 
@@ -948,9 +951,10 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * Saves the STACK related parameters of the questions
      * @return void
      */
-    public function saveAdditionalQuestionDataToDb()
+    public function saveAdditionalQuestionDataToDb(): void
     {
         global $tpl;
+
         try {
             assStackQuestionDB::_saveStackQuestion($this);
         } catch (stack_exception $e) {

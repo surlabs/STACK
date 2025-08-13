@@ -287,6 +287,19 @@ class assStackQuestionGUI extends assQuestionGUI
 	}
 
     /**
+     * @throws ilCtrlException
+     */
+    public function create(): void
+    {
+        $this->object->createNewQuestion();
+
+        $new_id = $this->object->getId();
+
+        $this->ctrl->setParameter($this, 'q_id', $new_id);
+        $this->ctrl->redirect($this, 'editQuestion');
+    }
+
+    /**
      * Returns the HTML for the question Preview
      * @param bool $show_question_only
      * @param bool $showInlineFeedback
@@ -491,11 +504,23 @@ class assStackQuestionGUI extends assQuestionGUI
 		$tabs->activateTab('edit_properties');
 		$tabs->activateSubTab('edit_question');
 
+        $is_new_question_before_save = ($this->object->getId() < 1);
 		$this->getQuestionTemplate();
 
 		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
 
         list($errors, $form) = $authoring_gui->showAuthoringPanel();
+
+        $is_save_successful = !$errors;
+        $has_new_id_after_save = ($this->object->getId() > 0);
+
+        if ($is_new_question_before_save && $is_save_successful && $has_new_id_after_save) {
+
+            $this->ctrl->setParameter($this, 'q_id', $this->object->getId());
+            $this->ctrl->redirect($this, 'editQuestion');
+
+            return false;
+        }
 
         if ($errors) {
             $checkonly = false;
