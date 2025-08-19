@@ -28,6 +28,7 @@ use assStackQuestionDB;
 use assStackQuestionGUI;
 use assStackQuestionUtils;
 use classes\platform\StackConfig;
+use ilAssQuestionPreviewSession;
 use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\CustomFactory;
 use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\ExpandableSection;
 use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\TaxonomySelect;
@@ -323,10 +324,20 @@ class StackQuestionAuthoringUI
                 TaxonomySelect::saveTaxonomySelect($this->question->getObjId(), $this->question->getId(), $taxonomy_id, $nodes);
             }
         }
-
+        $this->resetSavedPreviewSession();
         $this->question->saveToDb();
 
         return false;
+    }
+
+    public function resetSavedPreviewSession(): void
+    {
+        global $DIC;
+        $ilUser = $DIC['ilUser'];
+        $user_id = $ilUser->getId();
+        $question_id = $this->question->getId();
+        $ilAssQuestionPreviewSession = new ilAssQuestionPreviewSession($user_id, $question_id);
+        $ilAssQuestionPreviewSession->setParticipantsSolution([]);
     }
 
     /**

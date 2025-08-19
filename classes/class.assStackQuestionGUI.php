@@ -287,19 +287,6 @@ class assStackQuestionGUI extends assQuestionGUI
 	}
 
     /**
-     * @throws ilCtrlException
-     */
-    public function create(): void
-    {
-        $this->object->createNewQuestion();
-
-        $new_id = $this->object->getId();
-
-        $this->ctrl->setParameter($this, 'q_id', $new_id);
-        $this->ctrl->redirect($this, 'editQuestion');
-    }
-
-    /**
      * Returns the HTML for the question Preview
      * @param bool $show_question_only
      * @param bool $showInlineFeedback
@@ -524,6 +511,7 @@ class assStackQuestionGUI extends assQuestionGUI
 
         if ($errors) {
             $checkonly = false;
+            //$this->ctrl->setParameterByClass('assStackQuestionGUI', 'q_id', $this->object->getId());
         }
 
         if (!$checkonly) {
@@ -555,6 +543,12 @@ class assStackQuestionGUI extends assQuestionGUI
 		//Redirects to show Question Form
 		$this->editQuestion();
 	}
+
+    protected function setQuestionSpecificTabs(ilTabsGUI $ilTabs): void
+    {
+        $this->ctrl->setParameterByClass(ilLocalUnitConfigurationGUI::class, 'q_id', $this->object->getId());
+        $ilTabs->addTarget('units', $this->ctrl->getLinkTargetByClass(ilLocalUnitConfigurationGUI::class, ''), '', 'illocalunitconfigurationgui');
+    }
 
 	/**
 	 * Save the showing info messages state in the user session
