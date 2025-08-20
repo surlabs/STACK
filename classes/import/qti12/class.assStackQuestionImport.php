@@ -60,7 +60,7 @@ class assStackQuestionImport extends assQuestionImport
      * @param array $import_mapping
      * @access public
      */
-    public function fromXML(string $importdirectory, int $user_id, ilQTIItem $item, $questionpool_id, $tst_id, &$tst_object, &$question_counter, $import_mapping): array
+    public function fromXML(string $importdirectory, int $user_id, ilQTIItem $item, int $questionpool_id, ?int $tst_id, ?ilObject &$tst_object, int &$question_counter, array $import_mapping): array
     {
 
         global $DIC;
@@ -311,19 +311,14 @@ class assStackQuestionImport extends assQuestionImport
         // handle the import of media objects in XHTML code
         $question_text = $this->object->getQuestion();
 
-        if (is_array($_SESSION["import_mob_xhtml"])) {
+        if (is_array(ilSession::get("import_mob_xhtml"))) {
 
             //include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
             //include_once "./Services/RTE/classes/class.ilRTE.php";
 
-            foreach ($_SESSION["import_mob_xhtml"] as $mob) {
-                if ($tst_id > 0) {
-                    //#22754
-                    $importfile = $this->getTstImportArchivDirectory() . '/' . current(explode('?', $mob["uri"]));
-                } else {
-                    //#22754
-                    $importfile = $this->getQplImportArchivDirectory() . '/' . current(explode('?', $mob["uri"]));
-                }
+            foreach (ilSession::get("import_mob_xhtml") as $mob) {
+
+                $importfile = $importdirectory . DIRECTORY_SEPARATOR . current(explode('?', $mob["uri"]));
 
                 $GLOBALS['ilLog']->write(__METHOD__ . ': import mob from dir: ' . $importfile);
 

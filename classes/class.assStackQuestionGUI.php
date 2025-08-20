@@ -29,6 +29,7 @@ use classes\platform\StackUnitTest;
 use classes\ui\author\RandomisationAndSecurityUI;
 use classes\ui\author\ScoringUI;
 use classes\ui\author\StackQuestionAuthoringUI;
+use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\TaxonomySelect;
 
 
 /**
@@ -490,14 +491,27 @@ class assStackQuestionGUI extends assQuestionGUI
 		$tabs->activateTab('edit_properties');
 		$tabs->activateSubTab('edit_question');
 
+        $is_new_question_before_save = ($this->object->getId() < 1);
 		$this->getQuestionTemplate();
 
 		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
 
         list($errors, $form) = $authoring_gui->showAuthoringPanel();
 
+        $is_save_successful = !$errors;
+        $has_new_id_after_save = ($this->object->getId() > 0);
+
+        if ($is_new_question_before_save && $is_save_successful && $has_new_id_after_save) {
+
+            $this->ctrl->setParameter($this, 'q_id', $this->object->getId());
+            $this->ctrl->redirect($this, 'editQuestion');
+
+            return false;
+        }
+
         if ($errors) {
             $checkonly = false;
+            //$this->ctrl->setParameterByClass('assStackQuestionGUI', 'q_id', $this->object->getId());
         }
 
         if (!$checkonly) {
@@ -529,6 +543,12 @@ class assStackQuestionGUI extends assQuestionGUI
 		//Redirects to show Question Form
 		$this->editQuestion();
 	}
+
+    protected function setQuestionSpecificTabs(ilTabsGUI $ilTabs): void
+    {
+        $this->ctrl->setParameterByClass(ilLocalUnitConfigurationGUI::class, 'q_id', $this->object->getId());
+        $ilTabs->addTarget('units', $this->ctrl->getLinkTargetByClass(ilLocalUnitConfigurationGUI::class, ''), '', 'illocalunitconfigurationgui');
+    }
 
 	/**
 	 * Save the showing info messages state in the user session
@@ -583,10 +603,11 @@ class assStackQuestionGUI extends assQuestionGUI
 		$field->setRTESupport($this->object->getId(), "qpl", $this->rte_module);
 	}
 
-	/**
-	 * Sets the ILIAS tabs for this question type
-	 * called from ilObjTestGUI and ilObjQuestionPoolGUI
-	 */
+    /**
+     * Sets the ILIAS tabs for this question type
+     * called from ilObjTestGUI and ilObjQuestionPoolGUI
+     * @throws ilCtrlException
+     */
 	public function setQuestionTabs():void
 	{
 		global $DIC, $rbacsystem;
@@ -684,7 +705,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		}
 
 		// Assessment of questions sub menu entry
-		if ($_GET["q_id"]) {
+		if (($_GET["q_id"])) {
 			$tabs->addTarget("statistics", $this->ctrl->getLinkTargetByClass($classname, "assessment"), array("assessment"), $classname, "");
 		}
 
@@ -820,10 +841,11 @@ class assStackQuestionGUI extends assQuestionGUI
 		$this->tpl->setContent($form->getHTML());
 	}
 
-	/**
-	 * Actually runs the Importing of questions
-	 * @return void
-	 */
+    /**
+     * Actually runs the Importing of questions
+     * @return void
+     * @throws ilCtrlException
+     */
 	public function importQuestionFromMoodle()
 	{
 		global $DIC, $tpl;

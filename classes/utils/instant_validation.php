@@ -31,9 +31,9 @@ chdir("../../../../../../../../../");
 // (see ilInitialisation::InitILIAS for details)
 
 require_once "./include/inc.header.php";
-require_once './public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionUtils.php';
+require_once ILIAS_ABSOLUTE_PATH .'/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionUtils.php';
 //Initialization (load of stack wrapper classes)
-require_once './public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionInitialization.php';
+require_once ILIAS_ABSOLUTE_PATH .'/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionInitialization.php';
 
 header('Content-type: application/json; charset=utf-8');
 echo json_encode(checkUserResponse($_REQUEST['question_id'], $_REQUEST['input_name'], $_REQUEST['input_value']));
@@ -49,7 +49,7 @@ exit;
 function checkUserResponse($question_id, $input_name, $user_response)
 {
     global $DIC;
-    require_once './public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/class.assStackQuestion.php';
+    require_once ILIAS_ABSOLUTE_PATH .'/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/class.assStackQuestion.php';
 
 	$question = new assStackQuestion();
     try {
