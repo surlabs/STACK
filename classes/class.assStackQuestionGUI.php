@@ -705,7 +705,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		}
 
 		// Assessment of questions sub menu entry
-		if (isset($_GET["q_id"])) {
+		if (($_GET["q_id"])) {
 			$tabs->addTarget("statistics", $this->ctrl->getLinkTargetByClass($classname, "assessment"), array("assessment"), $classname, "");
 		}
 

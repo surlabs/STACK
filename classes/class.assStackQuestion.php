@@ -379,6 +379,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param bool $authorized
      * @return bool
      * @throws stack_exception
+     * @throws ilCtrlException
      */
     public function saveWorkingData(int $active_id, $pass = null, bool $authorized = true): bool
     {
@@ -586,8 +587,9 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     }
 
     /**
-     * @param ilAssQuestionPreviewSession $previewSession
+     * @param ilAssQuestionPreviewSession $preview_session
      * @return void
+     * @throws stack_exception
      */
     protected function savePreviewData(ilAssQuestionPreviewSession $preview_session): void
     {
@@ -927,7 +929,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param string $original_id
      *
      */
-    public function saveToDb($original_id = -1): void
+    public function saveToDb($original_id = null): void
     {
         global $tpl;
 
