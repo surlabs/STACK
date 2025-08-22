@@ -18,23 +18,14 @@
  *
  */
 
-// fim: [debug] optionally set error before initialisation
 use classes\platform\StackException;
+
+require_once("../../../../../../../../../../vendor/composer/vendor/autoload.php");
 
 error_reporting(E_ALL);
 ini_set("display_errors", "on");
-// fim.
 
-chdir("../../../../../../../../../");
-
-// Avoid redirection to start screen
-// (see ilInitialisation::InitILIAS for details)
-
-require_once "./include/inc.header.php";
-require_once ILIAS_ABSOLUTE_PATH .'/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionUtils.php';
-//Initialization (load of stack wrapper classes)
-require_once ILIAS_ABSOLUTE_PATH .'/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionInitialization.php';
-
+ilInitialisation::initILIAS();
 header('Content-type: application/json; charset=utf-8');
 echo json_encode(checkUserResponse($_REQUEST['question_id'], $_REQUEST['input_name'], $_REQUEST['input_value']));
 exit;
