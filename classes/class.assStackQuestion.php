@@ -929,14 +929,9 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param string $original_id
      *
      */
-    public function saveToDb($original_id = null): void
+    public function saveToDb(?int $original_id = null): void
     {
         global $tpl;
-
-        $original_id = (int) $original_id;
-        if ($original_id === 0) {
-            $original_id = -1;
-        }
 
         if ($this->getTitle() != "" and $this->getAuthor() != "" and $this->getQuestion() != "") {
             $this->saveQuestionDataToDb($original_id);
