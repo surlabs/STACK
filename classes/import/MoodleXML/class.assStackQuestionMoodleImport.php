@@ -90,12 +90,13 @@ class assStackQuestionMoodleImport
 
 	/* MAIN METHODS BEGIN */
 
-	/**
-	 * ### MAIN METHOD OF THIS CLASS ###
-	 * This method is called from assStackQuestion to import the questions from an MoodleXML file.
-	 * @param $xml_file
-	 */
-	public function import($xml_file)
+    /**
+     * ### MAIN METHOD OF THIS CLASS ###
+     * This method is called from assStackQuestion to import the questions from an MoodleXML file.
+     * @param $xml_file
+     * @throws stack_exception
+     */
+	public function import($xml_file): ?int
 	{
 		//Step 1: Get data from XML.
 		//LIBXML_NOCDATA Merge CDATA as Textnodes
@@ -104,6 +105,7 @@ class assStackQuestionMoodleImport
 		//Step 2: Initialize question in ILIAS
 		$number_of_questions_created = 0;
 
+        $first_imported_id = null;
 
         foreach ($xml->question as $question) {
 
@@ -133,6 +135,10 @@ class assStackQuestionMoodleImport
                         if (assStackQuestionDB::_saveStackQuestion($this->getQuestion(), 'import')) {
                             $this->saveMediaObjectUsages((int)$this->getQuestion()->getId());
                             $number_of_questions_created++;
+
+                            if ($first_imported_id === null) {
+                                $first_imported_id = $this->getQuestion()->getId();
+                            }
                         }
                     } catch (stack_exception $e) {
                         $this->error_log[] = 'question was not saved: ' . $this->getQuestion()->getTitle();
@@ -153,6 +159,7 @@ class assStackQuestionMoodleImport
                 }
             }
 		}
+        return $first_imported_id;
 	}
 
 	/**
@@ -266,7 +273,7 @@ class assStackQuestionMoodleImport
 		$options['complexno'] = ilUtil::secureString((string)$question->complexno);
 		$options['inversetrig'] = ilUtil::secureString((string)$question->inversetrig);
 		$options['matrixparens'] = ilUtil::secureString((string)$question->matrixparens);
-		$options['logicsymbol'] = ilUtil::secureString((string)$question->logicsymbol);
+        $options['logicsymbol'] = ilUtil::secureString('lang');
 
 		//load options
 		try {
@@ -542,7 +549,7 @@ class assStackQuestionMoodleImport
 	 * @param integer $question_id
 	 */
 	private function saveMediaObjectUsages(int $question_id):void
-	{
+    {
 		foreach ($this->media_objects as $media_object) {
 			ilObjMediaObject::_saveUsage($media_object->getId(), "qpl:html", $question_id);
 		}

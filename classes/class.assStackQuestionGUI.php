@@ -796,12 +796,13 @@ class assStackQuestionGUI extends assQuestionGUI
 
 	}
 
-	/**
-	 * Redirects to the import from MoodleXML Form
-	 * @return void
-	 */
-	public function importQuestionFromMoodleForm()
-	{
+    /**
+     * Redirects to the import from MoodleXML Form
+     * @return void
+     * @throws ilCtrlException
+     */
+	public function importQuestionFromMoodleForm(): void
+    {
 		global $DIC, $tpl;
 
 		$lng = $DIC->language();
@@ -844,7 +845,7 @@ class assStackQuestionGUI extends assQuestionGUI
     /**
      * Actually runs the Importing of questions
      * @return void
-     * @throws ilCtrlException
+     * @throws ilCtrlException|stack_exception
      */
 	public function importQuestionFromMoodle()
 	{
@@ -860,29 +861,33 @@ class assStackQuestionGUI extends assQuestionGUI
 			$xml_file = $_FILES["questions_xml"]["tmp_name"];
 		} else {
 			$tpl->setOnScreenMessage('failure', $this->plugin->txt('error_import_question_in_test'), true);
+            $this->importQuestionFromMoodleForm();
 			return;
 		}
 
-		//CHECK FOR NOT ALLOW IMPROT QUESTIONS DIRECTLY IN TESTS
-		if (isset($_GET['calling_test'])) {
-			$tpl->setOnScreenMessage('failure', $this->plugin->txt('error_import_question_in_test'), true);
-		} else {
-			//Include import class and prepare object
-			//$this->plugin->includeClass('model/import/MoodleXML/class.assStackQuestionMoodleImport.php');
-			$import = new assStackQuestionMoodleImport($this->plugin, (int)$_POST['first_question_id'], $this->object);
-			$import->setRTETags($this->getRTETags());
-			$import->import($xml_file);
+        $current_q_id = (int) $_POST['first_question_id'];
 
-			$DIC->ctrl()->redirect($this, 'editQuestion');
-		}
-	}
+        $import = new assStackQuestionMoodleImport($this->plugin, $current_q_id, $this->object);
+        $import->setRTETags($this->getRTETags());
+
+        $new_question_id = $import->import($_FILES["questions_xml"]["tmp_name"]);
+
+        if ($new_question_id > 0) {
+            $this->ctrl->setParameter($this, 'q_id', $new_question_id);
+            $this->ctrl->redirect($this, 'editQuestion');
+        } else {
+            $tpl->setOnScreenMessage('failure', $this->plugin->txt('error_import_question_in_test'), true);
+            $this->ctrl->setParameter($this, 'q_id', $current_q_id);
+            $this->ctrl->redirect($this, 'editQuestion');
+        }
+    }
 
 	/**
 	 * Redirects to the export from MoodleXML Form
 	 * @return void
 	 */
-	public function exportQuestiontoMoodleForm()
-	{
+	public function exportQuestiontoMoodleForm(): void
+    {
 
 		global $DIC, $tpl;
 		$tabs = $DIC->tabs();
