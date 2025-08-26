@@ -652,6 +652,8 @@ config_feedback_styles_changed_message#:#Die Standardeinstellungen für Feedback
 feedback_extra_1#:#Teilweise korrekt
 feedback_extra_1_info#:#Feedback-Style für teilweise korrekte Antworten
 copy_node#:#Knoten kopieren
+create_node#:#Knoten erstellen
+node_created#:#Knoten erstellt
 paste_node#:#Knoten einfügen
 copy_prt#:# Rückmeldebaum kopieren
 paste_prt#:#Rückmeldebaum einfügen
@@ -660,6 +662,7 @@ node_copied_to_clipboard#:#Knoten in die Zwischenablage kopiert
 node_paste#:#In dieser Frage wurde ein Knoten eingefügt
 prt_paste#:#In dieser Frage wurde ein Rückmeldebaum eingefügt
 prt_paste_error#:#Es gab einen Fehler beim Einfügen des PRT, vielleicht wurde das ursprüngliche PRT gelöscht
+node_create_error#:#Beim Erstellen des Knotens ist ein Fehler aufgetreten.
 srv_purpose#:#Verwendung
 srv_purpose_info#:#Wählen Sie "Testdurchlauf" um einen Maxima-Server exklusiv für zeitkritische Anfragen währen eines Tests zu reservieren, z.B. für E-Klausuren. Stellen Sie dann einen zweiten Server für alle anderen Anfragen bereit ("Erstellung/Bewertung").
 srv_purpose_run#:#Testdurchlauf

@@ -1224,7 +1224,54 @@ class assStackQuestionDB
         }
     }
 
-	/**
+    /**
+     * Create a new node for a given PRT in a question
+     *
+     * @param int $question_id
+     * @param string $prt_name
+     * @param string $node_name
+     * @return bool
+     */
+    public static function _createStackPrtNode(int $question_id, string $prt_name, string $node_name): bool
+    {
+        global $DIC;
+
+        try {
+            $DIC->database()->insert("xqcas_prt_nodes", array(
+                "id" => array("integer", $DIC->database()->nextId('xqcas_prt_nodes')),
+                "question_id" => array("integer", $question_id),
+                "prt_name" => array("text", $prt_name),
+                "node_name" => array("text", $node_name),
+                "answer_test" => array("text", "AlgEquiv"),
+                "sans" => array("text", "ans1"),
+                "tans" => array("text", "z"),
+                "test_options" => array("text", ""),
+                "quiet" => array("integer", 0),
+                "true_score_mode" => array("text", "="),
+                "true_score" => array("text", "1"),
+                "true_penalty" => array("text", "0"),
+                "true_next_node" => array("text", "-1"),
+                "true_answer_note" => array("text", $prt_name . '-' . $node_name . '-T'),
+                "true_feedback" => array("clob", ""),
+                "true_feedback_format" => array("integer", 0),
+                "false_score_mode" => array("text", "="),
+                "false_score" => array("text", "0"),
+                "false_penalty" => array("text", "0"),
+                "false_next_node" => array("text", "-1"),
+                "false_answer_note" => array("text", $prt_name . '-' . $node_name . '-F'),
+                "false_feedback" => array("clob", ""),
+                "false_feedback_format" => array("integer", 0),
+                "description" => array("clob", "")
+            ));
+
+            return true;
+        } catch (\Exception $e) {
+            $DIC->logger()->root()->error("Error creating node: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
 	 * @param int $question_id
 	 * @param string $prt_name
 	 * @param string $node_name
