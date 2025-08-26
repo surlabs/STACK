@@ -92,7 +92,9 @@ il.instant_validation = new function () {
 				})
 					.done(function (data) {
 						remove_spinner(name);
-						$('#validation_xqcas_' + question_id + '_' + input_name).html(data);
+						if (typeof MathJax !== 'undefined') {
+							MathJax.typesetPromise();
+						}
 						MathJax.Hub.Queue(["Typeset", MathJax.Hub, 'validation_xqcas_' + question_id + '_' + input_name]);
 					}).catch(function (error) {
 					console.log(error.responseText);
@@ -135,7 +137,9 @@ il.instant_validation = new function () {
 					.done(function (data) {
 						remove_spinner(name);
 						$('#validation_xqcas_' + question_id + '_' + input_name).html(data);
-						MathJax.Hub.Queue(["Typeset", MathJax.Hub, 'validation_xqcas_' + question_id + '_' + input_name]);
+						if (typeof MathJax !== 'undefined') {
+							MathJax.typesetPromise();
+						}
 						$('#validation_xqcas_roll_' + question_id + '_' + input_name).html("");
 					});
 

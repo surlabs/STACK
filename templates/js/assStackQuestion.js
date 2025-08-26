@@ -110,7 +110,9 @@ il.assStackQuestion = new function () {
 			.done(function (data) {
 				remove_spinner();
 				$('#validation_xqcas_' + question_id + '_' + input_name).html(data);
-				MathJax.Hub.Queue(["Typeset", MathJax.Hub, 'validation_xqcas_' + question_id + '_' + input_name]);
+				if (typeof MathJax !== 'undefined') {
+					MathJax.typesetPromise();
+				}
 			}).catch(function (error) {
 			console.log(error.responseText);
 		});
