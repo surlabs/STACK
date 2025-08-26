@@ -39,7 +39,8 @@ cdn.mathjax.org or downloaded to your own web server. It has to be configured in
 
 1. Administration > Third Party Software > MathJax
 2. Enable MathJax and enter the URL to MathJax (Currently only MathJax rendered in browser option is supported)
-3. Save
+3. Use the last MathJax version (currently 3.x)
+4. Save
 
 ### Installation steps
 1. Create subdirectories, if necessary for public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/
@@ -49,13 +50,13 @@ cdn.mathjax.org or downloaded to your own web server. It has to be configured in
 ```bash
 git clone https://github.com/surlabs/STACK.git ./assStackQuestion
 cd assStackQuestion
-git checkout ilias9_stack
+git checkout ilias10_stack_dev
 ```
 3. STACK uses the ILIAS composer autoloader functionality so, after installing or update the plugin, ensure you run on the ILIAS root folder
 ```bash
 composer install --no-dev
 npm install
-php setup/setup.php update
+php cli/setup.php update
 ```
 ***
 **Please ensure you don't ignore plugins on composer.json**
@@ -82,6 +83,7 @@ php setup/setup.php update
 - SIG Mathe [Forum](https://docu.ilias.de/goto_docu_frm_7004.html)
 
 # Version History
+* The version 10.0.x for **ILIAS 10** with the STACK Core version 4.5.0 can be found in the Github branch **ilias10_stack_dev**
 * The stable version 9.0.x for **ILIAS 9** with the STACK Core version 4.5.0 can be found in the Github branch **ilias9_stack**
 * The stable version 8.5.x for **ILIAS 8** with the STACK Core version 4.5.0 can be found in the Github branch **ilias8_stack**
 * The stable version 8.0.x for **ILIAS 8** with the STACK Core version 4.3.9 can be found in the Github branch **old_ilias8_stack2021** is on only security issues mode.
