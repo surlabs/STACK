@@ -649,6 +649,8 @@ config_feedback_styles_changed_message#:#La configuración predeterminada para e
 feedback_extra_1#:#Parcialmente correcto
 feedback_extra_1_info#:#Estilo de retroalimentación para respuestas parcialmente correctas
 copy_node#:#Copiar nodo
+create_node#:#Crear nodo
+node_created#:#El nodo ha sido creado.
 paste_node#:#Pegar nodo
 copy_prt#:#Copiar árboles de respuestas potenciales
 paste_prt#:#Pegar árboles de respuestas potenciales
@@ -657,6 +659,7 @@ node_copied_to_clipboard#:#Nodo copiado al portapapeles
 node_paste#:#Se ha pegado un nodo en esta pregunta
 prt_paste#:#Se ha pegado un árbole de respuestas potenciales en esta pregunta
 prt_paste_error#:#Hubo un error al pegar el PRT, tal vez el PRT original fue eliminado
+node_create_error#:#Hubo un error al crear el Nodo.
 srv_purpose#:#Uso
 srv_purpose_info#:#Seleccione "Ejecución de prueba" para reservar un servidor Maxima exclusivamente para solicitudes críticas durante una prueba, por ejemplo, para exámenes electrónicos. Luego, proporcione un segundo servidor para todas las demás solicitudes ("Creación/Evaluación").
 srv_purpose_run#:#Ejecución de prueba
