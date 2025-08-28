@@ -1284,6 +1284,54 @@ class assStackQuestionDB
 		}
 	}
 
+    /**
+     * Create a new node for a given PRT in a question
+     *
+     * @param int $question_id
+     * @param string $prt_name
+     * @param string $node_name
+     * @return bool
+     */
+    public static function _createStackPrtNode(int $question_id, string $prt_name, string $node_name): bool
+    {
+        global $DIC;
+
+        $standard_prt = assStackQuestionConfig::_getStoredSettings('prts');
+
+        try {
+            $DIC->database()->insert("xqcas_prt_nodes", array(
+                "id" => array("integer", $DIC->database()->nextId('xqcas_prt_nodes')),
+                "question_id" => array("integer", (int)$question_id),
+                "prt_name" => array("text", $prt_name),
+                "node_name" => array("text", $node_name),
+                "answer_test" => array("text", $standard_prt['prt_node_answer_test']),
+                "sans" => array("text", "ans1"),
+                "tans" => array("text", "ta"),
+                "test_options" => array("text", $standard_prt['prt_node_options']),
+                "quiet" => array("integer", (int)$standard_prt['prt_node_quiet']),
+                "true_score_mode" => array("text", $standard_prt['prt_pos_mod']),
+                "true_score" => array("text", $standard_prt['prt_pos_score']),
+                "true_penalty" => array("text", $standard_prt['prt_pos_penalty']),
+                "true_next_node" => array("text", "-1"),
+                "true_answer_note" => array("text", $prt_name . '-' . $node_name . '-T'),
+                "true_feedback" => array("clob", ""),
+                "true_feedback_format" => array("integer", 0),
+                "false_score_mode" => array("text", $standard_prt['prt_neg_mod']),
+                "false_score" => array("text", $standard_prt['prt_neg_score']),
+                "false_penalty" => array("text", $standard_prt['prt_neg_penalty']),
+                "false_next_node" => array("text", "-1"),
+                "false_answer_note" => array("text", $prt_name . '-' . $node_name . '-F'),
+                "false_feedback" => array("clob", ""),
+                "false_feedback_format" => array("integer", 0),
+            ));
+
+            return true;
+        } catch (\Exception $e) {
+            $DIC->logger()->root()->error("Error creating node: " . $e->getMessage());
+            return false;
+        }
+    }
+
 	/**
 	 * @param int $question_id
 	 * @return bool

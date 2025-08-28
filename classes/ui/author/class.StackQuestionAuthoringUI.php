@@ -330,6 +330,8 @@ class StackQuestionAuthoringUI
                 return $this->copyPrt($params["prt_name"]);
             case "pastePrt":
                 return $this->pastePrt();
+            case "createNode":
+                return $this->createNode($params["prt_name"]);
             case "deleteNode":
                 return $this->deleteNode($params["prt_name"], $params["node_name"]);
             case "copyNode":
@@ -699,6 +701,9 @@ class StackQuestionAuthoringUI
             ->withValue($node->quiet);
 
         $actions = [
+            $this->factory->button()->standard($this->plugin->txt("create_node"), "")->withOnLoadCode(function ($id) use ($prt, $node) {
+                return $this->generateActionCode($id, "createNode", ["prt_name" => $prt->get_name(), "node_name" => $node->nodename]);
+            }),
             $this->factory->button()->standard($this->plugin->txt("delete_node"), "")->withOnLoadCode(function ($id) use ($prt, $node) {
                 return $this->generateActionCode($id, "deleteNode", ["prt_name" => $prt->get_name(), "node_name" => $node->nodename]);
             }),
@@ -716,9 +721,9 @@ class StackQuestionAuthoringUI
         $inputs["actions"] = $this->customFactory->buttonSection($actions, $this->plugin->txt("actions"));
 
         $inputs["feedback"] = $this->customFactory->columnSection([
-                "positive" => $this->buildPositivePart($prt, $node),
-                "negative" => $this->buildNegativePart($prt, $node)
-            ], $this->plugin->txt("prt_node_feedback"))
+            "positive" => $this->buildPositivePart($prt, $node),
+            "negative" => $this->buildNegativePart($prt, $node)
+        ], $this->plugin->txt("prt_node_feedback"))
             ->withColumnStyles([
                 "positive" => [
                     "background" => "linear-gradient(45deg, #e2fff1, #a3ffd0);"
@@ -865,6 +870,35 @@ class StackQuestionAuthoringUI
         return "";
     }
 
+    private function createNode(string $prt_name): string
+    {
+        global $DIC;
+
+        if (!isset($this->question->prts[$prt_name])) {
+            return $this->renderer->render($this->factory->messageBox()->failure($this->plugin->txt('node_create_error')));
+        }
+
+        $prt = $this->question->prts[$prt_name];
+
+        $max = 0;
+        foreach ($prt->get_nodes() as $temp_node_name => $temp_node) {
+            if ((int) $temp_node_name > $max) {
+                $max = (int) $temp_node_name;
+            }
+        }
+        $new_node_name = (string) ($max + 1);
+
+        assStackQuestionDB::_createStackPrtNode(
+            $this->question->getId(),
+            $prt_name,
+            $new_node_name
+        );
+
+        $nodes_from_db_array = assStackQuestionDB::_readPrtNodes($this->question->getId(), $prt_name);
+        $prt->setNodes($nodes_from_db_array);
+
+        return $this->renderer->render($this->factory->messageBox()->success($this->plugin->txt('node_created')));
+    }
     private function deleteNode(string $prt_name, string $node_name): string
     {
         if(!isset($this->question->prts[$prt_name])) {
