@@ -14,9 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/filter.interface.php');
-//require_once(__DIR__ . '/996_call_modification.filter.php');
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/filter.interface.php');
+require_once(__DIR__ . '/996_call_modification.filter.php');
 
 /**
  * AST filter that rewrites calls to ev in such a way that they can deal
@@ -26,12 +33,15 @@
 class stack_ast_filter_995_ev_modification implements stack_cas_astfilter_parametric {
 
     // Whether to rewrite evaluation flags. Don't do for students.
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private $flags = false;
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function set_filter_parameters(array $parameters) {
         $this->flags = isset($parameters['flags']) ? $parameters['flags'] : false;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $process = function($node) {
@@ -81,7 +91,8 @@ class stack_ast_filter_995_ev_modification implements stack_cas_astfilter_parame
                             [
                                 new MP_List([new MP_Identifier('%_sev_e')]),
                                 new MP_Operation(':', new MP_Identifier('%_sev_e'), $payload),
-                                $node]);
+                                $node,
+                            ]);
                     } else {
                         $replacement = new MP_FunctionCall(new MP_Identifier('block'),
                             [
@@ -90,7 +101,8 @@ class stack_ast_filter_995_ev_modification implements stack_cas_astfilter_parame
                                 new MP_Operation(':', new MP_Identifier('simp'), $simp),
                                 new MP_Operation(':', new MP_Identifier('%_sev_e'), $payload),
                                 new MP_Operation(':', new MP_Identifier('simp'), new MP_Identifier('%_sev_s')),
-                                $node]);
+                                $node,
+                            ]);
                     }
                     $node->replace($payload, new MP_Identifier('%_sev_e'));
                     $node->parentnode->replace($node, $replacement);

@@ -14,17 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/cas/ast.container.class.php');
-//require_once(__DIR__ . '/cas/keyval.class.php');
-//require_once(__DIR__ . '/cas/castext2/castext2_evaluatable.class.php');
-//require_once(__DIR__ . '/answertest/controller.class.php');
-//require_once(__DIR__ . '/../vle_specific.php');
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/cas/ast.container.class.php');
+require_once(__DIR__ . '/cas/keyval.class.php');
+require_once(__DIR__ . '/cas/castext2/castext2_evaluatable.class.php');
+require_once(__DIR__ . '/answertest/controller.class.php');
+require_once(__DIR__ . '/../vle_specific.php');
 
 // Deals with whole potential response trees.
 // A rewrite dropping everything not needed for compiled PRTs.
 // Works as the compiler for the matching evaluatable.
 // Otherwise used as a store for meta-data related to the question-model.
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_potentialresponse_tree_lite {
 
     /** @var string Name of the PRT. */
@@ -45,7 +54,7 @@ class stack_potentialresponse_tree_lite {
     /** @var string index of the first node. */
     private $firstnode;
 
-    /** @var object[] the nodes of the tree. Just raw DB-objects. */
+    /** @var object the nodes of the tree. Just raw DB-objects. */
     private $nodes;
 
     /** @var int The feedback style of this PRT.
@@ -63,6 +72,7 @@ class stack_potentialresponse_tree_lite {
      * and other details when building those messages but do not need about those
      * details otherewise.
      */
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private $question = null;
 
     /**
@@ -71,12 +81,13 @@ class stack_potentialresponse_tree_lite {
      */
     private $trace = [];
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function __construct($prtdata, $value, $question = null) {
         $this->name          = $prtdata->name;
         $this->simplify      = (bool) $prtdata->autosimplify;
-        $this->feedbackstyle = (int) 1;
+        $this->feedbackstyle = (int) $prtdata->feedbackstyle;
 
-        // TODO move the scaling to other levels.
+        // TO-DO move the scaling to other levels.
         $this->value         = $value;
 
         $this->feedbackvariables = $prtdata->feedbackvariables;
@@ -101,10 +112,12 @@ class stack_potentialresponse_tree_lite {
         // Only for get_maxima_representation() and other debug details.
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_value() {
         return $this->value;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_name() {
         return $this->name;
     }
@@ -116,14 +129,14 @@ class stack_potentialresponse_tree_lite {
      */
     public function is_formative() {
         // Note, some of this logic is duplicated in renderer.php before we have instantiated this class.
-        //if ($this->feedbackstyle === 0) {
-        //    return true;
-        //}
-        //TODO
+        if ($this->feedbackstyle === 0) {
+            return true;
+        }
         return false;
     }
 
     /**
+     * Add description here.
      * @return int.
      */
     public function get_feedbackstyle() {
@@ -131,6 +144,7 @@ class stack_potentialresponse_tree_lite {
     }
 
     /**
+     * Add description here.
      * @return string The keyval-bit for some version changes.
      */
     public function get_feedbackvariables_keyvals() {
@@ -141,10 +155,11 @@ class stack_potentialresponse_tree_lite {
     }
 
     /**
+     * Add description here.
      * @return array Returns the answer tests used by this PRT for version changes.
      */
     public function get_answertests(): array {
-        $tests = array();
+        $tests = [];
         foreach ($this->nodes as $node) {
             $tests[$node->answertest] = true;
         }
@@ -152,6 +167,7 @@ class stack_potentialresponse_tree_lite {
     }
 
     /**
+     * Add description here.
      * @return string Representation of the PRT for Maxima offline use.
      */
     public function get_maxima_representation() {
@@ -205,13 +221,14 @@ class stack_potentialresponse_tree_lite {
     }
 
     /**
+     * Add description here.
      * @return array All the "sans" strings used in the nodes with test requiring a raw input.
      */
     public function get_raw_sans_used() {
-        $sans = array();
+        $sans = [];
         foreach ($this->nodes as $key => $node) {
             if (stack_ans_test_controller::required_raw($node->answertest)) {
-                $name = (string) $this->get_name() . '-' . ($key);
+                $name = (string) $this->get_name() . '-' . ($key + 1);
                 $sans[$name] = $node->sans;
             }
         }
@@ -219,12 +236,13 @@ class stack_potentialresponse_tree_lite {
     }
 
     /**
+     * Add description here.
      * @return array All the non-trivial strings used in the node arguments.
      */
     public function get_raw_arguments_used() {
-        $ans = array();
+        $ans = [];
         foreach ($this->nodes as $key => $node) {
-            $name = (string) $this->get_name() . '-' . ($key);
+            $name = (string) $this->get_name() . '-' . ($key + 1);
             if (trim($node->sans) != '') {
                 $ans[$name . '-sans'] = $node->sans;
             }
@@ -240,17 +258,19 @@ class stack_potentialresponse_tree_lite {
      * @return array string Of all the answer notes this tree might produce.
      */
     public function get_all_answer_notes() {
-        $nodenotes = array();
+        $nodenotes = [];
         foreach ($this->nodes as $node) {
             $nodenotes = array_merge($nodenotes, [$node->trueanswernote, $node->falseanswernote]);
         }
-        $notes = array('NULL' => 'NULL');
+        $notes = ['NULL' => 'NULL'];
         foreach ($nodenotes as $note) {
             $notes[$note] = $note;
         }
+        $notes[$this->name . '-bail'] = $this->name . '-bail';
         return $notes;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private function get_reverse_post_order_nodes(): array {
         // That is to say, list the nodes in the order they are last visited to allow simple
         // guard clauses... nice feature of acyclic graphs... drops the orphans too.
@@ -266,6 +286,7 @@ class stack_potentialresponse_tree_lite {
         return array_reverse($order);
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private function get_node($name) {
         // Simple getter that handles the cases where the key is bad or null.
         if (isset($this->nodes[$name])) {
@@ -275,6 +296,7 @@ class stack_potentialresponse_tree_lite {
     }
 
     // Summary of the nodes, for use in various logics that track answernotes and scores.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_nodes_summary(): array {
         $summary = [];
         foreach ($this->nodes as $node) {
@@ -291,7 +313,7 @@ class stack_potentialresponse_tree_lite {
             $n->falsescoremode  = $node->falsescoremode;
             $n->quiet           = $node->quiet;
             $n->answertest      = $this->compile_node_answertest($node);
-            $name = (((int) $node->nodename));
+            $name = (((int) $node->nodename) + 1);
             if (trim($node->description) !== '') {
                 $name .= ': ' . trim($node->description);
             }
@@ -302,10 +324,11 @@ class stack_potentialresponse_tree_lite {
     }
 
     /**
+     * Add description here.
      * @return array Languages used in the feedback.
      */
     public function get_feedback_languages() {
-        $langs = array();
+        $langs = [];
         $ml = new stack_multilang();
         foreach ($this->nodes as $key => $node) {
             $langs[$key] = [];
@@ -320,15 +343,16 @@ class stack_potentialresponse_tree_lite {
     }
 
     /**
+     * Add description here.
      * @return array of choices for the show validation select menu.
      */
     public static function get_feedbackstyle_options() {
-        return array(
+        return [
             '0' => get_string('feedbackstyle0', 'qtype_stack'),
             '1' => get_string('feedbackstyle1', 'qtype_stack'),
             '2' => get_string('feedbackstyle2', 'qtype_stack'),
             '3' => get_string('feedbackstyle3', 'qtype_stack'),
-        );
+        ];
     }
 
     /**
@@ -349,6 +373,7 @@ class stack_potentialresponse_tree_lite {
         return $text;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private function po_recurse($node, array &$postorder, array &$visited): array {
         $truenode                 = $this->get_node($node->truenextnode);
         $falsenode                = $this->get_node($node->falsenextnode);
@@ -369,9 +394,7 @@ class stack_potentialresponse_tree_lite {
     // what to use as local variables.
     // The returned array contains the function declaration, its call signature,
     // and any necessary additional preamble, i.e. textput rules and the like.
-    /**
-     * @throws stack_exception
-     */
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile(array $inputs, array $boundvars, $defaultpenalty, $security, $pathprefix, $map): array {
         $r = ['sig' => '', 'def' => '', 'cv' => null, 'be' => null, 'required' => [], 'units' => false];
         // Note these variables are initialised before the feedback-vars and if not forbidden
@@ -382,6 +405,7 @@ class stack_potentialresponse_tree_lite {
                 '%PRT_PATH:[],' . // The nodes visited and their answertest notes.
                 '%PRT_EXIT_NOTE: [],' . // The notes for nodes not the answertests.
                 '%_EXITS:{},'; // This tracks the exits from nodes so that we can decide the next node.
+                '%stack_prt_stop_p:false,'; // Should we bail from the PRT?
 
         // We build a trace here to help question authors understand and debug questions.
         if ($this->feedbackvariables === null) {
@@ -389,7 +413,7 @@ class stack_potentialresponse_tree_lite {
         }
 
         // Start a fresh trace with each compile.
-        $this->trace = array();
+        $this->trace = [];
         if ($this->feedbackvariables != '') {
             $this->trace[] = $this->feedbackvariables;
             $this->trace[] = '/* ------------------- */';
@@ -398,13 +422,6 @@ class stack_potentialresponse_tree_lite {
         $fv = new stack_cas_keyval($this->feedbackvariables);
         $fv->set_security($security);
         $fv->get_valid();
-        if(!$fv->get_valid()) {
-            $error_message = '';
-            foreach($fv->get_errors() as $error) {
-                $error_message .= $error . "\n";
-            }
-            throw new stack_exception(stack_string('feedback_variable_error', ["error" => $error_message, "prt" => $this->name]));
-        }
         $fv = $fv->compile($pathprefix . '/fv', $map);
         $r['be'] = $fv['blockexternal'];
         $r['cv'] = $fv['contextvariables'];
@@ -419,6 +436,7 @@ class stack_potentialresponse_tree_lite {
         $usage['write']['%PRT_PATH'] = true;
         $usage['write']['%PRT_EXIT_NOTE'] = true;
         $usage['write']['%_EXITS'] = true;
+        $usage['write']['%stack_prt_stop_p'] = true;
 
         // For the feedback we might want to provide extra information related to
         // feedback vars. Basically, for the debug-block we tell that these are
@@ -434,6 +452,9 @@ class stack_potentialresponse_tree_lite {
             }
             $body .= $fv['statement'] . ',';
         }
+
+        // Add in the bailout clause here.
+        $body .= 'if is(%stack_prt_stop_p=true) then return(["STACK_PRT_STOP!", "'. $this->name .'-bail"]),';
 
         // Let's build the node precedence map, i.e. through which edges are nodes reachable.
         $precedence = [];
@@ -508,7 +529,7 @@ class stack_potentialresponse_tree_lite {
             '%PRT_PATH' => true,
             '%PRT_EXIT_NOTE' => true,
             '%_EXITS' => true,
-            'simp'
+            'simp',
         ];
         // We want to make sure that any writing inside this logic does not affect
         // the outside. However, some of the vars that could be written come from
@@ -568,15 +589,15 @@ class stack_potentialresponse_tree_lite {
         return $r;
     }
 
-    /*
+    /**
      * Generate the complete maxima command for a single answertest in a specific node.
      */
     public static function compile_node_answertest($node) {
-        // TODO: make this saner, the way Stateful lets the tests do their own
+        // TO-DO: make this saner, the way Stateful lets the tests do their own
         // call construction might duplicate things but it does not require this
         // much knowledge about the shape of things.
         // We have no validation for these requirements.
-        // TODO: choose whether we error catch sans/tans/options separately or
+        // TO-DO: choose whether we error catch sans/tans/options separately or
         // at the whole test level. Now at test level.
         $at = 'AT' . $node->answertest . '(' . $node->sans;
 
@@ -604,16 +625,14 @@ class stack_potentialresponse_tree_lite {
         return $at;
     }
 
-    /**
-     * @throws stack_exception
-     */
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private function compile_node($node, $usage, $defaultpenalty, $security, $path, $ct2options): array {
         /* In the old system there is a hack that covers some options let's repeat that here.
          * For some tests there is an option assume_pos. This will be evaluated by maxima (since this is also the name
          * of a maxima variable).  So, we need to protect the name from being evaluated.
          */
         $op = $node->testoptions;
-        $reps = array('assume_pos' => 'assumepos', 'assume_real' => 'assumereal');
+        $reps = ['assume_pos' => 'assumepos', 'assume_real' => 'assumereal'];
         foreach ($reps as $key => $val) {
             $op = str_replace($key, $val, $op);
         }
@@ -701,7 +720,7 @@ class stack_potentialresponse_tree_lite {
             $p = '%PRT_PENALTY:' . $p;
         }
         // Now the score mode based logic, I wonder why both score and penalty use the same.
-        // TODO: trace the original logic and check how these are tied to each other.
+        // TO-DO: trace the original logic and check how these are tied to each other.
         switch ($node->truescoremode) {
             case '+':
                 $body .= ',' . $s . ',%PRT_SCORE:%PRT_SCORE+%_TMP,' . $p;
@@ -719,12 +738,13 @@ class stack_potentialresponse_tree_lite {
 
         if ($node->truefeedback !== null && trim($node->truefeedback) !== '') {
             // Note the space separates any feedback from that generated by the prt node.
-            $feedback = ' ' . assStackQuestionUtils::stack_castext_file_filter($node->truefeedback,
-                ['field' => 'prtnodetruefeedback',
-                 'prtnodeid' => $node->id,
-                 'prtid' => $this->id, // For completeness sake.
-                 'questionid' =>
-                    $this->question !== null && property_exists($this->question, 'id') ? $this->question->id : null
+            $feedback = ' ' . stack_castext_file_filter($node->truefeedback,
+                [
+                    'field' => 'prtnodetruefeedback',
+                    'prtnodeid' => $node->id,
+                    'prtid' => $this->id, // For completeness sake.
+                    'questionid' =>
+                        $this->question !== null && property_exists($this->question, 'id') ? $this->question->id : null,
                 ]);
             if (substr($body, -1) !== '(') {
                 // Depends on whether the score math was done.
@@ -796,7 +816,7 @@ class stack_potentialresponse_tree_lite {
             $p = '%PRT_PENALTY:' . $p;
         }
         // Now the score mode based logic, I wonder why both score and penalty use the same.
-        // TODO: trace the original logic and check how these are tied to each other.
+        // TO-DO: trace the original logic and check how these are tied to each other.
         switch ($node->falsescoremode) {
             case '+':
                 $body .= ',' . $s . ',%PRT_SCORE:%PRT_SCORE+%_TMP,' . $p;
@@ -814,12 +834,13 @@ class stack_potentialresponse_tree_lite {
 
         if ($node->falsefeedback !== null && trim($node->falsefeedback) !== '') {
             // Note the space separates any feedback from that generated by the prt node.
-            $feedback = ' ' . assStackQuestionUtils::stack_castext_file_filter($node->falsefeedback,
-                ['field' => 'prtnodefalsefeedback',
-                 'prtnodeid' => $node->id,
-                 'prtid' => $this->id, // For completeness sake.
-                 'questionid' => $this->question !==
-                    null && property_exists($this->question, 'id') ? $this->question->id : null
+            $feedback = ' ' . stack_castext_file_filter($node->falsefeedback,
+                [
+                    'field' => 'prtnodefalsefeedback',
+                    'prtnodeid' => $node->id,
+                    'prtid' => $this->id, // For completeness sake.
+                    'questionid' => $this->question !==
+                    null && property_exists($this->question, 'id') ? $this->question->id : null,
                 ]);
             if (substr($body, -1) !== '(') { // Depends on whether the score math was done.
                 $body .= ',';
@@ -830,7 +851,7 @@ class stack_potentialresponse_tree_lite {
             } else {
                 $body .= 'simp:false,';
             }
-            // TODO: consider the format to be used here.
+            // TO-DO: consider the format to be used here.
             $ct = castext2_evaluatable::make_from_source($feedback, $context . '/ff');
             if (!$ct->get_valid($node->falsefeedbackformat, $ct2options, $security)) {
                 throw new stack_exception('Error in ' . $context . ' false-feedback. ' . $ct->get_errors(true));
@@ -860,11 +881,9 @@ class stack_potentialresponse_tree_lite {
         return [$body, $usage, $ctincludes];
     }
 
-    /*
-     * @param array $labels an array of labels for the branches.
-     */
     /**
-     * @throws stack_exception
+     * Add description here
+     * @param array $labels an array of labels for the branches.
      */
     public function get_prt_graph($labels = false) {
         $graph = new stack_abstract_graph();
@@ -873,25 +892,24 @@ class stack_potentialresponse_tree_lite {
             if ($node->truenextnode == -1) {
                 $left = null;
             } else {
-                $left = $node->truenextnode;
+                $left = $node->truenextnode + 1;
             }
             if ($node->falsenextnode == -1) {
                 $right = null;
             } else {
-                $right = $node->falsenextnode;
+                $right = $node->falsenextnode + 1;
             }
-            $llabel = $node->truescoremode . round((float)$node->truescore, 2);
+            $llabel = $node->truescoremode . stack_utils::fix_trailing_zeros($node->truescore);
             if ($labels && array_key_exists($node->trueanswernote, $labels)) {
                 $llabel = $labels[$node->trueanswernote];
             }
-            $rlabel = $node->falsescoremode . round((float)$node->falsescore, 2);
+            $rlabel = $node->falsescoremode . stack_utils::fix_trailing_zeros($node->falsescore);
             if ($labels && array_key_exists($node->falseanswernote, $labels)) {
                 $rlabel = $labels[$node->falseanswernote];
             }
-            $key = (int) $key;
-            $graph->add_prt_node($key, $node->description, $left, $right, $llabel, $rlabel,
+            $graph->add_prt_node($key + 1, $node->description, $left, $right, $llabel, $rlabel,
                 '#fgroup_id_' . $this->name . 'node_' . $key);
-            $graph->add_prt_text($node->nodename, $node->answertest, $node->quiet,
+            $graph->add_prt_text($node->nodename + 1, $node->answertest, $node->quiet,
                 $node->trueanswernote, $node->falseanswernote);
         }
 
@@ -899,45 +917,11 @@ class stack_potentialresponse_tree_lite {
         return $graph;
     }
 
-    /*
+    /**
      * Returns the trace of the PRT.
      */
     public function get_trace() {
         return $this->trace;
     }
 
-    public function isSimplify(): bool
-    {
-        return $this->simplify;
-    }
-
-    public function setSimplify(bool $simplify): void
-    {
-        $this->simplify = $simplify;
-    }
-
-    /**
-     * Get the name of the first node of prt.
-     *
-     * @return string
-     */
-    public function get_first_node(): string {
-        // TODO SUR: Check if this is correct
-        return $this->firstnode;
-    }
-
-    /**
-     * Get all the nodes of prt.
-     *
-     * @return array
-     */
-    public function get_nodes(): array
-    {
-        return $this->nodes;
-    }
-
-    public function setNodes(array $new_nodes)
-    {
-        $this->nodes = $new_nodes;
-    }
 }

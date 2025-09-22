@@ -14,10 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Various utility classes for Stack.
  *
+ * @package    qtype_stack
  * @copyright  2012 University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,12 +27,14 @@
 /**
  * Interface for a class that stores debug information (or not).
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface stack_debug_log {
 
     /**
+     * Add description here.
      * @return string the contents of the log.
      */
     public function get_log();
@@ -47,14 +51,16 @@ interface stack_debug_log {
 /**
  * Interface for a class that stores debug information (or not).
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_debug_log_base implements stack_debug_log {
-
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $debuginfo = '';
 
     /**
+     * Add description here.
      * @return string the contents of the log.
      */
     public function get_log() {
@@ -80,12 +86,14 @@ class stack_debug_log_base implements stack_debug_log {
 /**
  * A null stack_debug_log. Does not acutally log anything. Used when debugging is off.
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_debug_log_null implements stack_debug_log {
 
     /**
+     * Add description here.
      * @return string the contents of the log.
      */
     public function get_log() {
@@ -106,6 +114,7 @@ class stack_debug_log_null implements stack_debug_log {
 /**
  * Utility methods for processing strings.
  *
+ * @package    qtype_stack
  * @copyright  2012 University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -114,7 +123,7 @@ class stack_utils {
     protected static $config = null;
 
     /** @var A list of mathematics environments we search for, from AMSmath package 2.0. */
-    protected static $mathdelimiters = array('equation', 'align', 'gather', 'flalign', 'multline', 'alignat', 'split');
+    protected static $mathdelimiters = ['equation', 'align', 'gather', 'flalign', 'multline', 'alignat', 'split'];
 
     /**
      * @var string fragment of regular expression that matches valid PRT and
@@ -176,7 +185,7 @@ class stack_utils {
      * @return boolean true if all brackets match and are nested properly.
      */
     public static function check_nested_bookends($string, $lefts = '([{', $rights = ')]}') {
-        $openstack = array();
+        $openstack = [];
         $length = strlen($string);
         for ($i = 0; $i < $length; $i++) {
             $char = $string[$i];
@@ -211,14 +220,14 @@ class stack_utils {
 
         $start = strpos($string, $left, $start);
         if ($start === false) {
-            return array('', -1, 0);
+            return ['', -1, 0];
         }
 
         if ($left == $right) {
             // Left and right are the same.
             $end = strpos($string, $right, $start + 1); // Just go for the next one.
             if ($end === false) {
-                return array('', $start, -1);
+                return ['', $start, -1];
             }
             $end += 1;
 
@@ -237,11 +246,11 @@ class stack_utils {
             }
 
             if ($nesting > 0) {
-                return array('', -1, -1);
+                return ['', -1, -1];
             }
         }
 
-        return array(substr($string, $start, $end - $start), $start, $end - 1);
+        return [substr($string, $start, $end - $start), $start, $end - 1];
     }
 
     /**
@@ -261,7 +270,7 @@ class stack_utils {
 
         $char = str_split($string);
         $length = count($char);
-        $var = array();
+        $var = [];
         $j = 0;
         $i = 0;
         $start = false;
@@ -366,7 +375,7 @@ class stack_utils {
      * @param array (Optional) additional characters to convert to underscores.
      * @return string with characters replaced.
      */
-    public static function underscore($string, $toreplace = array()) {
+    public static function underscore($string, $toreplace = []) {
         $toreplace[] = '-';
         $toreplace[] = ' ';
         return str_replace($toreplace, '_', $string);
@@ -375,7 +384,6 @@ class stack_utils {
     /**
      * Converts windows style paths to unix style with forward slashes
      *
-     * @access public
      * @return string|null
      */
     public static function convert_slash_paths($string) {
@@ -406,11 +414,10 @@ class stack_utils {
      * Extracts double quoted strings with \-escapes, extracts only the content
      * not the quotes.
      *
-     * @access public
      * @return array
      */
     public static function all_substring_strings($string) {
-        $strings = array();
+        $strings = [];
         $i = 0;
         $lastslash = false;
         $instring = false;
@@ -442,7 +449,6 @@ class stack_utils {
      * Replaces all Maxima strings with zero length strings to eliminate string
      * contents for validation tasks.
      *
-     * @access public
      * @return string
      */
     public static function eliminate_strings($string) {
@@ -474,11 +480,22 @@ class stack_utils {
     }
 
     /**
+     * Convert strings to protect LaTeX backslashes for use in Maxima strings.
+     * @param string in
+     * @return string out
+     */
+    public static function protect_backslash_latex($string) {
+        $string = addslashes($string);
+        // We don't want to add slashes to strings within strings.
+        $string = str_replace('\\\\\"', '\"', $string);
+        return($string);
+    }
+
+    /**
      * Converts a CSV string into an array, removing empty entries.
      *
      * @param string in
      * @return array out
-     * @access public
      */
     public static function cvs_to_array($string, $token = ',') {
         $exploded = explode($token, $string);
@@ -536,7 +553,7 @@ class stack_utils {
         // Delimited by next comma at same degree of nesting.
         $startdelimiter = "[({";
         $enddelimiter   = "])}";
-        $nesting = array(0 => 0, 1 => 0, 2 => 0); // Stores nesting for delimiters above.
+        $nesting = [0 => 0, 1 => 0, 2 => 0]; // Stores nesting for delimiters above.
         for ($i = 0; $i < strlen($list); $i++) {
             $startchar = strpos($startdelimiter, $list[$i]); // Which start delimiter.
             $endchar = strpos($enddelimiter, $list[$i]); // Which end delimiter (if any).
@@ -560,8 +577,9 @@ class stack_utils {
         }
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private static function list_to_array_workhorse($list, $rec = true) {
-        $array = array();
+        $array = [];
         $list = trim($list);
         $list = substr($list, 1, strlen($list) - 2); // Trims outermost [] only.
         $e = self::next_element($list);
@@ -599,6 +617,9 @@ class stack_utils {
      * @return array of placeholdernames.
      */
     public static function extract_placeholders($text, $type) {
+        if (!$text) {
+            return [];
+        }
         preg_match_all('~\[\[' . $type . ':(' . self::VALID_NAME_REGEX . ')\]\]~',
                 $text, $matches);
         return $matches[1];
@@ -619,7 +640,7 @@ class stack_utils {
         preg_match_all('~\[\[\s*' . $type . '\s*:(\s*' . self::VALID_NAME_REGEX . ')\s*\]\]~',
                 $text, $matches2);
 
-        $ret = array();
+        $ret = [];
         foreach ($matches2[1] as $key => $name) {
             if (!in_array(trim($name), $matches1[1])) {
                 $ret[] = $matches2[0][$key];
@@ -629,6 +650,7 @@ class stack_utils {
     }
 
     /**
+     * Add description here
      * @param string $name a potential name for part of a STACK question.
      * @return bool whether that name is allowed.
      */
@@ -636,7 +658,9 @@ class stack_utils {
         return preg_match('~^' . self::VALID_NAME_REGEX . '$~', $name);
     }
 
-    /** Get the stack configuration settings. */
+    /**
+     * Get the stack configuration settings.
+     */
     public static function get_config() {
         if (is_null(self::$config)) {
             self::$config = get_config('qtype_stack');
@@ -644,6 +668,7 @@ class stack_utils {
         return self::$config;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function clear_config_cache() {
         self::$config = null;
     }
@@ -665,8 +690,8 @@ class stack_utils {
      */
     public static function decompose_rename_operation(array $renamemap) {
 
-        $nontrivialmap = array();
-        $usednames = array();
+        $nontrivialmap = [];
+        $usednames = [];
         foreach ($renamemap as $from => $to) {
             $usednames[(string) $from] = 1;
             $usednames[(string) $to] = 1;
@@ -676,13 +701,13 @@ class stack_utils {
         }
 
         if (empty($nontrivialmap)) {
-            return array();
+            return [];
         }
 
         // First we deal with all renames that are not part of cycles.
         // This bit is O(n^2) and it ought to be possible to do better,
         // but it does not seem worth the effort.
-        $saferenames = array();
+        $saferenames = [];
         $todocount = count($nontrivialmap) + 1;
         while (count($nontrivialmap) < $todocount) {
             $todocount = count($nontrivialmap);
@@ -709,7 +734,7 @@ class stack_utils {
             // Extract the first cycle.
             reset($nontrivialmap);
             $current = $cyclestart = (string) key($nontrivialmap);
-            $cycle = array();
+            $cycle = [];
             do {
                 $cycle[] = $current;
                 $next = $nontrivialmap[$current];
@@ -783,11 +808,10 @@ class stack_utils {
 
     /**
      * Converts a PHP string object containing a Maxima string as presented by the grind command to a PHP string object.
-     * @param string $string that contains ""-quotes around the content.
-     * @return string without those quotes.
+     * @param a string that contains ""-quotes around the content.
+     * @return a string without those quotes.
      */
-    public static function maxima_string_to_php_string($string)
-    {
+    public static function maxima_string_to_php_string($string) {
         $converted = str_replace("\\\\", "\\", $string);
         $converted = str_replace("\\\"", '"', $converted);
         return substr($converted, 1, -1);
@@ -803,7 +827,7 @@ class stack_utils {
         if (substr($converted, 0, 2) == '\(' || substr($converted, 0, 2) == '\[') {
             $converted = substr($converted, 2, -2);
         }
-        if (substr(trim($converted), 0, 6) == '\mbox{') {
+        if (substr(trim($converted), 0, 6) == '\text{') {
             return substr(trim($converted), 6, -1);
         }
         return $string;
@@ -833,7 +857,7 @@ class stack_utils {
 
         $i = floor($n);
         if ($i == $n) { // If n is an integer, its rational representation is obvious.
-            return array($n, 1);
+            return [$n, 1];
         }
 
         // Take away the integer part of n.
@@ -847,7 +871,7 @@ class stack_utils {
         $denx = 1;
         $denc = 0;
 
-        $frac = array(); // Continued fraction coefficients.
+        $frac = []; // Continued fraction coefficients.
         $diff = $n - $i; // Difference between current approximation and n.
 
         $steps = 0;
@@ -870,16 +894,17 @@ class stack_utils {
             $onum = 0;
             $oden = 1;
             foreach ($frac as $c) {
-                list($oden, $onum) = array($oden * $c + $onum, $oden);
+                list($oden, $onum) = [$oden * $c + $onum, $oden];
             }
             $diff = $n - $onum / $oden;
 
             // Subtract i from our working, and then take its reciprocal.
-            list($numx, $numc, $denx, $denc) = array($denx, $denc, $numx - $denx * $i, $numc - $denc * $i);
+            list($numx, $numc, $denx, $denc) = [$denx, $denc, $numx - $denx * $i, $numc - $denc * $i];
         }
-        return array($nint * $oden + $onum, $oden);
+        return [$nint * $oden + $onum, $oden];
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function fix_to_continued_fraction($n, $accuracy) {
         $frac = self::rational_approximation($n, $accuracy);
         return $frac[0] / $frac[1];
@@ -926,7 +951,7 @@ class stack_utils {
         return 0 + $str;
     }
 
-    /*
+    /**
      * This function takes user input of the form "option:arg" and splits them up.
      * Used to sort out options to the inputs field.
      */
@@ -937,10 +962,10 @@ class stack_utils {
             $option = $ops[0];
             $arg = trim($ops[1]);
         }
-        return(array($option, $arg));
+        return([$option, $arg]);
     }
 
-    /*
+    /**
      * This function takes html and counts the number of img fields
      * with missing or empty alt text.
      */
@@ -984,5 +1009,239 @@ class stack_utils {
         }
 
         return $missingalt;
+    }
+
+    /**
+     * Takes a list of strings and returns the corresponding list of Base64-hashed string values.
+     */
+    public static function hash_array($arr) {
+        foreach ($arr as $key => $value) {
+            $arr[$key] = base64_encode($value);
+        }
+        return $arr;
+    }
+
+    /**
+     * Takes a list of Base64-hashed strings and returns the corresponding list of original string values.
+     */
+    public static function unhash_array($arr) {
+        foreach ($arr as $key => $value) {
+            $arr[$key] = base64_decode($value);
+        }
+        return $arr;
+    }
+
+    /**
+     * Decides if the string looks like an array.
+     */
+    public static function is_array_string($str) {
+        return preg_match('/^\[\s*(.*\S)?\s*\]$/', $str);
+    }
+
+    /**
+     * Takes a string that contains a list where each element has the format
+     * [<JSON>, <int>]
+     * and each JSON has the format
+     * {"used" :
+     *      [
+     *          [[<hashed string>, ..., <hashed string>]],
+     *          ...
+     *          [[<hashed string>, ..., <hashed string>]]
+     *      ],
+     *  "available" :
+     *      [<hashed string>, ... <hashed string>]
+     * }
+     * each `<hashed string>` is assumed to be Base64-hashed.
+     *
+     * Note that for proof parson's questions (neither rows nor columns specified in header) the shape of "used" will be (1, 1, ?),
+     * for grouping problems (only columns specified in header) the shape of "used" will be (#columns, 1, ?) and for matching
+     * problems (both rows and columns specified in header) the shape of "used" will be (#columns, #rows, 1).
+     *
+     * This function will return the same format string, with each `<hashed string>` replaced by the original string value.
+     */
+    public static function unhash_parsons_string($listofjsons) {
+        $decodedlist = json_decode($listofjsons);
+        if (!is_array($decodedlist)) {
+            return stack_string('invalid_json');
+        }
+        foreach ($decodedlist as $key => $json) {
+            foreach ($decodedlist[$key][0]->used as $i => $row) {
+                foreach ($row as $j => $item) {
+                    $decodedlist[$key][0]->used[$i][$j] = self::unhash_array($item);
+                }
+            }
+            $decodedlist[$key][0]->available = self::unhash_array($decodedlist[$key][0]->available);
+        }
+        return json_encode($decodedlist);
+    }
+
+    /**
+     * Maxima string version of `unhash_parsons_string`.
+     */
+    public static function unhash_parsons_string_maxima($listofjsons) {
+        $phplistofjsons = self::maxima_string_to_php_string($listofjsons);
+        return self::php_string_to_maxima_string(self::unhash_parsons_string($phplistofjsons));
+    }
+
+    /**
+     * Takes a string that contains a list where each element has the format
+     * [<JSON>, <int>]
+     * {"used" :
+     *      [
+     *          [[<string>, ..., <string>]],
+     *          ...
+     *          [[<string>, ..., <string>]]
+     *      ],
+     *  "available" :
+     *      [<string>, ... <string>]
+     * }
+     *
+     * Note that for proof parson's questions (neither rows nor columns specified in header) the shape of "used" will be (1, 1, ?),
+     * for grouping problems (only columns specified in header) the shape of "used" will be (#columns, 1, ?) and for matching
+     * problems (both rows and columns specified in header) the shape of "used" will be (#columns, #rows, 1).
+     *
+     * This function will return the same format string, with each `<string>` replaced by its Base64-hashed value.
+     */
+    public static function hash_parsons_string($listofjsons) {
+        $decodedlist = json_decode($listofjsons);
+        if (!is_array($decodedlist)) {
+            return stack_string('invalid_json');
+        }
+        foreach ($decodedlist as $key => $json) {
+            foreach ($decodedlist[$key][0]->used as $i => $row) {
+                foreach ($row as $j => $item) {
+                    $decodedlist[$key][0]->used[$i][$j] = self::hash_array($item);
+                }
+            }
+            $decodedlist[$key][0]->available = self::hash_array($decodedlist[$key][0]->available);
+        }
+        return json_encode($decodedlist);
+    }
+
+    /**
+     * Maxima string version of `hash_parsons_string`.
+     */
+    public static function hash_parsons_string_maxima($listofjsons) {
+        $phplistofjsons = self::maxima_string_to_php_string($listofjsons);
+        return self::php_string_to_maxima_string(self::hash_parsons_string($phplistofjsons));
+    }
+
+    /**
+     * Takes a PHP array and validates it's structure to check whether it represents a single Parson's state.
+     * In particular the PHP should be of the following format:
+     * array(2) {
+     *  [0]=>
+     *  array(2) {
+     *      ["used"]=>
+     *      array(1) {
+     *          [0]=>
+     *          array(1) {
+     *              [0]=>
+     *              array(_) {
+     *                  [0]=>
+     *                  string(_) <str>
+     *                  ...
+     *                  [n]=>
+     *                  string(_) <str>
+     *              }
+     *          }
+     *      }
+     *      ["available"]=>
+     *          array(_) {
+     *              [0]=>
+     *              string(_) <str>
+     *              ...
+     *              [m]=>
+     *              string(_) <str>
+     *          }
+     *      }
+     *      [1]=>
+     *      int(_)
+     *  }
+     *
+     * @param array $input
+     * @return bool whether $input represents a single Parson's state or not
+     */
+    public static function validate_parsons_state($state) {
+        // Check if $state is an array.
+        if (!is_array($state)) {
+            return false;
+        }
+
+        // Check if it's an array with exactly two elements.
+        if (count($state) !== 2) {
+            return false;
+        }
+
+        // Check if the first element is an associative array with keys "used" and "available".
+        $dict = $state[0];
+        if (!isset($dict['used']) || !isset($dict['available']) || !is_array($dict['used'])) {
+            return false;
+        }
+
+        // Validate that "used" is an array of at least two dimensions.
+        if (!is_array($dict['used'][0]) || !is_array($dict['used'][0][0])) {
+            return false;
+        }
+
+        // Check if "available" is an array of at least one dimension.
+        if (!is_array($dict['available'])) {
+            return false;
+        }
+
+        // Validate that the second element is an integer.
+        if (!is_int($state[1])) {
+            return false;
+        }
+
+        // If all checks pass, the string is valid.
+        return true;
+    }
+
+    /**
+     * Takes a string and checks whether it is a string containing a list of Parson's states.
+     * In particular, it checks whether each item in the list is of the following format:
+     * "[{"used": [[[<str>, ..., <str>]]], "available": [<str>, ..., <str>]}, <int>]"
+     *
+     * @param string $input
+     * @return bool whether $input represents a list of Parson's state or not
+     */
+    public static function validate_parsons_string($input) {
+        $data = json_decode($input, true);
+        // When used in the input class $input is a string of a string, so we need to decode twice
+        // But in later usage (e.g., for filters) $input is just a string.
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+        // Check if the JSON decoding was successful and the resulting structure is an array.
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
+            return false;
+        }
+
+        // Check whether each item is a valid PHP array corresponding to a single Parson's state.
+        foreach ($data as $state) {
+            if (!self::validate_parsons_state($state)) {
+                // If one of them fails, then the string is invalid.
+                return false;
+            }
+        }
+
+        // If all items pass, then the string is valid.
+        return true;
+    }
+
+    /**
+     * Validate a node to check that it is a string that represents a Parson's state.
+     * This is not strictly required as it is prevented by `$node instanceof MP_String`, but it is an
+     * additional safety measure to ensure we do not dehash other strings.
+     */
+    public static function validate_parsons_contents($contents) {
+        $strings = function($node) use (&$answernotes, &$errors) {
+            if ($node instanceof MP_String && self::validate_parsons_string($node->value)) {
+                $node->value = stack_utils::unhash_parsons_string($node->value);
+            }
+            return true;
+        };
+        return $strings($contents);
     }
 }

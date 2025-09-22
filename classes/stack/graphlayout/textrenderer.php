@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Displays a prt graph using an html table with text.
  *
@@ -26,14 +25,16 @@
 /**
  * Displays a {@link stack_abstract_graph} as text.
  *
+ * @package    qtype_stack
  * @copyright 2023 The University of Edinburgh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_prt_graph_text_renderer {
 
-    /*
+    /**
      * Hold the graph itself.
      */
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $g = null;
 
     /**
@@ -60,16 +61,18 @@ class stack_prt_graph_text_renderer {
      */
     protected function to_html() {
 
-        $table = array();
+        $table = [];
         foreach ($this->g->get_nodes() as $node) {
             $quiet = stack_string('quiet_icon_false');
             if ($node->quiet) {
                 $quiet = stack_string('quiet_icon_true');
             }
             // Put the name and description in one cell. It looks better.
-            $table[] = array($node->name . '. ' . $node->description,
-                    html_writer::tag('code', s($node->casstatement)), $quiet,
-                            $node->truenote, $node->falsenote);
+            $table[] = [
+                $node->name . '. ' . $node->description,
+                html_writer::tag('code', s($node->casstatement)), $quiet,
+                $node->truenote, $node->falsenote,
+            ];
         }
 
         $html = '';
@@ -80,8 +83,8 @@ class stack_prt_graph_text_renderer {
             }
             $html .= html_writer::tag('tr', $row) . "\n";
         }
-        // TODO: style the table with more padding.
-        $html = html_writer::start_tag('table', array('class' => 'prttexttable')) . $html .
+        // TO-DO: style the table with more padding.
+        $html = html_writer::start_tag('table', ['class' => 'prttexttable']) . $html .
                 html_writer::end_tag('table');
 
         return $html;

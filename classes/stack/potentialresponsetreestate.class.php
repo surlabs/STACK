@@ -14,13 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * This class represents the current state of a potential response tree.
  *
+ * @package    qtype_stack
  * @copyright  2012 University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_potentialresponse_tree_state {
 
     /**
@@ -36,20 +39,20 @@ class stack_potentialresponse_tree_state {
     /**
      * @var array of stack_prt_feedback_element.
      */
-    public $_feedback = array();
+    public $_feedback = [];
 
     /**
      * @var array of answernote strings for the teacher.
      */
-    public $_answernotes = array();
+    public $_answernotes = [];
 
     /**
      * @var array of detailed tracing for the teacher.
      */
-    public $_trace = array();
+    public $_trace = [];
 
     /**
-     * @var boolean Is this attempt valid?
+     * @var bool Is this attempt valid?
      */
     public $_valid = true;
 
@@ -84,7 +87,7 @@ class stack_potentialresponse_tree_state {
     protected $seed;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $simplify;
 
@@ -101,7 +104,7 @@ class stack_potentialresponse_tree_state {
      * @param array $debuginfo debug info.
      */
     public function __construct($weight, $valid = true, $score = null, $penalty = null,
-            $errors = '', $answernotes = array(), $feedback = array(), $debuginfo = null, $fverrors = null) {
+            $errors = '', $answernotes = [], $feedback = [], $debuginfo = null, $fverrors = null) {
         $this->_weight      = $weight;
         $this->_valid       = $valid;
         $this->_score       = $score;
@@ -113,9 +116,7 @@ class stack_potentialresponse_tree_state {
         $this->_debuginfo   = $debuginfo;
     }
 
-    /**
-     * @throws stack_exception
-     */
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function __get($field) {
         switch ($field) {
             case 'weight':
@@ -210,7 +211,6 @@ class stack_potentialresponse_tree_state {
      * Subsitute variables into the feedback text.
      * @param string $feedback the concatenated feedback text.
      * @return string the feedback with question variables substituted.
-     * @throws stack_exception
      */
     public function substitue_variables_in_feedback($feedback) {
         // In this case, we want to get as much castext as possible back to a student.
@@ -219,7 +219,7 @@ class stack_potentialresponse_tree_state {
         // However, many (most?) of the variables will exist, and we can generate decent partial castext.
         // We prune out any invalid variables at this stage.
         $sessionvars = $this->cascontext->get_session();
-        $cleanvars = array();
+        $cleanvars = [];
         foreach ($sessionvars as $var) {
             if ($var->get_valid()) {
                 $cleanvars[] = $var;
@@ -274,6 +274,7 @@ class stack_prt_feedback_element {
     /** @var int node id (used as the file area item id). */
     public $itemid;
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function __construct($feedback, $format, $filearea, $itemid) {
         $this->feedback = $feedback;
         $this->format   = $format;

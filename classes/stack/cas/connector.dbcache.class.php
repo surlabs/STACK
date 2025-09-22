@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Class which undertakes process control to connect to Maxima.
  *
+ * @package    qtype_stack
  * @copyright  2012 The University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
     /** @var stack_debug_log does the debugging. */
     protected $debug;
 
-    /** @var ilDBInterface The database connection to use for the cache. */
+    /** @var moodle_database The database connection to use for the cache. */
     protected $db;
 
     /**
@@ -36,12 +36,13 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
      * @param stack_cas_connection $rawconnection the un-cached connection.
      * @param stack_debug_log $debuglog the debug log to use.
      */
-    public function __construct(stack_cas_connection $rawconnection, stack_debug_log $debuglog, ilDBInterface $db) {
+    public function __construct(stack_cas_connection $rawconnection, stack_debug_log $debuglog, moodle_database $db) {
         $this->rawconnection = $rawconnection;
         $this->debug = $debuglog;
         $this->db = $db;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compute($command) {
         $cached = $this->get_cached_result($command);
         if ($cached->result) {
@@ -64,15 +65,12 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
         return $result;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_maxima_available() {
-        if ('linux' != stack_connection_helper::get_platform()) {
-            return stack_string('healthunabletolistavail');
-        }
-        $this->command = 'maxima --list-avail';
-        $rawresult = $this->compute('');
-        return $rawresult;
+        return stack_string('healthunabletolistavail');
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function json_compute($command): array {
         $cached = $this->get_cached_result($command);
         if ($cached->result) {
@@ -97,6 +95,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
         return $parsed;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_debuginfo() {
         return $this->debug->get_log();
     }
@@ -112,11 +111,10 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
         $cached = new stdClass();
         $cached->key = $this->get_cache_key($command);
 
-        //fau: #4 Use ILIAS DB instead of Moodle DB
-        $query = 'SELECT * FROM xqcas_cas_cache WHERE hash = "' . $cached->key . '" ORDER BY id';
-        $res = $this->db->query($query);
-        $data[] = $this->db->fetchObject($res);
-        if ($data[0] == NULL) {
+        // Are there any cached records that might match?
+        $data = $this->db->get_records('qtype_stack_cas_cache',
+                ['hash' => $cached->key], 'id');
+        if (!$data) {
             // Nothing relevant in the cache.
             $cached->result = null;
             return $cached;
@@ -132,13 +130,9 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
 
         // If there was more than one record in the cache (due to a race condition)
         // drop the duplicates.
-        //fau: #5 Use ILIAS DB instead of Moodle DB
-        if (!empty($data)) {
-            unset($data[0]);
-            foreach ($data as $record) {
-                $delete_query = 'DELETE FROM xqcas_cas_cache WHERE id = "' . $record->id . '"';
-                $res = $this->db->query($delete_query);
-            }
+        unset($data[$record->id]);
+        if ($data) {
+            $this->db->delete_records_list('qtype_stack_cas_cache', 'id', array_keys($data));
         }
 
         return $cached;
@@ -160,13 +154,11 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
         $data->command = $command;
         $data->result = json_encode($result);
 
-        //fau: #6 Use ILIAS DB instead of Moodle DB
-        $id = $this->db->nextId('xqcas_cas_cache');
-        $this->db->insert("xqcas_cas_cache", array("id" => array("integer", $id), "hash" => array("text", $key), "command" => array("clob", $data->command), "result" => array("clob", $data->result)));
-        //fau.
+        $this->db->insert_record('qtype_stack_cas_cache', $data);
     }
 
     /**
+     * Add description here
      * @param string $command Maxima code to execute.
      * @return string the key used to store this command.
      */
@@ -202,6 +194,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
     }
 
     /**
+     * Add description here
      * @param moodle_database $db the database connection to use to access the cache.
      * @return int the number of entries in the cache.
      */

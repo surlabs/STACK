@@ -14,8 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/filter.interface.php');
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/filter.interface.php');
 
 /**
  * AST filter that rewrites calls to functions to be checked at runtime.
@@ -23,11 +30,14 @@
 class stack_ast_filter_996_call_modification implements stack_cas_astfilter {
 
     // The name of the function that checks identifiers.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Constant
     const IDCHECK = '%_C';
 
     // The name of the function that checks expressions.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Constant
     const EXPCHECK = '%_E';
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $mapfuns = stack_cas_security::get_all_with_feature('mapfunction');
@@ -66,7 +76,7 @@ class stack_ast_filter_996_call_modification implements stack_cas_astfilter {
                     $replacement = new MP_FunctionCall(new MP_Identifier('block'),
                         [
                             new MP_List([new MP_Identifier('_tmp_996')]),
-                            new MP_Operation(':', new MP_Identifier('_tmp_996'), $node->arguments[0])
+                            new MP_Operation(':', new MP_Identifier('_tmp_996'), $node->arguments[0]),
                         ]);
                     $node->arguments[0]->position['call-id'] = true;
                     $replacement->position['ev-check'] = true;
@@ -87,7 +97,7 @@ class stack_ast_filter_996_call_modification implements stack_cas_astfilter {
 
                 // The order of these ifs is critical, we build up the checks
                 // so that no basic check gets lost due to more advanced ones
-                // doing more conplex things. The advanced cases assume that
+                // doing more complex things. The advanced cases assume that
                 // the simpler ones have been done already.
                 if (!($node->parentnode instanceof MP_Group) ||
                     $node->parentnode->items[0]->toString() !== $namecheck->toString()) {

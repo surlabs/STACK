@@ -14,109 +14,124 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
 
 
-// Answer test controller class.
-//
-// @copyright  2012 University of Birmingham
-// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+/**
+ * Answer test controller class.
+ *
+ * @package    qtype_stack
+ * @copyright  2012 University of Birmingham
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
+require_once(__DIR__ . '/anstest.class.php');
+require_once(__DIR__ . '/at_general_cas.class.php');
+require_once(__DIR__ . '/../cas/connector.class.php');
+require_once(__DIR__ . '/../cas/ast.container.class.php');
 
-
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_ans_test_controller {
-    protected static $types = array(
-              'AlgEquiv'             => 'stackOptions_AnsTest_values_AlgEquiv',
-              'AlgEquivNouns'        => 'stackOptions_AnsTest_values_AlgEquivNouns',
-              'EqualComAss'          => 'stackOptions_AnsTest_values_EqualComAss',
-              'EqualComAssRules'     => 'stackOptions_AnsTest_values_EqualComAssRules',
-              'CasEqual'             => 'stackOptions_AnsTest_values_CasEqual',
-              'SameType'             => 'stackOptions_AnsTest_values_SameType',
-              'SubstEquiv'           => 'stackOptions_AnsTest_values_SubstEquiv',
-              'SysEquiv'             => 'stackOptions_AnsTest_values_SysEquiv',
-              'Sets'                 => 'stackOptions_AnsTest_values_Sets',
-              'Expanded'             => 'stackOptions_AnsTest_values_Expanded',
-              'FacForm'              => 'stackOptions_AnsTest_values_FacForm',
-              'SingleFrac'           => 'stackOptions_AnsTest_values_SingleFrac',
-              'PartFrac'             => 'stackOptions_AnsTest_values_PartFrac',
-              'CompSquare'           => 'stackOptions_AnsTest_values_CompSquare',
-              'PropLogic'            => 'stackOptions_AnsTest_values_PropLogic',
-              'Equiv'                => 'stackOptions_AnsTest_values_Equiv',
-              'EquivFirst'           => 'stackOptions_AnsTest_values_EquivFirst',
-              'GT'                   => 'stackOptions_AnsTest_values_GT',
-              'GTE'                  => 'stackOptions_AnsTest_values_GTE',
-              'SigFigsStrict'        => 'stackOptions_AnsTest_values_SigFigsStrict',
-              'NumAbsolute'          => 'stackOptions_AnsTest_values_NumAbsolute',
-              'NumRelative'          => 'stackOptions_AnsTest_values_NumRelative',
-              'NumSigFigs'           => 'stackOptions_AnsTest_values_NumSigFigs',
-              'NumDecPlaces'         => 'stackOptions_AnsTest_values_NumDecPlaces',
-              'NumDecPlacesWrong'    => 'stackOptions_AnsTest_values_NumDecPlacesWrong',
-              'Units'                => 'stackOptions_AnsTest_values_UnitsSigFigs',
-              'UnitsStrict'          => 'stackOptions_AnsTest_values_UnitsStrictSigFigs',
-              'UnitsAbsolute'        => 'stackOptions_AnsTest_values_UnitsAbsolute',
-              'UnitsStrictAbsolute'  => 'stackOptions_AnsTest_values_UnitsStrictAbsolute',
-              'UnitsRelative'        => 'stackOptions_AnsTest_values_UnitsRelative',
-              'UnitsStrictRelative'  => 'stackOptions_AnsTest_values_UnitsStrictRelative',
-              'LowestTerms'          => 'stackOptions_AnsTest_values_LowestTerms',
-              'Diff'                 => 'stackOptions_AnsTest_values_Diff',
-              'Int'                  => 'stackOptions_AnsTest_values_Int',
-              'String'               => 'stackOptions_AnsTest_values_String',
-              'StringSloppy'         => 'stackOptions_AnsTest_values_StringSloppy',
-              'Levenshtein'          => 'stackOptions_AnsTest_values_Levenshtein',
-              'SRegExp'              => 'stackOptions_AnsTest_values_SRegExp',
-    );
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
+    protected static $types = [
+        'AlgEquiv'             => 'stackOptions_AnsTest_values_AlgEquiv',
+        'AlgEquivNouns'        => 'stackOptions_AnsTest_values_AlgEquivNouns',
+        'EqualComAss'          => 'stackOptions_AnsTest_values_EqualComAss',
+        'EqualComAssRules'     => 'stackOptions_AnsTest_values_EqualComAssRules',
+        'CasEqual'             => 'stackOptions_AnsTest_values_CasEqual',
+        'SameType'             => 'stackOptions_AnsTest_values_SameType',
+        'SubstEquiv'           => 'stackOptions_AnsTest_values_SubstEquiv',
+        'SysEquiv'             => 'stackOptions_AnsTest_values_SysEquiv',
+        'Sets'                 => 'stackOptions_AnsTest_values_Sets',
+        'Expanded'             => 'stackOptions_AnsTest_values_Expanded',
+        'FacForm'              => 'stackOptions_AnsTest_values_FacForm',
+        'SingleFrac'           => 'stackOptions_AnsTest_values_SingleFrac',
+        'PartFrac'             => 'stackOptions_AnsTest_values_PartFrac',
+        'CompSquare'           => 'stackOptions_AnsTest_values_CompSquare',
+        'PropLogic'            => 'stackOptions_AnsTest_values_PropLogic',
+        'Equiv'                => 'stackOptions_AnsTest_values_Equiv',
+        'EquivFirst'           => 'stackOptions_AnsTest_values_EquivFirst',
+        'GT'                   => 'stackOptions_AnsTest_values_GT',
+        'GTE'                  => 'stackOptions_AnsTest_values_GTE',
+        'SigFigsStrict'        => 'stackOptions_AnsTest_values_SigFigsStrict',
+        'NumAbsolute'          => 'stackOptions_AnsTest_values_NumAbsolute',
+        'NumRelative'          => 'stackOptions_AnsTest_values_NumRelative',
+        'NumSigFigs'           => 'stackOptions_AnsTest_values_NumSigFigs',
+        'NumDecPlaces'         => 'stackOptions_AnsTest_values_NumDecPlaces',
+        'NumDecPlacesWrong'    => 'stackOptions_AnsTest_values_NumDecPlacesWrong',
+        'Units'                => 'stackOptions_AnsTest_values_UnitsSigFigs',
+        'UnitsStrict'          => 'stackOptions_AnsTest_values_UnitsStrictSigFigs',
+        'UnitsAbsolute'        => 'stackOptions_AnsTest_values_UnitsAbsolute',
+        'UnitsStrictAbsolute'  => 'stackOptions_AnsTest_values_UnitsStrictAbsolute',
+        'UnitsRelative'        => 'stackOptions_AnsTest_values_UnitsRelative',
+        'UnitsStrictRelative'  => 'stackOptions_AnsTest_values_UnitsStrictRelative',
+        'LowestTerms'          => 'stackOptions_AnsTest_values_LowestTerms',
+        'Diff'                 => 'stackOptions_AnsTest_values_Diff',
+        'Int'                  => 'stackOptions_AnsTest_values_Int',
+        'Antidiff'             => 'stackOptions_AnsTest_values_Antidiff',
+        'AddConst'             => 'stackOptions_AnsTest_values_AddConst',
+        'String'               => 'stackOptions_AnsTest_values_String',
+        'StringSloppy'         => 'stackOptions_AnsTest_values_StringSloppy',
+        'Levenshtein'          => 'stackOptions_AnsTest_values_Levenshtein',
+        'SRegExp'              => 'stackOptions_AnsTest_values_SRegExp',
+        'Validator'            => 'stackOptions_AnsTest_values_Validator',
+    ];
 
-    /*
+    /**
      * Does this test require options [0] and are these evaluated by the CAS [1] ?
      * In [2] we have the value of simp in the CAS session.
      * Does the test require the raw value of the student's answer as a string [3] ?
      *
      * Note, the options are currently always simplified in the node class.
      */
-    protected static $pops = array(
-        'AlgEquiv'             => array(false, false, true, false),
-        'AlgEquivNouns'        => array(false, false, false, false),
-        'EqualComAss'          => array(false, false, false, false),
-        'EqualComAssRules'     => array(true, true, false, false),
-        'CasEqual'             => array(false, false, false, false),
-        'SameType'             => array(false, false, true, false),
-        'SubstEquiv'           => array('optional', true, true, false),
-        'SysEquiv'             => array(false, false, true, false),
-        'Sets'                 => array(false, false, false, false),
-        'Expanded'             => array(false, false, true, false),
-        'FacForm'              => array(true, true, false, false),
-        'SingleFrac'           => array(false, false, false, false),
-        'PartFrac'             => array(true, true, true, false),
-        'CompSquare'           => array(true, true, true, false),
-        'PropLogic'            => array(false, false, true, false),
-        'Equiv'                => array('optional', true, false, false),
-        'EquivFirst'           => array('optional', true, false, false),
-        'GT'                   => array(false, false, true, false),
-        'GTE'                  => array(false, false, true, false),
-        'SigFigsStrict'        => array(true, true, true, true),
-        'NumAbsolute'          => array(true, true, true, false),
-        'NumRelative'          => array(true, true, true, false),
-        'NumSigFigs'           => array(true, true, false, true),
-        'NumDecPlaces'         => array(true, true, false, true),
-        'NumDecPlacesWrong'    => array(true, true, false, false),
-        'Units'                => array(true, true, false, true),
-        'UnitsStrict'          => array(true, true, false, true),
-        'UnitsAbsolute'        => array(true, true, false, false),
-        'UnitsStrictAbsolute'  => array(true, true, false, false),
-        'UnitsRelative'        => array(true, true, false, false),
-        'UnitsStrictRelative'  => array(true, true, false, false),
-        'LowestTerms'          => array(false, false, false, false),
-        'Diff'                 => array(true, true, false, false),
-        'Int'                  => array(true, true, false, false),
-        'String'               => array(false, false, false, false),
-        'StringSloppy'         => array(false, false, false, false),
-        'Levenshtein'          => array(true, true, true, false),
-        'SRegExp'              => array(false, false, true, false),
-    );
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
+    protected static $pops = [
+        'AlgEquiv'             => [false, false, true, false],
+        'AlgEquivNouns'        => [false, false, false, false],
+        'EqualComAss'          => [false, false, false, false],
+        'EqualComAssRules'     => [true, true, false, false],
+        'CasEqual'             => [false, false, false, false],
+        'SameType'             => [false, false, true, false],
+        'SubstEquiv'           => ['optional', true, true, false],
+        'SysEquiv'             => [false, false, true, false],
+        'Sets'                 => [false, false, false, false],
+        'Expanded'             => [false, false, true, false],
+        'FacForm'              => [true, true, false, false],
+        'SingleFrac'           => [false, false, false, false],
+        'PartFrac'             => [true, true, true, false],
+        'CompSquare'           => [true, true, true, false],
+        'PropLogic'            => [false, false, true, false],
+        'Equiv'                => ['optional', true, false, false],
+        'EquivFirst'           => ['optional', true, false, false],
+        'GT'                   => [false, false, true, false],
+        'GTE'                  => [false, false, true, false],
+        'SigFigsStrict'        => [true, true, true, true],
+        'NumAbsolute'          => [true, true, true, false],
+        'NumRelative'          => [true, true, true, false],
+        'NumSigFigs'           => [true, true, false, true],
+        'NumDecPlaces'         => [true, true, false, true],
+        'NumDecPlacesWrong'    => [true, true, false, false],
+        'Units'                => [true, true, false, true],
+        'UnitsStrict'          => [true, true, false, true],
+        'UnitsAbsolute'        => [true, true, false, false],
+        'UnitsStrictAbsolute'  => [true, true, false, false],
+        'UnitsRelative'        => [true, true, false, false],
+        'UnitsStrictRelative'  => [true, true, false, false],
+        'LowestTerms'          => [false, false, false, false],
+        'Diff'                 => [true, true, false, false],
+        'Int'                  => [true, true, false, false],
+        'Antidiff'             => [true, true, false, false],
+        'AddConst'             => [true, true, false, false],
+        'String'               => [false, false, false, false],
+        'StringSloppy'         => [false, false, false, false],
+        'Levenshtein'          => [true, true, true, false],
+        'SRegExp'              => [false, false, true, false],
+        'Validator'            => [true, true, false, false],
+    ];
 
     /**
      * The answertest object that the functions call.
      * @var stack_anstest
-     * @access private
      */
     private $at;
 
@@ -128,10 +143,9 @@ class stack_ans_test_controller {
      * @param  string $tans A CAS string assumed to represent the tecaher's answer.
      * @param  object $options
      * @param  CasString $casoption
-     * @access public
      */
     public function __construct(string $anstest, stack_ast_container $sans, stack_ast_container $tans, $casoption = null,
-            $options = null, $contextsession = array()) {
+            $options = null, $contextsession = []) {
 
         switch($anstest) {
             case 'AlgEquiv':
@@ -149,6 +163,8 @@ class stack_ans_test_controller {
             case 'PropLogic':
             case 'Diff':
             case 'Int':
+            case 'Antidiff':
+            case 'AddConst':
             case 'GT':
             case 'GTE':
             case 'UnitsAbsolute':
@@ -165,6 +181,7 @@ class stack_ans_test_controller {
             case 'NumDecPlaces':
             case 'NumDecPlacesWrong':
             case 'Levenshtein':
+            case 'Validator':
                 $this->at = new stack_answertest_general_cas($sans, $tans, $anstest, $casoption, $options, $contextsession);
                 break;
 
@@ -198,6 +215,7 @@ class stack_ans_test_controller {
             case 'String':
             case 'StringSloppy':
             case 'RegExp':
+                require_once(__DIR__ . '/at_general_cas_preprepare.class.php');
                 $this->at = new stack_answertest_general_cas_preprepare($sans, $tans, $anstest, $options, $casoption);
                 break;
 
@@ -207,10 +225,9 @@ class stack_ans_test_controller {
     }
 
     /**
-     *
+     * Add description here
      *
      * @return bool
-     * @access public
      */
     public function do_test() {
         $result = $this->at->do_test();
@@ -218,56 +235,52 @@ class stack_ans_test_controller {
     }
 
     /**
-     *
+     * Add description here
      *
      * @return string
-     * @access public
      */
     public function get_at_errors() {
         return $this->at->get_at_errors();
     }
 
     /**
-     *
+     * Add description here
      *
      * @return float
-     * @access public
      */
     public function get_at_mark() {
         return $this->at->get_at_mark();
     }
 
     /**
-     *
+     * Add description here
      *
      * @return bool
-     * @access public
      */
     public function get_at_valid() {
         return $this->at->get_at_valid();
     }
 
     /**
-     *
+     * Add description here
      *
      * @return string
-     * @access public
      */
     public function get_at_answernote() {
         return trim($this->at->get_at_answernote());
     }
 
     /**
-     *
+     * Add description here
      *
      * @return string
-     * @access public
      */
     public function get_at_feedback() {
         return ($this->at->get_at_feedback());
     }
 
     /**
+     * Add description here.
      * @return array the list of available answertest types. An array
      *      answertest internal name => language string key.
      */
@@ -279,7 +292,6 @@ class stack_ans_test_controller {
      * Returns whether the testops are required for this test.
      *
      * @return bool
-     * @access public
      */
     public static function required_atoptions($atest) {
         $op = self::$pops[$atest];
@@ -290,10 +302,9 @@ class stack_ans_test_controller {
      * Returns a list of the answer tests who do not require test options
      *
      * @return array
-     * @access public
      */
     public static function get_ans_tests_without_options() {
-        $anstests = array();
+        $anstests = [];
         foreach (self::$pops as $key => $value) {
             if ($value[0] === false) {
                 $anstests[] = $key;
@@ -306,7 +317,6 @@ class stack_ans_test_controller {
      * Returns whether the testops should be processed by the CAS for this AnswerTest
      *
      * @return bool
-     * @access public
      */
     public static function process_atoptions($atest) {
         $op = self::$pops[$atest];
@@ -317,7 +327,6 @@ class stack_ans_test_controller {
      * Returns whether the session needs simplification.
      *
      * @return bool
-     * @access public
      */
     public static function simp($atest) {
         $op = self::$pops[$atest];
@@ -328,7 +337,6 @@ class stack_ans_test_controller {
      * Returns whether the test requires the raw input of the student's answer.
      *
      * @return bool
-     * @access public
      */
     public static function required_raw($atest) {
         $op = self::$pops[$atest];
@@ -339,7 +347,6 @@ class stack_ans_test_controller {
      * Validates the options, when needed.
      *
      * @return bool
-     * @access public
      */
     public function validate_atoptions($opt) {
         return $this->at->validate_atoptions($opt);
@@ -349,7 +356,6 @@ class stack_ans_test_controller {
      * Pass back CAS debug information for testing.
      *
      * @return string
-     * @access public
      */
     public function get_debuginfo() {
         return $this->at->get_debuginfo();
@@ -359,7 +365,6 @@ class stack_ans_test_controller {
      * Returns an intelligible trace of an executed answer test.
      *
      * @return string
-     * @access public
      */
     public function get_trace($includeresult = true) {
         return $this->at->get_trace($includeresult);

@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/filter.interface.php');
 
 /**
  * AST filter that identifies a specific use case related to trig functions
@@ -22,8 +30,10 @@
  */
 class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     public static $ssmap = null;
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
         if (self::$ssmap === null) {
             self::$ssmap = json_decode(file_get_contents(__DIR__ . '/../../maximaparser/unicode/superscript-stack.json'), true);
@@ -90,11 +100,13 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                 if ($bad === true) {
                     // Those rules should not match anything else.
                     $node->position['invalid'] = true;
-                    // TODO: now that we have the whole "function call" as the $node
+                    // TO-DO: now that we have the whole "function call" as the $node
                     // the error message could print out it all, but without that star...
                     $errors[] = stack_string('stackCas_trigexp',
-                        array('forbid' => stack_maxima_format_casstring($node->lhs->lhs->value.'^'),
-                            'identifier' => $node->lhs->lhs->value));
+                        [
+                            'forbid' => stack_maxima_format_casstring($node->lhs->lhs->value.'^'),
+                            'identifier' => $node->lhs->lhs->value,
+                        ]);
                     if (array_search('trigexp', $answernotes) === false) {
                         $answernotes[] = 'trigexp';
                     }
@@ -141,8 +153,10 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                     // Those rules should not match anything else.
                     $node->position['invalid'] = true;
                     $errors[] = stack_string('stackCas_trigexp',
-                        array('forbid' => stack_maxima_format_casstring($node->lhs->value.'^'),
-                        'identifier' => $node->lhs->value));
+                        [
+                            'forbid' => stack_maxima_format_casstring($node->lhs->value.'^'),
+                            'identifier' => $node->lhs->value,
+                        ]);
                     if (array_search('trigexp', $answernotes) === false) {
                         $answernotes[] = 'trigexp';
                     }
@@ -173,8 +187,10 @@ class stack_ast_filter_025_no_trig_power implements stack_cas_astfilter {
                     // Those rules should not match anything else.
                     $node->position['invalid'] = true;
                     $errors[] = stack_string('stackCas_trigexp',
-                        array('forbid' => stack_maxima_format_casstring($node->name->value.'^'),
-                        'identifier' => $node->name->value));
+                        [
+                            'forbid' => stack_maxima_format_casstring($node->name->value.'^'),
+                            'identifier' => $node->name->value,
+                        ]);
                     if (array_search('trigexp', $answernotes) === false) {
                         $answernotes[] = 'trigexp';
                     }

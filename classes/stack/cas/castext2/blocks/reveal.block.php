@@ -14,12 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with STACK.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once(__DIR__ . '/../../../utils.class.php');
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/../block.interface.php');
+require_once(__DIR__ . '/../../../utils.class.php');
 
 // Register a counter.
-//require_once(__DIR__ . '/iframe.block.php');
+require_once(__DIR__ . '/iframe.block.php');
 stack_cas_castext2_iframe::register_counter('///REVEAL_COUNT///');
 
 /**
@@ -29,6 +37,7 @@ stack_cas_castext2_iframe::register_counter('///REVEAL_COUNT///');
  */
 class stack_cas_castext2_reveal extends stack_cas_castext2_block {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         static $count = 0;
         /*
@@ -57,7 +66,7 @@ class stack_cas_castext2_reveal extends stack_cas_castext2_block {
         }
         $body->items[] = new MP_String('</div>');
 
-        $code = 'import stack_js from "' . castext2_parser_utils::stack_cors_link('stackjsiframe.min.js') . '";';
+        $code = 'import {stack_js} from "' . stack_cors_link('stackjsiframe.min.js') . '";';
         $code .= 'stack_js.request_access_to_input("' . $this->params['input'] . '", true).then((id) => {';
         // So that should give us access to the input.
         // Once we get the access immediately bind a listener to it.
@@ -75,28 +84,43 @@ class stack_cas_castext2_reveal extends stack_cas_castext2_block {
         // Now add a hidden [[iframe]] with suitable scripts.
         $body->items[] = new MP_List([
             new MP_String('iframe'),
-            new MP_String(json_encode(['hidden' => true,
-                'title' => 'Logic container for a revealing portion ///REVEAL_COUNT///.'])),
+            new MP_String(json_encode([
+                'hidden' => true,
+                'title' => 'Logic container for a revealing portion ///REVEAL_COUNT///.',
+            ])),
             new MP_List([
                 new MP_String('script'),
                 new MP_String(json_encode(['type' => 'module'])),
-                new MP_String($code)
-            ])
+                new MP_String($code),
+            ]),
         ]);
 
         return $body;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function is_flat(): bool {
         // Never flat, the [[iframe]] portion needs extra processing.
         return false;
     }
 
-    public function postprocess(array $params, castext2_processor $processor=null): string {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function postprocess(array $params, castext2_processor $processor,
+        castext2_placeholder_holder $holder): string {
         return 'Post processing of reveal blocks never happens, this block is handled through [[iframe]].';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
-        return array();
+        return [];
+    }
+
+    /**
+     * Is this an interactive block?
+     * If true, we can't generate a static version.
+     * @return bool
+     */
+    public function is_interactive(): bool {
+        return true;
     }
 }

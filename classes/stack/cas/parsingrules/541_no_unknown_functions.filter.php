@@ -14,12 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/filter.interface.php');
 
 /**
  * AST filter that prevents any function calls.
  */
 class stack_ast_filter_541_no_unknown_functions implements stack_cas_astfilter_exclusion {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
         $hasany = false;
         $known = stack_cas_security::get_protected_identifiers('function', $identifierrules->get_units());
@@ -33,8 +42,10 @@ class stack_ast_filter_541_no_unknown_functions implements stack_cas_astfilter_e
                 $hasany = true;
                 // Insert stars into the pattern.
                 $errors[] = stack_string('stackCas_unknownFunction',
-                        array('forbid' => stack_maxima_format_casstring($node->name->toString()),
-                            'term' => stack_maxima_format_casstring($node->toString())));
+                        [
+                            'forbid' => stack_maxima_format_casstring($node->name->toString()),
+                            'term' => stack_maxima_format_casstring($node->toString()),
+                        ]);
                 $node->position['invalid'] = true;
                 return false;
             }
@@ -53,6 +64,7 @@ class stack_ast_filter_541_no_unknown_functions implements stack_cas_astfilter_e
         return $ast;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function conflicts_with(string $otherfiltername): bool {
         if ($otherfiltername === '442_split_all_functions' ||
             $otherfiltername === '441_split_unknown_functions') {

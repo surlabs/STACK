@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/filter.interface.php');
 
 /**
  * AST filter that identifies a specific use case related to trig functions
@@ -22,6 +30,7 @@
  */
 class stack_ast_filter_030_no_trig_space implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $selectednames = stack_cas_security::get_all_with_feature('trigfun');
@@ -35,12 +44,12 @@ class stack_ast_filter_030_no_trig_space implements stack_cas_astfilter {
                 isset($node->parentnode->position['fixspaces'])) {
                 if (array_key_exists($node->value, $selectednames)) {
                     $errors[] = stack_string('stackCas_trigspace',
-                            array('trig' => stack_maxima_format_casstring($node->value.'(...)')));
+                            ['trig' => stack_maxima_format_casstring($node->value.'(...)')]);
                     if (array_search('trigspace', $answernotes) === false) {
                         $answernotes[] = 'trigspace';
                     }
                     $node->parentnode->position['invalid'] = true;
-                    // TODO: handle the case where we are not the lhs of the shared op.
+                    // TO-DO: handle the case where we are not the lhs of the shared op.
                 }
             }
             return true;

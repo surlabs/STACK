@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * A basic text-field input.
  *
+ * @package    qtype_stack
  * @copyright  2017 University of Edinburgh
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@ class stack_numerical_input extends stack_input {
      * This has numerous problems, and is difficult to maintain. Extra options will be in a JSON-like format.
      * @var array
      */
-    protected $extraoptions = array(
+    protected $extraoptions = [
         'hideanswer' => false,
         'allowempty' => false,
         'nounits' => false,
@@ -49,32 +49,33 @@ class stack_numerical_input extends stack_input {
         'minsf' => false,
         'maxsf' => false,
         'align' => 'left',
-        'validator' => false
-    );
+        'validator' => false,
+        'monospace' => false,
+    ];
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function render(stack_input_state $state, $fieldname, $readonly, $tavalue) {
 
         if ($this->errors) {
             return $this->render_error($this->errors);
         }
 
-        $size = $this->parameters['boxWidth'] + 0.2;
-        if($readonly){
-            $solution_input_id = $fieldname . '_sol';
-            $fieldname = $solution_input_id;
-        }
-        $attributes = array(
+        $size = $this->parameters['boxWidth'] * 0.9 + 0.1;
+        $attributes = [
             'type'  => 'text',
             'name'  => $fieldname,
             'id'    => $fieldname,
-            'size'  => $size,
+            'size'  => $this->parameters['boxWidth'] * 1.1,
             'style' => 'width: '.$size.'em',
             'autocapitalize' => 'none',
             'spellcheck'     => 'false',
             'class'     => 'numerical',
-        );
+        ];
         if ($this->extraoptions['align'] === 'right') {
             $attributes['class'] = 'numerical-right';
+        }
+        if ($this->extraoptions['monospace']) {
+            $attributes['class'] .= ' input-monospace';
         }
 
         $value = $this->contents_to_maxima($state->contents);
@@ -95,11 +96,39 @@ class stack_numerical_input extends stack_input {
             $attributes['readonly'] = 'readonly';
         }
 
+        // Metadata for JS users.
+        $attributes['data-stack-input-type'] = 'numerical';
+        if ($this->options->get_option('decimals') === ',') {
+            $attributes['data-stack-input-decimal-separator']  = ',';
+            $attributes['data-stack-input-list-separator'] = ';';
+        } else {
+            $attributes['data-stack-input-decimal-separator']  = '.';
+            $attributes['data-stack-input-list-separator'] = ',';
+        }
+
         return html_writer::empty_tag('input', $attributes);
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function render_api_data($tavalue) {
+        if ($this->errors) {
+            throw new stack_exception("Error rendering input: " . implode(',', $this->errors));
+        }
+
+        $data = [];
+
+        $data['type'] = 'numerical';
+        $data['boxWidth'] = $this->parameters['boxWidth'];
+        $data['align'] = $this->extraoptions['align'] === 'right' ? 'right' : 'left';
+        $data['syntaxHint'] = $this->parameters['syntaxHint'];
+        $data['syntaxHintType'] = $this->parameters['syntaxAttribute'] == '1' ? 'placeholder' : 'value';
+
+        return $data;
+    }
+
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function add_to_moodleform_testinput(MoodleQuickForm $mform) {
-        $mform->addElement('text', $this->name, $this->name, array('size' => $this->parameters['boxWidth']));
+        $mform->addElement('text', $this->name, $this->name, ['size' => $this->parameters['boxWidth']]);
         $mform->setDefault($this->name, $this->parameters['syntaxHint']);
         $mform->setType($this->name, PARAM_RAW);
     }
@@ -110,7 +139,7 @@ class stack_numerical_input extends stack_input {
      * @return array parameters` => default value.
      */
     public static function get_parameters_defaults() {
-        return array(
+        return [
             'mustVerify'         => true,
             'showValidation'     => 1,
             'boxWidth'           => 15,
@@ -122,7 +151,8 @@ class stack_numerical_input extends stack_input {
             'forbidFloats'       => false,
             'lowestTerms'        => true,
             'sameType'           => true,
-            'options'            => '');
+            'options'            => '',
+        ];
     }
 
     /**
@@ -140,6 +170,7 @@ class stack_numerical_input extends stack_input {
     }
 
     /**
+     * Add description here.
      * @return string the teacher's answer, displayed to the student in the general feedback.
      */
     public function get_teacher_answer_display($value, $display) {
@@ -152,6 +183,6 @@ class stack_numerical_input extends stack_input {
         $cs = stack_ast_container::make_from_teacher_source($value, '', new stack_cas_security());
         $cs->set_nounify(0);
         $value = $cs->get_inputform(true, 0, true, $this->options->get_option('decimals'));
-        return stack_string('teacheranswershow', array('value' => '<code>'.$value.'</code>', 'display' => $display));
+        return stack_string('teacheranswershow', ['value' => '<code>'.$value.'</code>', 'display' => $display]);
     }
 }

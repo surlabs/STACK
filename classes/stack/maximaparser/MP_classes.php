@@ -15,6 +15,13 @@
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 // Stateful by Matti Harjula 2017.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2017 Matti Harjula.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
 /*
  * Class defintions for the PHP version of the PEGJS parser.
  * toString functions are mainly to document what the objects parts mean.
@@ -43,9 +50,10 @@
  * 'flattree'                Used for debugging of the internals.  Does not print checking groups by design.
  */
 
+defined('MOODLE_INTERNAL') || die();
 
-//require_once(__DIR__ . '/../cas/cassecurity.class.php');
-//require_once(__DIR__ . '/../cas/parsingrules/996_call_modification.filter.php');
+require_once(__DIR__ . '/../cas/cassecurity.class.php');
+require_once(__DIR__ . '/../cas/parsingrules/996_call_modification.filter.php');
 
 // @codingStandardsIgnoreStart
 // We ignore coding in this file, because the library is used outside Moodle.
@@ -207,7 +215,7 @@ class MP_Node {
 
     // Extraction of terms in operations without caring about the references.
     // Returns null if none present or we are not part of an operation.
-    /* TODO: bugs with '-a*b^c-d+e!+f/g(x+y)+z' for d.
+    /* TO-DO: bugs with '-a*b^c-d+e!+f/g(x+y)+z' for d.
     public function get_operand_on_right() {
     if ($this->parentnode === null) {
     return null;
@@ -264,7 +272,7 @@ class MP_Node {
         return null;
     }
 
-    /* TODO: bugs with '-a*b^c-d+e!+f/g(x+y)+z' for d.
+    /* TO-DO: bugs with '-a*b^c-d+e!+f/g(x+y)+z' for d.
     public function get_operator_on_right() {
         if ($this->parentnode === null) {
             return null;
@@ -282,10 +290,10 @@ class MP_Node {
         return null;
     }
     */
-   
-   /** 
+
+   /**
     * Generates an array listing the types of nodes present in this subtree.
-    * Including this node. Keyed with class-name and includes some specific 
+    * Including this node. Keyed with class-name and includes some specific
     * predefined special cases like `ops` and `has control flow`
     */
    public function type_count(): array {
@@ -359,9 +367,9 @@ class MP_Node {
         return $r;
    }
 
-   /** 
+   /**
     * Checks if this node has a call for a given function in its ancestry.
-    * Returns false if not otherwise tells the index of the arguments of 
+    * Returns false if not otherwise tells the index of the arguments of
     * that function call that includes this.
     * @param  string $funname Name of the function we are intersted of
     * @return false or index.
@@ -937,7 +945,7 @@ class MP_Identifier extends MP_Atom {
     }
 }
 
-// TODO: remove this?  Only one occurance in the search.
+// TO-DO: remove this?  Only one occurance in the search.
 class MP_Annotation extends MP_Node {
     public $annotationtype = null;
     public $params         = null;
@@ -1164,7 +1172,7 @@ class MP_FunctionCall extends MP_Node {
             if ('' != $prefix) {
                 // Hack for stacklet.
                 if ($n == 'stacklet') {
-                    // TODO: fix parsing of let.
+                    // TO-DO: fix parsing of let.
                     return $prefix .' '. implode('=', $ar);
                 }
                 return $prefix . implode($sep, $ar);
@@ -1242,7 +1250,7 @@ class MP_Group extends MP_Node {
             $this->items[0]->name instanceof MP_Atom &&
             $this->items[0]->name->value === stack_ast_filter_996_call_modification::IDCHECK;
     }
-    
+
     public function toString($params = null): string {
         $indent = '';
 
@@ -1767,7 +1775,7 @@ class MP_If extends MP_Node {
         $total = $this->toString();
         $this->position['start'] = $offset;
         $this->position['end'] = $offset + mb_strlen($total);
-        // TODO: fill in this.
+        // TO-DO: fill in this.
     }
 
     public function toString($params = null): string {
@@ -1862,7 +1870,7 @@ class MP_Loop extends MP_Node {
         $total = $this->toString();
         $this->position['start'] = $offset;
         $this->position['end'] = $offset + mb_strlen($total);
-        // TODO: fill in this.
+        // TO-DO: fill in this.
     }
 
     public function replace($node, $with) {

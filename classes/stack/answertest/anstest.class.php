@@ -17,6 +17,7 @@
 /**
  * Answer test base class.
  *
+ * @package    qtype_stack
  * @copyright  2012 University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -58,7 +59,7 @@ class stack_anstest {
      * Special variables in the question which should be exposed to the answer test.
      * @var cas_evaluatable[]
      */
-    protected $contextsession = array();
+    protected $contextsession = [];
 
     /**
      * @var    float
@@ -86,7 +87,7 @@ class stack_anstest {
     protected $atfeedback;
 
     /**
-     * $var string.  Copies the debug info, e.g. from the CAS session.
+     * @var string.  Copies the debug info, e.g. from the CAS session.
      */
     protected $debuginfo;
 
@@ -97,7 +98,7 @@ class stack_anstest {
      * @param  string $tanskey
      */
     public function __construct(stack_ast_container $sans, stack_ast_container $tans, $options = null, $atoption = null,
-            $contextsession = array()) {
+            $contextsession = []) {
         $this->sanskey = $sans;
         $this->tanskey = $tans;
         $this->contextsession = $contextsession;
@@ -127,7 +128,7 @@ class stack_anstest {
     }
 
     /**
-     *
+     * Add description here
      *
      * @return string
      */
@@ -136,7 +137,7 @@ class stack_anstest {
     }
 
     /**
-     *
+     * Add description here
      *
      * @return float
      */
@@ -145,7 +146,7 @@ class stack_anstest {
     }
 
     /**
-     *
+     * Add description here
      *
      * @return bool
      */
@@ -154,7 +155,7 @@ class stack_anstest {
     }
 
     /**
-     *
+     * Add description here
      *
      * @return string
      */
@@ -163,7 +164,7 @@ class stack_anstest {
     }
 
     /**
-     *
+     * Add description here
      *
      * @return string
      */
@@ -175,7 +176,6 @@ class stack_anstest {
      * Returns some sensible debug information for testing questions.
      *
      * @return string
-     * @access public
      */
     public function get_debuginfo() {
         return $this->debuginfo;
@@ -185,7 +185,6 @@ class stack_anstest {
      * Returns some sensible debug information for testing questions.
      *
      * @return string
-     * @access public
      */
     protected function get_casfunction() {
         return $this->casfunction;
@@ -196,13 +195,12 @@ class stack_anstest {
      * This should strip out any internal functions like _C(..).
      *
      * @return string
-     * @access public
      */
     public function get_trace($includeresult) {
 
         if ($this->tanskey && $this->tanskey->get_valid()) {
             $ta = $this->tanskey->ast_to_string(null,
-                array('logicnoun' => true, 'keyless' => true, 'checkinggroup' => true));
+                ['logicnoun' => true, 'keyless' => true, 'checkinggroup' => true]);
             if ($this->tanskey->is_correctly_evaluated()) {
                 $ta = $this->tanskey->get_value();
             }
@@ -211,7 +209,7 @@ class stack_anstest {
         }
         if ($this->sanskey && $this->sanskey->get_valid()) {
             $sa = $this->sanskey->ast_to_string(null,
-                array('logicnoun' => true, 'keyless' => true, 'checkinggroup' => true));
+                ['logicnoun' => true, 'keyless' => true, 'checkinggroup' => true]);
             if ($this->sanskey->is_correctly_evaluated()) {
                 $sa = $this->sanskey->get_value();
             }
@@ -222,7 +220,7 @@ class stack_anstest {
         $atopt = '';
         if ($this->atoption && $this->atoption->get_valid()) {
             $atopt = $this->atoption->ast_to_string(null,
-                array('logicnoun' => true, 'keyless' => true, 'checkinggroup' => true));
+                ['logicnoun' => true, 'keyless' => true, 'checkinggroup' => true]);
         }
         if ($this->atoption && $this->atoption->is_correctly_evaluated()) {
             $atopt = $this->atoption->get_value();

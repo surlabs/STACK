@@ -15,9 +15,17 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once(__DIR__ . '/../../../utils.class.php');
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/../block.interface.php');
+require_once(__DIR__ . '/../../../utils.class.php');
 
 /**
  * A block for dealing with scripts in IFRAME blocks.
@@ -29,14 +37,15 @@
  */
 class stack_cas_castext2_script extends stack_cas_castext2_block {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         $r = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode($this->params))
+            new MP_String(json_encode($this->params)),
         ]);
 
         if (!isset($options['in iframe'])) {
-            return new MP_String(' ERROR [[script]] blocks muSt be within iframes. ');
+            return new MP_String(' ERROR [[script]] blocks must be within iframes. ');
         }
 
         // All formatting assumed to be raw HTML here.
@@ -52,23 +61,27 @@ class stack_cas_castext2_script extends stack_cas_castext2_block {
         return $r;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function is_flat(): bool {
         // These are never flat.
         return false;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
         // No CAS arguments.
         return [];
     }
 
-    public function postprocess(array $params, castext2_processor $processor): string {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function postprocess(array $params, castext2_processor $processor,
+        castext2_placeholder_holder $holder): string {
 
         $parameters = json_decode($params[1], true);
         $content    = '';
         for ($i = 2; $i < count($params); $i++) {
             if (is_array($params[$i])) {
-                $content .= $processor->process($params[$i][0], $params[$i]);
+                $content .= $processor->process($params[$i][0], $params[$i], $holder, $processor);
             } else {
                 $content .= $params[$i];
             }
@@ -84,7 +97,7 @@ class stack_cas_castext2_script extends stack_cas_castext2_block {
 
         // Provide a way to reference scripts served out through the CORS directory.
         if (isset($attributes['src']) && strpos($attributes['src'], 'cors://') === 0) {
-            $attributes['src'] = castext2_parser_utils::stack_cors_link(substr($attributes['src'], 7));
+            $attributes['src'] = stack_cors_link(substr($attributes['src'], 7));
         }
 
         // No need if nothing to do.
@@ -93,5 +106,14 @@ class stack_cas_castext2_script extends stack_cas_castext2_block {
         }
 
         return html_writer::tag('script', $content, $attributes);
+    }
+
+    /**
+     * Is this an interactive block?
+     * If true, we can't generate a static version.
+     * @return bool
+     */
+    public function is_interactive(): bool {
+        return true;
     }
 }

@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/filter.interface.php');
 
 /**
  * AST filter that marks everything that has been fixed by fixing
@@ -22,6 +30,7 @@
  */
 class stack_ast_filter_990_no_fixing_spaces implements stack_cas_astfilter_exclusion {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $spaces = false;
@@ -39,11 +48,11 @@ class stack_ast_filter_990_no_fixing_spaces implements stack_cas_astfilter_exclu
         // Now that those have been checked and invalidated. Let's write custom errors.
         if ($spaces === true) {
             $missingstring = $ast->toString(
-                    array('fixspaces_as_red_spaces' => true, 'qmchar' => true, 'inputform' => true));
+                    ['fixspaces_as_red_spaces' => true, 'qmchar' => true, 'inputform' => true]);
             if ($ast instanceof MP_Root) {
                 $missingstring = mb_substr($missingstring, 0, -2);
             }
-            $a = array();
+            $a = [];
             $a['expr']  = stack_maxima_format_casstring($missingstring);
             array_unshift($errors, stack_string('stackCas_spaces', $a));
         }
@@ -51,6 +60,7 @@ class stack_ast_filter_990_no_fixing_spaces implements stack_cas_astfilter_exclu
         return $ast;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function conflicts_with(string $otherfiltername): bool {
         if ($otherfiltername === '999_strict') {
             return true;

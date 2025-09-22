@@ -14,9 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/filter.interface.php');
-//require_once(__DIR__ . '/../../maximaparser/corrective_parser.php');
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/filter.interface.php');
+require_once(__DIR__ . '/../../maximaparser/corrective_parser.php');
 
 /**
  * AST filter that handles the logarithm base syntax-extension.
@@ -28,6 +36,7 @@
  * Will add 'logsubs' answernote if triggered.
  */
 class stack_ast_filter_002_log_candy implements stack_cas_astfilter {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors,
             array &$answernotes, stack_cas_security $identifierrules): MP_Node {
         $process = function($node) use (&$errors, &$answernotes) {
@@ -46,7 +55,7 @@ class stack_ast_filter_002_log_candy implements stack_cas_astfilter {
                     // This is a problem case.
                     // Let's assume we are dealing with: log_(ex)...(x) => lg(x,(ex)...).
                     // As we cannot be dealing with an empty base. So let's eat that.
-                    $arguments = array(); // Should be only one.
+                    $arguments = []; // Should be only one.
                     foreach ($node->arguments as $arg) {
                         $arguments[] = $arg->toString();
                     }
@@ -63,8 +72,10 @@ class stack_ast_filter_002_log_candy implements stack_cas_astfilter {
                     $argument = mb_substr($node->name->value, 4);
                     // This will unfortunately lose all the information about insertted stars
                     // but that is hardly an issue.
-                    $parsed = maxima_corrective_parser::parse($argument, $errors, $answernotes, array('startRule' => 'Root',
-                               'letToken' => stack_string('equiv_LET')));
+                    $parsed = maxima_corrective_parser::parse($argument, $errors, $answernotes, [
+                        'startRule' => 'Root',
+                        'letToken' => stack_string('equiv_LET'),
+                    ]);
                     // Should there be something truly unexpected.
                     if ($parsed === null) {
                         $node->position['invalid'] = true;
@@ -163,7 +174,7 @@ class stack_ast_filter_002_log_candy implements stack_cas_astfilter {
                     $node->parentnode instanceof MP_Functioncall)) {
                     // We have ended up in a situation where there is nothing to eat.
                     $node->position['invalid'] = true;
-                    // TODO: localise, maybe include the erroneous portion.
+                    // TO-DO: localise, maybe include the erroneous portion.
                     $errors[] = 'Logarithm without an argument...';
                     return false;
                 }

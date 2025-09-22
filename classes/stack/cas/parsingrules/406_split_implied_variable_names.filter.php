@@ -14,9 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/filter.interface.php');
-//require_once(__DIR__ . '/../../maximaparser/utils.php');
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/filter.interface.php');
+require_once(__DIR__ . '/../../maximaparser/utils.php');
 
 /**
  * AST filter that splits function calls to implied variable names
@@ -24,10 +32,11 @@
  *
  * f(x(x+f(1))) => f(x*(x+f(1)))
  *
- * Tags the stars and adds 'missing_stars' answernote.
+ * Tags the stars and adds 'missing_stars' and the specific 'Variable_function' answernote.
  */
 class stack_ast_filter_406_split_implied_variable_names implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $usage = maxima_parser_utils::variable_usage_finder($ast);

@@ -14,15 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Connection to Maxima for linux-like systems.
  *
+ * @package    qtype_stack
  * @copyright  2012 The University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_cas_connection_linux extends stack_cas_connection_base {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function guess_maxima_command($path) {
         global $CFG;
         if (stack_connection_helper::get_platform() == 'linux-optimised') {
@@ -49,14 +50,15 @@ class stack_cas_connection_linux extends stack_cas_connection_base {
         return $maximacommand;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function call_maxima($command) {
         // For unicode support, we need to add something like 'LANG' => 'en_GB.UTF-8' to the environment below.
-        $env = array('PATH' => getenv('PATH'));
+        $env = ['PATH' => getenv('PATH')];
 
-        $descriptors = array(
-            0 => array('pipe', 'r'),
-            1 => array('pipe', 'w'),
-        );
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+        ];
         $casprocess = proc_open($this->command . ' 2>&1', $descriptors, $pipes, null, $env);
 
         if (!is_resource($casprocess)) {

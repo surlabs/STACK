@@ -23,15 +23,17 @@
  */
 
 
+defined('MOODLE_INTERNAL') || die();
 
-//require_once(__DIR__ . '/prtnode.php');
-//require_once(__DIR__ . '/graphclump.php');
-//require_once(__DIR__ . '/svgrenderer.php');
-//require_once(__DIR__ . '/textrenderer.php');
+require_once(__DIR__ . '/prtnode.php');
+require_once(__DIR__ . '/graphclump.php');
+require_once(__DIR__ . '/svgrenderer.php');
+require_once(__DIR__ . '/textrenderer.php');
 
 /**
  * Abstract representation of a graph (e.g. a PRT).
  *
+ * @package    qtype_stack
  * @copyright 2013 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -42,7 +44,7 @@ class stack_abstract_graph {
     const RIGHT = 1;
 
     /** @var array node name => stack_abstract_graph_node the nodes of the graph. */
-    protected $nodes = array();
+    protected $nodes = [];
 
     /**
      * @var array array node name => stack_abstract_graph_node once the graph
@@ -55,17 +57,18 @@ class stack_abstract_graph {
      * find a cycle in the graph we break it at an arbitrary point, and record
      * that fact here, then carry on. Therefore, in a sense, this is a list of errors.
      */
-    protected $brokenloops = array();
+    protected $brokenloops = [];
 
     /** @var array depth => array stack_abstract_graph_node. */
-    protected $nodesbydepth = array();
+    protected $nodesbydepth = [];
 
     /**
      * @var array of node names that have been visited on the path from root
      * that is currently being explored in the depth-first search.
      */
-    protected $stack = array();
+    protected $stack = [];
 
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $clumps = null;
 
     /**
@@ -100,6 +103,7 @@ class stack_abstract_graph {
             $leftlabel, $rightlabel, $url);
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function add_prt_text($name, $casstatement, $quiet, $truenote, $falsenote) {
         if ($this->nodes[$name] instanceof stack_prt_graph_node) {
             $this->nodes[$name]->add_prt_text($casstatement, $quiet, $truenote, $falsenote);
@@ -108,6 +112,7 @@ class stack_abstract_graph {
         }
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function remove_node($nametodelete) {
         foreach ($this->nodes as $name => $node) {
             if ($name == $nametodelete) {
@@ -131,7 +136,7 @@ class stack_abstract_graph {
     public function layout() {
         // First we assign a depth to each node, to ensure that ercs always go
         // from one depth to a deeper one.
-        $this->stack = array();
+        $this->stack = [];
         $this->roots = $this->nodes;
         while (true) {
             $firstnode = null;
@@ -148,7 +153,7 @@ class stack_abstract_graph {
         }
 
         // Next, but build arrays listing the nodes at each depth.
-        $this->nodesbydepth = array();
+        $this->nodesbydepth = [];
         foreach ($this->nodes as $node) {
             $this->nodesbydepth[$node->depth][] = $node;
         }
@@ -166,11 +171,11 @@ class stack_abstract_graph {
             $node->heuristicxs = null;
         }
         foreach ($this->nodesbydepth as $depth => $nodes) {
-            uasort($this->nodesbydepth[$depth], array('stack_abstract_graph', 'compare_node_x_coords'));
+            uasort($this->nodesbydepth[$depth], ['stack_abstract_graph', 'compare_node_x_coords']);
         }
 
         // Now, working from the bottom, we stick nodes together to form clumps.
-        $this->clumps = array();
+        $this->clumps = [];
         foreach ($this->nodesbydepth as $depth => $nodes) {
             foreach ($nodes as $node) {
                 if (is_null($node->left) && is_null($node->right)) {
@@ -226,7 +231,7 @@ class stack_abstract_graph {
 
         // Now sort each row by level by x-coordinate.
         foreach ($this->nodesbydepth as $depth => $nodes) {
-            uasort($this->nodesbydepth[$depth], array('stack_abstract_graph', 'compare_node_x_coords'));
+            uasort($this->nodesbydepth[$depth], ['stack_abstract_graph', 'compare_node_x_coords']);
         }
         ksort($this->nodesbydepth);
 
@@ -269,7 +274,7 @@ class stack_abstract_graph {
         $currentnode->depth = $depth;
         array_push($this->stack, $currentnode->name);
 
-        if (isset($currentnode->left)) {
+        if ($currentnode->left) {
             if (in_array($currentnode->left, $this->stack)) {
                 $this->brokenloops[$currentnode->name . '|' . self::LEFT] = true;
                 $currentnode->left = null;
@@ -278,7 +283,7 @@ class stack_abstract_graph {
                 $this->depth_first_search($this->get($currentnode->left), $depth + 1);
             }
         }
-        if (isset($currentnode->right)) {
+        if ($currentnode->right) {
             if (in_array($currentnode->right, $this->stack)) {
                 $this->brokenloops[$currentnode->name . '|' . self::RIGHT] = true;
                 $currentnode->right = null;
@@ -289,7 +294,7 @@ class stack_abstract_graph {
         }
 
         if (array_pop($this->stack) != $currentnode->name) {
-            throw new stack_exception('Something went wrong with the stack.');
+            throw new coding_exception('Something went wrong with the stack.');
         }
     }
 
@@ -306,10 +311,10 @@ class stack_abstract_graph {
     protected function compute_heuristic_xs(stack_abstract_graph_node $node, $x, $dx) {
         $node->heuristicxs[] = $x;
         $dx /= 2;
-        if (isset($node->left)) {
+        if ($node->left) {
             $this->compute_heuristic_xs($this->get($node->left), $x - $dx, $dx);
         }
-        if (isset($node->right)) {
+        if ($node->right) {
             $this->compute_heuristic_xs($this->get($node->right), $x + $dx, $dx);
         }
     }
@@ -325,7 +330,7 @@ class stack_abstract_graph {
                 return $clump;
             }
         }
-        throw new stack_exception($node->name . ' is not in any clump.');
+        throw new coding_exception($node->name . ' is not in any clump.');
     }
 
     /**
@@ -335,7 +340,7 @@ class stack_abstract_graph {
     protected function remove_clump(stack_abstract_graph_node_clump $clump) {
         $key = array_search($clump, $this->clumps);
         if (is_null($key)) {
-            throw new stack_exception('Unknown clump.');
+            throw new coding_exception('Unknown clump.');
         }
         unset($this->clumps[$key]);
     }
@@ -347,19 +352,23 @@ class stack_abstract_graph {
      */
     public function get($nodename) {
         if (!array_key_exists($nodename, $this->nodes)) {
-            throw new stack_exception('Node ' . $nodename . ' is not in the graph.');
+            throw new coding_exception('Node ' . $nodename . ' is not in the graph.');
         }
         return $this->nodes[$nodename];
     }
 
     /**
+     * Add description here.
      * @return array node name => stack_abstract_graph_node the list of all nodes.
      */
     public function get_nodes() {
+        // ISS-1041 Fix issue with nodes being retrieved with names sorted as strings.
+        uasort($this->nodes, fn($a, $b) => $a->name - $b->name);
         return $this->nodes;
     }
 
     /**
+     * Add description here.
      * @return array node name => stack_abstract_graph_node nodes that are
      * roots in the graph. (That is, no other node links to them.) Only available
      * once the graph has been laid out.
@@ -369,6 +378,7 @@ class stack_abstract_graph {
     }
 
     /**
+     * Add description here.
      * @return array with keys like "node name|-1" or "node name|1". If, we
      * find a cycle in the graph we break it at an arbitrary point, and record
      * that fact here, then carry on. Therefore, this is a list of errors.
@@ -379,6 +389,7 @@ class stack_abstract_graph {
     }
 
     /**
+     * Add description here
      * @param stack_abstract_graph_node $node the parent node of the edge.
      * @param int $direction self::LEFT or self::RIGHT.
      * @return book whether this edge was broken to break a cycle.
@@ -388,6 +399,7 @@ class stack_abstract_graph {
     }
 
     /**
+     * Add description here.
      * @return int the maximum depth of any node. Root nodes have depth 1.
      */
     public function max_depth() {
@@ -396,6 +408,7 @@ class stack_abstract_graph {
     }
 
     /**
+     * Add description here.
      * @return array with two elements, the minimum and maximum x-coordinates of any node.
      */
     public function x_range() {
@@ -410,10 +423,11 @@ class stack_abstract_graph {
                 $maxx = max($maxx, $node->x);
             }
         }
-        return array($minx, $maxx);
+        return [$minx, $maxx];
     }
 
     /**
+     * Add description here
      * @param stack_abstract_graph_node $parent the parent node.
      * @param stack_abstract_graph_node $child one of its children.
      * @return bool whether there is another node on the direct line from parent to child.
@@ -441,8 +455,8 @@ class stack_abstract_graph {
      * @return array old node name => new node name.
      */
     public function get_suggested_node_names() {
-        $rawresults = $this->suggested_names_worker(array(), reset($this->roots));
-        $newnames = array();
+        $rawresults = $this->suggested_names_worker([], reset($this->roots));
+        $newnames = [];
         foreach ($rawresults as $newkey => $oldname) {
             $newnames[$oldname] = $newkey + 1;
         }
@@ -484,6 +498,7 @@ class stack_abstract_graph {
         }
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function __toString() {
         $string = '';
         foreach ($this->nodesbydepth as $depth => $nodes) {

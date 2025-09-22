@@ -14,10 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2017 Matti Harjula.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once($CFG->libdir . '/weblib.php');
+require_once(__DIR__ . '/../block.interface.php');
+require_once($CFG->libdir . '/weblib.php');
 
 /**
  * Block that will simply convert anything inside it from Markdown
@@ -26,6 +34,7 @@ global $CFG;
  */
 class stack_cas_castext2_demarkdown extends stack_cas_castext2_block {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // Basically mark the contents for post-processing.
         $r = new MP_List([new MP_String('demarkdown')]);
@@ -46,21 +55,24 @@ class stack_cas_castext2_demarkdown extends stack_cas_castext2_block {
         return $r;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function is_flat(): bool {
         return false;
     }
 
-    public function postprocess(array $params, castext2_processor $processor=null): string {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function postprocess(array $params, castext2_processor $processor,
+        castext2_placeholder_holder $holder): string {
         // First collapse the content.
         $content = [''];
         $dontproc = [];
         for ($i = 1; $i < count($params); $i++) {
             if (is_array($params[$i]) && $params[$i][0] !== 'demoodle' &&
                     $params[$i][0] !== 'demarkdown' && $params[$i][0] !== 'htmlformat') {
-                $content[count($content) - 1] .= $processor->process($params[$i][0], $params[$i]);
+                $content[count($content) - 1] .= $processor->process($params[$i][0], $params[$i], $holder, $processor);
             } else if (is_array($params[$i])) {
                 $dontproc[count($content)] = true;
-                $content[] = $processor->process($params[$i][0], $params[$i]);
+                $content[] = $processor->process($params[$i][0], $params[$i], $holder, $processor);
                 $content[] = '';
             } else {
                 $content[count($content) - 1] .= $params[$i];
@@ -74,7 +86,7 @@ class stack_cas_castext2_demarkdown extends stack_cas_castext2_block {
             if (isset($dontproc[$k])) {
                 $r .= $v;
             } else {
-                /* $v = markdown_to_html($v); */
+                $v = markdown_to_html($v);
                 // Note that at this point most of the interesting chars are entities.
                 // We need to revert some of those conversions to allow later processign to
                 // detect LaTeX for MathJax.
@@ -88,7 +100,8 @@ class stack_cas_castext2_demarkdown extends stack_cas_castext2_block {
         return $r;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
-        return array();
+        return [];
     }
 }

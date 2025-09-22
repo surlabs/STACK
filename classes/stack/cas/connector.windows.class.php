@@ -14,15 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Connection to Maxima for Windows systems.
+ * This functionality is NOT SUPPORTED since STACK 4.8.3.
  *
+ * @package    qtype_stack
  * @copyright  2012 The University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_cas_connection_windows extends stack_cas_connection_base {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function guess_maxima_command($path) {
         if ('default' == stack_connection_helper::get_maximaversion()) {
             throw new stack_exception("stack_cas_connection: maxima cannot be set to default on Windows platform. ".
@@ -35,14 +37,16 @@ class stack_cas_connection_windows extends stack_cas_connection_base {
         return $cmd;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function call_maxima($command) {
         set_time_limit(0); // Note, some users may not want this!
         $ret = false;
 
-        $descriptors = array(
-            0 => array('pipe', 'r'),
-            1 => array('pipe', 'w'),
-            2 => array('file', $this->logs . "cas_errors.txt", 'a'));
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['file', $this->logs . "cas_errors.txt", 'a'],
+        ];
 
         $cmd = '"'.$this->command.'"';
         $this->debug->log('Command line', $cmd);

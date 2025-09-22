@@ -13,14 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
-use classes\platform\StackConfig;
-use classes\platform\StackException;
 
 /**
  * Connection to Maxima running in a tomcat-server using the MaximaPool-servlet.
  * This version handles transfer of the plots generated on possibly remote servlet.
  * For details of this see https://github.com/maths/stack_util_maximapool/
  *
+ * @package    qtype_stack
  * @copyright  2012 The University of Birmingham
  * @copyright  2012 Aalto University - Matti Harjula
  * @copyright  2014 Loughborough University
@@ -28,13 +27,12 @@ use classes\platform\StackException;
  */
 class stack_cas_connection_server extends stack_cas_connection_base {
 
-    /**
-     * @throws StackException
-     */
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function guess_maxima_command($path) {
-        return StackConfig::get("maxima_pool_url");
+        return 'http://localhost:8080/MaximaPool/MaximaPool';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function call_maxima($command) {
         global $CFG;
         $err = '';
@@ -79,7 +77,8 @@ class stack_cas_connection_server extends stack_cas_connection_base {
             $zip = new ZipArchive();
             $zip->open($ziptemp);
             for ($i = 0; $i < $zip->numFiles; $i++) {
-                $filenameinzip = $zip->getNameIndex($i);
+                // In some PHP versions, zip::getNameIndex returns filename with leading '/', hence trim.
+                $filenameinzip = trim($zip->getNameIndex($i), '/');
 
                 if ($filenameinzip === 'OUTPUT') {
                     // This one contains the output from maxima.
@@ -87,7 +86,7 @@ class stack_cas_connection_server extends stack_cas_connection_base {
 
                 } else {
                     // Otherwise this is a plot.
-                    $filename =  ILIAS_WEB_DIR . "/" . CLIENT_ID . "/xqcas/stack/plots/" . $filenameinzip;
+                    $filename = $CFG->dataroot . "/stack/plots/" . $filenameinzip;
                     file_put_contents($filename, $zip->getFromIndex($i));
                 }
             }

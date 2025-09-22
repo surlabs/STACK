@@ -14,24 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
 
-//require_once(__DIR__ . '/../../utils.class.php');
+require_once(__DIR__ . '/../../utils.class.php');
 
 /**
  * Input that is a text area.
  * However, the purpose is to allow a student to write language (English) notes.
  * These are not passed into the CAS
+ * @package    qtype_stack
  * @copyright  2017 University of Edinburgh
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_notes_input extends stack_input {
-
-    protected $extraoptions = array(
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
+    protected $extraoptions = [
         'hideanswer' => false,
         'allowempty' => false,
         'manualgraded' => false,
-    );
+    ];
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function render(stack_input_state $state, $fieldname, $readonly, $tavalue) {
         if ($this->errors) {
             return $this->render_error($this->errors);
@@ -39,14 +42,10 @@ class stack_notes_input extends stack_input {
 
         // Note that at the moment, $this->boxHeight and $this->boxWidth are only
         // used as minimums. If the current input is bigger, the box is expanded.
-        if($readonly){
-            $solution_input_id = $fieldname . '_sol';
-            $fieldname = $solution_input_id;
-        }
-        $attributes = array(
+        $attributes = [
             'name' => $fieldname,
             'id'   => $fieldname,
-        );
+        ];
 
         if ($this->is_blank_response($state->contents)) {
             $current = $this->parameters['syntaxHint'];
@@ -68,8 +67,26 @@ class stack_notes_input extends stack_input {
             $attributes['readonly'] = 'readonly';
         }
 
+        // Metadata for JS users.
+        $attributes['data-stack-input-type'] = 'notes';
+
         return html_writer::tag('textarea', htmlspecialchars($current, ENT_COMPAT), $attributes) .
-            html_writer::tag('div', "", array('class' => 'clearfix'));
+            html_writer::tag('div', "", ['class' => 'clearfix']);
+    }
+
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function render_api_data($tavalue) {
+        if ($this->errors) {
+            throw new stack_exception("Error rendering input: " . implode(',', $this->errors));
+        }
+
+        $data = [];
+
+        $data['type'] = 'notes';
+        $data['boxWidth'] = $this->parameters['boxWidth'];
+        $data['syntaxHint'] = $this->parameters['syntaxHint'];
+
+        return $data;
     }
 
     /**
@@ -83,16 +100,17 @@ class stack_notes_input extends stack_input {
      */
     protected function validate_contents($contents, $basesecurity, $localoptions) {
         $errors   = null;
-        $notes    = array();
-        $caslines = array();
+        $notes    = [];
+        $caslines = [];
         $valid    = true;
         $answer   = stack_ast_container::make_from_student_source('', '', $basesecurity);;
 
-        return array($valid, $errors, $notes, $answer, $caslines);
+        return [$valid, $errors, $notes, $answer, $caslines, $answer, []];
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function add_to_moodleform_testinput(MoodleQuickForm $mform) {
-        $mform->addElement('text', $this->name, $this->name, array('size' => $this->parameters['boxWidth']));
+        $mform->addElement('text', $this->name, $this->name, ['size' => $this->parameters['boxWidth']]);
         $mform->setDefault($this->name, $this->parameters['syntaxHint']);
         $mform->setType($this->name, PARAM_RAW);
     }
@@ -114,7 +132,7 @@ class stack_notes_input extends stack_input {
      * @return array option => default value.
      */
     public static function get_parameters_defaults() {
-        return array(
+        return [
             'mustVerify'     => false,
             'showValidation' => 1,
             'boxWidth'       => 50,
@@ -126,7 +144,7 @@ class stack_notes_input extends stack_input {
             'lowestTerms'    => true,
             'sameType'       => true,
             'options'        => '',
-        );
+        ];
     }
 
     /**
@@ -148,6 +166,7 @@ class stack_notes_input extends stack_input {
     }
 
     /**
+     * Add description here.
      * @return string the teacher's answer, an example of what could be typed into
      * this input as part of a correct response to the question.
      * For the notes class this is always the boolean "true".
@@ -171,10 +190,13 @@ class stack_notes_input extends stack_input {
      * Generate the HTML that gives the results of validating the student's input.
      * @param stack_input_state $state represents the results of the validation.
      * @param string $fieldname the field name to use in the HTML for this input.
+     * @param string $lang language of the question.
      * @return string HTML for the validation results for this input.
      */
-    public function render_validation(stack_input_state $state, $fieldname) {
-
+    public function render_validation(stack_input_state $state, $fieldname, $lang) {
+        if ($lang !== null && $lang !== '') {
+            $prevlang = force_current_language($lang);
+        }
         if (self::BLANK == $state->status) {
             return '';
         }
@@ -188,12 +210,16 @@ class stack_notes_input extends stack_input {
         $contents = $state->contents;
         $render = '';
         if (array_key_exists(0, $contents)) {
-            $render .= html_writer::tag('p', $contents[0]);
+            $render .= html_writer::tag('p', htmlentities($contents[0], ENT_COMPAT));
         }
-        $render .= html_writer::tag('p', stack_string('studentValidation_notes'), array('class' => 'stackinputnotice'));
-        return stack_maths::process_display_castext($render);
+        $render .= html_writer::tag('p', stack_string('studentValidation_notes'), ['class' => 'stackinputnotice']);
+        if ($lang !== null && $lang !== '') {
+            force_current_language($prevlang);
+        }
+        return format_text(stack_maths::process_display_castext($render));
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function summarise_response($name, $state, $response) {
         // Output the value for reporting.
         $val = '';
@@ -203,4 +229,18 @@ class stack_notes_input extends stack_input {
         return $name . ': ' . $val . ' [' . $state->status . ']';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function get_api_solution_render($tadisplay, $ta) {
+        return '';
+    }
+
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    protected function ajax_to_response_array($in) {
+        // ISS1317 EJMF - Notes are treated the same as textareas on the front end so
+        // we need to add this to match the textarea input and avoid
+        // <br> appearing in the validation display.
+        $in = explode('<br>', $in);
+        $in = implode("\n", $in);
+        return [$this->name => $in];
+    }
 }
