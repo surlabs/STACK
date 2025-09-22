@@ -21,8 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
 
 /**
  * AST filter that splits the inconvenient (x-1)(x+2) pattern should it

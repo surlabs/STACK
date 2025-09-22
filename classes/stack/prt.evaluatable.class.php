@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL')|| die();
-
-require_once(__DIR__ . '/cas/evaluatable_object.interfaces.php');
-require_once(__DIR__ . '/cas/castext2/utils.php');
 
 /**
  * A wrapper class encapsulating PRT-evaluation logic. Just add

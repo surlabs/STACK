@@ -21,13 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/cas/ast.container.class.php');
-require_once(__DIR__ . '/cas/keyval.class.php');
-require_once(__DIR__ . '/cas/castext2/castext2_evaluatable.class.php');
-require_once(__DIR__ . '/answertest/controller.class.php');
-require_once(__DIR__ . '/../vle_specific.php');
 
 // Deals with whole potential response trees.
 // A rewrite dropping everything not needed for compiled PRTs.

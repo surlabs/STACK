@@ -14,10 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../vle_specific.php');
-
 /**
  * Encapsulates the location of an error happening in CAS with the actual error.
  * Allows us to decide the level of error message specificity at the point of output.

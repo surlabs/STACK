@@ -21,11 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../block.interface.php');
-require_once(__DIR__ . '/../../../utils.class.php');
-require_once(__DIR__ . '/../../ast.container.class.php');
 /**
  * The commonstring block is used to ouput string templates that
  * come from the localised strings. It requires that one defined

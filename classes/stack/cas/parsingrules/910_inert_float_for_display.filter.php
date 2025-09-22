@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-require_once(__DIR__ . '/../../utils.class.php');
-
 /**
  * AST filter that rewrites floats as display functions to ensure
  * that the representation of them does not change when going through

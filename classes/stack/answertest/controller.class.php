@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -24,11 +23,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2012 University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-
-require_once(__DIR__ . '/anstest.class.php');
-require_once(__DIR__ . '/at_general_cas.class.php');
-require_once(__DIR__ . '/../cas/connector.class.php');
-require_once(__DIR__ . '/../cas/ast.container.class.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_ans_test_controller {
@@ -215,7 +209,6 @@ class stack_ans_test_controller {
             case 'String':
             case 'StringSloppy':
             case 'RegExp':
-                require_once(__DIR__ . '/at_general_cas_preprepare.class.php');
                 $this->at = new stack_answertest_general_cas_preprepare($sans, $tans, $anstest, $options, $casoption);
                 break;
 

@@ -21,11 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-require_once(__DIR__ . '/../../utils.class.php');
-require_once(__DIR__ . '/201_sig_figs_validation.filter.php');
-
 /**
  * AST filter that examines the decimal places of the leftmost
  * integer or float.

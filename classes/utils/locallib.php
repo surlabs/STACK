@@ -21,17 +21,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
+use classes\platform\StackException;
 
-require_once(__DIR__ . '/stack/mathsoutput/mathsoutput.class.php');
 
 /**
  * Base class for all the types of exception we throw.
  */
-class stack_exception extends moodle_exception {
-    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+class stack_exception extends StackException {
     public function __construct($error) {
-        parent::__construct('exceptionmessage', 'qtype_stack', '', $error);
+        parent::__construct($error);
     }
 }
 

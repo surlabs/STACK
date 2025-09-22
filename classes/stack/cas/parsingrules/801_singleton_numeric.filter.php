@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-require_once(__DIR__ . '/../../maximaparser/utils.php');
-
 /**
  * AST filter that checks that the AST represents a singleton value
  * that is purely numeric. It can also be used to turn that value

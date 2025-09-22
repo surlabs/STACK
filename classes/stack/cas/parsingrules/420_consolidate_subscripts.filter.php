@@ -21,9 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-
 /**
  * AST filter that consolidates subscripted atoms in the form M_1 into M1.
  * Consolidating students' input in this way makes it less likley they will be penalised

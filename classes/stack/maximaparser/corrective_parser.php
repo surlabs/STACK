@@ -21,14 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/autogen/parser.mbstring.php');
-// Also needs stack_string().
-require_once(__DIR__ . '/../../locallib.php');
-require_once(__DIR__ . '/../utils.class.php');
-
-require_once(__DIR__ . '/MP_classes.php');
 
 /**
  * A Maxima parser wrapper that tries to insert missing stars to statements

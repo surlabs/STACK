@@ -21,11 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/demarkdown.block.php');
-
 /**
  * Block that will simply convert anything inside it from Markdown
  * to HTML. Allowing certain types of mixed contents. Primarily exists

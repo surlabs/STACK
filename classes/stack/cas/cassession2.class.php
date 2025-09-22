@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Note that is a complete rewrite of cassession, in this we generate
@@ -26,12 +25,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2019 Aalto University.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-
-require_once(__DIR__ . '/connectorhelper.class.php');
-require_once(__DIR__ . '/../options.class.php');
-require_once(__DIR__ . '/../utils.class.php');
-require_once(__DIR__ . '/evaluatable_object.interfaces.php');
-require_once(__DIR__ . '/caserror.class.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_session2 {

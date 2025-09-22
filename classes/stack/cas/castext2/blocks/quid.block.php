@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../block.interface.php');
-
 /**
  * A block for outputting question usage level unique identifiers.
  * Primarily used for scripting and to ensure that identifiers stay

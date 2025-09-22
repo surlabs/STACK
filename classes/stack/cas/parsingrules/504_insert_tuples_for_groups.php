@@ -21,9 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-
 /**
  * AST filter turns all evaluation groups into tuples.
  * Does not change function calls, or arguments of operators, so x/(y+z) is not changed.

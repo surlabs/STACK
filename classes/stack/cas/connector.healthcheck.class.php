@@ -21,20 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../locallib.php');
-require_once(__DIR__ . '/../utils.class.php');
-require_once(__DIR__ . '/../options.class.php');
-require_once(__DIR__ . '/connectorhelper.class.php');
-require_once(__DIR__ . '/cassession2.class.php');
-require_once(__DIR__ . '/castext2/castext2_evaluatable.class.php');
-require_once(__DIR__ . '/connector.dbcache.class.php');
-require_once(__DIR__ . '/installhelper.class.php');
-require_once(__DIR__ . '/ast.container.class.php');
-require_once(__DIR__ . '/connectorhelper.class.php');
-require_once(__DIR__ . '/cassession2.class.php');
-
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_healthcheck {

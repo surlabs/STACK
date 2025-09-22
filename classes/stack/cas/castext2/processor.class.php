@@ -21,17 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/blocks/root.specialblock.php');
-require_once(__DIR__ . '/blocks/commonstring.block.php');
-require_once(__DIR__ . '/blocks/stack_translate.specialblock.php');
-require_once(__DIR__ . '/blocks/ioblock.specialblock.php');
-require_once(__DIR__ . '/blocks/smlt.specialblock.php');
-require_once(__DIR__ . '/blocks/pfs.specialblock.php');
-require_once(__DIR__ . '/blocks/placeholder.specialblock.php');
-require_once(__DIR__ . '/block.factory.php');
-require_once(__DIR__ . '/castext2_placeholder_holder.class.php');
 
 /**
  * In certain cases one may wish to collect a specialised processor to

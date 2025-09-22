@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-require_once(__DIR__ . '/996_call_modification.filter.php');
-
 /**
  * AST filter that rewrites calls to ev in such a way that they can deal
  * with the security system. Also rewrites evaluation flags if they are

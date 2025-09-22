@@ -21,13 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/../block.interface.php');
-require_once($CFG->libdir . '/questionlib.php');
-
-
 /**
  * Special block allowing one to define plugin file details for subtrees
  * of the concatenated CASText. Basically, tag content like

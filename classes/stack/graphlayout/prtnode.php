@@ -22,9 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/graphnode.php');
 
 /**
  * Represents a node in a STACK PRT extending {@link stack_abstract_graph}.

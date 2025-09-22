@@ -14,11 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/mathsoutputfilterbase.class.php');
-
-
 /**
  * STACK maths output methods for using Moodle's TeX filter.
  *
@@ -43,8 +38,6 @@ class stack_maths_output_tex extends stack_maths_output_filter_base {
             return new \filter_tex\text_filter(context_system::instance(), []);
         } else {
             // Once Moodle 4.5 is the lowest supported version of Moodle.
-            require_once($CFG->libdir . '/filterlib.php');
-            require_once($CFG->dirroot . '/filter/tex/filter.php');
             return new filter_tex(context_system::instance(), []);
         }
     }

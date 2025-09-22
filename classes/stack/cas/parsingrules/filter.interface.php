@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../maximaparser/MP_classes.php');
-require_once(__DIR__ . '/../cassecurity.class.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface stack_cas_astfilter {

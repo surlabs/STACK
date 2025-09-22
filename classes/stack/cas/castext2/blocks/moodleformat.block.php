@@ -21,10 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/demoodle.block.php');
 
 /**
  * Block that will simply convert anything inside it from Moodle-auto-format

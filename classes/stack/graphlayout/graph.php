@@ -23,12 +23,6 @@
  */
 
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/prtnode.php');
-require_once(__DIR__ . '/graphclump.php');
-require_once(__DIR__ . '/svgrenderer.php');
-require_once(__DIR__ . '/textrenderer.php');
 
 /**
  * Abstract representation of a graph (e.g. a PRT).

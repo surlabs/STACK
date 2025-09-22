@@ -42,11 +42,6 @@ $CFG->dirroot = realpath(dirname(__FILE__) . '/../..');
 $CFG->dataroot = ILIAS_WEB_DIR . "/".CLIENT_ID . '/xqcas';
 $GLOBALS['CFG'] =& $CFG;
 
-//define('PARAM_RAW', 'raw');
-//define('MOODLE_INTERNAL', '1');
-
-//include_once './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/locallib.php';
-
 
 if (!function_exists('getLanguage')) {
     function getLanguage()

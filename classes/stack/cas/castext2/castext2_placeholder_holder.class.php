@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../maximaparser/utils.php');
-
 /**
  * This is a simple key value store that will simply store some sensitive strings
  * and place them back into the evaluated castext.

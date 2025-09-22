@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-require_once(__DIR__ . '/../../maximaparser/corrective_parser.php');
-
 /**
  * AST filter that check identifiers for the use of chars that are
  * considered supercript. If found converts the expression into its

@@ -23,15 +23,8 @@
 
 declare(strict_types = 1);
 
-defined('MOODLE_INTERNAL') || die();
 
 /* CASText2 parser utils */
-
-require_once(__DIR__ . '/CTP_classes.php');
-require_once(__DIR__ . '/processor.class.php');
-require_once(__DIR__ . '/castext2_placeholder_holder.class.php');
-require_once(__DIR__ . '/../../utils.class.php');
-require_once(__DIR__ . '/autogen/parser.mbstring.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class castext2_parser_utils {

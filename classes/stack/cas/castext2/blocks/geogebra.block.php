@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * GeoGebra block for STACK derived by jsxGraph STACK implementation
@@ -30,12 +29,6 @@ defined('MOODLE_INTERNAL') || die();
  * @author     Tim Lutz
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once(__DIR__ . '/../block.interface.php');
-require_once(__DIR__ . '/../block.factory.php');
-
-require_once(__DIR__ . '/root.specialblock.php');
-require_once(__DIR__ . '/stack_translate.specialblock.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_geogebra extends stack_cas_castext2_block {

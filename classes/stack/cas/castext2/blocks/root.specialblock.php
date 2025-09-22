@@ -21,20 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../block.interface.php');
-require_once(__DIR__ . '/../block.factory.php');
-require_once(__DIR__ . '/../CTP_classes.php');
-require_once(__DIR__ . '/../utils.php');
-require_once(__DIR__ . '/../../../utils.class.php');
-
-
-require_once(__DIR__ . '/ioblock.specialblock.php');
-require_once(__DIR__ . '/raw.specialblock.php');
-require_once(__DIR__ . '/stack_translate.specialblock.php');
-require_once(__DIR__ . '/demarkdown.block.php');
-require_once(__DIR__ . '/demoodle.block.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_special_root extends stack_cas_castext2_block {

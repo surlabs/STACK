@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Holds the results of one {@link stack_question_test).
@@ -23,8 +22,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2012 The Open University.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-
-require_once('utils.class.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_question_test_result {

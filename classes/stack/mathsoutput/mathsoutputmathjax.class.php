@@ -14,10 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/filterlib.php');
-require_once(__DIR__ . '/mathsoutputfilterbase.class.php');
 
 /**
  * STACK maths output methods for using MathJax.
@@ -45,8 +41,6 @@ class stack_maths_output_mathjax extends stack_maths_output_filter_base {
             $filter = new \filter_mathjaxloader\text_filter($PAGE->context, []);
         } else {
             // Once Moodle 4.5 is the lowest supported version of Moodle.
-            require_once($CFG->libdir . '/filterlib.php');
-            require_once($CFG->dirroot . '/filter/mathjaxloader/filter.php');
             return new filter_mathjaxloader($PAGE->context, []);
         }
 

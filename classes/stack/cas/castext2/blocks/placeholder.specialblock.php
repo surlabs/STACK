@@ -21,11 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../block.interface.php');
-require_once(__DIR__ . '/../../../utils.class.php');
-
 /**
  * Internal use block for marking active bits out generated output that need
  * to be protected from filtering. Only use this for marking of compile time

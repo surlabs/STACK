@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Add description here!
@@ -22,13 +21,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Aalto University.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-
-require_once(__DIR__ . '/autogen/parser.mbstring.php');
-// Also needs stack_string().
-require_once(__DIR__ . '/../../locallib.php');
-require_once(__DIR__ . '/../../vle_specific.php');
-require_once(__DIR__ . '/../utils.class.php');
-require_once(__DIR__ . '/MP_classes.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class maxima_parser_utils {

@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-require_once(__DIR__ . '/../../utils.class.php');
-
 /**
  * AST filter that examines whether we have a pattern like a*x*b which might have arisen from axb, indicating
  * x has been used to indicate multiplication.  Typically 23.2 x 10^b, which is why we look for an identifier x10.

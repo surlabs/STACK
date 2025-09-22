@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Functions related to dealing with scientific units in STACK.
@@ -23,9 +22,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 University of Edinburgh.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-
-require_once(__DIR__ . '/../../locallib.php');
-require_once(__DIR__ . '/../utils.class.php');
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_casstring_units {

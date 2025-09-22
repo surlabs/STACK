@@ -21,13 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/../block.interface.php');
-require_once($CFG->libdir . '/weblib.php');
-
-
 /**
  * Block that will simply convert anything inside it from Moodle-auto-format
  * to HTML. Allowing certain types of mixed contents. Primarily exists

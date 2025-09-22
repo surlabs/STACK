@@ -21,11 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../json/json.class.php');
-require_once(__DIR__ . '/../../utils.class.php');
-
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_parsons_input extends stack_json_input {
 

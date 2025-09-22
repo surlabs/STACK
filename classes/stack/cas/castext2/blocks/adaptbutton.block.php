@@ -21,13 +21,8 @@
  * @copyright  2025 Ruhr University Bochum.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->libdir . '/questionlib.php');
-require_once(__DIR__ . '/../block.interface.php');
-// Register a counter.
-require_once(__DIR__ . '/iframe.block.php');
 stack_cas_castext2_iframe::register_counter('///ADAPTBUTTON_COUNT///');
 
 /**

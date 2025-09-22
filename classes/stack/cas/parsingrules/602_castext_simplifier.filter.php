@@ -21,9 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-
 /**
  * AST filter that simplifies compiled CASText, the aim is to merge
  * as much as possible down to as simple as possible parts.

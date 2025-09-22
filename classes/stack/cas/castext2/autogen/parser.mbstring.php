@@ -4800,9 +4800,6 @@ class CTP_Parser {
     }
 
     /* BEGIN initializer code */
-
-     require_once(__DIR__ . '/../CTP_classes.php');
-     
     /* END initializer code */
 
     $peg_result = call_user_func($peg_startRuleFunction);

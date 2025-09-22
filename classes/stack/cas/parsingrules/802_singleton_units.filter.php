@@ -21,10 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-defined('MOODLE_INTERNAL') || die();
-require_once(__DIR__ . '/filter.interface.php');
-require_once(__DIR__ . '/801_singleton_numeric.filter.php');
-
 /**
  * AST filter that checks that the AST represents a singleton value
  * that consists of a numeric part and a part that describes a unit
