@@ -24,7 +24,7 @@ $scriptname = urldecode($_GET['name']);
 
 $full_path = realpath(__DIR__ . "/" . basename($scriptname));
 
-if (empty($full_path) || strpos($full_path, realpath(__DIR__)) !== 0) {
+if (empty($full_path) || !str_starts_with($full_path, realpath(__DIR__))) {
     die("You are not allowed to access this script.");
 }
 
