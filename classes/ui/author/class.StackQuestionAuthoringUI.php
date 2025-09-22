@@ -171,7 +171,7 @@ class StackQuestionAuthoringUI
 
         if (empty($basic["question_note"])) {
             foreach (stack_cas_security::get_all_with_feature('random') as $random) {
-                if (strpos($basic["question_variables"], $random) !== false) {
+                if (str_contains($basic["question_variables"], $random)) {
                     $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt("error_no_question_note"), true);
                     return true;
                 }

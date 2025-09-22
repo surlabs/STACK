@@ -897,7 +897,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
 
     function oldTestImportIdFinder($string, $starts_with)
     {
-        if (substr($string, 0, strlen($starts_with)) === $starts_with) {
+        if (str_starts_with($string, $starts_with)) {
             return substr($string, strlen($starts_with));
         }
         return $this->getId();
@@ -2353,7 +2353,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $session->add_statement(new stack_secure_loader($key . ':' . $value, 'i/' .
                 array_search($key, array_keys($this->inputs)) . '/s'));
             $is .= ',[' . stack_utils::php_string_to_maxima_string($key) . ',';
-            if (strpos($value, 'ev(') === 0) { // Unpack the value if we have simp...
+            if (str_starts_with($value, 'ev(')) { // Unpack the value if we have simp...
                 $is .= stack_utils::php_string_to_maxima_string(mb_substr($value, 3, -6)) . ']';
             } else {
                 $is .= stack_utils::php_string_to_maxima_string($value) . ']';

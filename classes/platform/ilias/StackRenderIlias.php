@@ -103,7 +103,7 @@ class StackRenderIlias extends StackRender
             return '';
         }
 
-        if (strpos($feedback, "ilc_section_") !== false) {
+        if (str_contains($feedback, "ilc_section_")) {
             $stylesheet_id = assStackQuestionUtils::_getActiveContentStyleId();
 
             if (!empty($stylesheet_id)) {

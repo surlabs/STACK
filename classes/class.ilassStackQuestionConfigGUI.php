@@ -389,15 +389,11 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     {
         $data = StackConfig::getAll();
 
-        switch ($section_type) {
-            case "configure":
-                return $this->configure($data);
-            case "maxima":
-                return $this->maxima($data);
-            case "defaults":
-                return $this->defaults($data);
-            default :
-                throw new stack_exception("Unknown section type: " . $section_type);
-        }
+        return match ($section_type) {
+            "configure" => $this->configure($data),
+            "maxima" => $this->maxima($data),
+            "defaults" => $this->defaults($data),
+            default => throw new stack_exception("Unknown section type: " . $section_type),
+        };
     }
 }

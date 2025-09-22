@@ -2283,7 +2283,7 @@ class assStackQuestionDB
         }
 
         foreach ($data as $input_name => $response) {
-            if (strpos($input_name, '_sub_') !== false) {
+            if (str_contains($input_name, '_sub_')) {
                 $input_name = substr($input_name, 0, strpos($input_name, '_sub_'));
             }
 
