@@ -354,6 +354,7 @@ class assStackQuestionMoodleImport
             $temp_prt_data->autosimplify = (int) $prt_data->autosimplify;
             $temp_prt_data->feedbackvariables = assStackQuestionUtils::_debugText((string) $prt_data->feedbackvariables->text);
             $temp_prt_data->nodes = array();
+            $temp_prt_data->feedbackstyle = 1;
 
             foreach ($prt_data->node as $node_data) {
                 $node = new stdClass();

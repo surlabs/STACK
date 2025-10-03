@@ -1482,4 +1482,17 @@ class assStackQuestionUtils
             }
         }, $a_str);
     }
+
+    public static function getMathjaxVersion(): string
+    {
+        $repo = new ilMathJaxConfigSettingsRepository(new ilSetting('MathJax'));
+
+        $url = $repo->getConfig()->getClientScriptUrl();
+
+        if (str_contains($url, 'mathjax3')) {
+            return "3";
+        }
+
+        return "2";
+    }
 }

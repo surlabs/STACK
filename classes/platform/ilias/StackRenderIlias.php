@@ -87,9 +87,9 @@ class StackRenderIlias extends StackRender
         $state = StackEvaluation::stateForFraction($result->get_score());
 
         $prt_feedback_instantiated = match ($state) {
-            'incorrect' => $question->prt_incorrect_instantiated->get_rendered($question->getCasTextProcessor()),
-            'partially_correct' => $question->prt_partially_correct_instantiated->get_rendered($question->getCasTextProcessor()),
-            'correct' => $question->prt_correct_instantiated->get_rendered($question->getCasTextProcessor()),
+            'incorrect' => $question->prt_incorrect_instantiated->apply_placeholder_holder($question->prt_incorrect_instantiated->get_rendered($question->getCasTextProcessor())),
+            'partially_correct' => $question->prt_partially_correct_instantiated->apply_placeholder_holder($question->prt_partially_correct_instantiated->get_rendered($question->getCasTextProcessor())),
+            'correct' => $question->prt_correct_instantiated->apply_placeholder_holder($question->prt_correct_instantiated->get_rendered($question->getCasTextProcessor())),
             default => throw new StackException('Invalid state.'),
         };
 
@@ -153,6 +153,7 @@ class StackRenderIlias extends StackRender
         $question->setCasTextProcessor(new castext2_default_processor());
 
         $question_text = $question->question_text_instantiated->get_rendered($question->getCasTextProcessor());
+        $question_text = $question->question_text_instantiated->apply_placeholder_holder($question_text);
 
         // Replace inputs.
         //TODO: INPUT REQUIRES VALIDATION
@@ -223,9 +224,7 @@ class StackRenderIlias extends StackRender
                 if (is_a($input, 'stack_matrix_input')) {
                     $ilias_validation = '<div class="xqcas_input_validation">
                         <div id="validation_xqcas_' . $question->getId() . '_' . $input_name . '">' . $validation_rendered. '</div>
-                    </div>'.
-                        '<div id="xqcas_input_matrix_width_' . $input_name . '" style="visibility: hidden">' . $input->getWidth() . '</div>
-                    <div id="xqcas_input_matrix_height_' . $input_name . '" style="visibility: hidden">' . $input->getHeight() . '</div>';
+                    </div>';
                 } else {
                     $ilias_validation = '<div class="xqcas_input_validation">
                         <div id="validation_xqcas_' . $question->getId() . '_' . $input_name . '">' . $validation_rendered. '</div>
@@ -311,6 +310,7 @@ class StackRenderIlias extends StackRender
         }
 
         $feedback_text = $question->specific_feedback_instantiated->get_rendered($question->getCasTextProcessor());
+        $feedback_text = $question->specific_feedback_instantiated->apply_placeholder_holder($feedback_text);
         if (!$feedback_text) {
             return '';
         }
@@ -383,6 +383,7 @@ class StackRenderIlias extends StackRender
         }
 
         $general_feedback_text = $question->general_feedback_instantiated->get_rendered($question->getCasTextProcessor());
+        $general_feedback_text = $question->general_feedback_instantiated->apply_placeholder_holder($general_feedback_text);
 
         if (!$general_feedback_text) {
             $general_feedback_text = '';

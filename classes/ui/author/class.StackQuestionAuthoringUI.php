@@ -28,6 +28,7 @@ use assStackQuestionDB;
 use assStackQuestionGUI;
 use assStackQuestionUtils;
 use classes\platform\StackConfig;
+use classes\platform\StackException;
 use ilAssQuestionPreviewSession;
 use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\CustomFactory;
 use public\Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStackQuestion\classes\ui\Component\Input\Field\ExpandableSection;
@@ -45,6 +46,7 @@ use ilObjTaxonomy;
 use ilTaxNodeAssignment;
 use ilTaxonomyException;
 use ilTestQuestionPoolInvalidArgumentException;
+use stack_abstract_graph;
 use stack_abstract_graph_svg_renderer;
 use stack_ans_test_controller;
 use stack_cas_security;
@@ -148,6 +150,7 @@ class StackQuestionAuthoringUI
      * @throws stack_exception
      * @throws ilTestQuestionPoolInvalidArgumentException
      * @throws ilTaxonomyException
+     * @throws StackException
      */
     private function save(array $result): bool
     {
@@ -244,7 +247,7 @@ class StackQuestionAuthoringUI
             $prt_data->value = $prt["settings"]["prt_value"];
             $prt_data->autosimplify = $prt["settings"]["simplify"];
             $prt_data->feedbackvariables = $prt["settings"]["feedback_variables"];
-            $prt_data->firstnodename = $prt["first_node"];
+            $prt_data->feedbackstyle = 1;
 
 
             $prt_data->nodes = array();
@@ -279,6 +282,31 @@ class StackQuestionAuthoringUI
 
                 $prt_data->nodes[$node_name] = $node_data;
             }
+
+            // Calculate first node by graph
+            $graph = new stack_abstract_graph();
+            foreach ($prt_data->nodes as $node_name => $node) {
+                if ($node->truenextnode == -1) {
+                    $left = null;
+                } else {
+                    $left = $node->truenextnode + 1;
+                }
+                if ($node->falsenextnode == -1) {
+                    $right = null;
+                } else {
+                    $right = $node->falsenextnode + 1;
+                }
+
+                $graph->add_prt_node($node_name + 1, $node->description, $left, $right);
+            }
+            $graph->layout();
+            $roots = $graph->get_roots();
+            if (empty($fromform->isbroken) && (count($roots) != 1 || $graph->get_broken_cycles())) {
+                throw new StackException('The PRT ' . $prt_name . ' is malformed.');
+            }
+            $first_node = key($roots) - 1;
+
+            $prt_data->firstnodename = $first_node;
 
             $prts_array[$prt_name] = $prt_data;
         }
@@ -641,11 +669,9 @@ class StackQuestionAuthoringUI
         $inputs["prt_name"] = $this->factory->input()->field()->text($this->plugin->txt("prt_name"), $this->plugin->txt("prt_name_info"))->withRequired(true)
             ->withValue($prt->get_name());
         $node_list = [];
-        foreach ($prt->get_nodes_summary() as $node_name => $prt_node) {
+        foreach ($prt->get_nodes() as $node_name => $prt_node) {
             $node_list[$node_name] = $node_name;
         }
-        $inputs["first_node"] = $this->factory->input()->field()->select($this->plugin->txt("prt_first_node"), $node_list)->withRequired(true)
-            ->withValue($prt->get_first_node());
         $inputs["settings"] = $this->customFactory->expandableSection($this->buildPrtOptions($prt), $this->plugin->txt("prt_settings_and_nodes"))->withExpandedByDefault(true);
         $inputs["nodes"] = $this->customFactory->tabSection($this->buildNodeSection($prt), $this->plugin->txt("prt_nodes"));
 
@@ -944,16 +970,6 @@ class StackQuestionAuthoringUI
         }
 
         $prt = $this->question->prts[$prt_name];
-
-        if (sizeof($prt->get_nodes()) < 2) {
-            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('deletion_error_first_node'), true);
-            return false;
-        }
-
-        if ((int)$prt->get_first_node() == (int) $node_name) {
-            $DIC->ui()->mainTemplate()->setOnScreenMessage("failure", $this->plugin->txt('deletion_error_first_node'), true);
-            return false;
-        }
 
         $new_nodes = $prt->get_nodes();
         unset($new_nodes[$node_name]);

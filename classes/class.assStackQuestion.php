@@ -1185,7 +1185,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             }
 
             //Create Input
-            $input = stack_input_factory::make($standard_input['input_type'], $input_name, 1, $this->options, $parameters);
+            $input = stack_input_factory::make($standard_input['input_type'], $input_name, "1", $this->options, $parameters);
             //Load input to the question.
             $this->inputs[$input_name] = $input;
         } else {

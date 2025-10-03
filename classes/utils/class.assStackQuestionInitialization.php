@@ -84,6 +84,13 @@ if (!function_exists('getString')) {
     }
 }
 
+if (!function_exists('get_string')) {
+    function get_string($key, $a = null): string
+    {
+        return stack_string($key, $a);
+    }
+}
+
 /**
  * Translates a string taken as output from Maxima.
  *
@@ -115,114 +122,101 @@ if (!function_exists('stack_trans')) {
  */
 
 if (!function_exists('get_config')) {
-    function get_config($section = 'qtype_stack')
-    {
+    function get_config($component = 'qtype_stack', $parameter = null) {
         global $CFG;
-        $configs = new stdClass();
 
-        $saved_config = StackConfig::getAll();
-        /*
-         * CONNECTION CONFIGURATION
-         */
-        //Platform type
-        $configs->platform = $saved_config['platform_type'];
-        //Maxima version
-        $configs->maximaversion = $saved_config['maxima_version'];
-        //Connection timeout
-        $configs->castimeout = $saved_config['cas_connection_timeout'];
-        //Caching
-        $configs->casresultscache = $saved_config['cas_result_caching'];
-        //Maxima command - If blank: maxima
-        if ($saved_config['platform_type'] == 'server') {
-            $configs->maximacommand = $saved_config['maxima_pool_url'];
-            $configs->maximacommandserver = $saved_config['maxima_pool_url'];
+        // Verificar si $CFG está vacío e inicializarlo si es necesario
+        if (empty((array)$CFG)) {
+            $CFG = new stdClass();
+            $CFG->wwwroot = ilUtil::_getHttpPath();
+            $CFG->dirroot = realpath(dirname(__FILE__) . '/../..');
+            $CFG->dataroot = ILIAS_WEB_DIR . "/" . CLIENT_ID . '/xqcas';
+        }
 
-            if ($saved_config["maxima_uses_proxy"]  == "1") {
-                $configs->platform = "server-proxy";
+        // Si no se solicita un parámetro específico, devolver toda la configuración
+        if ($parameter === null) {
+            $configs = new stdClass();
+            $saved_config = StackConfig::getAll();
+
+            /*
+             * CONNECTION CONFIGURATION
+             */
+            $configs->platform = $saved_config['platform_type'];
+            $configs->maximaversion = $saved_config['maxima_version'];
+            $configs->castimeout = $saved_config['cas_connection_timeout'];
+            $configs->casresultscache = $saved_config['cas_result_caching'];
+            $configs->serveruserpass = $saved_config['serveruserpass'] ?? '';
+
+            if ($saved_config['platform_type'] == 'server') {
+                $configs->maximacommand = $saved_config['maxima_pool_url'];
+                $configs->maximacommandserver = $saved_config['maxima_pool_url'];
+
+                if ($saved_config["maxima_uses_proxy"] == "1") {
+                    $configs->platform = "server-proxy";
+                }
+            } elseif (!$saved_config['maxima_command'] || $saved_config['platform_type'] == 'unix') {
+                $configs->maximacommand = "maxima";
+            } else {
+                $configs->maximacommand = $saved_config['maxima_command'];
             }
-        } elseif (!$saved_config['maxima_command'] or $saved_config['platform_type'] == 'unix') {
-            $configs->maximacommand = "maxima";
-        } else {
-            $configs->maximacommand = $saved_config['maxima_command'];
+
+            $configs->plotcommand = $saved_config['plot_command'] ?: "gnuplot";
+            $configs->casdebugging = $saved_config['cas_debugging'] == 1;
+
+            /*
+             * DISPLAY CONFIGURATION
+             */
+            $configs->ajaxvalidation = $saved_config['instant_validation'];
+            $configs->mathsdisplay = $saved_config['maths_filter'];
+            $configs->replacedollars = $saved_config['replace_dollars'];
+
+            /*
+             * DEFAULT OPTIONS CONFIGURATION
+             */
+            $configs->questionsimplify = $saved_config['options_question_simplify'];
+            $configs->assumepositive = $saved_config['options_assume_positive'];
+            $configs->prtcorrect = $saved_config['options_prt_correct'];
+            $configs->prtpartiallycorrect = $saved_config['options_prt_partially_correct'];
+            $configs->prtincorrect = $saved_config['options_prt_incorrect'];
+            $configs->multiplicationsign = $saved_config['options_multiplication_sign'];
+            $configs->sqrtsign = $saved_config['options_sqrt_sign'];
+            $configs->complexno = $saved_config['options_complex_numbers'];
+            $configs->inversetrig = $saved_config['options_inverse_trigonometric'];
+            $configs->matrixparens = "[";
+
+            $configs->assumereal = $saved_config['options_assume_real'];
+            $configs->logicsymbol = $saved_config['options_logic_symbol'];
+
+            /*
+             * DEFAULT INPUTS CONFIGURATION
+             */
+            $configs->inputtype = $saved_config['input_type'];
+            $configs->inputboxsize = $saved_config['input_box_size'];
+            $configs->inputstrictsyntax = $saved_config['input_strict_syntax'];
+            $configs->inputinsertstars = $saved_config['input_insert_stars'];
+            $configs->inputforbidwords = $saved_config['input_forbidden_words'];
+            $configs->inputforbidfloat = $saved_config['input_forbid_float'];
+            $configs->inputrequirelowestterms = $saved_config['input_require_lowest_terms'];
+            $configs->inputcheckanswertype = $saved_config['input_check_answer_type'];
+            $configs->inputmustverify = $saved_config['input_must_verify'];
+            $configs->inputshowvalidation = $saved_config['input_show_validation'];
+
+            $configs->maximalocalfolder = realpath($CFG->dataroot) . '/stack';
+            $configs->stackmaximaversion = "2025073100";
+            $configs->version = "2025073100";
+
+            $configs->geogebrabaseurl = $saved_config['geogebra_base_url'] ?? '';
+            $configs->maximalibraries = $saved_config['cas_maxima_libraries'] ?? '';
+
+            return $configs;
         }
-        //Plot command - If blank: gnuplot
-        if (!$saved_config['plot_command']) {
-            $configs->plotcommand = "gnuplot";
-        } else {
-            $configs->plotcommand = $saved_config['plot_command'];
+
+        // Si se solicita un parámetro específico, devolverlo si existe
+        if (property_exists($CFG, $parameter)) {
+            return $CFG->$parameter;
         }
-        //CAS debug
-        $configs->casdebugging = $saved_config['cas_debugging'] == 1;
 
-        /*
-         * DISPLAY CONFIGURATION
-         */
-        //Instant validation
-        $configs->ajaxvalidation = $saved_config['instant_validation'];
-        //Maths filter
-        $configs->mathsdisplay = $saved_config['maths_filter'];
-        //Replace dollars
-        $configs->replacedollars = $saved_config['replace_dollars'];
-
-        /*
-         * DEFAULT OPTIONS CONFIGURATION
-         */
-        //simp variable in Maxima
-        $configs->questionsimplify = $saved_config['options_question_simplify'];
-        //assume_pos variable in maxima
-        $configs->assumepositive = $saved_config['options_assume_positive'];
-        //PRT Correct message
-        $configs->prtcorrect = $saved_config['options_prt_correct'];
-        //PRT Partially Correct message
-        $configs->prtpartiallycorrect = $saved_config['options_prt_partially_correct'];
-        //PRT Incorrect message
-        $configs->prtincorrect = $saved_config['options_prt_incorrect'];
-        //Multiplication sign
-        $configs->multiplicationsign = $saved_config['options_multiplication_sign'];
-        //Sqrt sign
-        $configs->sqrtsign = $saved_config['options_sqrt_sign'];
-        //Complex numbers
-        $configs->complexno = $saved_config['options_complex_numbers'];
-        //Inverse trigonometric
-        $configs->inversetrig = $saved_config['options_inverse_trigonometric'];
-        $configs->matrixparens = "[";
-
-        //assume_real variable in maxima
-        $configs->assumereal = $saved_config['options_assume_real'];
-        //assume_real variable in maxima
-        $configs->logicsymbol = $saved_config['options_logic_symbol'];
-
-        /*
-         * DEFAULT INPUTS CONFIGURATION
-         */
-        //Default input type
-        $configs->inputtype = $saved_config['input_type'];
-        //Default box size
-        $configs->inputboxsize = $saved_config['input_box_size'];
-        //Use strict syntax
-        $configs->inputstrictsyntax = $saved_config['input_strict_syntax'];
-        //Insert stars when multiplication
-        $configs->inputinsertstars = $saved_config['input_insert_stars'];
-        //Forbidden words
-        $configs->inputforbidwords = $saved_config['input_forbidden_words'];
-        //Forbid floats
-        $configs->inputforbidfloat = $saved_config['input_forbid_float'];
-        //Require lowest terms
-        $configs->inputrequirelowestterms = $saved_config['input_require_lowest_terms'];
-        //Check answer type
-        $configs->inputcheckanswertype = $saved_config['input_check_answer_type'];
-        //Student must verify
-        $configs->inputmustverify = $saved_config['input_must_verify'];
-        //Show validation button
-        $configs->inputshowvalidation = $saved_config['input_show_validation'];
-
-        $configs->maximalocalfolder = realpath($CFG->dataroot) . '/stack';
-        $configs->stackmaximaversion = "2023121100";
-        $configs->version = "2023121100";
-
-        $configs->geogebrabaseurl = $saved_config['geogebra_base_url'] ?? '';
-
-        return $configs;
+        return "";
     }
 }
 
@@ -970,5 +964,111 @@ if (!function_exists('s')) {
         // next line to ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, and remove the
         // 'UTF-8' argument. Both bring a speed-increase.
         return preg_replace('/&amp;#(\d+|x[0-9a-f]+);/i', '&#$1;', htmlspecialchars($var, ENT_QUOTES, 'UTF-8'));
+    }
+}
+
+if (!function_exists('make_upload_directory')) {
+    function make_upload_directory($path) {
+        $path = realpath("./" . ILIAS_WEB_DIR . "/" . CLIENT_ID) . '/xqcas/' . $path;
+
+        if (!is_dir($path)) {
+            mkdir($path, 0755, true);
+        }
+    }
+}
+
+if (!function_exists('stack_cors_link')) {
+    function stack_cors_link(string $filename): string {
+        return '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/corsscripts/cors.php?name=' . urlencode($filename);
+    }
+}
+
+if (!function_exists('stack_get_system_language')) {
+    function stack_get_system_language(): string {
+        global $DIC;
+
+        $language = $DIC->user()->getLanguage();
+
+        if (!$language) {
+            $language = 'en';
+        }
+
+        return $language;
+    }
+}
+
+if (!function_exists("format_text")) {
+    function format_text($text, $format = assStackQuestionUtils::FORMAT_HTML, $options = null)
+    {
+        return $text;
+    }
+}
+
+if (!function_exists("stack_fetch_included_content")) {
+    function stack_fetch_included_content(string $url) {
+        static $cache = [];
+        $lc = trim(strtolower($url));
+        $good = false;
+        $islocalfile = false;
+        // Not actually passing the $error out now, it is here for documentation
+        // and possible future use.
+        $error = 'Not a fetchable URL type.';
+        $translated = $url;
+        if (strpos($url, '://') === false) {
+            $good = false;
+            return false;
+        }
+        $path = explode('://', $url, 2)[1];
+        if (strpos($lc, 'http://') === 0 || strpos($lc, 'https://') === 0) {
+            $good = true;
+        } else {
+            if (strpos($path, '..') !== false || strpos($path, '/') === 0 || strpos($path, '~') === 0) {
+                $error = 'Traversing the directory tree is forbidden.';
+                $good = false;
+                return false;
+            }
+        }
+
+        if (strpos($lc, 'contrib://') === 0 || strpos($lc, 'contribl://') === 0) {
+            $good = true;
+            if (strpos($lc, 'contrib://') === 0) {
+                $translated = 'https://raw.githubusercontent.com/maths/moodle-qtype_stack/' .
+                    'master/stack/maxima/contrib/' . $path;
+            } else {
+                $islocalfile = true;
+                $translated = __DIR__ . '/../stack/maxima/contrib/' . $path;
+            }
+        } else if (strpos($lc, 'template://') === 0 || strpos($lc, 'templatel://') === 0) {
+            $good = true;
+            if (strpos($lc, 'template://') === 0) {
+                $translated = 'https://raw.githubusercontent.com/maths/moodle-qtype_stack/' .
+                    'master/stack/cas/castext2/template/' . $path;
+            } else {
+                $islocalfile = true;
+                $translated = __DIR__ . '/stack/cas/castext2/template/' . $path;
+            }
+        }
+
+        if ($good) {
+            if (!isset($cache[$translated])) {
+                // Feel free to apply any proxying here if you want.
+                // Just remember that $islocalfile might be true and you might do
+                // something else then.
+
+                if ($islocalfile) {
+                    $cache[$translated] = file_get_contents($translated);
+                } else {
+                    $headers = get_headers($translated);
+                    if (strpos($headers[0], '404') === false) {
+                        $cache[$translated] = file_get_contents($translated);
+                    } else {
+                        $cache[$translated] = false;
+                    }
+                }
+            }
+            return $cache[$translated];
+        }
+        $cache[$translated] = false;
+        return false;
     }
 }

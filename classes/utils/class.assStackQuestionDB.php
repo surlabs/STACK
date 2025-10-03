@@ -182,6 +182,7 @@ class assStackQuestionDB
 			$potential_response_trees[$prt_name]->autosimplify = $row['auto_simplify'];
 			$potential_response_trees[$prt_name]->feedbackvariables = $row['feedback_variables'];
 			$potential_response_trees[$prt_name]->firstnodename = $row['first_node_name'];
+            $potential_response_trees[$prt_name]->feedbackstyle = 1;
 
 			//Reading nodes
 
@@ -1702,7 +1703,18 @@ class assStackQuestionDB
                     if (stack_input::SCORE == $input_state->status || stack_input::VALID == $input_state->status) {
                         $raw_input["value"] = $input_state->contentsmodified;
                     } else {
-                        $raw_input["value"] = implode('', $input_state->__get("contents"));
+                        $contents = $input_state->__get("contents");
+                        if (is_array($contents) && isset($contents[0]) && is_array($contents[0])) {
+                            $string_rows = [];
+                            foreach ($contents as $row) {
+                                $string_rows[] = '[' . implode(',', $row) . ']';
+                            }
+                            $raw_input["value"] = 'matrix(' . implode(',', $string_rows) . ')';
+                        } else if (is_array($contents)) {
+                            $raw_input["value"] = implode('', $contents);
+                        } else {
+                            $raw_input["value"] = $contents;
+                        }
                     }
                 }
             }
