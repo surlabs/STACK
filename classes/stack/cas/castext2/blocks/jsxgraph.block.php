@@ -112,7 +112,8 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
         $r->items[] = new MP_String(json_encode($xpars));
 
         // Plug in some style and scripts.
-        $mathjax = stack_get_mathjax_url();
+        $mathjax = new ilSetting("MathJax");
+
         // Silence the MathJax message that blinks on top of every graph.
         $r->items[] = new MP_List([
             new MP_String('script'),
@@ -121,7 +122,7 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
         ]);
         $r->items[] = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax])),
+            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax->get("path_to_mathjax")])),
         ]);
         $r->items[] = new MP_List([
             new MP_String('style'),
@@ -162,8 +163,8 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
             '"><div class="jxgbox" id="jxgbox" style="width:100%;height:100%;"></div></div><script type="module">');
 
         // For binding we need to import the binding libraries.
-        $r->items[] = new MP_String("\nimport {stack_js} from '" . stack_cors_link('stackjsiframe.min.js') . "';\n");
-        $r->items[] = new MP_String("import {stack_jxg} from '" . stack_cors_link('stackjsxgraph.min.js') . "';\n");
+        $r->items[] = new MP_String("\nimport stack_js from '" . stack_cors_link('stackjsiframe.min.js') . "';\n");
+        $r->items[] = new MP_String("import stack_jxg from '" . stack_cors_link('stackjsxgraph.min.js') . "';\n");
 
         // Do we need to bind anything?
         if (count($inputs) > 0) {

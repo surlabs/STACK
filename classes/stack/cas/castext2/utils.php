@@ -34,9 +34,9 @@ class castext2_parser_utils {
     // have no other special cases.
     // Intentionally matching Moodle values.
     // phpcs:ignore moodle.Commenting.MissingDocblock.Constant
-    const MDFORMAT = FORMAT_MARKDOWN;
+    const MDFORMAT = assStackQuestionUtils::FORMAT_MARKDOWN;
     // phpcs:ignore moodle.Commenting.MissingDocblock.Constant
-    const RAWFORMAT = FORMAT_HTML;
+    const RAWFORMAT = assStackQuestionUtils::FORMAT_HTML;
 
     // Does the whole compile process.
     // Basically when compiling we need to know if Markdown is in use and

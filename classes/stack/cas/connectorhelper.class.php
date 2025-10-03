@@ -71,10 +71,10 @@ abstract class stack_connection_helper {
 
         switch (self::$config->casresultscache) {
             case 'db':
-                global $DB;
-                $connection = new stack_cas_connection_db_cache($connection, $debuglog, $DB);
+                global $DIC;
+                $db = $DIC->database();
+                $connection = new stack_cas_connection_db_cache($connection, $debuglog, $db);
                 break;
-
             case 'otherdb':
                 $connection = new stack_cas_connection_db_cache($connection, $debuglog, self::get_other_db());
                 break;
@@ -95,16 +95,16 @@ abstract class stack_connection_helper {
             return self::$otherdb;
         }
 
-        $dboptions = [];
+        $dboptions = array();
         if (!empty(self::$config->cascachedbsocket)) {
             $dboptions['dbsocket'] = true;
         }
 
         self::$otherdb = moodle_database::get_driver_instance(
-                self::$config->cascachedbtype, self::$config->cascachedblibrary);
+            self::$config->cascachedbtype, self::$config->cascachedblibrary);
         self::$otherdb->connect(self::$config->cascachedbhost,
-                self::$config->cascachedbuser, self::$config->cascachedbpass,
-                self::$config->cascachedbname, self::$config->cascachedbprefix, $dboptions);
+            self::$config->cascachedbuser, self::$config->cascachedbpass,
+            self::$config->cascachedbname, self::$config->cascachedbprefix, $dboptions);
         return self::$otherdb;
     }
 

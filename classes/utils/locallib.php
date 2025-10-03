@@ -41,8 +41,7 @@ class stack_exception extends StackException {
  * @return string HTML ready to output.
  */
 function stack_ouput_castext($castext) {
-    return format_text(stack_maths::process_display_castext($castext),
-            FORMAT_HTML, ['noclean' => true, 'allowid' => true]);
+    return stack_maths::process_display_castext($castext);
 }
 
 /**
@@ -52,8 +51,24 @@ function stack_ouput_castext($castext) {
  * @param mixed $a (optional) any values to interpolate into the string.
  * @return string the language string
  */
-function stack_string($key, $a = null) {
-    return stack_maths::process_lang_string(get_string($key, 'qtype_stack', $a));
+function stack_string($key, $a = null):string
+{
+    //require_once './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/stack/cas/installhelper.class.php';
+    global $DIC;
+    $lng = $DIC->language();
+    $user_language = $lng->getUserLanguage();
+    static $string = array();
+    static $available_languages = ["en", "de", "es"];
+
+    if (!in_array($user_language, $available_languages)) {
+        $user_language = 'de';
+    }
+
+    if (empty($string)) {
+        include_once ILIAS_ABSOLUTE_PATH. "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_$user_language.php";
+    }
+
+    return stack_maths::process_lang_string(getString($key, $string, $a));
 }
 
 /**
@@ -78,7 +93,7 @@ function get_stack_maxima_latex_replacements() {
     // This is an array language code => replacements array.
     static $replacements = [];
 
-    $lang = current_language();
+    $lang = getLanguage();
     if (!isset($replacements[$lang])) {
         $replacements[$lang] = [
             'QMCHAR' => '?',

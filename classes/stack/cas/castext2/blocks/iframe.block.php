@@ -22,9 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-
-use api\util\StackIframeHolder;
-
 /**
  * A block for providing means for creating IFRAMES.
  *
@@ -186,18 +183,19 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
             $code = str_replace('!ploturl!',
             '/plots/', $code);
         } else {
-            $code = str_replace('!ploturl!',
-            moodle_url::make_file_url('/question/type/stack/plot.php', '/'), $code);
+            $code = str_replace('!ploturl!', ILIAS_HTTP_PATH . "/" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/xqcas/stack/plots/", $code);
         }
         // Unpack held things if they happen to exist inside the IFRAME.
         // That content would never go through the processing that that logic
         // protects against.
         $code = $holder->replace($code);
+        $b64 = base64_encode($code);
+
 
         // Escape some JavaScript strings.
         $args = [
             json_encode($frameid),
-            json_encode($code),
+            'atob(' . json_encode($b64) . ')',
             json_encode($divid),
             json_encode($title),
             $scrolling ? 'true' : 'false',

@@ -61,7 +61,7 @@ class stack_question_library {
         $translate->search = '/(<span(\s+lang="[a-zA-Z0-9_-]+"|\s+class="multilang")' .
                                 '{2}\s*>.*?<\/span>)(\s*<span(\s+lang="[a-zA-Z0-9_-]+"' .
                                 '|\s+class="multilang"){2}\s*>.*?<\/span>)+/is';
-        $language = current_language();
+        $language = getLanguage();
 
         $plots = [];
         $questiontext = $translate->filter(
@@ -80,7 +80,7 @@ class stack_question_library {
         $formatoptions->noclean = true;
         $formatoptions->para = false;
         $formatoptions->allowid = true;
-        $questiontext = format_text($questiontext, FORMAT_HTML, $formatoptions);
+        $questiontext = format_text($questiontext, assStackQuestionUtils::FORMAT_HTML, $formatoptions);
 
         foreach ($question->inputs as $name => $input) {
             $tavalue = $question->get_ta_for_input($name);

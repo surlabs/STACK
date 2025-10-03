@@ -51,7 +51,7 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         $clone = 'false';
 
         // MathJax version.
-        $mathjaxversion = stack_get_mathjax_version();
+        $mathjaxversion = $this->params['mathjax'] ?? assStackQuestionUtils::getMathjaxVersion();
         $mathjaxversionmajor = explode(".", $mathjaxversion)[0];
 
         // Number of available columns.
@@ -134,10 +134,11 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         $r->items[] = new MP_String(json_encode($xpars));
 
         // Plug in some style and scripts.
-        $mathjax = stack_get_mathjax_url();
+        $mathjax = new ilSetting("MathJax");
+
         $r->items[] = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax])),
+            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax->get("path_to_mathjax")])),
         ]);
         $r->items[] = new MP_List([
             new MP_String('style'),
@@ -188,8 +189,8 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         // JS script.
         $r->items[] = new MP_String('<script type="module">');
 
-        $importcode = "\nimport {stack_js} from '" . stack_cors_link('stackjsiframe.min.js') . "';\n";
-        $importcode .= "import {Sortable} from '" . stack_cors_link('sortablecore.min.js') . "';\n";
+        $importcode = "\nimport stack_js from '" . stack_cors_link('stackjsiframe.min.js') . "';\n";
+        $importcode .= "import Sortable from '" . stack_cors_link('sortablecore.min.js') . "';\n";
         $importcode .= "import {preprocess_steps,
                                 stack_sortable,
                                 get_iframe_height,
@@ -472,12 +473,13 @@ class stack_cas_castext2_parsons extends stack_cas_castext2_block {
         }
 
         // Check MathJax version has been parsed correctly.
-        $mathjaxversionmajor = explode(".", stack_get_mathjax_version())[0];
-        if (!$mathjaxversionmajor === "2" || !$mathjaxversionmajor === "3") {
-            $valid = false;
-            $err[] = stack_string('stackBlock_parsons_unknown_mathjax_version', [
-                'mjversion' => '2, 3',
-            ]);
+        if (array_key_exists('mathjax', $this->params)) {
+            $validmjversions = ['2', '3'];
+            if (!in_array($this->params['mathjax'], $validmjversions)) {
+                $valid = false;
+                $err[] = stack_string('stackBlock_parsons_unknown_mathjax_version', ['mjversion' => implode(', ',
+                    $validmjversions)]);
+            }
         }
 
         // Check value of transpose is only "true" or "false".

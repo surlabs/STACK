@@ -106,7 +106,7 @@ class stack_input_factory {
             }
 
             // Skip folders with dubious names.
-            $inputname = clean_param($foldername, PARAM_PLUGIN);
+            $inputname = $foldername;
             if (empty($inputname) || $inputname != $foldername) {
                 continue;
             }

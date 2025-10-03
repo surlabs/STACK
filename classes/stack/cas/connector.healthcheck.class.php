@@ -39,6 +39,7 @@ class stack_cas_healthcheck {
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function __construct($config) {
         global $CFG;
+
         $this->config = $config;
 
         // Record the platform in the summary.
@@ -252,7 +253,7 @@ class stack_cas_healthcheck {
         } else {
             // This content is goind to a secure output where we do not do the two phase
             // handlign the holder would want.
-            $test['details'] .= html_writer::tag('p', stack_ouput_castext($ct->apply_placeholder_holder($ct->get_rendered())));
+            $test['details'] .= html_writer::tag('p', stack_ouput_castext(assStackQuestionUtils::_getLatex($ct->apply_placeholder_holder($ct->get_rendered()))));
         }
         $this->tests[] = $test;
     }

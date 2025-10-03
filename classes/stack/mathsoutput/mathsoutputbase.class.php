@@ -94,8 +94,7 @@ abstract class stack_maths_output {
             $text = $this->replace_dollars($text);
         }
 
-        $text = str_replace('!ploturl!',
-                moodle_url::make_file_url('/question/type/stack/plot.php', '/'), $text ?? '');
+        $text = str_replace('!ploturl!', ILIAS_HTTP_PATH . "/" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/xqcas/stack/plots/", $text);
 
         $text = stack_fact_sheets::display($text, $renderer);
 
@@ -125,8 +124,8 @@ abstract class stack_maths_output {
             $v4start      = '{@';
             $v4end        = '@}';
         }
-        $text = preg_replace('~(?<!\\\\)\$\$(.*?)(?<!\\\\)\$\$~', $displaystart . '$1' . $displayend, $text);
-        $text = preg_replace('~(?<!\\\\)\$(.*?)(?<!\\\\)\$~', $inlinestart . '$1' . $inlineend, $text);
+        $text = preg_replace('~(?<!\\\\)\$\$(.*?)(?<!\\\\)\$\$~', $displaystart . '$1' . $displayend, $text ?? "");
+        $text = preg_replace('~(?<!\\\\)\$(.*?)(?<!\\\\)\$~', $inlinestart . '$1' . $inlineend, $text ?? "");
 
         $temp = stack_utils::all_substring_between($text, '@', '@', true);
         $i = 0;

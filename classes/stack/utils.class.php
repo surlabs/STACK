@@ -1243,4 +1243,18 @@ class stack_utils {
         };
         return $strings($contents);
     }
+
+
+
+    public static function toStdClass(array $array) :stdClass {
+        $object = new stdClass();
+
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $value = self::toStdClass($value);
+            }
+            $object->$key = $value;
+        }
+        return $object;
+    }
 }

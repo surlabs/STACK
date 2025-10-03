@@ -1454,7 +1454,7 @@ abstract class stack_input {
      * @param string $lang language of the question.
      * @return string HTML for the validation results for this input.
      */
-    public function render_validation(stack_input_state $state, $fieldname, $lang) {
+    public function render_validation(stack_input_state $state, $fieldname, $lang = null) {
         if ($lang !== null && $lang !== '') {
             $prevlang = force_current_language($lang);
         }
@@ -1717,5 +1717,9 @@ abstract class stack_input {
      */
     public function get_api_solution_render($tadisplay, $ta) {
         return $tadisplay;
+    }
+
+    public function get_name(): string {
+        return $this->name;
     }
 }

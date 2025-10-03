@@ -28,7 +28,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
     /** @var stack_debug_log does the debugging. */
     protected $debug;
 
-    /** @var moodle_database The database connection to use for the cache. */
+    /** @var ilDBInterface The database connection to use for the cache. */
     protected $db;
 
     /**
@@ -36,7 +36,7 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
      * @param stack_cas_connection $rawconnection the un-cached connection.
      * @param stack_debug_log $debuglog the debug log to use.
      */
-    public function __construct(stack_cas_connection $rawconnection, stack_debug_log $debuglog, moodle_database $db) {
+    public function __construct(stack_cas_connection $rawconnection, stack_debug_log $debuglog, ilDBInterface $db) {
         $this->rawconnection = $rawconnection;
         $this->debug = $debuglog;
         $this->db = $db;
@@ -112,9 +112,10 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
         $cached->key = $this->get_cache_key($command);
 
         // Are there any cached records that might match?
-        $data = $this->db->get_records('qtype_stack_cas_cache',
-                ['hash' => $cached->key], 'id');
-        if (!$data) {
+        $query = 'SELECT * FROM xqcas_cas_cache WHERE hash = "' . $cached->key . '" ORDER BY id';
+        $res = $this->db->query($query);
+        $data[] = $this->db->fetchObject($res);
+        if (empty($data) || $data[0] === NULL) {
             // Nothing relevant in the cache.
             $cached->result = null;
             return $cached;
@@ -130,9 +131,12 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
 
         // If there was more than one record in the cache (due to a race condition)
         // drop the duplicates.
-        unset($data[$record->id]);
-        if ($data) {
-            $this->db->delete_records_list('qtype_stack_cas_cache', 'id', array_keys($data));
+        if (!empty($data)) {
+            unset($data[0]);
+            foreach ($data as $record) {
+                $delete_query = 'DELETE FROM xqcas_cas_cache WHERE id = "' . $record->id . '"';
+                $res = $this->db->query($delete_query);
+            }
         }
 
         return $cached;
@@ -154,7 +158,8 @@ class stack_cas_connection_db_cache implements stack_cas_connection {
         $data->command = $command;
         $data->result = json_encode($result);
 
-        $this->db->insert_record('qtype_stack_cas_cache', $data);
+        $id = $this->db->nextId('xqcas_cas_cache');
+        $this->db->insert("xqcas_cas_cache", array("id" => array("integer", $id), "hash" => array("text", $key), "command" => array("clob", $data->command), "result" => array("clob", $data->result)));
     }
 
     /**

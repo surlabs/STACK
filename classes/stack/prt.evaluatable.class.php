@@ -337,4 +337,9 @@ class prt_evaluatable implements cas_raw_value_extractor {
         }
         return $this->holder->replace($filtered);
     }
+
+    public function getWeight(): float
+    {
+        return $this->weight;
+    }
 }
