@@ -1096,6 +1096,7 @@ class assStackQuestionUtils
             if (!$all_formative) {
                 $prt_value = $prt_data->value / $total_value;
             }
+            $prt_data->feedbackstyle = 1;
             $question->prts[$name] = new stack_potentialresponse_tree_lite($prt_data, $prt_value);
         }
 
