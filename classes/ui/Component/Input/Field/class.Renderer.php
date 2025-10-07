@@ -384,16 +384,23 @@ class Renderer extends RendererILIAS
             ];
         }
 
-        $modal = $this->getUIFactory()->modal()->lightbox($this->getUIFactory()->modal()->lightboxTextPage($this->buildTaxonomyNodes($nodes, $tax_id), $this->txt("tax_nodes")));
+        $modal = $this->getUIFactory()->modal()->roundtrip($this->txt("tax_nodes"), [$this->buildTaxonomyNodes($nodes, $tax_id)])->withCancelButtonLabel($this->txt("save"));
         $modal_rendered = $this->render($modal);
 
-        $tax_tpl->setVariable("MODAL", $modal_rendered);
+        $modal_load_code = "
+            <script>
+                setTimeout(() => {
+                    $('#{$tax_id}_cont').append(`$modal_rendered`);
+                }, 100);
+            </script>
+        ";
+
         $tax_tpl->setVariable("MODAL_SIGNAL", $modal->getShowSignal());
 
-        return $this->wrapInFormContext($component, $component->getLabel(), $tax_tpl->get());
+        return $this->wrapInFormContext($component, $component->getLabel(), $tax_tpl->get()) . $modal_load_code;
     }
 
-    private function buildTaxonomyNodes(array $nodes, string $taxonomy_id): string
+    private function buildTaxonomyNodes(array $nodes, string $taxonomy_id): Component
     {
         global $DIC;
 
@@ -407,6 +414,6 @@ class Renderer extends RendererILIAS
             );
         }
 
-        return $checkboxs;
+        return $this->getUIFactory()->legacy($checkboxs);
     }
 }
