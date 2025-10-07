@@ -1623,34 +1623,36 @@ abstract class stack_input {
      * This function is responsible for removing the validation tags from the question stem and replacing
      * them with the validation feedback.  Only the equiv input type currently does anything different here.
      */
-    public function replace_validation_tags($state, $fieldname, $questiontext) {
+    public function replace_validation_tags($state, $fieldname, $questiontext, $custom_validation) {
 
         $name = $this->name;
         // ISS879 Set language override to null as we should be in the question render here. It's only
         // when we're calling the validation via the webservice that we may need to override.
         $feedback = $this->render_validation($state, $fieldname, null);
-
         $class = "stackinputfeedback standard";
         $divspan = 'div';
-        // Equiv inputs don't have validation divs.
-        if ($this->get_validation_method() == 'equiv') {
-            $class = "stackinputfeedback equiv";
-            $divspan = 'span';
-        }
-        if ($this->get_parameter('showValidation', 1) == 3) {
-            $class = "stackinputfeedback compact";
-            $divspan = 'span';
+
+        if ($custom_validation) {
+            $feedback = $custom_validation;
+        } else {
+            // Equiv inputs don't have validation divs.
+            if ($this->get_validation_method() == 'equiv') {
+                $class = "stackinputfeedback equiv";
+                $divspan = 'span';
+            }
+            if ($this->get_parameter('showValidation', 1) == 3) {
+                $class = "stackinputfeedback compact";
+                $divspan = 'span';
+            }
+
+            if (!$feedback) {
+                $class .= ' empty';
+            }
         }
 
-        if (!$feedback) {
-            $class .= ' empty';
-        }
+        $feedback = html_writer::tag($divspan, $feedback, ['class' => $class, 'id' => $fieldname.'_val', 'aria-live' => 'assertive']);
 
-        $feedback = html_writer::tag($divspan, $feedback,
-            ['class' => $class, 'id' => $fieldname.'_val', 'aria-live' => 'assertive']);
-        $response = str_replace("[[validation:{$name}]]", $feedback, $questiontext);
-
-        return $response;
+        return str_replace("[[validation:{$name}]]", $feedback, $questiontext);
     }
 
     /**
