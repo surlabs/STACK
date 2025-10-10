@@ -1227,3 +1227,33 @@ $db->update("xqcas_configuration", ["group_name" => ["text", "feedback_styles"]]
 
 $db->query("DELETE FROM xqcas_configuration WHERE group_name = 'feedback'");
 ?>
+<#58>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if ($db->tableColumnExists('xqcas_options', 'question_note')) {
+    $db->modifyTableColumn(
+        'xqcas_options',
+        'question_note',
+        array(
+            'length' => 4000
+        )
+    );
+}
+?>
+<#59>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if ($db->tableColumnExists('xqcas_options', 'question_note')) {
+    $db->modifyTableColumn(
+        "xqcas_options",
+        "question_note",
+        array(
+            "notnull" => false
+        )
+    );
+}
+?>
