@@ -3568,10 +3568,8 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         $this->cas_text_processor = $cas_text_processor;
     }
 
-    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $active_id, int $pass) : int {
+    public function setExportDetailsXLSX(ilAssExcelFormatHelper $worksheet, int $startrow, int $col, int $active_id, int $pass) : int {
         $solutions = assStackQuestionDB::_readTestSolution($this->getId(), $active_id, $pass);
-
-        //dump($solutions); exit();
 
         // Set the question title
         $worksheet->setFormattedExcelTitle($worksheet->getColumnCoord(0) . $startrow, $this->lng->txt("qpl_qst_xqcas_" . $this->getQuestionType()));
