@@ -54,9 +54,7 @@ git checkout ilias10_stack_dev
 ```
 3. STACK uses the ILIAS composer autoloader functionality so, after installing or update the plugin, ensure you run on the ILIAS root folder
 ```bash
-npm install
 composer install --no-dev
-php cli/setup.php update
 ```
 ***
 **Please ensure you don't ignore plugins on composer.json**
