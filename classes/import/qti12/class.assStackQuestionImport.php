@@ -98,6 +98,14 @@ class assStackQuestionImport extends assQuestionImport
 
             $this->object = assStackQuestionUtils::_arrayToQuestion($stack_question, $this->object);
 
+            //Process possible image references
+            $this->object->specific_feedback = $this->processNonAbstractedImageReferences($this->object->specific_feedback, $item->getIliasSourceNic());
+            $this->object->prt_correct = $this->processNonAbstractedImageReferences($this->object->prt_correct, $item->getIliasSourceNic());
+            $this->object->prt_partially_correct = $this->processNonAbstractedImageReferences($this->object->prt_partially_correct, $item->getIliasSourceNic());
+            $this->object->prt_incorrect = $this->processNonAbstractedImageReferences($this->object->prt_incorrect, $item->getIliasSourceNic());
+            $this->object->question_note = $this->processNonAbstractedImageReferences($this->object->question_note, $item->getIliasSourceNic());
+            $this->object->general_feedback = $this->processNonAbstractedImageReferences($this->object->general_feedback, $item->getIliasSourceNic());
+
             foreach ($this->object->prts as $prt) {
                 foreach ($prt->get_nodes() as $node) {
                     $node->truefeedback = $this->processNonAbstractedImageReferences($node->truefeedback, $item->getIliasSourceNic());
