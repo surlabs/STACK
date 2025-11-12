@@ -38,11 +38,15 @@ use ilTaxonomyException;
  */
 class TaxonomySelect extends FormInput {
     private ilObjTaxonomy $taxonomy;
+    private array $tree = [];
+
     public function __construct(ilObjTaxonomy $taxonomy)
     {
         global $DIC;
 
         $this->taxonomy = $taxonomy;
+
+        $this->buildTree();
 
         parent::__construct(new Factory(), $DIC->refinery(), sprintf($DIC->language()->txt('qpl_qst_edit_form_taxonomy'), $taxonomy->getTitle()));
     }
@@ -69,17 +73,17 @@ class TaxonomySelect extends FormInput {
         $this->checkArg("value", $this->isClientSideValueOk($value), "Display value does not match input type.");
         $clone = clone $this;
 
-        foreach ($value as $key => $item) {
-            if (is_numeric($item)) {
-                $tree = $this->getTaxonomy()->getTree();
+        $nodes = $this->collectNodesRecursive($this->tree);
 
-                foreach ($tree->getChilds($tree->readRootId()) as $node) {
-                    if ((int) $node["child"] == $item) {
-                        $value[$key] = [
-                            "id" => (int) $node["child"],
-                            "title" => $node["title"]
-                        ];
-                    }
+        foreach ($value as $key => $item) {
+            foreach ($nodes as $node) {
+                if ($node['id'] === $item) {
+                    $value[$key] = [
+                        'id' => $node['id'],
+                        'title' => $node['title']
+                    ];
+
+                    break;
                 }
             }
         }
@@ -139,5 +143,67 @@ class TaxonomySelect extends FormInput {
                 $tax_node_ass->addAssignment($node["id"], $id);
             }
         }
+    }
+
+    public function getTree(): array
+    {
+        return $this->tree;
+    }
+
+    private function buildTree(): void
+    {
+        $tree = $this->taxonomy->getTree();
+        $root_id = $tree->readRootId();
+
+        $this->tree = $this->getNodesRecursive($root_id);
+    }
+
+    private function getNodesRecursive(int $node_id): array
+    {
+        global $DIC;
+
+        $nodes = [];
+
+        $tree = $this->taxonomy->getTree();
+
+        foreach ($tree->getChilds($node_id) as $node) {
+            $node_data = [
+                "id" => (int) $node["child"],
+                "title" => $node["title"],
+                "order" => $node["order_nr"],
+                "tax_id" => "taxonomy_select_" . $node["tax_id"],
+                "icon" => $DIC->ui()->factory()->symbol()->icon()->standard("taxs", "taxs")
+            ];
+
+            $children = $this->getNodesRecursive((int) $node["child"]);
+
+            if (!empty($children)) {
+                $node_data["children"] = $children;
+            }
+
+            $nodes[] = $node_data;
+        }
+
+        usort($nodes, fn($a, $b) => $a['order'] <=> $b['order']);
+
+        return $nodes;
+    }
+
+    private function collectNodesRecursive(array $nodes): array
+    {
+        $collected = [];
+
+        foreach ($nodes as $node) {
+            $collected[] = [
+                "id" => $node['id'],
+                "title" => $node['title'],
+            ];
+
+            if (isset($node['children'])) {
+                $collected = array_merge($collected, $this->collectNodesRecursive($node['children']));
+            }
+        }
+
+        return $collected;
     }
 }

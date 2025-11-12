@@ -84,6 +84,18 @@ $(document).ready(function() {
     });
 
     new MutationObserver((mutations, obs) => {
+        $(".taxNodeListItem").each(function() {
+            const nodeId = $(this).attr("node-id");
+            const nodeTitle = $(this).attr("node-title");
+            const taxonomy = $(this).attr("taxonomy-id");
+
+            if ($(this).find(".tax-node[node-id='" + nodeId + "'][taxonomy-id='" + taxonomy + "']").length === 0) {
+                $(this).find(".c-tree__node__line").first().prepend(
+                    '<input type="checkbox" class="tax-node" node-id="' + nodeId + '" node-title="' + nodeTitle + '" taxonomy-id="' + taxonomy + '">'
+                );
+            }
+        });
+
         if ($(".tax-node").length > 0) {
             obs.disconnect();
 
@@ -99,6 +111,7 @@ $(document).ready(function() {
                                 const node = $("#" + taxonomy + "_cont").find(".tax-node[taxonomy-id='" + taxonomy + "'][node-id='" + value[i].id + "'] input");
                                 if (node.length > 0) {
                                     node.prop("checked", true);
+                                    node.parents(".expandable").not(node.parent().parent(".expandable")).attr("aria-expanded", "true");
                                 }
                             }
                         }

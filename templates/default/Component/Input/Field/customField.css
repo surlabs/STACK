@@ -63,3 +63,7 @@
 .column .form-group {
     background-color: transparent !important;
 }
+
+.tax-node {
+    margin-left: 5px !important;
+}

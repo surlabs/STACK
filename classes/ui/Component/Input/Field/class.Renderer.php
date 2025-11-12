@@ -28,6 +28,9 @@ use Expand;
 use ILIAS\UI\Component\Component;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\UI\Component\JavaScriptBindable;
+use ILIAS\UI\Component\Tree\Node\Factory;
+use ILIAS\UI\Component\Tree\Node\Node;
+use ILIAS\UI\Component\Tree\TreeRecursion;
 use ILIAS\UI\Implementation\Component\Input\Field\Renderer as RendererILIAS;
 use ILIAS\UI\Implementation\Render\Template;
 use ilRTE;
@@ -384,7 +387,7 @@ class Renderer extends RendererILIAS
             ];
         }
 
-        $modal = $this->getUIFactory()->modal()->roundtrip($this->txt("tax_nodes"), [$this->buildTaxonomyNodes($nodes, $tax_id)])->withCancelButtonLabel($this->txt("save"));
+        $modal = $this->getUIFactory()->modal()->roundtrip($this->txt("tax_nodes"), [$this->getUIFactory()->legacy($this->buildTaxonomyNodes($component->getTree()))])->withCancelButtonLabel($this->txt("save"));
         $modal_rendered = $this->render($modal);
 
         $modal_load_code = "
@@ -400,20 +403,28 @@ class Renderer extends RendererILIAS
         return $this->wrapInFormContext($component, $component->getLabel(), $tax_tpl->get()) . $modal_load_code;
     }
 
-    private function buildTaxonomyNodes(array $nodes, string $taxonomy_id): Component
+    private function buildTaxonomyNodes(array $tree): string
     {
         global $DIC;
 
-        $checkboxs = "";
+        $factory = $this->getUIFactory();
 
-        foreach ($nodes as $node) {
-            $checkboxs .= $DIC->ui()->renderer()->render(
-                $this->getUIFactory()->input()->field()->checkbox($node["title"])->withAdditionalOnLoadCode(function ($id) use ($node, $taxonomy_id) {
-                    return "$('#$id').attr('node-id', {$node['id']}).attr('node-title', '{$node['title']}').addClass('tax-node').attr('taxonomy-id', '$taxonomy_id');";
-                })
-            );
-        }
+        $renderer = $DIC->ui()->renderer();
 
-        return $this->getUIFactory()->legacy($checkboxs);
+        $recursion = new class () implements TreeRecursion {
+            public function getChildren($record, $environment = null): array
+            {
+                return $record['children'] ?? [];
+            }
+
+            public function build(Factory $factory, $record, $environment = null): Node
+            {
+                return $factory->simple($record["title"], $record["icon"])->withAdditionalOnLoadCode(function ($id) use ($record) {
+                    return "$('#$id').attr('node-id', {$record['id']}).attr('node-title', '{$record['title']}').attr('taxonomy-id', '{$record['tax_id']}').addClass('taxNodeListItem');";
+                });
+            }
+        };
+
+        return $renderer->render($factory->tree()->expandable('', $recursion)->withData($tree));
     }
 }
