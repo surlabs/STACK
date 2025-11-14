@@ -21,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-
 /**
  * A Maxima parser wrapper that tries to insert missing stars to statements
  * to make them parseable.

@@ -875,11 +875,11 @@ abstract class stack_input {
         // we don't need to extract updated values from the instantiated $session explicitly.
         if ('units' == $validationmethod || 'unitsnegpow' == $validationmethod) {
             // The units type changes the display, so we really need the validation method display here.
-            list($valid, $errors, $display) = $this->validation_display($answer, $lvars, $caslines, $additionalvars,
-                $valid, $errors, $castextprocessor, $inertdisplayform, $ilines);
+            list($valid, $errors, $display, $notes) = $this->validation_display($answer, $lvars, $caslines, $additionalvars,
+                $valid, $errors, $castextprocessor, $inertdisplayform, $ilines, $notes);
         } else {
-            list($valid, $errors, $display) = $this->validation_display($answerd, $lvars, $caslines, $additionalvars,
-                $valid, $errors, $castextprocessor, $inertdisplayform, $ilines);
+            list($valid, $errors, $display, $notes) = $this->validation_display($answerd, $lvars, $caslines, $additionalvars,
+                $valid, $errors, $castextprocessor, $inertdisplayform, $ilines, $notes);
         }
 
         // Answers may not contain the ? character.  CAS-strings may, but answers may not.
@@ -1018,14 +1018,15 @@ abstract class stack_input {
             $filterstoapply[] = '990_no_fixing_spaces';
         }
 
+        // Assume single letter variable names = 16.
+        // This needs to come before we split names into single letters.
+        if ($grammarautofixes & self::GRAMMAR_FIX_FUNCTIONS) {
+            $filterstoapply[] = '407_split_unknown_functions';
+        }
+
         // Assume single letter variable names = 4.
         if ($grammarautofixes & self::GRAMMAR_FIX_SINGLE_CHAR) {
             $filterstoapply[] = '410_single_char_vars';
-        }
-
-        // Assume single letter variable names = 16.
-        if ($grammarautofixes & self::GRAMMAR_FIX_FUNCTIONS) {
-            $filterstoapply[] = '441_split_unknown_functions';
         }
 
         // Consolidate M_1 to M1 and so on.
@@ -1229,7 +1230,7 @@ abstract class stack_input {
      *      string if the input is valid - at least according to this test.
      */
     protected function validation_display($answer, $lvars, $caslines, $additionalvars, $valid, $errors,
-                $castextprocessor, $inertdisplayform, $ilines) {
+                $castextprocessor, $inertdisplayform, $ilines, $notes) {
 
         $display = stack_maxima_format_casstring(htmlentities($this->contents_to_maxima($this->rawcontents), ENT_COMPAT));
         if ($answer->is_correctly_evaluated()) {
@@ -1250,7 +1251,7 @@ abstract class stack_input {
 
         // Guard clause at this point.
         if (!$valid) {
-            return [$valid, $errors, $display];
+            return [$valid, $errors, $display, $notes];
         }
 
         // The "novars" option is only used by the numerical input type.
@@ -1402,7 +1403,7 @@ abstract class stack_input {
             }
         }
 
-        return [$valid, $errors, $display];
+        return [$valid, $errors, $display, $notes];
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
@@ -1629,8 +1630,18 @@ abstract class stack_input {
         // ISS879 Set language override to null as we should be in the question render here. It's only
         // when we're calling the validation via the webservice that we may need to override.
         $feedback = $this->render_validation($state, $fieldname, null);
+
         $class = "stackinputfeedback standard";
         $divspan = 'div';
+        // Equiv inputs don't have validation divs.
+        if ($this->get_validation_method() == 'equiv') {
+            $class = "stackinputfeedback equiv";
+            $divspan = 'span';
+        }
+        if ($this->get_parameter('showValidation', 1) == 3) {
+            $class = "stackinputfeedback compact";
+            $divspan = 'span';
+        }
 
         if ($custom_validation) {
             $feedback = $custom_validation;
@@ -1650,9 +1661,11 @@ abstract class stack_input {
             }
         }
 
-        $feedback = html_writer::tag($divspan, $feedback, ['class' => $class, 'id' => $fieldname.'_val', 'aria-live' => 'assertive']);
+        $feedback = html_writer::tag($divspan, $feedback,
+            ['class' => $class, 'id' => $fieldname.'_val', 'aria-live' => 'assertive']);
+        $response = str_replace("[[validation:{$name}]]", $feedback, $questiontext);
 
-        return str_replace("[[validation:{$name}]]", $feedback, $questiontext);
+        return $response;
     }
 
     /**
@@ -1694,6 +1707,18 @@ abstract class stack_input {
      */
     public function summarise_response($name, $state, $response) {
         return $name . ': ' . $this->contents_to_maxima($state->contents) . ' [' . $state->status . ']';
+    }
+
+
+    /**
+     * Provide a summary of the student's response for download as a JSON object.
+     */
+    public function summarise_response_json($name, $state, $response) {
+        $sum = [];
+        $sum['status'] = $state->status;
+        $sum['note']   = $state->note;
+        $sum['value']  = $this->contents_to_maxima($state->contents);
+        return $sum;
     }
 
     /**

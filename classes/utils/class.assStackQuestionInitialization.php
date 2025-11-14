@@ -202,8 +202,8 @@ if (!function_exists('get_config')) {
             $configs->inputshowvalidation = $saved_config['input_show_validation'];
 
             $configs->maximalocalfolder = realpath($CFG->dataroot) . '/stack';
-            $configs->stackmaximaversion = "2025073100";
-            $configs->version = "2025073100";
+            $configs->stackmaximaversion = "2025102100";
+            $configs->version = "2025102100";
 
             $configs->geogebrabaseurl = $saved_config['geogebra_base_url'] ?? '';
             $configs->maximalibraries = $saved_config['cas_maxima_libraries'] ?? '';

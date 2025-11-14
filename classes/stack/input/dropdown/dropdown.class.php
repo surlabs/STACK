@@ -29,7 +29,7 @@
 class stack_dropdown_input extends stack_input {
 
     /**
-     * ddlvalues is an array of the types used.
+     * ddlvalues is an array of the evaluated answers used by this input.
      * @var array
      */
     protected $ddlvalues = [];
@@ -142,6 +142,7 @@ class stack_dropdown_input extends stack_input {
         $this->notanswered = stack_string('notanswered');
         // We need to reset the errors here, now we have a new teacher's answer.
         $this->errors = [];
+        $ddlvalues = [];
 
         /*
          * Sort out the ddlvalues.
@@ -678,6 +679,10 @@ class stack_dropdown_input extends stack_input {
         }
         if (array_key_exists(trim($key), $this->ddlvalues)) {
             return $this->ddlvalues[$key]['value'];
+        }
+        // This is an edge case where we have both "nonotanswered" and "allowempty".
+        if (!$this->nonotanswered && $this->get_extra_option('allowempty') && $key === '') {
+            return('EMPTYANSWER'); 
         }
         // The tidy question script returns the name of the input during tidying.
         // That is useful for figuring out where in the question this input occurs.
