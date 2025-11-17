@@ -14,7 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
 
 /**
  * AST filter that spots one inconvenient parser missconception dealing
@@ -22,6 +28,7 @@
  */
 class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $process = function($node) use (&$valid, &$errors, &$answernotes) {
@@ -43,7 +50,7 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                     ($node->lhs instanceof MP_Float &&
                     $node->lhs->raw !== null &&
                     substr($node->lhs->raw, -1) === '.')) {
-                    $a = array();
+                    $a = [];
                     $a['cmd']  = stack_maxima_format_casstring('..');
                     if (array_search(stack_string('stackCas_spuriousop', $a), $errors) === false) {
                         $errors[] = stack_string('stackCas_spuriousop', $a);
@@ -61,7 +68,7 @@ class stack_ast_filter_003_no_dot_dot implements stack_cas_astfilter {
                             $node->lhs->rhs->raw !== null &&
                             substr($node->lhs->rhs->raw, -1) === '.')) {
                     $node->position['invalid'] = true;
-                    $a = array();
+                    $a = [];
                     $a['cmd']  = stack_maxima_format_casstring('..');
                     if (array_search(stack_string('stackCas_spuriousop', $a), $errors) === false) {
                         $errors[] = stack_string('stackCas_spuriousop', $a);

@@ -18,11 +18,13 @@
 /**
  * STACK maths output methods for using MathJax.
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_maths_output_mathjax extends stack_maths_output_filter_base {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function initialise_delimiters() {
         $this->displaywrapstart = '';
         $this->displaywrapend = '';
@@ -32,12 +34,17 @@ class stack_maths_output_mathjax extends stack_maths_output_filter_base {
         $this->inlineend = '\)';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function make_filter() {
         global $CFG, $PAGE;
-        //require_once($CFG->dirroot . '/filter/mathjaxloader/filter.php');
-        $context = context_system::instance();
-        $filter = new filter_mathjaxloader($context, array());
-        $filter->setup($PAGE, $context);
+        if (class_exists('\filter_mathjaxloader\text_filter')) {
+            $filter = new \filter_mathjaxloader\text_filter($PAGE->context, []);
+        } else {
+            // Once Moodle 4.5 is the lowest supported version of Moodle.
+            return new filter_mathjaxloader($PAGE->context, []);
+        }
+
+        $filter->setup($PAGE, $PAGE->context);
         return $filter;
     }
 }

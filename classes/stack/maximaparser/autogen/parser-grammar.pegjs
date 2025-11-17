@@ -2,7 +2,6 @@
  * Grammar for parsing STACK-Maxima commands/statements coming from keyval or casstring fields.
  * Not a complete Maxima syntax parser, but probably not that far from such.
  *  Known missing parts, i.e., stuff that I did not bother to add (yet):
- *   - '$' silent line terminator
  *   - end condition for "for ... in ... do"
  *
  *  Also includes the STACK specific |x| => abs(x) syntax trick. But at the cost of the infix operator |.
@@ -20,7 +19,7 @@
 {
 
  /** <?php
- //require_once(__DIR__ . '/../MP_classes.php');
+ require_once(__DIR__ . '/../MP_classes.php');
  if (!array_key_exists('letToken', $options)) {
    $options['letToken'] = 'let';
  }
@@ -47,6 +46,7 @@
    case '!!':
     return 160;
    case '^':
+   case 'nounpow':
    case '**':
     return 140;
    case '.':
@@ -55,14 +55,19 @@
    case '@@IS@@':
    case '@@Is@@':
    case '/':
+   case 'nounmul':
+   case 'noundiv':
     return 120;
    case '+-':
    case '#pm#':
    case '+':
+   case 'nounadd':
    case '-':
     return 100;
    case '=':
+   case 'nouneq':
    case '*':
+   case 'nounmul':
    case '#':
    case '>':
    case '>=':
@@ -242,7 +247,7 @@ Equivline
   }
 
 Line
- = __? s:Statement _? ';' {/** <?php return $s; ?> **/ return s;}
+ = __? s:Statement _? [;$] {/** <?php return $s; ?> **/ return s;}
  / Comment
 
 Integer "integer"
@@ -577,6 +582,7 @@ PrefixOp
   = "#pm#"
   / "+-" & { /** <?php return $this->options['allowPM']; ?> **/ return options.allowPM; } {return '+-';}
   / "-"
+  / "nounsub "
   / "+"
   / "''"
   / "'"
@@ -601,6 +607,11 @@ InfixOp
   / "+-" & { /** <?php return $this->options['allowPM']; ?> **/ return options.allowPM; } {return '+-';}
   / "-"
   / "+"
+  / "nounadd"
+  / "nounmul"
+  / "noundiv"
+  / "nounpow"
+  / "nouneq"
   / "%and"
   / "%or"
   / "and"

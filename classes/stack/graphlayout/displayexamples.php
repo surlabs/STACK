@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Script that displays some example graphs.
  *
@@ -26,12 +25,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//require_once(__DIR__ . '/../../../../../config.php');
-//require_once(__DIR__ . '/graph.php');
+require_login();
+require_capability('moodle/site:config', context_system::instance());
 
-//$PAGE->set_url('/prt.php');
-//$PAGE->set_context(context_system::instance());
-//$PAGE->set_title('PRT rendering test');
+$PAGE->set_url('/prt.php');
+$PAGE->set_context(context_system::instance());
+$PAGE->set_title('PRT rendering test');
 
 $broken = new stack_abstract_graph();
 $broken->add_node(1, '', 2, 3, '=1', '=0', 'http://google.com');
@@ -122,7 +121,7 @@ $graph6->add_node(8, '', null, 9, '+0.1', '-0.1');
 $graph6->add_node(9, '', 10, 10, '+0.1', '-0.1');
 $graph6->add_node(10, '', null, null, '+0.1', '-0.1');
 
-$examples = array(
+$examples = [
     $broken,
     $broken2,
     $tree,
@@ -134,16 +133,16 @@ $examples = array(
     $graph4,
     $graph5,
     $graph6,
-);
+];
 foreach ($examples as $example) {
     $example->layout();
 }
 
-/*
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Example graphs');
 $i = 0;
 foreach ($examples as $example) {
     echo stack_abstract_graph_svg_renderer::render($example, 'example' . $i++);
 }
-echo $OUTPUT->footer();*/
+echo $OUTPUT->footer();

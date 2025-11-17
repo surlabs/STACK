@@ -15,8 +15,12 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
-//require_once(__DIR__ . '/../block.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
 /**
  * A block to turn unknown block references to something readable.
@@ -27,24 +31,27 @@
  */
 class stack_cas_castext2_unknown extends stack_cas_castext2_block {
 
-    public function compile($format, $options): ? MP_Node {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function compile($format, $options): ?MP_Node {
         // Unknown blocks do not get anywhere ever.
         return null;
     }
 
-    public function is_flat() : bool {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function is_flat(): bool {
         return true;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
         return [];
     }
 
-    /*
+    /**
      * Unknown blocks are always invalid.
      */
     public function validate(&$errors = [], $options = []): bool {
-        $errors[] = new $options['errclass'](stack_string("unknown_block", ['type' => $this->params[' type']]),
+        $errors[] = new $options['errclass'](stack_string('unknown_block', ['type' => $this->params[' type']]),
                 $options['context'] . '/' . $this->position['start'] . '-' . $this->position['end']);
         return false;
     }

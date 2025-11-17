@@ -14,7 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
 
 /**
  * AST filter that checks for very specific characters within
@@ -22,9 +28,10 @@
  */
 class stack_ast_filter_090_special_forbidden_characters implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
-        $warned = array();
+        $warned = [];
         $process = function($node) use (&$warned) {
             if ($node instanceof MP_Identifier) {
                 if (mb_strpos($node->value, 'ˆ')) {
@@ -39,7 +46,7 @@ class stack_ast_filter_090_special_forbidden_characters implements stack_cas_ast
         $ast->callbackRecurse($process);
 
         if (count($warned) > 0) {
-            $errors[] = stack_string('stackCas_forbiddenChar', array( 'char' => implode(", ", array_unique($warned))));
+            $errors[] = stack_string('stackCas_forbiddenChar', ['char' => implode(", ", array_unique($warned))]);
             $answernotes[] = 'forbiddenChar';
         }
 

@@ -23,11 +23,10 @@
  */
 
 
-//require_once(__DIR__ . '/graphnode.php');
-
 /**
  * Represents a node in a STACK PRT extending {@link stack_abstract_graph}.
  *
+ * @package    qtype_stack
  * @copyright 2023 The University of Edinburgh
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,7 +37,7 @@ class stack_prt_graph_node extends stack_abstract_graph_node {
     public $casstatement;
 
     /**
-     * @var boolean Is the feedback from this test igored?
+     * @var bool Is the feedback from this test igored?
      */
     public $quiet;
 
@@ -52,6 +51,13 @@ class stack_prt_graph_node extends stack_abstract_graph_node {
      */
     public $falsenote;
 
+    /**
+     *
+     * @param string $casstatement
+     * @param bool $quiet
+     * @param string $truenote
+     * @param string $falsenote
+     */
     public function add_prt_text($casstatement, $quiet, $truenote, $falsenote) {
         $this->casstatement = $casstatement;
         $this->quiet        = $quiet;

@@ -15,24 +15,28 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// Input that is a radio/multiple choice.
-//
-// @copyright  2015 University of Edinburgh.
-// @author     Chris Sangwin.
-// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+/**
+ * Input that is a radio/multiple choice.
+ *
+ * @package    qtype_stack
+ * @copyright  2015 University of Edinburgh.
+ * @author     Chris Sangwin.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../dropdown/dropdown.class.php');
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_radio_input extends stack_dropdown_input {
-
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $ddltype = 'radio';
 
-    /*
+    /**
      * Default ddldisplay for radio is 'LaTeX'.
      */
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $ddldisplay = 'LaTeX';
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function render(stack_input_state $state, $fieldname, $readonly, $tavalue) {
-
         if ($this->errors) {
             return $this->render_error($this->errors);
         }
@@ -43,29 +47,29 @@ class stack_radio_input extends stack_dropdown_input {
         $selected = $state->contents;
 
         $selected = array_flip($state->contents);
-        $radiobuttons = array();
-        $classes = array();
+        $radiobuttons = [];
+        $classes = [];
 
         foreach ($values as $key => $ansid) {
-            if($readonly){
-                $solution_input_id = $fieldname . '_sol';
-                $fieldname = $solution_input_id;
-            }
-            $inputattributes = array(
+            $inputattributes = [
                 'type' => 'radio',
                 'name' => $fieldname,
                 'value' => $key,
-                'id' => $fieldname.'_'.$key
-            );
-            $labelattributes = array(
-                'for' => $fieldname.'_'.$key
-            );
+                'id' => $fieldname.'_'.$key,
+            ];
+            $labelattributes = [
+                'for' => $fieldname.'_'.$key,
+            ];
             if (array_key_exists($key, $selected)) {
                 $inputattributes['checked'] = 'checked';
             }
             if ($readonly) {
                 $inputattributes['disabled'] = 'disabled';
             }
+
+            // Metadata for JS users.
+            $inputattributes['data-stack-input-type'] = 'radio';
+
             $radiobuttons[] = html_writer::empty_tag('input', $inputattributes) .
                 html_writer::tag('label', $ansid, $labelattributes);
             if ('' === $key) {
@@ -76,12 +80,26 @@ class stack_radio_input extends stack_dropdown_input {
 
         $result = '';
 
-        $result .= html_writer::start_tag('div', array('class' => 'answer'));
+        $result .= html_writer::start_tag('div', ['class' => 'answer']);
         foreach ($radiobuttons as $key => $radio) {
-            $result .= html_writer::tag('div', stack_maths::process_lang_string($radio), array('class' => 'option'));
+            $result .= html_writer::tag('div', stack_maths::process_lang_string($radio), ['class' => 'option']);
         }
         $result .= html_writer::end_tag('div');
 
         return $result;
+    }
+
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function render_api_data($tavalue) {
+        if ($this->errors) {
+            throw new stack_exception("Error rendering input: " . implode(',', $this->errors));
+        }
+
+        $data = [];
+
+        $data['type'] = 'radio';
+        $data['options'] = $this->get_choices();
+
+        return $data;
     }
 }

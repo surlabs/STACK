@@ -14,20 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-global $CFG;
-//require_once($CFG->libdir . '/filterlib.php');
-//require_once(__DIR__ . '/mathsoutputfilterbase.class.php');
 
+global $CFG;
 
 /**
  * STACK maths output methods for using The OU's maths filter.
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_maths_output_maths extends stack_maths_output_filter_base {
 
     /**
+     * Add description here.
      * @return boolean is the OU maths filter installed?
      */
     public static function filter_is_installed() {
@@ -35,6 +35,7 @@ class stack_maths_output_maths extends stack_maths_output_filter_base {
         return file_exists($CFG->dirroot . '/filter/maths/filter.php');
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function initialise_delimiters() {
         $this->displaystart = '&lt;tex mode="display"&gt;';
         $this->displayend = '&lt;/tex&gt;';
@@ -42,14 +43,14 @@ class stack_maths_output_maths extends stack_maths_output_filter_base {
         $this->inlineend = '&lt;/tex&gt;';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function make_filter() {
         global $CFG;
 
         if (!self::filter_is_installed()) {
-            throw new stack_exception('The OU maths filter is not installed.');
+            throw new coding_exception('The OU maths filter is not installed.');
         }
 
-        //require_once($CFG->dirroot . '/filter/maths/filter.php');
-        return new filter_maths(context_system::instance(), array());
+        return new filter_maths(context_system::instance(), []);
     }
 }

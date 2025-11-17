@@ -30,7 +30,7 @@ $(document).ready(function() {
         const $cont = $("#" + taxonomy + "_cont");
 
         $cont.find(".taxonomyResult").val(JSON.stringify([])).trigger("input");
-        $cont.find(".tax-node").prop("checked", false);
+        $cont.find(".tax-node input").prop("checked", false);
     });
 
     $(".taxonomyResult").on("input", function () {
@@ -57,10 +57,14 @@ $(document).ready(function() {
         $(this).trigger("input");
     });
 
-    $(document).on("change", ".tax-node", function() {
-        const taxonomy = $(this).attr("taxonomy-id");
+    $(document).on("change", ".tax-node input", function() {
+        const $fieldset = $(this).closest(".tax-node");
 
+        const taxonomy = $fieldset.attr("taxonomy-id");
+        const nodeId = parseInt($fieldset.attr("node-id"));
+        const nodeTitle = $fieldset.attr("node-title");
         const value = $(this).is(":checked");
+
         const $result = $("#" + taxonomy + "_cont").find(".taxonomyResult");
         let result = $result.val();
 
@@ -70,20 +74,13 @@ $(document).ready(function() {
             result = [];
         }
 
-        result = result.filter(function (item) {
-            return parseInt(item.id) !== parseInt($(this).attr("node-id"));
-        }.bind(this));
+        result = result.filter(item => parseInt(item.id) !== nodeId);
 
         if (value) {
-            result.push({
-                id: parseInt($(this).attr("node-id")),
-                title: $(this).attr("node-title")
-            });
+            result.push({ id: nodeId, title: nodeTitle });
         }
 
-        result.sort(function (a, b) {
-            return a.id - b.id;
-        });
+        result.sort((a, b) => a.id - b.id);
 
         $result.val(JSON.stringify(result)).trigger("input");
     });
@@ -113,7 +110,7 @@ $(document).ready(function() {
 
                         if (value) {
                             for (let i = 0; i < value.length; i++) {
-                                const node = $("#" + taxonomy + "_cont").find(".tax-node[taxonomy-id='" + taxonomy + "'][node-id='" + value[i].id + "']");
+                                const node = $("#" + taxonomy + "_cont").find(".tax-node[taxonomy-id='" + taxonomy + "'][node-id='" + value[i].id + "'] input");
                                 if (node.length > 0) {
                                     node.prop("checked", true);
                                     node.parents(".expandable").not(node.parent().parent(".expandable")).attr("aria-expanded", "true");

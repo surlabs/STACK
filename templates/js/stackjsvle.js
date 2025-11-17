@@ -94,9 +94,13 @@ function vle_get_element(id) {
  * @param {String} name the name of the input we want
  * @param {String} srciframe the identifier of the iframe wanting it
  */
-function vle_get_input_element(name, srciframe) {
-    /* In the case of Moodle we are happy as long as the element is inside
+function vle_get_input_element(name, srciframe, outside) {
+    /* In the case of ILIAS we are happy as long as the element is inside
        something with the `ilc_question_Standard`-class. */
+    if (outside === undefined) {
+        // Old default was to search beyond the question.
+        outside = true;
+    }
     let iter = document.getElementById(srciframe);
     while (iter && !iter.classList.contains('ilc_question_Standard')) {
         iter = iter.parentElement;
@@ -108,8 +112,18 @@ function vle_get_input_element(name, srciframe) {
         if (possible !== null) {
             return possible;
         }
+        possible = iter.querySelector('textarea[id$="_' + name + '"]');
+        if (possible !== null) {
+            return possible;
+        }
         // Radios have interesting ids, but the name makes sense
         possible = iter.querySelector('input[id$="_' + name + '_1"][type=radio]');
+        if (possible !== null) {
+            return possible;
+        }
+        // Same for checkboxes, note that non STACK checkbox can be targeted by
+        // just the id using the topmost case here.
+        possible = iter.querySelector('input[id$="_' + name + '_1"][type=checkbox]');
         if (possible !== null) {
             return possible;
         }
@@ -118,12 +132,30 @@ function vle_get_input_element(name, srciframe) {
             return possible;
         }
     }
-
-    // If we did not find anything we return null. Because if we search everywhere we might find something that is not in the question.
-
-    return null;
+    if (!outside) {
+        return null;
+    }
+    // If none found within the question itself, search in some panel-body (for healthcheck).
+    let possible = document.querySelector('.panel-body input[id$="_' + name + '"]');
+    if (possible !== null) {
+        return possible;
+    }
+    possible = document.querySelector('.panel-body textarea[id$="_' + name + '"]');
+    if (possible !== null) {
+        return possible;
+    }
+    // Radios have interesting ids, but the name makes sense
+    possible = document.querySelector('.panel-body input[id$="_' + name + '_1"][type=radio]');
+    if (possible !== null) {
+        return possible;
+    }
+    possible = document.querySelector('.panel-body input[id$="_' + name + '_1"][type=checkbox]');
+    if (possible !== null) {
+        return possible;
+    }
+    possible = document.querySelector('.panel-body select[id$="_' + name + '"]');
+    return possible;
 }
-
 /**
  * Triggers any VLE specific scripting related to updates of the given
  * input element.
@@ -145,7 +177,9 @@ function vle_update_input(inputelement) {
  * @param {HTMLElement} modifiedsubtreerootelement element under which changes may have happened.
  */
 function vle_update_dom(modifiedsubtreerootelement) {
-    CustomEvents.notifyFilterContentUpdated(modifiedsubtreerootelement);
+    if (typeof CustomEvents !== 'undefined' && CustomEvents.notifyFilterContentUpdated) {
+        CustomEvents.notifyFilterContentUpdated(modifiedsubtreerootelement);
+    }
 }
 
 /**
@@ -415,7 +449,7 @@ window.addEventListener("message", (e) => {
             // 4. Let the requester know that we have bound things
             //    and let it know the initial value.
             if (!(msg.src in INPUTS[input.id])) {
-                console.log(msg.name, response);
+                // console.log(msg.name, response);
                 IFRAMES[msg.src].contentWindow.postMessage(JSON.stringify(response), '*');
             }
 

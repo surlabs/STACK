@@ -14,16 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
 
 /**
  * AST filter that replaces arccos with acos and so on.
  */
 class stack_ast_filter_022_trig_replace_synonyms implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         // As these are invalid they do not exist in the security-map.
-        $selectednames = array('arcsin' => 'asin', 'arccos' => 'acos',
+        $selectednames = [
+            'arcsin' => 'asin', 'arccos' => 'acos',
             'arctan' => 'atan', 'arcsec' => 'asec',
             'arccot' => 'acot', 'arccsc' => 'acsc',
             'arcsinh' => 'asinh', 'arccosh' => 'acosh',
@@ -32,8 +41,8 @@ class stack_ast_filter_022_trig_replace_synonyms implements stack_cas_astfilter 
             'arccosec' => 'acsc',
             'arsinh' => 'asinh', 'arcosh' => 'acosh',
             'artanh' => 'atanh', 'arsech' => 'asech',
-            'arcoth' => 'acoth', 'arcsch' => 'acsch'
-        );
+            'arcoth' => 'acoth', 'arcsch' => 'acsch',
+        ];
 
         $process = function($node) use (&$errors, &$answernotes, $selectednames) {
             if ($node instanceof MP_Functioncall &&

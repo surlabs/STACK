@@ -14,111 +14,121 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Options enable a context to be set for each question, and information
  * made generally available to other classes.
  *
+ * @package    qtype_stack
  * @copyright  2012 The University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_options {
 
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private $options;
 
-    public function __construct($settings = array()) {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function __construct($settings = []) {
 
         // OptionType can be: boolean, string, html, list.
-        $this->options  = array( // Array of public class settings for this class.
-            'display'   => array(
+        $this->options  = [ // Array of public class settings for this class.
+            'display'   => [
                 'type'       => 'list',
                 'value'      => 'LaTeX',
                 'strict'     => true,
-                'values'     => array('LaTeX', 'String'),
+                'values'     => ['LaTeX', 'String'],
                 'caskey'     => 'OPT_OUTPUT',
                 'castype'    => 'string',
-             ),
-            'decimals'       => array(
+            ],
+            'decimals'       => [
                 'type'       => 'list',
                 'value'      => '.',
                 'strict'     => true,
-                'values'     => array('.', ','),
+                'values'     => ['.', ','],
                 'caskey'     => 'texput_decimal',
                 'castype'    => 'fun',
-            ),
-            'multiplicationsign'   => array(
+            ],
+            'scientificnotation' => [
+                'type'       => 'list',
+                'value'      => '*10',
+                'strict'     => true,
+                'values'     => ['*10', 'E'],
+                'caskey'     => 'texput_scientificnotation',
+                'castype'    => 'fun',
+            ],
+            'multiplicationsign'   => [
                 'type'       => 'list',
                 'value'      => 'dot',
                 'strict'     => true,
-                'values'     => array('dot', 'cross', 'onum', 'none'),
+                'values'     => ['dot', 'cross', 'onum', 'none', 'space'],
                 'caskey'     => 'make_multsgn',
                 'castype'    => 'fun',
-            ),
-            'complexno'   => array(
+            ],
+            'complexno'   => [
                 'type'       => 'list',
                 'value'      => 'i',
                 'strict'     => true,
-                'values'     => array('i', 'j', 'symi', 'symj'),
+                'values'     => ['i', 'j', 'symi', 'symj'],
                 'caskey'     => 'make_complexJ',
                 'castype'    => 'fun',
-            ),
-            'inversetrig'   => array(
+            ],
+            'inversetrig'   => [
                 'type'       => 'list',
                 'value'      => 'cos-1',
                 'strict'     => true,
-                'values'     => array('cos-1', 'acos', 'arccos', 'arccos-arcosh'),
+                'values'     => ['cos-1', 'acos', 'arccos', 'arsinh'],
                 'caskey'     => 'make_arccos',
                 'castype'    => 'fun',
-            ),
-            'logicsymbol'   => array(
+            ],
+            'logicsymbol'   => [
                 'type'       => 'list',
                 'value'      => 'lang',
                 'strict'     => true,
-                'values'     => array('lang', 'symbol'),
+                'values'     => ['lang', 'symbol'],
                 'caskey'     => 'make_logic',
                 'castype'    => 'fun',
-            ),
-            'sqrtsign'   => array(
+            ],
+            'sqrtsign'   => [
                 'type'       => 'boolean',
                 'value'      => true,
                 'strict'     => true,
-                'values'     => array(),
+                'values'     => [],
                 'caskey'     => 'sqrtdispflag',
                 'castype'    => 'ex',
-            ),
-            'simplify'   => array(
+            ],
+            'simplify'   => [
                 'type'       => 'boolean',
                 'value'      => true,
                 'strict'     => true,
-                'values'     => array(),
+                'values'     => [],
                 'caskey'     => 'simp',
                 'castype'    => 'ex',
-            ),
-            'assumepos'   => array(
+            ],
+            'assumepos'   => [
                 'type'       => 'boolean',
                 'value'      => false,
                 'strict'     => true,
-                'values'     => array(),
+                'values'     => [],
                 'caskey'     => 'assume_pos',
                 'castype'    => 'ex',
-            ),
-            'assumereal'   => array(
+            ],
+            'assumereal'   => [
                 'type'       => 'boolean',
                 'value'      => false,
                 'strict'     => true,
-                'values'     => array(),
+                'values'     => [],
                 'caskey'     => 'assume_real',
                 'castype'    => 'ex',
-            ),
-            'matrixparens'   => array(
+            ],
+            'matrixparens'   => [
                 'type'       => 'list',
                 'value'      => '[',
                 'strict'     => true,
-                'values'     => array('[', '(', '', '{', '|'),
+                'values'     => ['[', '(', '', '{', '|'],
                 'caskey'     => 'lmxchar',
                 'castype'    => 'exs',
-            ),
-        );
+            ],
+        ];
 
         if (!is_array($settings)) {
             throw new stack_exception('stack_options: $settings must be an array.');
@@ -134,10 +144,12 @@ class stack_options {
         }
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function set_site_defaults() {
         $stackconfig = stack_utils::get_config();
         // Display option does not match up to $stackconfig->mathsdisplay).
         $this->set_option('decimals', $stackconfig->decimals);
+        $this->set_option('scientificnotation', $stackconfig->scientificnotation);
         $this->set_option('multiplicationsign', $stackconfig->multiplicationsign);
         $this->set_option('complexno', $stackconfig->complexno);
         $this->set_option('inversetrig', $stackconfig->inversetrig);
@@ -150,7 +162,7 @@ class stack_options {
         return true;
     }
 
-    /*
+    /**
      * This function validates the information.
      */
     private function validate_key($key, $val) {
@@ -174,6 +186,7 @@ class stack_options {
         return true;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_option($key) {
         if (!array_key_exists($key, $this->options)) {
             throw new stack_exception('stack_options get_option: $key '.$key.' is not a valid option name.');
@@ -182,11 +195,13 @@ class stack_options {
         }
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function set_option($key, $val) {
         $this->validate_key($key, $val); // Throws an exception on error.
         $this->options[$key]['value'] = $val;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_cas_commands() {
 
         $names = '';
@@ -217,122 +232,195 @@ class stack_options {
                 }
             }
         }
-        $ret = array('names' => $names, 'commands' => $commands);
+        $ret = ['names' => $names, 'commands' => $commands];
         return $ret;
     }
 
     /**
+     * Add description here.
      * @return array of choices for a no/yes select menu.
      */
     public static function get_yes_no_options() {
-        return array(
+        return [
             '0' => get_string('no'),
             '1' => get_string('yes'),
-        );
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the insert stars select menu.
      */
     public static function get_insert_star_options() {
-        return array(
+        return [
             '0' => get_string('insertstarsno', 'qtype_stack'),
             '1' => get_string('insertstarsyes', 'qtype_stack'),
             '2' => get_string('insertstarsassumesinglechar', 'qtype_stack'),
             '3' => get_string('insertspaces', 'qtype_stack'),
             '4' => get_string('insertstarsspaces', 'qtype_stack'),
-            '5' => get_string('insertstarsspacessinglechar', 'qtype_stack')
-        );
+            '5' => get_string('insertstarsspacessinglechar', 'qtype_stack'),
+            '6' => get_string('insertspacesfunctions', 'qtype_stack'),
+            '7' => get_string('insertspacesfunctionssingle', 'qtype_stack'),
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the input syntax hint display attribute.
      */
     public static function get_syntax_attribute_options() {
-        return array(
-                '0' => get_string('syntaxattributevalue', 'qtype_stack'),
-                '1' => get_string('syntaxattributeplaceholder', 'qtype_stack'),
-        );
+        return [
+            '0' => get_string('syntaxattributevalue', 'qtype_stack'),
+            '1' => get_string('syntaxattributeplaceholder', 'qtype_stack'),
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the decimal sign select menu.
      */
     public static function get_decimals_sign_options() {
-        return array(
+        return [
             '.'    => '.',
             ','    => ',',
-        );
+        ];
     }
 
     /**
+     * Add description here.
+     * @return array of choices for the scientific notation select menu.
+     */
+    public static function get_scientificnotation_options() {
+        return [
+            '*10'  => get_string('scientificnotation_10', 'qtype_stack'),
+            'E'    => get_string('scientificnotation_E', 'qtype_stack'),
+        ];
+    }
+
+    /**
+     * Add description here.
      * @return array of choices for the multiplication sign select menu.
      */
     public static function get_multiplication_sign_options() {
-        return array(
+        return [
             'dot'   => get_string('multdot', 'qtype_stack'),
             'cross' => get_string('multcross', 'qtype_stack'),
             'onum'  => get_string('multonlynumbers', 'qtype_stack'),
+            'space' => get_string('multspace', 'qtype_stack'),
             'none'  => get_string('none'),
-        );
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the complex number select menu.
      */
     public static function get_complex_no_options() {
-        return array(
+        return [
             'i'    => 'i',
             'j'    => 'j',
             'symi' => 'symi',
             'symj' => 'symj',
-        );
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the inverse trig select menu.
      */
     public static function get_inverse_trig_options() {
-        return array(
+        return [
             'cos-1'         => "cos\xe2\x81\xbb\xc2\xb9(x)",
             'acos'          => 'acos(x)',
             'arccos'        => 'arccos(x)',
-            'arccos-arcosh' => 'arccos(x)/arcosh(x)'
-        );
+            'arsinh'        => 'arsinh(x)',
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the inverse trig select menu.
      */
     public static function get_logic_options() {
-        return array(
+        return [
             'lang'   => get_string('logicsymbollang', 'qtype_stack'),
             'symbol' => get_string('logicsymbolsymbol', 'qtype_stack'),
-        );
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the matrix prenthesis select menu.
      */
     public static function get_matrix_parens_options() {
-        return array(
+        return [
             '[' => '[',
             '(' => '(',
             ''  => '',
             '{' => '{',
             '|' => '|',
-        );
+        ];
     }
 
     /**
+     * Add description here.
      * @return array of choices for the show validation select menu.
      */
     public static function get_showvalidation_options() {
-        return array(
+        return [
             '0' => get_string('showvalidationno', 'qtype_stack'),
             '1' => get_string('showvalidationyes', 'qtype_stack'),
             '2' => get_string('showvalidationyesnovars', 'qtype_stack'),
             '3' => get_string('showvalidationcompact', 'qtype_stack'),
-        );
+        ];
+    }
+
+    /**
+     * Add description here.
+     * @return array of choices for the monospace input select menu.
+     */
+    public static function get_monospace_options() {
+        return [
+            // Options will appear in order listed, not key order.
+            // Keys need to match is_monospace() below.
+            '0' => get_string('inputtypealgebraic', 'qtype_stack'),
+            '1' => get_string('inputtypenumerical', 'qtype_stack'),
+            '2' => get_string('inputtypeunits', 'qtype_stack'),
+            '3' => get_string('inputtypevarmatrix', 'qtype_stack'),
+        ];
+    }
+
+    /**
+     * Get the monospace default for supplied input class.
+     * @return bool
+     *
+     * We have a class name in format 'stack_XXXX_input' where 'XXXX' is the input type.
+     * The monospace default config setting is a string in format '0,2,4' where the integers are
+     * the array keys from the option selection in get_monospace_options().
+     * We have to convert the input type to an integer and then check if it's in the config string.
+     */
+    public static function is_monospace($class) {
+        $options = [
+            // These need to match get_monospace_options() above.
+            '0' => 'algebraic',
+            '1' => 'numerical',
+            '2' => 'units',
+            '3' => 'varmatrix',
+        ];
+        $optionkey = array_search(explode('_', $class)[1], $options);
+        if ($optionkey === false) {
+            // This type of input not allowed to be monospace.
+            return false;
+        }
+
+        $monoinputkeys = explode(',', get_config('qtype_stack', 'inputmonospace'));
+
+        $key = array_search(strval($optionkey), $monoinputkeys, true);
+
+        if ($key === false) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

@@ -48,7 +48,7 @@ class StackCheckPrt {
             if (isset($data["prts"]) && !empty($data["prts"])) {
                 foreach ($data["prts"] as $prt) {
                     if (isset($data["question_text"]) && isset($data["specific_feedback"])) {
-                        if (strpos($data["question_text"], "[[feedback:" . $prt . "]]") === false && strpos($data["specific_feedback"], "[[feedback:" . $prt . "]]") === false) {
+                        if (!str_contains($data["question_text"], "[[feedback:" . $prt . "]]") && !str_contains($data["specific_feedback"], "[[feedback:" . $prt . "]]")) {
                             $errors[$question_id]["title"] = $data["title"];
                             $errors[$question_id]["missing_placeholders"][] = $prt;
                         } else if (!stack_utils::is_valid_name($prt) && is_numeric($prt)) {
@@ -67,7 +67,7 @@ class StackCheckPrt {
                 foreach ($data["prts"] as $prt => $node) {
                     foreach ($node as $node_name => $node_data) {
                         foreach ($node_data as $key => $value) {
-                            if (strpos($value, ",") !== false) {
+                            if (str_contains($value, ",")) {
                                 $errors[$question_id]["title"] = $data["title"];
                                 $errors[$question_id]["comma_errors"][] = [
                                     "prt" => $prt,
@@ -99,7 +99,7 @@ class StackCheckPrt {
 
             if (isset($data["prts"]) && !empty($data["prts"])) {
                 foreach ($data["prts"] as $prt) {
-                    if (strpos($data["question_text"], "[[feedback:" . $prt . "]]") === false && strpos($data["specific_feedback"], "[[feedback:" . $prt . "]]") === false) {
+                    if (!str_contains($data["question_text"], "[[feedback:" . $prt . "]]") && !str_contains($data["specific_feedback"], "[[feedback:" . $prt . "]]")) {
                         if ($specific_feedback ==  "") {
                             $specific_feedback = "<p>[[feedback:". $prt . "]]</p>";
                         } else {
@@ -172,7 +172,7 @@ class StackCheckPrt {
                 foreach ($data["prts"] as $prt => $node) {
                     foreach ($node as $node_name => $node_data) {
                         foreach ($node_data as $key => $value) {
-                            if (strpos($value, ",") !== false) {
+                            if (str_contains($value, ",")) {
                                 $fixed_value = (float) preg_replace('/\.{2,}/', '.', str_replace(",", ".", $value));
 
                                 assStackQuestionDB::updatePrtNodeValue($question_id, (string) $prt, (string) $node_name, (string) $key, $fixed_value);
@@ -204,7 +204,7 @@ class StackCheckPrt {
                     foreach ($question_data["prts"] as $prt => $node) {
                         foreach ($node as $node_name => $node_data) {
                             foreach ($node_data as $key => $value) {
-                                if (strpos($value, ",") !== false) {
+                                if (str_contains($value, ",")) {
                                     $fixed_value = (float) preg_replace('/\.{2,}/', '.', str_replace(",", ".", $value));
 
                                     assStackQuestionDB::updatePrtNodeValue((string) $question_id, (string) $prt, (string) $node_name, (string) $key, $fixed_value);

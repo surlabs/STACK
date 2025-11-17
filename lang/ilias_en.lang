@@ -720,3 +720,6 @@ ui_admin_configuration_quality_check_prt_comma_errors_fixed_count#:#Comma errors
 fix#:#Fix
 fix_all_comma_errors#:#Fix all comma errors
 node_deleted#:#Node deleted
+ui_admin_configuration_defaults_section_title_healthcheck_healthcheckjsxgraph#:#JSXGraph
+ui_admin_configuration_defaults_section_title_healthcheck_healthcheckparsons#:#Parsons
+ui_admin_configuration_defaults_section_title_healthcheck_healthcheckgeogebra#:#GeoGebra

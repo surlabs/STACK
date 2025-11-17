@@ -15,21 +15,15 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
-/*
- @copyright  2018 Aalto University.
- @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
-*/
 
-//require_once(__DIR__ . '/autogen/parser.mbstring.php');
-// Also needs stack_string().
-//require_once(__DIR__ . '/../../utils/locallib.php');
-//require_once(__DIR__ . '/../../vle_specific.php');
-//require_once(__DIR__ . '/../utils.class.php');
-//require_once(__DIR__ . '/MP_classes.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2018 Aalto University.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-include_once ILIAS_ABSOLUTE_PATH . '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionInitialization.php';
-include_once ILIAS_ABSOLUTE_PATH . '/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/locallib.php';
-
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class maxima_parser_utils {
 
     /**
@@ -47,7 +41,7 @@ class maxima_parser_utils {
         $parseoptions = [
             'startRule' => $parserule,
             'letToken' => stack_string('equiv_LET'),
-            'allowPM' => $allowpm
+            'allowPM' => $allowpm,
         ];
         if ($parserule === 'Root') {
             $cachekey = ($allowpm ? '|PM|' : '|noPM|') . $parseoptions['letToken'] . '|' . $code;
@@ -77,19 +71,15 @@ class maxima_parser_utils {
      * @return MP_Node the AST.
      */
     protected static function do_parse(string $code, array $parseoptions, string $cachekey): MP_Node {
-        //TODO SAUL Connect valor real
-        //$muccachelimit = get_config('qtype_stack', 'parsercacheinputlength');
-        $muccachelimit = 50;
+        $muccachelimit = get_config('qtype_stack', 'parsercacheinputlength');
 
         $cache = null;
-        if ($cachekey  && strlen($code) >= $muccachelimit && mb_strpos($code, 'stack_include') === false) {
-            //TODO SAUL Conectar con cache nueva
-            /*
+        if ($cachekey && $muccachelimit && strlen($code) >= $muccachelimit && mb_strpos($code, 'stack_include') === false) {
             $cache = cache::make('qtype_stack', 'parsercache');
             $ast = $cache->get($cachekey);
             if ($ast) {
                 return $ast;
-            }*/
+            }
         }
 
         $parser = new MP_Parser();
@@ -104,9 +94,10 @@ class maxima_parser_utils {
 
     // Takes a raw tree and the matching source code and remaps the positions from char to line:linechar
     // use when you need to have pretty printed position data.
-    public static function position_remap(MP_Node $ast, string $code, array $limits = null) {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public static function position_remap(MP_Node $ast, string $code, ?array $limits = null) {
         if ($limits === null) {
-            $limits = array();
+            $limits = [];
             foreach (explode("\n", $code) as $line) {
                 $limits[] = strlen($line) + 1;
             }
@@ -151,6 +142,7 @@ class maxima_parser_utils {
 
     // This one removes comments before parsing.
     // For those cases where you just must check for some chars.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function remove_comments(string $src): string {
         $chars = preg_split('//u', $src, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -201,10 +193,11 @@ class maxima_parser_utils {
 
 
     // Takes a raw tree and drops the comments sections from it.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function strip_comments(MP_Root $ast) {
         // For now comments exist only at the top level and there are no "inline"
         // comments within statements, hopefully at some point we can go further.
-        $nitems = array();
+        $nitems = [];
         foreach ($ast->items as $node) {
             if ($node instanceof MP_Comment) {
                 continue;
@@ -220,6 +213,7 @@ class maxima_parser_utils {
 
     // Tries to parse a long string of statements and if not imediately valid
     // tries to fix by adding semicolons.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function parse_and_insert_missing_semicolons($str, $lastfix = -1) {
         try {
             $ast = self::parse($str);
@@ -253,6 +247,7 @@ class maxima_parser_utils {
     // Will generate a singular AST with position remaps and inlined included statements.
     // Generates errors if inclusions within inclusions or inclusions in unexpected places.
     // Returns either the AST or some form of an exception.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function parse_and_insert_missing_semicolons_with_includes($str) {
         $root = self::parse_and_insert_missing_semicolons($str);
         if ($root instanceof MP_Root) {
@@ -282,7 +277,7 @@ class maxima_parser_utils {
                                 if ($node->name->value === 'stack_include_contrib') {
                                     $remoteurl = 'contrib://' . $remoteurl;
                                 }
-                                $srccode = castext2_parser_utils::stack_fetch_included_content($remoteurl);
+                                $srccode = stack_fetch_included_content($remoteurl);
                                 if ($srccode === false) {
                                     // Do not give the address in the output.
                                     $errors[] = 'stack_include or stack_include_contrib, could not retrieve: ' . $remoteurl;
@@ -364,7 +359,7 @@ class maxima_parser_utils {
             while ($root->callbackRecurse($include) !== true) {}
             // @codingStandardsIgnoreEnd
 
-            // TODO: wrap those errors into something more readable.
+            // TO-DO: wrap those errors into something more readable.
             if (count($errors) > 0) {
                 // Returning an exception because we already either return an excpetion or the root node, so why
                 // have even more types in play.
@@ -379,6 +374,7 @@ class maxima_parser_utils {
 
 
     // Function to find suitable place to inject a semicolon to i.e. place into start of whitespace.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private static function previous_non_whitespace($code, $pos) {
         $i = $pos;
         if (mb_substr($code, $i - 1, 2) === '/*') {
@@ -391,6 +387,7 @@ class maxima_parser_utils {
     }
 
     // Custom rules on what is an is not whitespace.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private static function is_whitespace($mbc) {
         // So ctype_space does not handle those fancy unicode spaces...
         // There are more than these but we add things as we meet them.
@@ -408,18 +405,19 @@ class maxima_parser_utils {
     // Tool to extract information about which variables are being used and how.
     // In a given parsed section of code. Updates a given usage list so that use
     // for example in going through a PRT tree is convenient.
-    public static function variable_usage_finder($ast, $output=array()) {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public static function variable_usage_finder($ast, $output=[]) {
         if (!array_key_exists('read', $output)) {
-            $output['read'] = array();
+            $output['read'] = [];
         }
         if (!array_key_exists('write', $output)) {
-            $output['write'] = array();
+            $output['write'] = [];
         }
         if (!array_key_exists('calls', $output)) {
-            $output['calls'] = array();
+            $output['calls'] = [];
         }
         if (!array_key_exists('declares', $output)) {
-            $output['declares'] = array();
+            $output['declares'] = [];
         }
         $recursion = function($node) use(&$output) {
             // Feel free to expand this to track any other types of usages,
@@ -448,6 +446,7 @@ class maxima_parser_utils {
     // Note that this identifies stackmaps by default.
     // Also after this has done its thing you will not be able to separate strings from identifiers.
     // Intended for processing complex return values from CAS using PHP methods.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function mp_to_php(
         MP_Node $in,
         bool $stackmaps = true
@@ -782,6 +781,7 @@ class maxima_parser_utils {
     }
 
     // Does blind replacement with no care about usage context.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function id_replace(MP_Node $ast, array $ids): MP_Node {
         $replace = function($node) use(&$ids) {
             if ($node instanceof MP_Identifier && isset($ids[$node->value])) {
@@ -809,6 +809,7 @@ class maxima_parser_utils {
 
     // Includes a timeout logic that will stop exploring after a time if we time out
     // a special key '% TIMEOUT %' will have a value.
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function identify_identifier_values($ast, $expand=[], $timeout=20): array {
         $timelimit = microtime(true) + $timeout;
         $output = array_merge($expand, []);
@@ -1142,8 +1143,10 @@ class maxima_parser_utils {
                     // the three argument case as we see what we do in those cases, others
                     // stay 'unevaluated' for now.
                     if (count($node->arguments) === 3) {
-                        $r = new MP_FunctionCall(new MP_Identifier('ev'), [$node->arguments[2],
-                            new MP_Operation('=', $node->arguments[1], $node->arguments[0])]);
+                        $r = new MP_FunctionCall(new MP_Identifier('ev'), [
+                            $node->arguments[2],
+                            new MP_Operation('=', $node->arguments[1], $node->arguments[0]),
+                        ]);
                         $node->parentnode->replace($node, $r);
                         return false;
                     } else if (count($node->arguments) === 2) {
@@ -2172,7 +2175,7 @@ class maxima_parser_utils {
                             if ($arg instanceof MP_Operation && ($arg->op === '=' || $arg->op === ':')
                                     && $arg->lhs instanceof MP_Identifier) {
                                 $repl[$arg->lhs->value] = clone $arg->rhs;
-                            } // TODO: is this else condition reachable? If so tag everything as unknown.
+                            } // TO-DO: is this else condition reachable? If so tag everything as unknown.
                         }
                         foreach ($repl as $key => $value) {
                             if (!isset($output[$key])) {
@@ -2335,7 +2338,9 @@ class maxima_parser_utils {
         return $output;
     }
 
-    /* Common merge actions for type struct fixing. */
+    /**
+     * Common merge actions for type struct fixing.
+     */
     private static function mergeclasses(array $data, array $funcs, stack_cas_security $sec, bool $merge = false): array {
         $output = $data;
 
@@ -2491,7 +2496,9 @@ class maxima_parser_utils {
         return $output;
     }
 
-    /* Turn a subtree to `stack_complex_expression`. */
+    /**
+     * Turn a subtree to `stack_complex_expression`.
+     */
     private static function to_sce(MP_Node $ast, stack_cas_security $sec): MP_Node {
         $terms = [];
         $seek2 = function($n) use (&$terms, &$sec) {

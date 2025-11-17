@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Represents a group of nodes that have been laid out relative to each other.
  *
@@ -23,25 +22,23 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-
-
 /**
  * Used by {@link stack_abstract_graph} during the layout algorithm.
  * This represents a group of nodes that have been laid out relative to each other.
  *
+ * @package    qtype_stack
  * @copyright 2013 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_abstract_graph_node_clump {
     /** @var array stack_abstract_graph_node. */
-    public $nodes = array();
+    public $nodes = [];
 
     /** @var array depth => x-coordinate of the left-most node in the clump at this depth. */
-    public $leftedge = array();
+    public $leftedge = [];
 
     /** @var array depth => y-coordinate of the right-most node in the clump at this depth. */
-    public $rightedge = array();
+    public $rightedge = [];
 
     /**
      * Constructor.
@@ -134,7 +131,7 @@ class stack_abstract_graph_node_clump {
                 }
             }
         }
-        return array($leftneighbour, $rightneighbour);
+        return [$leftneighbour, $rightneighbour];
     }
 
     /**
@@ -171,6 +168,7 @@ class stack_abstract_graph_node_clump {
     }
 
     /**
+     * Checkis if this clump contains a node.
      * @param stack_abstract_graph_node $node
      * @return bool whether this clump contains the given node.
      */
@@ -200,7 +198,7 @@ class stack_abstract_graph_node_clump {
      * @param float $gap
      */
     public function comput_offset(stack_abstract_graph_node_clump $otherclump, $gap) {
-        $requiredshifts = array();
+        $requiredshifts = [];
         foreach ($this->rightedge as $depth => $right) {
             if (array_key_exists($depth, $otherclump->leftedge)) {
                 $requiredshifts[] = $right + $gap - $otherclump->leftedge[$depth];

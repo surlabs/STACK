@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
-//require_once(__DIR__ . '/filter.interface.php');
-//require_once(__DIR__ . '/../../maximaparser/corrective_parser.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
 /**
  * AST filter that check identifiers for the use of chars that are
@@ -25,8 +28,10 @@
  */
 class stack_ast_filter_180_char_based_superscripts implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     public static $ssmap = null;
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
         if (self::$ssmap === null) {
             self::$ssmap = json_decode(file_get_contents(__DIR__ . '/../../maximaparser/unicode/superscript-stack.json'), true);
@@ -69,13 +74,17 @@ class stack_ast_filter_180_char_based_superscripts implements stack_cas_astfilte
                 if (count($segments) > 1) {
                     // Parts between which we have insert stars.
                     // E.g. x²x²x²x -> x^2*x^2*x^2*x.
+                    // Note, the above is not used in students' input because we now forbid unicode superscript.
+                    // And, we use 150_replace filter.
                     $parts = [];
                     while (count($segments) > 1) {
                         $base = new MP_Identifier(array_shift($segments));
                         $power = array_shift($segments);
 
-                        $power = maxima_corrective_parser::parse($power, $errors, $answernotes, array('startRule' => 'Root',
-                                   'letToken' => stack_string('equiv_LET')));
+                        $power = maxima_corrective_parser::parse($power, $errors, $answernotes, [
+                            'startRule' => 'Root',
+                            'letToken' => stack_string('equiv_LET'),
+                        ]);
                         // Should there be something truly unexpected.
                         if ($power === null) {
                             $node->position['invalid'] = true;

@@ -15,16 +15,10 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
-//require_once(__DIR__ . '/connector.interface.php');
-//require_once(__DIR__ . '/connector.class.php');
-//require_once(__DIR__ . '/connector.dbcache.class.php');
-//require_once(__DIR__ . '/installhelper.class.php');
-
-
 /**
  * The base class for connections to Maxima.
  *
+ * @package    qtype_stack
  * @copyright  2012 The University of Birmingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -54,21 +48,14 @@ abstract class stack_connection_helper {
         $debuglog = stack_utils::make_debug_log(self::$config->casdebugging);
 
         switch (self::$config->platform) {
-            case 'win':
-                //require_once(__DIR__ . '/connector.windows.class.php');
-                $connection = new stack_cas_connection_windows(self::$config, $debuglog);
-                break;
             case 'linux':
             case 'linux-optimised':
-                //require_once(__DIR__ . '/connector.linux.class.php');
                 $connection = new stack_cas_connection_linux(self::$config, $debuglog);
                 break;
             case 'server':
-                //require_once(__DIR__ . '/connector.server.class.php');
                 $connection = new stack_cas_connection_server(self::$config, $debuglog);
                 break;
             case 'server-proxy':
-                //require_once(__DIR__ . '/connector.server_proxy.class.php');
                 $connection = new stack_cas_connection_server_proxy(self::$config, $debuglog);
                 break;
             case 'tomcat':
@@ -84,13 +71,10 @@ abstract class stack_connection_helper {
 
         switch (self::$config->casresultscache) {
             case 'db':
-                //fau: #7 Use ILIAS DB instead of Moodle DB
                 global $DIC;
                 $db = $DIC->database();
                 $connection = new stack_cas_connection_db_cache($connection, $debuglog, $db);
-                //fau.
                 break;
-
             case 'otherdb':
                 $connection = new stack_cas_connection_db_cache($connection, $debuglog, self::get_other_db());
                 break;
@@ -111,20 +95,21 @@ abstract class stack_connection_helper {
             return self::$otherdb;
         }
 
-        $dboptions = array();
+        $dboptions = [];
         if (!empty(self::$config->cascachedbsocket)) {
             $dboptions['dbsocket'] = true;
         }
 
         self::$otherdb = moodle_database::get_driver_instance(
-                self::$config->cascachedbtype, self::$config->cascachedblibrary);
+            self::$config->cascachedbtype, self::$config->cascachedblibrary);
         self::$otherdb->connect(self::$config->cascachedbhost,
-                self::$config->cascachedbuser, self::$config->cascachedbpass,
-                self::$config->cascachedbname, self::$config->cascachedbprefix, $dboptions);
+            self::$config->cascachedbuser, self::$config->cascachedbpass,
+            self::$config->cascachedbname, self::$config->cascachedbprefix, $dboptions);
         return self::$otherdb;
     }
 
     /**
+     * Add description here.
      * @return string the configured platform type.
      */
     public static function get_platform() {
@@ -133,6 +118,7 @@ abstract class stack_connection_helper {
     }
 
     /**
+     * Add description here.
      * @return string the configured version number.
      */
     public static function get_maximaversion() {
@@ -152,14 +138,12 @@ abstract class stack_connection_helper {
         }
 
         foreach ($result as $res) {
-            if (is_array($res)){
-                if (array_key_exists('error', $res)) {
-                    if (!(false === strpos($res['error'], 'The CAS timed out'))) {
-                        return true;
-                    }
-                } else {
+            if (array_key_exists('error', $res)) {
+                if (!(false === strpos($res['error'], 'The CAS timed out'))) {
                     return true;
                 }
+            } else {
+                return true;
             }
         }
         return false;
@@ -204,6 +188,7 @@ abstract class stack_connection_helper {
     }
 
     /**
+     * Add description here.
      * @return string the version of the STACK Maxima libraries that should be in use.
      */
     public static function get_required_stackmaxima_version() {
@@ -217,8 +202,7 @@ abstract class stack_connection_helper {
      * @param stack_debug_log $debug log to write debug information to.
      */
     public static function warn_about_version_mismatch($debug) {
-        $warning = "WARNING: the version of the STACK-Maxima libraries used do not match the expected version. " .
-                "Please visit the STACK heathcheck page to resolve the problems.";
+        $warning = stack_string('healthchecksstackmaximawarning');
         $debug->log($warning);
         debugging($warning);
     }
@@ -240,12 +224,12 @@ abstract class stack_connection_helper {
         $results = $connection->compute($command);
 
         if (empty($results)) {
-            return array('stackCas_allFailed', array(), false);
+            return ['stackCas_allFailed', [], false];
         }
 
         if (!isset(self::$config->stackmaximaversion)) {
             $notificationsurl = new moodle_url('/admin/index.php');
-            return array('healthchecksstackmaximanotupdated', array($notificationsurl->out()), false);
+            return ['healthchecksstackmaximanotupdated', [$notificationsurl->out()], false];
         }
 
         $usedversion = stack_string('healthchecksstackmaximatooold');
@@ -256,8 +240,10 @@ abstract class stack_connection_helper {
 
             $usedversion = $result['value'];
             if (self::$config->stackmaximaversion == $usedversion) {
-                return array('healthchecksstackmaximaversionok',
-                    array('usedversion' => $usedversion), true);
+                return [
+                    'healthchecksstackmaximaversionok',
+                    ['usedversion' => $usedversion], true,
+                ];
             } else {
                 break;
             }
@@ -265,8 +251,8 @@ abstract class stack_connection_helper {
 
         switch (self::$config->platform) {
             case 'linux-optimised':
-                $docsurl = new moodle_url('/question/type/stack/doc/doc.php/CAS/Optimising_Maxima.md');
-                $fix = stack_string('healthchecksstackmaximaversionfixoptimised', array('url' => $docsurl->out()));
+                $docsurl = new moodle_url('/question/type/stack/doc/doc.php/Installation/Optimising_Maxima.md');
+                $fix = stack_string('healthchecksstackmaximaversionfixoptimised', ['url' => $docsurl->out()]);
                 break;
 
             case 'server':
@@ -278,9 +264,13 @@ abstract class stack_connection_helper {
                 $fix = stack_string('healthchecksstackmaximaversionfixunknown');
         }
 
-        return array('healthchecksstackmaximaversionmismatch',
-                array('fix' => $fix, 'usedversion' => $usedversion,
-                    'expectedversion' => self::$config->stackmaximaversion), false);
+        return [
+            'healthchecksstackmaximaversionmismatch',
+            [
+                'fix' => $fix, 'usedversion' => $usedversion,
+                'expectedversion' => self::$config->stackmaximaversion,
+            ], false,
+        ];
     }
 
     /**
@@ -296,6 +286,7 @@ abstract class stack_connection_helper {
         $casdebugging = self::$config->casdebugging;
         self::$config->casresultscache = 'none';
         self::$config->casdebugging = true;
+        self::$config->castimeout = max(100, self::$config->castimeout);
 
         $connection = self::make();
         $results = $connection->compute($command);
@@ -304,7 +295,7 @@ abstract class stack_connection_helper {
         self::$config->casdebugging = $casdebugging;
 
         $debug = $connection->get_debuginfo();
-        return array($results, $debug);
+        return [$results, $debug];
     }
 
     /**
@@ -332,7 +323,7 @@ abstract class stack_connection_helper {
         list($results, $debug) = self::stackmaxima_nocache_call($command);
 
         $success = true;
-        $message = array();
+        $message = [];
         if (empty($results)) {
             $message[] = stack_string('stackCas_allFailed');
             $success = false;
@@ -347,7 +338,7 @@ abstract class stack_connection_helper {
                 if ('CASresult' === $result['key']) {
                     if ($result['value'] != 'n*x^(n-1)') {
                         $message[] = stack_string('healthuncachedstack_CAS_calculation',
-                                array('expected' => "n*x^(n-1)", 'actual' => $result['value']));
+                                ['expected' => "n*x^(n-1)", 'actual' => $result['value']]);
                         $success = false;
                     }
                 } else if ('CAStime' === $result['key']) {
@@ -363,10 +354,10 @@ abstract class stack_connection_helper {
                     $maximaversionstr = $result['value'] . ' ('.$maximaversionum.')';
                     if ('default' == $maximaversion) {
                         $message[] = stack_string('healthuncachedstack_CAS_versionnotchecked',
-                                array('actual' => $maximaversionstr));
+                                ['actual' => $maximaversionstr]);
                     } else if ($result['value'] != '"'.$maximaversion.'"') {
                         $message[] = stack_string('healthuncachedstack_CAS_version',
-                                array('expected' => $maximaversion, 'actual' => $maximaversionstr));
+                                ['expected' => $maximaversion, 'actual' => $maximaversionstr]);
                         $success = false;
                     }
                 }
@@ -386,10 +377,10 @@ abstract class stack_connection_helper {
 
         $message = implode(" ", $message);
 
-        return array($message, $debug, $success);
+        return [$message, $debug, $success];
     }
 
-    /*
+    /**
      * This function is in this class, rather than installhelper.class.php, to
      * ensure the lowest level connection to the CAS, without caching.
      */
@@ -431,7 +422,7 @@ abstract class stack_connection_helper {
                 if (trim($lisprun) == '') {
                     $success = false;
                     $message = stack_string('healthautomaxopt_nolisprun');
-                    return array($message, '', $success, '');
+                    return [$message, '', $success, ''];
                 }
                 $lisprun = explode("\n", $lisprun);
                 $rawcommand = $lisprun[0].' -q -M '.stack_utils::convert_slash_paths($imagename);
@@ -440,7 +431,7 @@ abstract class stack_connection_helper {
             default:
                 $success = false;
                 $message = stack_string('healthautomaxopt_nolisp');
-                return array($message, '', $success, '');
+                return [$message, '', $success, ''];
         }
 
         // Really make sure there is no cache.
@@ -450,14 +441,14 @@ abstract class stack_connection_helper {
         $success = true;
 
         // Add the timeout command to the message.
-        $commandline = 'timeout --kill-after=10s 10s '.$rawcommand;
-        $message = stack_string('healthautomaxopt_ok', array('command' => $commandline));
+        $commandline = 'timeout --kill-after=30s 30s '.$rawcommand;
+        $message = stack_string('healthautomaxopt_ok', ['command' => $commandline]);
         if (!file_exists($imagename)) {
             $success = false;
             $message = stack_string('healthautomaxopt_notok');
         }
 
-        return array($message, $debug, $success, $commandline, $rawcommand);
+        return [$message, $debug, $success, $commandline, $rawcommand];
     }
 
 }

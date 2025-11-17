@@ -14,13 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once(__DIR__ . '/../../ast.container.silent.class.php');
-//require_once(__DIR__ . '/../../ast.container.class.php');
 
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_if extends stack_cas_castext2_block {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // If we are flat we just sconcat stuff to return but if not then we need to
         // generate the list version like the root-block.
@@ -39,7 +44,7 @@ class stack_cas_castext2_if extends stack_cas_castext2_block {
                 $body = new MP_FunctionCall(new MP_Identifier('sconcat'), [new MP_String('')]);
             }
 
-            $items = array();
+            $items = [];
             foreach ($this->children as $item) {
                 $c = $item->compile($format, $options);
                 if ($c !== null) {
@@ -159,6 +164,7 @@ class stack_cas_castext2_if extends stack_cas_castext2_block {
         return $r;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function is_flat(): bool {
         // Now then the problem here is that the flatness depends on the flatness of
         // the blocks contents. If they all generate strings then we are flat but if not...
@@ -171,8 +177,9 @@ class stack_cas_castext2_if extends stack_cas_castext2_block {
         return $flat;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
-        $r = array();
+        $r = [];
         if (!isset($this->params['test'])) {
             return $r;
         }
@@ -189,6 +196,7 @@ class stack_cas_castext2_if extends stack_cas_castext2_block {
         return $r;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate(&$errors=[], $options=[]): bool {
         if (!array_key_exists('test', $this->params)) {
             $errors[] = new $options['errclass']('If block requires a test parameter.', $options['context'] . '/' .

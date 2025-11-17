@@ -13,26 +13,31 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
+
+
 /**
- * GeoGebra block for STACK
- * derived by jsxGraph STACK implementation
+ * GeoGebra block for STACK derived by jsxGraph STACK implementation
+ *
+ * The creation of these resources has been (partially) funded by the ERASMUS+ grant
+ * program of the European Union under grant No. 2021-1-DE01-KA220-HED-000032031.
+ * Neither the European Commission nor the project's national funding agency DAAD
+ * are responsible for the content or liable for any losses or damage resulting
+ * of the use of these resources.
+ *
+ * @package    qtype_stack
  * @copyright  2022-2023 University of Edinburgh
  * @author     Tim Lutz
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once(__DIR__ . '/../block.factory.php');
-
-//require_once(__DIR__ . '/root.specialblock.php');
-//require_once(__DIR__ . '/stack_translate.specialblock.php');
-
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private static $countgraphs = 1;
 
     // Compatibility with php 7.4: Defining "str_ends_with" if not in existence, delete this function when
     // dropping support for php 7.4, replace all occurences of this->str_ends_with(args) by str_ends_with(args).
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private function str_ends_with($word, $searchstring) {
         $searchstringlen = mb_strlen($searchstring);
         if (mb_substr($word, -$searchstringlen, $searchstringlen) == $searchstring) {
@@ -41,6 +46,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
         return false;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // We are outputting as [[iframe]], so we will generate some parameters for it on the side.
         $r = new MP_List([new MP_String('iframe')]);
@@ -52,7 +58,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
         $iparams['title'] = 'STACK GeoGebra ' . self::$countgraphs;
         self::$countgraphs = self::$countgraphs + 1;
 
-        // TODO:
+        // TO-DO:
         // 1. Do we need to load some CSS as well?
 
         // The bits of code we construct. We could simply output these into
@@ -68,7 +74,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
         // Start by identifying the inputs we deal with.
         $inputmapping = [];
         foreach ($this->params as $key => $value) {
-            // TODO: are these actually a thing?
+            // TO-DO: are these actually a thing?
             if (substr($key, 0, 10) === 'input-ref-') {
                 $inputname = substr($key, 10);
                 $inputmapping[$value] = $inputname;
@@ -133,7 +139,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
                 }
             }
         }
-        // TODO: as there was no dynamic content inside that loop might as well
+        // TO-DO: as there was no dynamic content inside that loop might as well
         // directly generate as a singular MP_String, on the other hand
         // the simplifier during compilation will turn that to a string and
         // writing it like this makes it simpler to add any dynamic bits needed
@@ -313,29 +319,30 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
 
         // Then let's add some script tags to the head to load some stuff.
         $mathjax = new ilSetting("MathJax");
+
         // Silence the MathJax message that blinks on top of every graph.
         $r->items[] = new MP_List([
             new MP_String('script'),
             new MP_String(json_encode(['type' => 'text/x-mathjax-config'])),
-            new MP_String('MathJax.Hub.Config({messageStyle: "none"});')
+            new MP_String('MathJax.Hub.Config({messageStyle: "none"});'),
         ]);
         $r->items[] = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax->get("path_to_mathjax")]))
+            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax->get("path_to_mathjax")])),
         ]);
         // Naturally having GeoGebra loaded is important, we load it from our CORS source.
         $r->items[] = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode(['type' => 'text/javascript', 'src' => 'cors://geogebracore.js']))
+            new MP_String(json_encode(['type' => 'text/javascript', 'src' => 'cors://geogebracore.js'])),
         ]);
 
         // Then lets start building up the contents of the body.
         $r->items[] = new MP_String('<div style="' . $style .
             '"><div class="geogebrabox" id="geogebrabox" style="width:100%;height:100%;"></div></div><script type="module">');
         // For binding we need to import the binding libraries.
-        $r->items[] = new MP_String("\nimport stack_js from '" . castext2_parser_utils::stack_cors_link('stackjsiframe.min.js') . "';\n");
-        // TODO: minify.
-        $r->items[] = new MP_String("import stack_geogebra from '" . castext2_parser_utils::stack_cors_link('stackgeogebra.js') . "';\n");
+        $r->items[] = new MP_String("\nimport stack_js from '" . stack_cors_link('stackjsiframe.min.js') . "';\n");
+        // TO-DO: minify.
+        $r->items[] = new MP_String("import stack_geogebra from '" . stack_cors_link('stackgeogebra.js') . "';\n");
 
         // Lets define the common bits of code.
         $commonprecode = 'var presetparams = {"id":"applet","appName":"classic","width":800,"height": 600,' .
@@ -444,23 +451,28 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
 
 
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function is_flat(): bool {
         return false;
     }
 
-    public function postprocess(array $params, castext2_processor $processor): string {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function postprocess(array $params, castext2_processor $processor,
+        castext2_placeholder_holder $holder): string {
         return 'This is never happening! The logic goes to [[iframe]].';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
         // Note that all the "set" variables are actually CAS variables.
         // So we should return the nosuffix versions here for checking.
         // Not a major issue as the security system will stop any calls and
         // I really do not consider the reads possible through this as serious enough.
-        // TODO: not bothering now.
+        // TO-DO: not bothering now.
         return [];
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate(&$errors = [], $options = []): bool {
         // Basically, check that the dimensions have units we know.
         // Also that the references make sense.
@@ -629,5 +641,14 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
         }
 
         return $valid;
+    }
+
+    /**
+     * Is this an interactive block?
+     * If true, we can't generate a static version.
+     * @return bool
+     */
+    public function is_interactive(): bool {
+        return true;
     }
 }

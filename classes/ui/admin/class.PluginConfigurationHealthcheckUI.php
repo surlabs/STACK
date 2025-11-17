@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use classes\platform\ilias\StackRenderIlias;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Implementation\Component\Input\Field\Section;
 use classes\platform\StackException;
@@ -33,7 +34,7 @@ class PluginConfigurationHealthcheckUI
     /**
      * Shows the healthcheck
      */
-    public static function show(array $data, ilPlugin $plugin_object): array
+    public static function show(ilPlugin $plugin_object): array
     {
         global $DIC;
 
@@ -50,8 +51,13 @@ class PluginConfigurationHealthcheckUI
                 'run'
             );
 
-            $serverAddress = $data["maxima_pool_url"];
-            $healthcheck = new stack_cas_healthcheck($data);
+            $config = get_config();
+
+            $serverAddress = $config->maximacommandserver;
+
+            StackRenderIlias::ensureMathJaxLoaded();
+
+            $healthcheck = new stack_cas_healthcheck($config);
             $data = $healthcheck->get_test_results();
 
             $sections = [];

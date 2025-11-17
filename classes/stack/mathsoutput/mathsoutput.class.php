@@ -17,20 +17,16 @@
 
 // Public API for other parts of STACK to call in order to process equations.
 
-//fau: #32 change the way to call this classes in order to ensure it also works for ILIAS
-//require_once(dirname(__DIR__) . '/mathsoutput/mathsoutputbase.class.php');
-//require_once(dirname(__DIR__) . '/utils.class.php');
-//fau.
-
 /**
  * Public API to the maths rendering system.
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_maths {
     /** @var array output name => instance. */
-    protected static $outputs = array();
+    protected static $outputs = [];
 
     /**
      * Do the necessary processing on equations in a language string, before it
@@ -48,10 +44,10 @@ class stack_maths {
      * the question text or general feedback. The result of calling this method is
      * then passed to Moodle's {@link format_text()} function.
      * @param string $text the content to process.
-     * @param qtype_stack_renderer $renderer (options) the STACK renderer, if you have one.
+     * @param qtype_stack_renderer|null $renderer (options) the STACK renderer, if you have one.
      * @return string the content ready to pass to format_text.
      */
-    public static function process_display_castext($text, qtype_stack_renderer $renderer = null) {
+    public static function process_display_castext($text, ?qtype_stack_renderer $renderer = null) {
         return self::get_output()->process_display_castext($text,
                 stack_utils::get_config()->replacedollars, $renderer);
     }
@@ -88,6 +84,7 @@ class stack_maths {
     }
 
     /**
+     * Add description here.
      * @return string the name of the currently configured output method.
      */
     public static function configured_output_name() {
@@ -95,6 +92,7 @@ class stack_maths {
     }
 
     /**
+     * Add description here.
      * @return stack_maths_output the output method that has been set in the
      *      configuration options.
      */
@@ -107,6 +105,7 @@ class stack_maths {
     }
 
     /**
+     * Add description here
      * @param string $type the output method name.
      * @return stack_maths_output instance of the output class for this method.
      */
@@ -124,16 +123,14 @@ class stack_maths {
      * @return string the corresponding class name.
      */
     protected static function class_for_type($type) {
-		//fau: #33 comment unused global variable and change access to classes.
-		//global $CFG;
-		$file = dirname(__FILE__) . "/mathsoutput{$type}.class.php";
-		//fau.
+        global $CFG;
+        $file = __DIR__ . "/mathsoutput{$type}.class.php";
         $class = "stack_maths_output_{$type}";
 
         if (!is_readable($file)) {
             throw new stack_exception('stack_maths: unknown output method ' . $type);
         }
-        //include_once($file);
+        include_once($file);
 
         if (!class_exists($class)) {
             throw new stack_exception('stack_maths: output method ' . $type .

@@ -14,34 +14,52 @@
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once(__DIR__ . '/../block.factory.php');
 
-//require_once(__DIR__ . '/root.specialblock.php');
-//require_once(__DIR__ . '/stack_translate.specialblock.php');
-//require_once(__DIR__ . '/../../../../vle_specific.php');
-
-//require_once(__DIR__ . '/iframe.block.php');
 stack_cas_castext2_iframe::register_counter('///JSXGRAPH_COUNT///');
 
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
 
-    /* This is not something we want people to edit in general. */
+    /**
+     * This is not something we want people to edit in general.
+     */
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     public static $namedversions = [
-        /* TODO: make this `cdn-latest` if possible, no point in having it
-         * pointing to a particular version.
-         */
         'cdn' => [
+            'css' => 'https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.min.css',
+            'js' => 'https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js',
+        ],
+        'cdn-1.11.1' => [
             'css' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.11.1/jsxgraph.min.css',
-            'js' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.11.1/jsxgraphcore.min.js'],
+            'js' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.11.1/jsxgraphcore.min.js',
+        ],
+        'cdn-1.10.1' => [
+            'css' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.10.1/jsxgraph.min.css',
+            'js' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.10.1/jsxgraphcore.min.js',
+        ],
+        'cdn-1.8.0' => [
+            'css' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.8.0/jsxgraph.min.css',
+            'js' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.8.0/jsxgraphcore.min.js',
+        ],
+        'cdn-1.5.0' => [
+            'css' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.5.0/jsxgraph.min.css',
+            'js' => 'https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.5.0/jsxgraphcore.min.js',
+        ],
         'local' => [
             'css' => 'cors://jsxgraph.min.css',
             'js' => 'cors://jsxgraphcore.min.js',
-        ]
+        ],
     ];
 
-    public function compile($format, $options):  ? MP_Node {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function compile($format, $options): ?MP_Node {
         $r = new MP_List([new MP_String('iframe')]);
 
         // We need to transfer the parameters forward.
@@ -87,6 +105,10 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
             $js = $this->params['overridejs'];
         }
 
+        if (isset($this->params['style'])) {
+            $css = 'cors://jsxgraphstyles/' . $this->params['style'] . '.css';
+        }
+
         $r->items[] = new MP_String(json_encode($xpars));
 
         // Plug in some style and scripts.
@@ -96,19 +118,19 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
         $r->items[] = new MP_List([
             new MP_String('script'),
             new MP_String(json_encode(['type' => 'text/x-mathjax-config'])),
-            new MP_String('MathJax.Hub.Config({messageStyle: "none"});')
+            new MP_String('MathJax.Hub.Config({messageStyle: "none"});'),
         ]);
         $r->items[] = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax->get("path_to_mathjax")]))
+            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax->get("path_to_mathjax")])),
         ]);
         $r->items[] = new MP_List([
             new MP_String('style'),
-            new MP_String(json_encode(['href' => $css]))
+            new MP_String(json_encode(['href' => $css])),
         ]);
         $r->items[] = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $js]))
+            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $js])),
         ]);
 
         // We need to define a size for the inner content.
@@ -141,8 +163,8 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
             '"><div class="jxgbox" id="jxgbox" style="width:100%;height:100%;"></div></div><script type="module">');
 
         // For binding we need to import the binding libraries.
-        $r->items[] = new MP_String("\nimport stack_js from '" . castext2_parser_utils::stack_cors_link('stackjsiframe.min.js') . "';\n");
-        $r->items[] = new MP_String("import stack_jxg from '" . castext2_parser_utils::stack_cors_link('stackjsxgraph.min.js') . "';\n");
+        $r->items[] = new MP_String("\nimport stack_js from '" . stack_cors_link('stackjsiframe.min.js') . "';\n");
+        $r->items[] = new MP_String("import stack_jxg from '" . stack_cors_link('stackjsxgraph.min.js') . "';\n");
 
         // Do we need to bind anything?
         if (count($inputs) > 0) {
@@ -188,23 +210,29 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
         return $r;
     }
 
-    public function is_flat() : bool {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function is_flat(): bool {
         // Even when the content were flat we need to evaluate this during postprocessing.
         return false;
     }
 
-    public function postprocess(array $params, castext2_processor $processor): string {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function postprocess(array $params, castext2_processor $processor,
+        castext2_placeholder_holder $holder): string {
         return 'This is never happening! The logic goes to [[iframe]].';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
         return [];
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate(
         &$errors = [],
         $options = []
     ): bool {
+        global $CFG;
         // Basically, check that the dimensions have units we know.
         // Also that the references make sense.
         $valid  = true;
@@ -218,8 +246,10 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
         }
 
         // NOTE! List ordered by length. For the trimming logic.
-        $validunits = ['vmin', 'vmax', 'rem', 'em', 'ex', 'px', 'cm', 'mm',
-            'in', 'pt', 'pc', 'ch', 'vh', 'vw', '%'];
+        $validunits = [
+            'vmin', 'vmax', 'rem', 'em', 'ex', 'px', 'cm', 'mm',
+            'in', 'pt', 'pc', 'ch', 'vh', 'vw', '%',
+        ];
 
         $widthend   = false;
         $heightend  = false;
@@ -273,9 +303,23 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
             $err[] = stack_string('stackBlock_jsxgraph_underdefined_dimension');
         }
 
-        if (array_key_exists('version', $this->params) && array_key_exists($this->params['version'], self::$namedversions)) {
+        if (array_key_exists('version', $this->params) && !array_key_exists($this->params['version'], self::$namedversions)) {
             $valid    = false;
             $err[] = stack_string('stackBlock_jsxgraph_unknown_named_version');
+        }
+
+        if (array_key_exists('style', $this->params)) {
+            $stylename = $this->params['style'];
+            if (strpos($stylename, '..') !== false
+                    || strpos($stylename, '/') !== false
+                    || strpos($stylename, '\\') !== false) {
+                $valid    = false;
+                $err[] = stack_string('stackBlock_jsxgraph_unknown_style', ['style' => $stylename]);
+            } else if (!file_exists($CFG->dirroot . '/question/type/stack/corsscripts/jsxgraphstyles/' .
+                    $stylename . '.css')) {
+                $valid    = false;
+                $err[] = stack_string('stackBlock_jsxgraph_unknown_style', ['style' => $stylename]);
+            }
         }
 
         $valids = null;
@@ -287,7 +331,8 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
                         ['var' => $varname]);
                 }
             } else if ($key !== 'width' && $key !== 'height' && $key !== 'aspect-ratio' &&
-                    $key !== 'version' && $key !== 'overridejs' && $key !== 'overridecss') {
+                    $key !== 'version' && $key !== 'overridejs' && $key !== 'overridecss' &&
+                    $key !== 'style') {
                 $err[] = "Unknown parameter '$key' for jsxgraph-block.";
                 $valid    = false;
                 if ($valids === null) {
@@ -302,7 +347,8 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
                         $valids = array_merge($valids, $inputs);
                     }
                     $err[] = stack_string('stackBlock_jsxgraph_param', [
-                        'param' => implode(', ', $valids)]);
+                        'param' => implode(', ', $valids),
+                    ]);
                 }
             }
         }
@@ -314,5 +360,14 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
         }
 
         return $valid;
+    }
+
+    /**
+     * Is this an interactive block?
+     * If true, we can't generate a static version.
+     * @return bool
+     */
+    public function is_interactive(): bool {
+        return true;
     }
 }

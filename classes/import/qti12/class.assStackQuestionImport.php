@@ -274,6 +274,7 @@ class assStackQuestionImport extends assQuestionImport
                 if (!$all_formative) {
                     $prt_value = (float) $prt_data->value / $total_value;
                 }
+                $prt_data->feedbackstyle = 1;
                 $this->object->prts[$name] = new stack_potentialresponse_tree_lite($prt_data, $prt_value);
             }
 

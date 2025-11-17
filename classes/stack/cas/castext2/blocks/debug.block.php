@@ -14,12 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Stateful.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2017 Matti Harjula.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once(__DIR__ . '/../utils.php');
 
+// phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_debug extends stack_cas_castext2_block {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // So we are to print out a table of bound variable values.
         $bounds = [];
@@ -30,7 +36,7 @@ class stack_cas_castext2_debug extends stack_cas_castext2_block {
         // We are lazy and are not going to write this logic ourselves,
         // instead fall back to CASText and let other parts do the task.
         if (count($bounds) == 0) {
-            return new MP_List([new MP_String('%cs'), new MP_String('castext_debug_no_vars')]);
+            return castext2_parser_utils::compile('[[commonstring key="castext_debug_no_vars"/]]', $format, $options);
         }
         $castext = '';
         if ($format === castext2_parser_utils::MDFORMAT) {
@@ -46,7 +52,7 @@ class stack_cas_castext2_debug extends stack_cas_castext2_block {
                 $castext .= "\n| `$key` | `{#$key,simp#}` | `{#$key,simp=false#}` | {@$key,simp@} | {@$key,simp=false@} |";
             }
         } else {
-            $castext = '<table><thead><th>[[commonstring key="castext_debug_header_key"/]]</th>' .
+            $castext = '<table class="table"><thead><th>[[commonstring key="castext_debug_header_key"/]]</th>' .
                 '<th>[[commonstring key="castext_debug_header_value_simp"/]]</th>' .
                 '<th>[[commonstring key="castext_debug_header_value_no_simp"/]]</th>' .
                 '<th>[[commonstring key="castext_debug_header_disp_simp"/]]</th>' .
@@ -62,11 +68,14 @@ class stack_cas_castext2_debug extends stack_cas_castext2_block {
         return castext2_parser_utils::compile($castext, $format, $options);
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function is_flat(): bool {
-        return true;
+        // ISS1085 - Change to false. Common strings need to be evaluated.
+        return false;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
-        return array();
+        return [];
     }
 }

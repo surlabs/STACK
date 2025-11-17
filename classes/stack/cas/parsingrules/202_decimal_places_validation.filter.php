@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
-//require_once(__DIR__ . '/../../utils.class.php');
-//require_once(__DIR__ . '/201_sig_figs_validation.filter.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
 /**
  * AST filter that examines the decimal places of the leftmost
@@ -26,14 +29,18 @@
 class stack_ast_filter_202_decimal_places_validation implements stack_cas_astfilter_parametric {
     // Min and max are integer or null, null or values less than
     // 1 signify that there is no limit in the given direction.
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private $min = 3;
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private $max = 3;
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function set_filter_parameters(array $parameters) {
         $this->min = $parameters['min'];
         $this->max = $parameters['max'];
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
            $root = $ast;
         if ($root instanceof MP_Root) {

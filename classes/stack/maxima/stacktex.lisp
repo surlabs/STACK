@@ -138,15 +138,17 @@
 
 )) ;; etc
 
-
-
 ;; Remove un-needed {}s from string output.
 ;; Chris Sangwin, 28/10/2009
 
 (defun tex-string (x)
-  (cond ((equal x "") (concatenate 'string "\\mbox{ }"))
+  (cond ((equal x "") (concatenate 'string "\\text{ }"))
     ((eql (elt x 0) #\\) x)
-    (t (concatenate 'string "\\mbox{" x "}"))))
+    (t (concatenate 'string "\\text{" x "}"))))
+
+;; Remove & from the quoted characters.
+(defun quote-% (sym)
+  (quote-chars sym "$%_"))
 
 ;; Chris Sangwin, 21/9/2010
 
@@ -239,7 +241,7 @@
 ;; This list is an exception, e.g. conjugate(x)^2.
 ;; We use this list because tex-mexpt is also defined in stacktex40.lisp for earlier versions of Maxima.
 (defvar tex-mexpt-fnlist '(%sum %product %derivative %integrate %at $conjugate $texsub $lg $logbase %sqrt
-                                         %lsum %limit $pderivop $#pm#))
+                                         %lsum %limit $pderivop $#pm# $disp_select $displaydp $displaysci))
 
 ;; insert left-angle-brackets for mncexpt. a^<n> is how a^^n looks.
 (defun tex-mexpt (x l r)
@@ -294,6 +296,16 @@
                              (tex x (list "^")(cons "" r) 'mparen 'mparen)
                              (tex x (list "^{")(cons "}" r) 'mparen 'mparen)))))))
     (append l r)))
+
+;; Added by CJS, 15-2-24.  Display an aligned environmant.
+(defprop $aligned tex-aligned tex)
+
+(defun tex-aligned(x l r) ;;matrix looks like ((mmatrix)((mlist) a b) ...)
+  (append l `("\\begin{aligned}")
+      (mapcan #'(lambda(y)
+              (tex-list (cdr y) nil (list "\\cr ") "&"))
+          (cdr x))
+      '("\\end{aligned}") r))
 
 ;; Added by CJS, 10-9-16.  Display an argument.
 (defprop $argument tex-argument tex)
@@ -517,4 +529,119 @@
     ;; cdr is the trailing op
     x (tex-list (cdr x) nil r (or (nth 2 (texsym (caar x))) (if (string= $stackfltsep '",") '" ; " '" , "))))
   (append l x))
+
+
+;; *************************************************************************************************
+;; Added 13 March 2025.
+;; 
+(defun tex1 (mexplabel &optional filename-or-stream) ;; mexplabel, and optional filename or stream
+  (prog (mexp  texport x y itsalabel need-to-close-texport)
+     (reset-ccol)
+     ;; collect the file-name, if any, and open a port if needed
+     (setq filename-or-stream (meval filename-or-stream))
+     (setq texport
+       (cond
+         ((null filename-or-stream) *standard-output*)
+         ((eq filename-or-stream t) *standard-output*)
+         ((streamp filename-or-stream) filename-or-stream)
+         (t
+           (setq need-to-close-texport t)
+           (open (namestring (maxima-string filename-or-stream))
+                 :direction :output
+                 :if-exists :append
+                 :if-does-not-exist :create))))
+     ;; go back and analyze the first arg more thoroughly now.
+     ;; do a normal evaluation of the expression in macsyma
+     (setq mexp (meval mexplabel))
+     (cond ((member mexplabel $labels :test #'eq)	; leave it if it is a label
+	    (setq mexplabel (concatenate 'string "(" (print-invert-case (stripdollar mexplabel))
+					 ")"))
+	    (setq itsalabel t))
+	   (t (setq mexplabel nil)))	;flush it otherwise
+
+     ;; maybe it is a function?
+     (cond((symbolp (setq x mexp)) ;;exclude strings, numbers
+	   (setq x ($verbify x))
+	   (cond ;; Removed in March 2025.  We print function names, not the whole function in TeX.
+	         ;; ((setq y (mget x 'mexpr))
+		 ;;  (setq mexp (list '(mdefine) (cons (list x) (cdadr y)) (caddr y))))
+		 ((setq y (mget x 'mmacro))
+		  (setq mexp (list '(mdefmacro) (cons (list x) (cdadr y)) (caddr y))))
+		 ((setq y (mget x 'aexpr))
+		  (setq mexp (list '(mdefine) (cons (list x 'array) (cdadr y)) (caddr y)))))))
+     (cond ((and (null(atom mexp))
+		 (member (caar mexp) '(mdefine mdefmacro) :test #'eq))
+	    (format texport (car (get-tex-environment (caar mexp))))
+	    (cond (mexplabel (format texport "~a " mexplabel)))
+	    (mgrind mexp texport)	;write expression as string
+	    (format texport (cdr (get-tex-environment (caar mexp)))))
+	   ((and
+	     itsalabel ;; but is it a user-command-label?
+         ;; THE FOLLOWING TESTS SEEM PRETTY STRANGE --
+         ;; WHY CHECK INITIAL SUBSTRING IF SYMBOL IS ON THE $LABELS LIST ??
+         ;; PROBABLY IT IS A HOLDOVER FROM THE DAYS WHEN LABELS WERE C AND D INSTEAD OF %I AND %O
+	     (<= (length (string $inchar)) (length (string mexplabel)))
+	     (string= (subseq (maybe-invert-string-case (string $inchar)) 1 (length (string $inchar)))
+		      (subseq (string mexplabel) 1 (length (string $inchar))))
+	     ;; Check to make sure it isn't an outchar in disguise
+	     (not
+	      (and
+	       (<= (length (string $outchar)) (length (string mexplabel)))
+	       (string= (subseq (maybe-invert-string-case (string $outchar)) 1 (length (string $outchar)))
+			(subseq (string mexplabel) 1 (length (string $outchar)))))))
+	    ;; aha, this is a C-line: do the grinding:
+	    (format texport (car (get-tex-environment 'mlabel)))
+        (format texport "~a" mexplabel)
+	    (mgrind mexp texport)	;write expression as string
+	    (format texport (cdr (get-tex-environment 'mlabel))))
+	   (t 
+	    (if mexplabel (setq mexplabel (quote-% mexplabel)))
+					; display the expression for TeX now:
+        (myprinc (car (get-tex-environment mexp)) texport)
+	    (mapc #'(lambda (x) (myprinc x texport))
+		  ;;initially the left and right contexts are
+		  ;; empty lists, and there are implicit parens
+		  ;; around the whole expression
+		  (tex mexp nil nil 'mparen 'mparen))
+	    (cond (mexplabel
+		   (format texport "\\leqno{\\tt ~a}" mexplabel)))
+	    (format texport (cdr (get-tex-environment mexp)))))
+     (terpri texport)
+     (if need-to-close-texport
+	    (close texport))
+     (return mexplabel)))
+
+;; *************************************************************************************************
+;; Added 3 Aug 2025.
+;; 
+;;(defun tex-stripdollar (sym) 
+;;     (maybe-invert-string-case (quote-% (stripdollar sym)))
+;;)
+(defun tex-stripdollar (sym)
+  ;; Are we printing normal Maxima or plain atoms?
+  (if $tex_plain_atoms
+      ;; Plain atoms
+      ;;(maybe-invert-string-case (quote-% (stripdollar sym)))
+      ;; SYM is a simple symbol.
+      (let ((s (maybe-invert-string-case (quote-% (stripdollar sym)))))
+          (if (> (length s) 1)
+              (concatenate 'string "{\\it " s "}")
+          s)
+      )
+      ;; Normal Maxima
+      (let
+         ((nn-list (extract-trailing-digits (symbol-name sym))))
+           (if nn-list
+             ;; SYM matches foo_mm_nn.
+             (apply #'concatenate 'string (tex-array `((,(intern (first nn-list)) 'array) ,@(rest nn-list)) nil nil))
+             ;; SYM is a simple symbol.
+             (let ((s (maybe-invert-string-case (quote-% (stripdollar sym)))))
+                (if (> (length s) 1)
+                   (concatenate 'string "{\\it " s "}")
+                   s))
+           )
+      )
+   )
+)
+
 

@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Defines the stack_cas_connection interface.
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,6 +31,7 @@ interface stack_cas_connection {
     public function compute($command);
 
     /**
+     * Add description here.
      * @return string any debug info from this session. Will be blank unless
      *      debugging is enabled by the configuration.
      */

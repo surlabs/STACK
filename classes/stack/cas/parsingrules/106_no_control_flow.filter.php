@@ -14,7 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
+
 
 /**
  * AST filter that prevents the use of any programming logic.
@@ -22,6 +28,7 @@
  * to do the same.
  */
 class stack_ast_filter_106_no_control_flow implements stack_cas_astfilter {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
         $checkfloats = function($node) use (&$answernotes, &$errors) {
             if ($node instanceof MP_If ||

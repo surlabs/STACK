@@ -36,25 +36,14 @@ class StackUserResponseIlias extends StackUserResponse
     public static function getStackUserResponse(string $purpose, int $question_id, int $id, int $pass = 0): array
     {
 
-        switch ($purpose) {
-            case 'post':
-                $stack_user_response = self::getPostStackUserResponse();
-                break;
-            case 'preview':
-                $stack_user_response = self::getPreviewStackUserResponse($question_id, $id);
-                break;
-            case 'test':
-                $stack_user_response = self::getTestStackUserResponse($question_id, $id, $pass);
-                break;
-            case 'unit_test':
-                $stack_user_response = self::getUnitTestStackUserResponse();
-                break;
-            case 'correct':
-                $stack_user_response = self::getCorrectStackUserResponse();
-                break;
-            default:
-                throw new StackException('Invalid purpose selected: ' . $purpose . '.');
-        }
+        $stack_user_response = match ($purpose) {
+            'post' => self::getPostStackUserResponse(),
+            'preview' => self::getPreviewStackUserResponse($question_id, $id),
+            'test' => self::getTestStackUserResponse($question_id, $id, $pass),
+            'unit_test' => self::getUnitTestStackUserResponse(),
+            'correct' => self::getCorrectStackUserResponse(),
+            default => throw new StackException('Invalid purpose selected: ' . $purpose . '.'),
+        };
 
         if ($stack_user_response === null) {
             return [];
@@ -69,16 +58,11 @@ class StackUserResponseIlias extends StackUserResponse
     public function saveStackUserResponse(array $stack_user_response, string $purpose): void
     {
 
-        switch ($purpose) {
-            case 'preview':
-                $stack_user_response = $this->getPreviewStackUserResponse();
-                break;
-            case 'test':
-                $stack_user_response = $this->getTestStackUserResponse();
-                break;
-            default:
-                throw new StackException('Invalid purpose selected: ' . $purpose . '.');
-        }
+        $stack_user_response = match ($purpose) {
+            'preview' => $this->getPreviewStackUserResponse(),
+            'test' => $this->getTestStackUserResponse(),
+            default => throw new StackException('Invalid purpose selected: ' . $purpose . '.'),
+        };
 
     }
 

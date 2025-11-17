@@ -15,9 +15,13 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../block.interface.php');
-//require_once(__DIR__ . '/../../../utils.class.php');
 
 /**
  * A block for providing means for repetition with the option for
@@ -27,6 +31,7 @@
  */
 class stack_cas_castext2_template extends stack_cas_castext2_block {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         if (count($this->children) === 0) {
             // If we are applying a template then we need to decide how we
@@ -37,11 +42,11 @@ class stack_cas_castext2_template extends stack_cas_castext2_block {
             }
 
             $r = new MP_If([
-                new MP_FunctionCall(new MP_Identifier('fboundp'), [new MP_Identifier('ctt_' . $this->params['name'])])
-                ], [
-                    new MP_FunctionCall(new MP_Identifier('ctt_' . $this->params['name']), [new MP_Integer(0)]),
-                    $result
-                ]);
+                new MP_FunctionCall(new MP_Identifier('fboundp'), [new MP_Identifier('ctt_' . $this->params['name'])]),
+            ], [
+                new MP_FunctionCall(new MP_Identifier('ctt_' . $this->params['name']), [new MP_Integer(0)]),
+                $result,
+            ]);
 
             return $r;
         }
@@ -57,11 +62,11 @@ class stack_cas_castext2_template extends stack_cas_castext2_block {
         // Either use the body or override by something else.
         if (array_key_exists('mode', $this->params) && $this->params['mode'] === 'default') {
             $r = new MP_If([
-                new MP_FunctionCall(new MP_Identifier('fboundp'), [new MP_Identifier('ctt_' . $this->params['name'])])
-                ], [
-                    new MP_FunctionCall(new MP_Identifier('ctt_' . $this->params['name']), [new MP_Integer(0)]),
-                    $body
-                ]);
+                new MP_FunctionCall(new MP_Identifier('fboundp'), [new MP_Identifier('ctt_' . $this->params['name'])]),
+            ], [
+                new MP_FunctionCall(new MP_Identifier('ctt_' . $this->params['name']), [new MP_Integer(0)]),
+                $body,
+            ]);
             return $r;
         }
 
@@ -69,10 +74,11 @@ class stack_cas_castext2_template extends stack_cas_castext2_block {
         return new MP_Group([
             new MP_Operation(':=', new MP_FunctionCall(new MP_Identifier('ctt_' . $this->params['name']),
                 [new MP_Identifier('%dummyvariable')]), $body),
-            new MP_String('')
+            new MP_String(''),
         ]);
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function is_flat(): bool {
         if (count($this->children) === 0 && !array_key_exists('mode', $this->params)) {
             // When declaring a template the result will always be an empty string.
@@ -82,10 +88,12 @@ class stack_cas_castext2_template extends stack_cas_castext2_block {
         return false;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate_extract_attributes(): array {
         return [];
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function validate(&$errors=[], $options=[]): bool {
         if (!array_key_exists('name', $this->params)) {
             $errors[] = new $options['errclass']('The "template"-block needs a name.',

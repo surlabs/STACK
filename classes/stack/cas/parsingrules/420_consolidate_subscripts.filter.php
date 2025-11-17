@@ -14,8 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
-//require_once(__DIR__ . '/filter.interface.php');
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
 /**
  * AST filter that consolidates subscripted atoms in the form M_1 into M1.
@@ -26,6 +30,7 @@
  */
 class stack_ast_filter_420_consolidate_subscripts implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $protected = stack_cas_security::get_protected_identifiers('variable', $identifierrules->get_units());

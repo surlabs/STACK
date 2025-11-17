@@ -47,6 +47,7 @@ stack_reset(not_used) := block(
   Pi: %pi,
   PI: %pi,
   pi() := %pi,         /* Why does Excel do this?! */
+  i:%i,
   /* Display of matrixes */
   lmxchar: "[",
   /* Sets up randomization, using Maxima's internal random command. */
@@ -58,7 +59,7 @@ stack_reset(not_used) := block(
   STACK_SETUP(true),
 
   MAXIMA_VERSION_STR: ?\*autoconf\-version\*,
-  MAXIMA_VERSION: map(parse_string, tokens(?\*autoconf\-version\*, 'digitcharp)),
+  MAXIMA_VERSION: map('parse_string, tokens(?\*autoconf\-version\*, 'digitcharp)),
   /* We need the "if" statement below, because versions compiled from source give erroneous results. */
   MAXIMA_VERSION_NUM: float(MAXIMA_VERSION[2]+(if is(length(MAXIMA_VERSION)>2)
     then (if is(MAXIMA_VERSION[3]<10) then MAXIMA_VERSION[3]/10 else 0) else 0)),
@@ -81,7 +82,7 @@ stack_reset(true);
 /* Make sure this is at least defined. */
 debug:false;
 
-/* TODO: remove this from install process.                               */
+/* TO-DO: remove this from install process.                               */
 /* ********************************************************************* */
 /*  Evaluate variables are return errors, display, and content forms.    */
 /* ********************************************************************* */
@@ -133,6 +134,7 @@ load("functs");
 /* Load the logic package, but remove the "eq" infix operator which conflicts with too many existing things. */
 /* We've edited the logic package which over writes the eq operator as xnor.                                 */
 load("stack_logic.lisp");
+load("Ksimplifier.lisp");
 
 /* We don't want to allow people to put boxes round things. */
 box(ex) := ex;
@@ -140,7 +142,7 @@ box(ex) := ex;
 /* Although this works well in MAXIMA, |'s are not allowed in STACK */
 /* The heuristics to catch the various errors do not work, since | is symmetrical */
 matchfix("|", "|");
-"|"([a]) := apply(abs, a);
+"|"([a]) := apply('abs, a);
 
 /* Does not quite work yet ..... */
 /* load("noninteractive.mac"); */
@@ -149,9 +151,9 @@ matchfix("|", "|");
 /* Load STACK packages                */
 /* ********************************** */
 
+load("errortostring.lisp");
 /* This must come before stacktex.lisp as the latter relies on compiled functions in utils.mac. */
 load("utils.mac");
-load("errortostring.lisp");
 
 load("assessment.mac");
 load("validator.mac");
@@ -160,10 +162,14 @@ load("inequalities.mac");
 load("intervals.mac");
 load("geometry.mac");
 load("proof.mac");
+load("linearalgebra_core.mac");
 load("stackunits.mac");
-load("stacktex.lisp");
 load("stackstrings.mac");
 load("fboundp.mac");
+load("functs");
+
+/* Are we printing normal Maxima or plain atoms? */
+tex_plain_atoms:false$
 
 load("stacktex.lisp");
 /* Ensure back compatability with versions before 5.41.0. */
@@ -174,6 +180,7 @@ if is(MAXIMA_VERSION_NUM<44.0) then load("stack44.mac");
 load("trigrat.lisp");
 load("trigtools");
 load("diag");
+load("eigen");
 
 load("sregex");
 load("numericaltest.mac");
@@ -186,11 +193,17 @@ if is(MAXIMA_VERSION_NUM>30.0) then compile(scientific_notation)$
 texput(QMCHAR, "\\color{red}{?}");
 texput(theta, "\\theta");
 
-int([ex]) := apply(integrate, ex); /* Allows integrate to be called with int().  Avoid alias to allow nouns to work. */
-alias(cosec,csc);                  /* Corresponds to current student expectations. */
-alias(cosech,csch);                /* Corresponds to current student expectations. */
+/* Issue #615 suggests we make matrix multiplication much more promenent.
+   This is possible, but would be confused with notation for Hadamard product.
 
-alias(sgn,signum);                 /* Corresponds to current student expectations. */
+   texput(".","\\circ ",infix);
+*/
+
+int([ex]) := apply('integrate, ex); /* Allows integrate to be called with int().  Avoid alias to allow nouns to work. */
+alias(cosec, csc);                  /* Corresponds to current student expectations. */
+alias(cosech, csch);                /* Corresponds to current student expectations. */
+
+alias(sgn, signum);                 /* Corresponds to current student expectations. */
 texput(signum, "\\mathrm{sgn}");
 
 declare ("#", commutative);
@@ -198,25 +211,32 @@ declare ("#", commutative);
 simplify(ex) := ev(fullratsimp(ex), simp);      /* Allows simplify to be something. */
 degree(ex, v) := ev(hipow(expand(ex), v), simp); /* See notes on hipow.              */
 
-
 make_complexJ(OPT_COMPLEXJ) := block(
   if OPT_COMPLEXJ = "i" then
-    (i:%i,texput(%i,"\\mathrm{i}"))
-  else if OPT_COMPLEXJ = "j" then
-    (%j:%i,j:%i,texput(%i,"\\mathrm{j}"))
-  else if OPT_COMPLEXJ = "symi" then
     (texput(%i,"\\mathrm{i}"))
+  else if OPT_COMPLEXJ = "j" then
+    (kill(i),%j:%i,j:%i,texput(%i,"\\mathrm{j}"))
+  else if OPT_COMPLEXJ = "symi" then
+    (kill(i),texput(%i,"\\mathrm{i}"))
   else if OPT_COMPLEXJ = "symj" then
-    (texput(%i,"\\mathrm{j}"))
+    (kill(i),texput(%i,"\\mathrm{j}"))
   else true
 )$
 
 /* Choose the symbol for the multiplication sign. */
 make_multsgn(OPT_MULTSGN) := block(
-    if OPT_MULTSGN = "cross" then texput("*", "\\times ", nary),
-    if OPT_MULTSGN = "dot" then texput("*", "\\cdot ", nary),
-    if OPT_MULTSGN = "onum" then texput("*", multsgnonlyfornumbers),
-    if OPT_MULTSGN = "blank" then texput("*", "\\, ", nary)
+    if ev(not(elementp(OPT_MULTSGN, {"cross", "dot", "onum", "none", "space"})), simp) 
+        then error("make_multsgn received un-supported option: ", OPT_MULTSGN),
+    if OPT_MULTSGN = "cross" then (texput("*", "\\times ", nary),
+                                   texput("nounmul", "\\times ", nary)),
+    if OPT_MULTSGN = "dot" then (texput("*", "\\cdot ", nary),
+                                   texput("nounmul", "\\cdot ", nary)),
+    if OPT_MULTSGN = "onum" then (texput("*", multsgnonlyfornumbers),
+                                   texput("nounmul", multsgnonlyfornumbers)),
+    if OPT_MULTSGN = "none" then (texput("*", " ", nary),
+                                   texput("nounmul", " ", nary)),
+    if OPT_MULTSGN = "space" then (texput("*", "\\,", nary),
+                                   texput("nounmul","\\,", nary))
 );
 
 /* This only prints a multiplication sign for numbers. */
@@ -226,15 +246,15 @@ texput(multsgnonlyfornumberssym, "\\times")$
 multsgnonlyfornumbers(e) := block([arglist, resstr, a, lastisnum, isnum, multsgn, str],
     arglist: args(e),
     a: pop(arglist),
-    resstr: if (safe_op(a) = "-" or (real_numberp(a) and is(a<0))) then sconcat("\\left(", tex1(a), "\\right)")
+    resstr: if ev(is(safe_op(a) = "-" or (real_numberp(a) and is(a<0)))=true, simp) then sconcat("\\left(", tex1(a), "\\right)")
                 else if (atom(a) or is(length(args(a))=1) or safe_op(a) = "^") then tex1(a)
                 else sconcat("\\left(", tex1(a), "\\right)"),
     lastisnum: numberp(a),
     for a in arglist do (
         isnum: numberp(a),
-        multsgn: if (lastisnum and isnum) then tex1(multsgnonlyfornumberssym) else "\\,",
-        str: if (safe_op(a) = "-" or (real_numberp(a) and is(a<0))) then sconcat("\\left(", tex1(a), "\\right)")
-                else if (atom(a) or is(length(args(a))=1) or safe_op(a) = "^") then tex1(a)
+        multsgn: if ev(is(lastisnum and isnum)=true, simp) then tex1(multsgnonlyfornumberssym) else "\\,",
+        str: if ev(is(safe_op(a) = "-" or (real_numberp(a) and is(a<0)))=true, simp) then sconcat("\\left(", tex1(a), "\\right)")
+                else if ev(is(atom(a) or is(length(args(a))=1) or safe_op(a) = "^")=true, simp) then tex1(a)
                 else sconcat("\\left(", tex1(a), "\\right)"),
         resstr: sconcat(resstr, multsgn, " ", str),
         lastisnum: isnum
@@ -244,15 +264,15 @@ multsgnonlyfornumbers(e) := block([arglist, resstr, a, lastisnum, isnum, multsgn
 
 make_logic(OPT_LOGIC) := block(
     if OPT_LOGIC = "lang" then block(
-        texput("and", "\\,{\\mbox{ !AND! }}\\, ", nary),
-        texput("nounand", "\\,{\\mbox{ !AND! }}\\, ", nary),
-        texput("or", "\\,{\\mbox{ !OR! }}\\, ", nary),
-        texput("nounor", "\\,{\\mbox{ !OR! }}\\, ", nary),
-        texput("nand", "\\,{\\mbox{ !NAND! }}\\, ", nary),
-        texput("nor", "\\,{\\mbox{ !NOR! }}\\, ", nary),
-        texput("xor", "\\,{\\mbox{ !XOR! }}\\, ", nary),
-        texput("xnor", "\\,{\\mbox{ !XNOR! }}\\, ", nary),
-        texput("implies", "\\,{\\mbox{ !IMPLIES! }}\\, ", nary),
+        texput("and", "\\,{\\text{ !AND! }}\\, ", nary),
+        texput("nounand", "\\,{\\text{ !AND! }}\\, ", nary),
+        texput("or", "\\,{\\text{ !OR! }}\\, ", nary),
+        texput("nounor", "\\,{\\text{ !OR! }}\\, ", nary),
+        texput("nand", "\\,{\\text{ !NAND! }}\\, ", nary),
+        texput("nor", "\\,{\\text{ !NOR! }}\\, ", nary),
+        texput("xor", "\\,{\\text{ !XOR! }}\\, ", nary),
+        texput("xnor", "\\,{\\text{ !XNOR! }}\\, ", nary),
+        texput("implies", "\\,{\\text{ !IMPLIES! }}\\, ", nary),
         texput("not", "{\\rm !NOT!}", prefix),
         texput("nounnot", "{\\rm !NOT!}", prefix)
     ),
@@ -315,7 +335,7 @@ make_arccos(OPT_ACOS) := block(
        ?tex\-setup(?cdr([?%acsch, "{\\rm acsch}"])),
        ?tex\-setup(?cdr([?%acoth, "{\\rm acoth}"]))
     ),
-    if OPT_ACOS = "arccos-arcosh" then block(
+    if OPT_ACOS = "arsinh" then block(
        ?tex\-setup(?cdr([?%asin, "\\arcsin "])),
        ?tex\-setup(?cdr([?%acos, "\\arccos "])),
        ?tex\-setup(?cdr([?%atan, "\\arctan "])),
@@ -387,7 +407,7 @@ rand(ex) := block(
   ex:ev(ex, simp),
   if (integerp(ex)) then return(random(ex)),
   if (floatnump(ex)) then return(random(ex)),
-  if (matrixp(ex)) then return(matrixmap(random, ex)),
+  if (matrixp(ex)) then return(matrixmap('random, ex)),
   if (listp(ex)) then return(randlist(ex))
 )$
 
@@ -482,9 +502,9 @@ list_remove(ex, n) := block([k, l],
 /* Could be implemented with rand_selection but would require two conversions
  * between sets and lists*/
 random_subset(u):=
-  disjoin(false, map(lambda([x], if rand(2)=0 then x), u)); 
+  disjoin(false, map(lambda([x], if rand(2)=0 then x), u));
 
-random_subset_n(u,n) := 
+random_subset_n(u,n) :=
   setify(rand_selection(listify(u),n));
 
 /* random non-empty subset */
@@ -512,7 +532,7 @@ multiselqn(corbase, numcor, wrongbase, numwrong):=block([ta1, ta2, ta, version],
   ta1: maplist(lambda([ex], [ex, true]), rand_selection(corbase, numcor)),
   ta2: maplist(lambda([ex], [ex, false]), rand_selection(wrongbase, numwrong)),
   ta: random_permutation(append(ta1, ta2)),
-  version: map(first, ta),
+  version: map('first, ta),
   return([ta, version])
 )$
 
@@ -539,7 +559,7 @@ multiselqnalpha([exs]):=block([corbase, numcor, wrongbase, numwrong, dispflag, t
   talab: ev(makelist(sconcat("(",ascii(96+i),")"), i, 1, length(ta3)), simp),
   ta:zip_with(lambda([ex1, ex2], [ex1, ex2[2], sconcat("<b>", ex1, "</b> ",
     if stringp(ex2[1]) then ex2[1] else stack_disp(ex2[1], dispflag))]), talab, ta3),
-  version: map(first, ta3),
+  version: map('first, ta3),
   return([ta, version])
 )$
 
@@ -557,7 +577,7 @@ multiselqndisplay(corbase, numcor, wrongbase, numwrong):=block([ta1, ta2, ta, ve
   ta1: maplist(lambda([ex], [first(ex), true, second(ex)]), rand_selection(corbase, numcor)),
   ta2: maplist(lambda([ex], [first(ex), false, second(ex)]), rand_selection(wrongbase, numwrong)),
   ta: random_permutation(append(ta1, ta2)),
-  version: map(first, ta),
+  version: map('first, ta),
   /*      */
   return([ta, version])
 )$
@@ -567,14 +587,14 @@ mcq_correct(ta):=block(
     if not(listp(ta)) then error("mcq_correct: first argument must be a list, but was passed: ", string(ta)),
     if not(all_listp(listp, ta)) then error("mcq_correct: all list elements must be lists, but was passed: ", string(ta)),
     if not(all_listp(lambda([ex], is(length(ex)>=2)), ta)) then error("mcq_correct: all list elements must be lists of length at least 2, but was passed: ", string(ta)),
-    maplist(first, sublist(ta, lambda([ex], second(ex))))
+    maplist('first, sublist(ta, lambda([ex], second(ex))))
 )$
 
 mcq_incorrect(ta):=block(
     if not(listp(ta)) then error("mcq_incorrect: first argument must be a list, but was passed: ", string(ta)),
     if not(all_listp(listp, ta)) then error("mcq_incorrect: all list elements must be lists, but was passed: ", string(ta)),
     if not(all_listp(lambda([ex], is(length(ex)>=2)), ta)) then error("mcq_incorrect: all list elements must be lists of length at least 2, but was passed: ", string(ta)),
-    maplist(first, sublist(ta, lambda([ex], not(second(ex)))))
+    maplist('first, sublist(ta, lambda([ex], not(second(ex)))))
 )$
 
 /* ********************************** */
@@ -585,13 +605,13 @@ mcq_incorrect(ta):=block(
 /*  mode(n) returns a list of all the modal elements in the list n */
 mode(n):= block([i,j,count_elements,counts,highest_count,mode_set],
     count_elements: makelist(0,i,1,length(n)),
-    for i: 1 thru length(n) do 
-        (for j: 1 thru length(n) do 
+    for i: 1 thru length(n) do
+        (for j: 1 thru length(n) do
             (if n[i]=n[j] then count_elements[i]: count_elements[i]+1)),
     counts: listify(setify(count_elements)),
     highest_count:counts[length(counts)],
     mode_set:{},
-    for i:1 thru length(n) do 
+    for i:1 thru length(n) do
         (if count_elements[i]=highest_count then mode_set: union(mode_set,{n[i]})),
     mode_list:listify(mode_set),
     return(mode_list)
@@ -632,11 +652,11 @@ _UNDO_ERR(err_list, reference) := block([%_tmp],
 /* Function to attach a note to the current statement. */
 _APPEND_NOTE(note) := if ev(stackmap_has_key(%NOTES, %stmt), simp)
  then
-  %NOTES:stackmap_set(%NOTES,%stmt,append(stackmap_get(%NOTES,%stmt),[note]))
+  %NOTES:stackmap_set(%NOTES, %stmt, append(stackmap_get(%NOTES, %stmt), [note]))
  else
-  %NOTES:stackmap_set(%NOTES,%stmt,[note])$
+  %NOTES:stackmap_set(%NOTES, %stmt, [note])$
 
-_RESET_NOTES() := %NOTES:stackmap_unset(%NOTES,%stmt)$
+_RESET_NOTES() := %NOTES:stackmap_unset(%NOTES, %stmt)$
 
 /* Function to attach a note to the current statement. */
 _APPEND_FEEDBACK(feedback) := if ev(stackmap_has_key(%FEEDBACK, %stmt), simp)
@@ -677,7 +697,7 @@ _CS2dv(_k,_v) := block([%_tmp, simp],
  %_tmp:[[_k, stack_dispvalue(_v)]],
  if listp(%_tmp) then _DVALUES:append(_DVALUES,%_tmp),
  0)$
-_CS2dvv(_k,_v) := (_CS2v(_k,_v),_CS2dv(_k,_v),0)$
+_CS2dvv(_k, _v) := (_CS2v(_k, _v), _CS2dv(_k, _v), 0)$
 
 _CS2out() := (
  _RESPONSE : stackmap_set(_RESPONSE, "timeout", false),
@@ -760,9 +780,12 @@ texput_decimal(ex):= stackfltsep:ex$
         tx:ev(printf(false, stackfltfmt, x), simp)
     ) else if ev(integerp(x),simp) then (
         if (is(stackintfmt="~r") or is(stackintfmt="~:r")) then
-            tx:sconcat("\\mbox{",ev(printf(false, stackintfmt, x), simp),"}")
-        else
-            tx:ev(printf(false, stackintfmt, x), simp)
+            tx:sconcat("\\text{",ev(printf(false, stackintfmt, x), simp),"}")
+        else (
+            /* Protect spaces in integers so TeX (MathJax) displays them as spaces. */
+            tx:ev(printf(false, stackintfmt, x), simp),
+            tx:ssubst("\\ ", " ", tx)
+            )
     ) else
     tx:string(x),
     /* We need this separation because validation displays trailing zeros and this is controlled by stackfltfmt. */
@@ -770,7 +793,7 @@ texput_decimal(ex):= stackfltsep:ex$
         tx:ssubst("\\ ", ",", tx),
         tx:ssubst("{,}", ".", tx)
     ),
-    tx
+   tx
 )$
 /* Some systems are throwing an error here, which is spurious. */
 errcatch(compile(?texnumformat));
@@ -779,23 +802,20 @@ errcatch(compile(?texnumformat));
 /* Display: Subscripts, and strip singular + operators. */
 /* **************************************************** */
 
-stack_disp_sub_script(ex) := block([s],
+stack_disp_sub_script(ex) := block([_s],
  if taylorp(ex) then return(ex),
- if safe_setp(ex) then return(apply(set, maplist(stack_disp_sub_script, args(ex)))),
- if arrayp(ex) then return(arraymake(op(ex), maplist(stack_disp_sub_script, args(ex)))),
- /* The following are not, strictly speaking, a subscript issue, but we don't want another recursive call. */
- /* Strip out empty plus operators, which cause problems in display with simp:false.             */
- if is(safe_op(ex)="+") and is(length(args(ex))=1) then return(stack_disp_sub_script(first(args(ex)))),
+ if safe_setp(ex) then return(apply('set, maplist('stack_disp_sub_script, args(ex)))),
+ if arrayp(ex) then return(arraymake(op(ex), maplist('stack_disp_sub_script, args(ex)))),
  /* Now deal with supscripts. */
- if not(atom(ex)) then return(apply(op(ex), maplist(stack_disp_sub_script, args(ex)))),
+ if not(atom(ex)) then return(apply(op(ex), maplist('stack_disp_sub_script, args(ex)))),
  if simp_numberp(ex) or stringp(ex) or ex or not(ex) then return(ex),
  /* Check for an explicit entry in the texput database for this atom. */
  if stringp(get_texword(ex)) then return(ex),
- s: string(ex),
- s: split(s, "_"),
+ _s: string(ex),
+ _s: split(_s, "_"),
  /* If we can't parse the string back, just use the string. */
- s: maplist(lambda([ex], block([parsed], parsed:errcatch(parse_string(ex)), if emptyp(parsed) then ex else first(parsed))), s),
- stack_disp_sub_script_helper(s)
+ _s: maplist(lambda([ex], block([_parsed], _parsed:errcatch(%_C(ex)), if emptyp(_parsed) then return(ex), _parsed:errcatch(parse_string(ex)), if emptyp(_parsed) then return(ex) else first(_parsed))), _s),
+ stack_disp_sub_script_helper(_s)
 )$
 
 stack_disp_sub_script_helper(l) := block(
@@ -812,7 +832,7 @@ stack_disp_sub_script_helper(l) := block(
 */
 stack_disp_comma_separate(ex):= block(
   if not(listp(ex)) then error("stack_disp_comma_separate: expects its argument to be a list"),
-  return(simplode(maplist(string, ex), ", "))
+  return(simplode(maplist('string, ex), ", "))
 )$
 
 /* ********************************** */
@@ -837,7 +857,7 @@ detexcolor(ex) := block([argsex],
   if op(ex) = texcolor then return(detexcolor(argsex[2])),
   if op(ex) = texcolorplain then return(detexcolor(argsex[2])),
   if op(ex) = "/" then return(detexcolor(argsex[1])/detexcolor(argsex[2])),
-  map(detexcolor, ex)
+  map('detexcolor, ex)
 )$
 
 /* We only display matrices with the following matching pairs of delimiters.
@@ -847,6 +867,12 @@ detexcolor(ex) := block([argsex],
 */
 stack_matrix_pairs:[ ["[", "[", "]"], ["(", "(", ")"], ["\{", "\\{", "\\}"], ["{", "\\{", "\\}"], ["", "", ""], [".", "", ""], ["|", "|", "|"]] $
 
+/* This function takes the matrix, and returns the string of characters "c", "l", or "r" to
+   decide how to format the columns in the array.  By default, this is centered with "c".
+   We need a _function_ to count the number of columns.
+*/
+stack_matrix_col(ex):=simplode(maplist(lambda([ex], "c"), first(args(ex))))$
+
 stack_matrix_disp(m):= block([ret, lp, rp, parens],
   if not(matrixp(m)) then error("stack_matrix_disp: argument must be a matrix."),
   if not(stringp(lmxchar)) then error("stack_matrix_disp requires lmxchar to be a string. "),
@@ -855,10 +881,10 @@ stack_matrix_disp(m):= block([ret, lp, rp, parens],
   parens: first(parens),
   lp: second(parens),
   rp: third(parens),
-  ret: maplist(lambda([ex], maplist(tex1, args(ex))), args(m)),
+  ret: maplist(lambda([ex], maplist('tex1, args(ex))), args(m)),
   ret: maplist(lambda([ex], simplode(ex, " & ")), ret),
   ret: simplode(ret, " \\\\ "),
-  ret: sconcat("\\begin{array}{", simplode(maplist(lambda([ex], "c"), first(args(m)))), "} ", ret, " \\end{array}"),
+  ret: sconcat("\\begin{array}{", stack_matrix_col(m), "} ", ret, " \\end{array}"),
   if ""#lp then
     ret: sconcat("\\left", lp, ret),
   if ""#rp then
@@ -897,20 +923,20 @@ texput(matrix, stack_matrix_disp)$
 unary_minus_traverse(ex) := block(
   /* We want atom here, not mapatom to catch a[4]. */
   if atom(ex) then return(ex),
-  if op(ex) = "-" and numberp(first(args(ex))) then return(ev(ex,simp)),
-  if arrayp(ex) then return(arraymake(op(ex), maplist(unary_minus_traverse, args(ex)))),
-  apply(op(ex), map(unary_minus_traverse, args(ex)) )
+  if op(ex) = "-" and (is(first(args(ex))=0) or is(first(args(ex))=0.0)) then return(ex),
+  if op(ex) = "-" and numberp(first(args(ex))) then return(ev(ex, simp)),
+  if arrayp(ex) then return(arraymake(op(ex), maplist('unary_minus_traverse, args(ex)))),
+  apply(op(ex), map('unary_minus_traverse, args(ex)) )
 )$
-
 
 /* Pulls out "-" to the front of any expression in a sum of products which needs it. */
 /* For example,   -(2*y^2) is ok                                                     */
 /* But            (-3)*7 is not.                                                     */
 unary_minus_pull(ex) := block([ex2],
   if atom(ex) then return(ex),
-  ex2: apply(op(ex), map(unary_minus_pull, args(ex))),
-  if arrayp(ex) then ex2:arraymake(op(ex), map(unary_minus_pull, args(ex))),
-  if op(ex) = "+" then ex2:apply("+", map(unary_minus_pull_helper, args(ex2))),
+  ex2: apply(op(ex), map('unary_minus_pull, args(ex))),
+  if arrayp(ex) then ex2:arraymake(op(ex), map('unary_minus_pull, args(ex))),
+  if op(ex) = "+" then ex2:apply("+", map('unary_minus_pull_helper, args(ex2))),
   if op(ex) = "*" then ex2:unary_minus_pull_helper(ex2),
   return(ex2)
 )$
@@ -1051,9 +1077,9 @@ plot(ex, [ra]) :=  /*stack_web_plot*/
         ufn: concat("<div class='stack_plot'>", ufn, "</div>"),
     /* Sort out plot_options and preamble*/
     preamble: "",
-    if not(member(xlabel, maplist(first, ral))) then ral: append(ral, [[xlabel, ""]]),
-    if not(member(ylabel, maplist(first, ral))) then ral: append(ral, [[ylabel, ""]]),
-    if member(legend, maplist(first, ral)) then block([lv],
+    if not(member(xlabel, maplist('first, ral))) then ral: append(ral, [[xlabel, ""]]),
+    if not(member(ylabel, maplist('first, ral))) then ral: append(ral, [[ylabel, ""]]),
+    if member(legend, maplist('first, ral)) then block([lv],
             /* If we have [legend, true] then we should use the default legend */
             lv: sublist(ral, lambda([ex], (first(ex)=legend))),
             if second(first(lv))=true then ral:delete([legend, true], ral)
@@ -1065,7 +1091,7 @@ set output ", afn),
     /* Gnuplot only allows alpha-numeric characters in the plot name, so not even spaces!  This is a problem with the string function. */
     if PLOT_TERMINAL="svg" then preamble:concat("set terminal ", PLOT_TERMINAL, psize, " ", PLOT_TERM_OPT),
     /* Reduce margins around plots: this can be added in again with CSS if required, but can't be clipped later. */
-    if member(margin, maplist(first, ral)) then block([lv],
+    if member(margin, maplist('first, ral)) then block([lv],
             /* If we have [legend, true] then we should use the default legend */
             lv: first(sublist(ral, lambda([ex], listp(ex) and (first(ex)=margin)))),
             ral:delete(lv, ral),
@@ -1149,7 +1175,8 @@ ATAlgEquiv(SA,SB) := block([simp:true, ret, newret, SAN, SBN],
 
 /* An algebraic equivalence test which does not evaluate noun forms, but does other simplifications.
 */
-ATAlgEquivNouns(SA,SB) := block([simp:true, ret, newret, SAN, SBN],
+ATAlgEquivNouns(SA,SB) := block([simp:true, ret, newret, SAN, SBN, algebraic_equivalence_nounsp],
+    algebraic_equivalence_nounsp: false,
     /* Turn on simplification and error catch */
     if is(_EC(errcatch(SA:ev(SA, simp, rat)), "") = false) then
         return([false, false, StackAddNote("", "ATAlgEquivNouns_STACKERROR_SAns"), ""]),
@@ -1203,13 +1230,19 @@ ATAlgEquivfun(SA, SB) :=  block([SApoly, SBpoly, keepfloat, RawMark, FeedBack, A
     /* Are we dealing with lists? */
     if listp(SB) then
       if listp(SA)#true then
-        return(StackBasicReturn(false, false, "ATAlgEquiv_SA_not_list"))
+          if is(stackfltsep=".") then 
+            return(StackBasicReturn(false, false, "ATAlgEquiv_SA_not_list"))
+          else
+            return([false, false, StackAddNote("", "ATAlgEquiv_SA_not_list"), StackAddFeedback("", "ATAlgEquiv_SA_not_list_semi")])
       else
         return(ATList(SA, SB)),
     /* Are we dealing with sets? */
     if safe_setp(SB) then
       if safe_setp(SA)=false then
-        return(StackBasicReturn(false, false, "ATAlgEquiv_SA_not_set"))
+          if is(stackfltsep=".") then 
+            return(StackBasicReturn(false, false, "ATAlgEquiv_SA_not_set"))
+          else
+            return([false, false, StackAddNote("", "ATAlgEquiv_SA_not_set"), StackAddFeedback("", "ATAlgEquiv_SA_not_set_semi")])
       else
         return(ATSet(SA, SB)),
     /* Are we dealing with non-trivial sets? */
@@ -1275,7 +1308,7 @@ ATAlgEquivfun(SA, SB) :=  block([SApoly, SBpoly, keepfloat, RawMark, FeedBack, A
 stack_noteq_single_solve(ex) := block(
    if atom(ex) then return(ex),
    if freeof("#", ex) then return(ex),
-   if not(safe_op(ex)="#") then return(apply(op(ex), map(stack_noteq_single_solve, args(ex)))),
+   if not(safe_op(ex)="#") then return(apply(op(ex), map('stack_noteq_single_solve, args(ex)))),
    /* Only attempt solving in single variables cases. */
    if length(listofvars(ex))=1 then return(apply("nounand", map(lambda([ex2], subst("#","=",ex2)), solve(first(ex)=second(ex))))),
    ex
@@ -1284,7 +1317,7 @@ stack_noteq_single_solve(ex) := block(
 stack_noteq_single_remove(ex) := block(
    if atom(ex) then return(ex),
    if freeof("#", ex) then return(ex),
-   if not(safe_op(ex)="#") then return(apply(op(ex), map(stack_noteq_single_remove, args(ex)))),
+   if not(safe_op(ex)="#") then return(apply(op(ex), map('stack_noteq_single_remove, args(ex)))),
    /* Only attempt solving in single variables cases. */
    if length(listofvars(ex))=1 then return((first(ex)<second(ex) nounor first(ex)>second(ex))),
    ex
@@ -1373,7 +1406,7 @@ stack_assignmentrev(ex) := block(
    This is needed in practice with systems of equations, as students may write [d=10, d=v*t] */
 stack_eval_assignments(ex) := block([asl, sl],
   if not(listp(ex)) then return(ex),
-  sl:maplist(stack_assignmentrev, ex),
+  sl:maplist('stack_assignmentrev, ex),
   asl:sublist(sl, stack_assignmentp),
   if not(emptyp(asl)) then block(
       sl:listify(setdifference(setify(sl), setify(asl))),
@@ -1402,6 +1435,12 @@ ATEquation(SA, SB) := block([keepfloat, RawMark, SA1, SB1, SB2, Rationalex1, Rat
     if algebraic_equivalence(lhs(SB),0) then SB:rhs(SB)=0,
 
     /* Trap edge cases.                                                              */
+    /* If we have empty equations we should bail now.                                */
+    if ATEquation_emptyp(lhs(SB)-rhs(SB)) then
+        if ATEquation_emptyp(lhs(SA)-rhs(SA)) then
+             return([true, true, "ATEquation_empty", ""])
+        else return([true, false, "ATEquation_empty_fail", ""]),
+
     edgecase:false,
     if logic_edgep(SA) or logic_edgep(SB) then edgecase:true,
 
@@ -1424,10 +1463,6 @@ ATEquation(SA, SB) := block([keepfloat, RawMark, SA1, SB1, SB2, Rationalex1, Rat
         if ATEquation_zerop(Rationalex1) then
              return([true, true, "ATEquation_zero", ""])
         else return([true, false, "ATEquation_zero_fail", ""]),
-    if ATEquation_emptyp(lhs(SB)-rhs(SB)) then
-        if ATEquation_emptyp(lhs(SA)-rhs(SA)) then
-             return([true, true, "ATEquation_empty", ""])
-        else return([true, false, "ATEquation_empty_fail", ""]),
     if numberp(float(abs(Rationalex1/Rationalex2))) then
         return([true, true, "", ""]),    Rationalex1:num(ratsimp(Rationalex1)),
     Rationalex2:num(ratsimp(Rationalex2)),
@@ -1493,7 +1528,7 @@ ATInequality(SA, SB) := block([RawMark, FeedBack, AnswerNote, SA1, SB1, samex],
     SB:logical_normal(SB),
     if debug then print("ATInequality(", SA, ", ", SB, ")"),
     if SA = SB then RawMark:true
-    else if single_variable_solver_real(SA)=single_variable_solver_real(SB) then block(
+    else if stack_single_variable_solver(SA)=stack_single_variable_solver(SB) then block(
         RawMark:true,
         AnswerNote:StackAddNote("", "ATInequality_solver")
     ),
@@ -1581,7 +1616,7 @@ ATMatrix(SA, SB) := block([RawMark, FeedBack, AnswerNote, str, ret, SAr, SAc, SB
         if retnew[2] = false then AddFeedBack:true
     ),
     if AddFeedBack = true then block(
-        /* TODO: better answernotes for matrices */
+        /* TO-DO: better answernotes for matrices */
         ret[3]:StackAddNote("", "ATMatrix_wrongentries"),
         ret[4]:StackAddFeedback("", "ATMatrix_wrongentries", stack_disp(SA, "d"))
     ),
@@ -1607,7 +1642,7 @@ ATSet(SA, SB) := block([RawMark, FeedBack, AnswerNote, SAl, SBl, ZM],
     ZM:setdifference(SA, SB),
     if not(emptyp(ZM)) then
       FeedBack:StackAddFeedback("", "ATSet_wrongentries", stack_disp(ZM, "d")),
-    return([true, false, StackAddNote("","ATSet_wrongentries"), FeedBack])
+    return([true, false, StackAddNote("", "ATSet_wrongentries"), FeedBack])
 )$
 
 /* Note, this test (ATSets not ATSet as above) gives much more detailed feedback
@@ -1623,7 +1658,10 @@ ATSets(SA, SB) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsimp],
     if not(safe_setp(SB)) then
         return(StackBasicReturn(false, false, "ATSets_SB_not_set")),
     if not(safe_setp(SA)) then
-        return(StackBasicReturn(false, false, "ATSets_SA_not_set")),
+          if is(stackfltsep=".") then 
+            return(StackBasicReturn(false, false, "ATSets_SA_not_set"))
+          else
+            return([false, false, StackAddNote("", "ATSets_SA_not_set"), StackAddFeedback("", "ATSets_SA_not_set_semi")]),
 
     SAsimp:ATSets_prepare(SAsimp),
     SBsimp:ATSets_prepare(SBsimp),
@@ -1725,6 +1763,26 @@ ATStringSloppy(SA, SB) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsimp],
     return([true, false, AnswerNote, FeedBack])
 )$
 
+ATValidator(SA, SB, SO) := block([SAsimp, SOsimp, res],
+    /* Turn on simplification and error catch. */
+    if (is(_EC(errcatch(SAsimp:ev(SA, simp, nouns)), "") = false)) then
+        return([false,false,StackAddNote("","ATValidator_STACKERROR_SAns"),""]),
+    /* SB is ignored. */
+    if (is(_EC(errcatch(SOsimp:ev(SO, simp, nouns)), "") = false)) then
+        return([false,false,StackAddNote("","ATValidator_STACKERROR_Opt"),""]),
+    %_C(SO),
+    if (is(_EC(errcatch(res:ev(apply(SO, [SA]))), "") = false)) then
+        return(StackBasicReturn(false, false, "ATValidator_STACKERROR_ev")),
+    if is(safe_op(res)=string(SO)) then
+        (_EC(errcatch(1/0), ""), return(StackBasicReturn(false, false, "ATValidator_not_fun"))),
+    if not(stringp(res)) then
+        (_EC(errcatch(1/0), ""), return(StackBasicReturn(false, false, "ATValidator_res_not_string"))),
+
+    if is(res="") then
+        return([true, true, "", ""]),
+    return([true, false, "", res])
+)$
+
 /* ********************************** */
 /* Levenshtein distance               */
 /* ********************************** */
@@ -1808,7 +1866,7 @@ ATLevenshtein(SA, SB, SO) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsim
         SOsimp:setify(rest(SOsimp)),
         if elementp(CASE, SOsimp) then levupper:false,
         if elementp(WHITESPACE, SOsimp) then levwhitespace:false
-    ), 
+    ),
 
     if not(numberp(tol)) then
         return(StackBasicReturn(false, false, "ATLevenshtein_tol_not_number")),
@@ -1819,12 +1877,12 @@ ATLevenshtein(SA, SB, SO) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsim
     /* Pre-process strings to upper case. */
     if (levupper=true) then block(
         SAsimp:supcase(SAsimp),
-        SBsimpmod:maplist(lambda([ex2], maplist(supcase, ex2)), SBsimpmod)
+        SBsimpmod:maplist(lambda([ex2], maplist('supcase, ex2)), SBsimpmod)
     ),
     /* Tidy whitespace. */
     if (levwhitespace=true) then block(
         SAsimp:ssquish(SAsimp),
-        SBsimpmod:maplist(lambda([ex2], maplist(ssquish, ex2)), SBsimpmod)
+        SBsimpmod:maplist(lambda([ex2], maplist('ssquish, ex2)), SBsimpmod)
     ),
 
     /* Find the closest allow string. */
@@ -1864,7 +1922,7 @@ ATLevenshtein(SA, SB, SO) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsim
 sremove_chars(rem, st) := sremove_chars_helper(charlist(rem), st)$
 sremove_chars_helper(remlist, st) := if emptyp(remlist) then st else sremove_chars_helper(rest(remlist), sremove(first(remlist), st))$
 
-/* 
+/*
    (1) Replace all tab and newline characters with spaces.
    (2) Trim spaces from each end.
    (3) Remove all multiple spaces and replace with a single space.
@@ -1872,16 +1930,16 @@ sremove_chars_helper(remlist, st) := if emptyp(remlist) then st else sremove_cha
    (This is called str_squish in the R language, and squish in other languages.).
 */
 ssquish(st) := block(
-    st:ssubst(" ", tab, st), 
+    st:ssubst(" ", tab, st),
     st:ssubst(" ", newline, st),
-    st:strim(" ", st), 
+    st:strim(" ", st),
     /* while is(slength(st)>slength(st:ssubst(" ", "  ", st))) do true,*/
     st:regex_subst(" ", "\\s+", st),
     st
 )$
 
 /* **************************************** */
-/* A wrapper for an all purpose answer test 
+/* A wrapper for an all purpose answer test
    which checks things are of the same "type".
    Based upon the results of AtAlgEquivfun(SA,SB)
 */
@@ -1942,9 +2000,8 @@ ATLowestTerms(SA, SB) := block([simp:false, ret, validity, mark, FeedBack, Answe
     rd:rationalized(SA),
     if not(is(rd=true)) then block(
             mark:false,
-            fbn:"ATLowestTerms_not_rat",
-            FeedBack: StackAddFeedback(FeedBack, fbn, stack_disp(rd, "d")),
-            AnswerNote:StackAddNote(AnswerNote, fbn)
+            FeedBack:StackAddFeedback(FeedBack, "ATLowestTerms_not_rat", stack_disp(rd, "d")),
+            AnswerNote:StackAddNote(AnswerNote, "ATLowestTerms_not_rat")
     ),
     return([validity, mark, AnswerNote, FeedBack])
 )$
@@ -1990,8 +2047,8 @@ ATLogic(SA, SB) := block([SAL, SBL, res],
     if (debug) then print("ATLogic: [", string(SA), " | ", string(SB), "]"),
     if SA = SB then
         return([true, true, StackAddNote("", "ATLogic_True"), ""]),
-    SAP:ev(single_variable_solver_real(SA), simp),
-    SBP:ev(single_variable_solver_real(SB), simp),
+    SAP:ev(stack_single_variable_solver(SA), simp),
+    SBP:ev(stack_single_variable_solver(SB), simp),
     if (debug) then print("ATLogic_to_poly_solver: [", string(SAP), " | ", string(SBP), "]"),
     if SAP=SBP then
         return([true, true, StackAddNote("", "ATLogic_Solver_True"), ""]),
@@ -2014,8 +2071,8 @@ ATPropLogic(SA,SB) := block([simp:true, ret, SAc, SBc],
     if is(SB=[STACKERROR]) then return([false, false, StackAddNote("", "ATPropLogic_STACKERROR_TAns"), ""]),
     SB:SB[1],
     /* We don't want noun forms getting in the way here. */
-    SA:noun_logic_remove(SA),
-    SB:noun_logic_remove(SB),
+    SA:noun_logic_remove(logical_normal(SA)),
+    SB:noun_logic_remove(logical_normal(SB)),
     /* Can we find a permutation of the variables? */
     if logic_equiv(SA, SB) then
         return([true, true, "", ""]
@@ -2085,9 +2142,9 @@ ATSysEquiv(SA,SB):=block([keepfloat,Validity, RawMark, FeedBack, AnswerNote, SAA
 
     /* Are all list elements not atoms? */
     if ev(all_listp(atom, SA), simp) then
-        return(StackBasicReturn(false,false,"ATSysEquiv_SA_not_eq_list")),
+        return(StackBasicReturn(false, false, "ATSysEquiv_SA_not_eq_list")),
     if ev(all_listp(atom, SB), simp) then
-        return(StackBasicReturn(false,false,"ATSysEquiv_SB_not_eq_list")),
+        return(StackBasicReturn(false, false, "ATSysEquiv_SB_not_eq_list")),
 
     /* Are all list elements equations? */
     if ev(not all_listp(equationp, SA), simp) then
@@ -2096,24 +2153,24 @@ ATSysEquiv(SA,SB):=block([keepfloat,Validity, RawMark, FeedBack, AnswerNote, SAA
         return(StackBasicReturn(false, false, "ATSysEquiv_SB_not_eq_list")),
 
     /* Turn our equations into expressions, and remove assignments. */
-    S1: ev(maplist(stack_eqnprepare, stack_eval_assignments(SA)), simp),
-    S2: ev(maplist(stack_eqnprepare, stack_eval_assignments(SB)), simp),
+    S1: ev(maplist('stack_eqnprepare, stack_eval_assignments(SA)), simp),
+    S2: ev(maplist('stack_eqnprepare, stack_eval_assignments(SB)), simp),
     /* Is S1 is empty?  This means we only had assignments in the answer,
        i.e. the answer was in a "solved" form, e.g. x=1. */
-    if emptyp(S1) and ev(equal(setify(maplist(stack_eqnprepare, SA)), setify(maplist(stack_eqnprepare, flatten(solve(S2,listofvars(S2)))))),simp) then
+    if emptyp(S1) and ev(equal(setify(maplist('stack_eqnprepare, SA)), setify(maplist('stack_eqnprepare, flatten(solve(S2,listofvars(S2)))))),simp) then
             return([true,true,StackAddNote("","ATSysEquiv_SA_Completely_solved"),""]),
     if emptyp(S1) then
             return([true,false,StackAddNote("","ATSysEquiv_SA_Not_completely_solved"),""]),
 
     /* Turn our equations into expressions, and keep assignments. */
-    S1: ev(maplist(stack_eqnprepare, SA), simp),
-    S2: ev(maplist(stack_eqnprepare, SB), simp),
+    S1: ev(maplist('stack_eqnprepare, SA), simp),
+    S2: ev(maplist('stack_eqnprepare, SB), simp),
 
     /* Is each expression a polynomial? */
     if not all_listp(polynomialpsimp, S1) then
-        return(StackBasicReturn(false,false,"ATSysEquiv_SA_not_poly_eq_list")),
+        return(StackBasicReturn(false, false, "ATSysEquiv_SA_not_poly_eq_list")),
     if not all_listp(polynomialpsimp, S2) then
-        return(StackBasicReturn(false,false,"ATSysEquiv_SB_not_poly_eq_list")),
+        return(StackBasicReturn(false, false, "ATSysEquiv_SB_not_poly_eq_list")),
 
     /*
     At this point have two lists of polynomials. We now check whether the
@@ -2151,10 +2208,10 @@ ATSysEquivVars(S1,S2):=block([XA,XB],
     XA: setify(listofvars(S1)),
     XB: setify(listofvars(S2)),
     if subsetp(XA,XB) then
-        return(StackBasicReturn(true,false,"ATSysEquiv_SA_missing_variables")),
+        return(StackBasicReturn(true, false, "ATSysEquiv_SA_missing_variables")),
     if subsetp(XB,XA) then
-        return(StackBasicReturn(true,false,"ATSysEquiv_SA_extra_variables")),
-    return(StackBasicReturn(true,false,"ATSysEquiv_SA_wrong_variables"))
+        return(StackBasicReturn(true, false, "ATSysEquiv_SA_extra_variables")),
+    return(StackBasicReturn(true, false, "ATSysEquiv_SA_wrong_variables"))
 )$
 
 /*
@@ -2171,7 +2228,7 @@ ATSysEquivGrob(GA, GB, SA, varlist) := block([retl, ret, kloop],
     /* Is the student's system underdetermined? */
 
     if poly_grobner_subsetp(GA,GB,varlist) then
-        return(StackBasicReturn(true,false,"ATSysEquiv_SA_system_underdetermined")),
+        return(StackBasicReturn(true, false, "ATSysEquiv_SA_system_underdetermined")),
 
     /*
         Given that the student's system is neither underdetermined nor equal to
@@ -2186,7 +2243,7 @@ ATSysEquivGrob(GA, GB, SA, varlist) := block([retl, ret, kloop],
         else
             ret:append(ret,[texcolor("red", SA[ev(kloop, simp)])])),
 
-    return([true,false,StackAddNote("","ATSysEquiv_SA_system_overdetermined"),StackAddFeedback("","ATSysEquiv_SA_system_overdetermined", stack_disp(ret, "d"))])
+    return([true, false, StackAddNote("", "ATSysEquiv_SA_system_overdetermined"), StackAddFeedback("", "ATSysEquiv_SA_system_overdetermined", stack_disp(ret, "d"))])
 )$
 
 /*****************************************************************/
@@ -2287,7 +2344,7 @@ irred_Q(p, v) := block([ret,deg,cl,ci],
   if ev(not(polynomialp(p, [v], lambda([ex], freeof(v, ex)))), simp) then return([false, StackAddFeedback("", "ATFacForm_notpoly")]),
   deg:ev(hipow(expand(p), v), simp),
   /* Now perform the general test. */
-  cl:ev(map(second, coeff_list_nz(expand(p), v)), simp),
+  cl:ev(map('second, coeff_list_nz(expand(p), v)), simp),
   /* Are all coefficients of p are integers?  (note, negative number don't count as integers here!)  */
   ci:all_listp(lambda([ex], integerp(ev(abs(ex), simp))), cl),
   /* General starting position. */
@@ -2388,13 +2445,13 @@ FacFormfun(SA, SB, SO) := block([val, rawmk, ansnote, fb, ret, deg, aequiv, up, 
         else block(
             rawmk: false,
             ansnote:StackAddNote(ansnote, "ATFacForm_int_false")
-            ) 
+            )
     else block(
         /* Check for the correct answer. */
         if (aequiv and factorp(SA)) then
             ansnote:StackAddNote("", "ATFacForm_true")
         else block(
-            if (factorp(SA)) then block( 
+            if (factorp(SA)) then block(
                 /* We need to provide some feedback, if possible. */
                 ansnote:StackAddNote(ansnote, "ATFacForm_isfactored"),
                 fb:StackAddFeedback(fb, "ATFacForm_isfactored")
@@ -2566,10 +2623,10 @@ PartFrac_term_p(ex, v) := block([n1, d1, ret],
  n1:num(ex),
  d1:denom(ex),
  /* Can we divide through? */
- if is((degree(d1, v) < degree(n1, v)) and degree(d1, v) > 0) then return(false),  
+ if is((degree(d1, v) < degree(n1, v)) and degree(d1, v) > 0) then return(false),
  /* Ignore any power here. */
  if safe_op(d1)="^" then d1:first(args(d1)),
- /* Terms of the form n1/(v-a)^m must have a numerical n1! */ 
+ /* Terms of the form n1/(v-a)^m must have a numerical n1! */
  if is(degree(d1, v) = 1) and (degree(n1, v)#0) then return(false),
  ret:irred_Q(d1, v),
  if third(ret) then true else first(ret)
@@ -2596,7 +2653,7 @@ ATSingleFrac(SA, SB) := block(
         if algebraic_equivalence(SA,SB) then
             return([true,true,"",""])
         else
-            return(StackBasicReturn(true,false,"ATSingleFrac_ret_exp")),
+            return(StackBasicReturn(true, false, "ATSingleFrac_ret_exp")),
 
     /* Ignore minus signs. */
     SAA:SA,
@@ -2821,16 +2878,16 @@ ATCompSquare(SA, SB, SO) := block([Validity,RawMark,FeedBack,AnswerNote,ret,wrt,
 
     /* Check for algebraic equivalence */
     if cform and ae then
-        return([true,true,StackAddNote("","ATCompSquare_true"),""]),
+        return([true,true,StackAddNote("", "ATCompSquare_true"),""]),
 
     if cform then
-        return([true,false,StackAddNote("","ATCompSquare_true_not_AlgEquiv"),StackAddFeedback("","ATCompSquare_not_AlgEquiv")]),
+        return([true,false,StackAddNote("", "ATCompSquare_true_not_AlgEquiv"), StackAddFeedback("", "ATCompSquare_not_AlgEquiv")]),
 
     if not(ae) then
-        return([true,false,StackAddNote("","ATCompSquare_false_not_AlgEquiv"),""]),
+        return([true,false,StackAddNote("", "ATCompSquare_false_not_AlgEquiv"),""]),
 
-    AnswerNote:concat("ATCompSquare_false",AnswerNote),
-    return([true,false,StackAddNote("",AnswerNote),StackAddFeedback("",AnswerNote)])
+    AnswerNote:concat("ATCompSquare_false", AnswerNote),
+    return([true, false, StackAddNote("", AnswerNote), StackAddFeedback("", AnswerNote)])
     )$
 
 /*********************/
@@ -2839,14 +2896,14 @@ ATCompSquare(SA, SB, SO) := block([Validity,RawMark,FeedBack,AnswerNote,ret,wrt,
 
 /* This function substitutes an "integrationconstant" in ex for v.
    If v is a list, this substitutes as many integration constants as possible */
-subst_int_const(ex,v):=block([lv,li,ls],
+subst_int_const(ex, v):=block([lv,li,ls],
   lv:listofvars(ex),
-  li:sublist_indices(lv, lambda([ex],is(smismatch("integrationconstant",string(ex))>19) or is(smismatch("%c",string(ex))>2)) ),
+  li:sublist_indices(lv, lambda([ex], is(smismatch("integrationconstant", string(ex))>19) or is(smismatch("%c", string(ex))>2)) ),
   if emptyp(li) then return(ex),
   /* If we have only one variable v, then use this */
-  if not(listp(v)) then return(subst(lv[li[1]]=v,ex)),
-  ls:map(lambda([n],lv[n]),li),
-  subst(zip_with("=",ls,v),ex)
+  if not(listp(v)) then return(subst(lv[li[1]]=v, ex)),
+  ls:map(lambda([n], lv[n]), li),
+  subst(zip_with("=", ls, v), ex)
   )$
 
 /* This function strips off any trailing constant of integration from an expression, which is not a number */
@@ -3013,7 +3070,7 @@ Intfun(SA, SB, SBdisp, constint, acceptformal, var) := block([val,rawmk,ansnote,
                 (rawmk:true, ansnote:StackAddNote("", "ATInt_const_int_condone"))
         else if freeof(log, SA) or freeof(log, SB) then
             if ATIntWeirdConstp(ex, var) then
-                (rawmk:false, fb:StackAddFeedback("", "ATInt_weirdconst"), ansnote:StackAddNote("", "ATInt_weirdconst"))
+                (rawmk:false, fb:StackAddFeedback(StackAddFeedback("", "ATInt_weirdconst"), "seekhelp"), ansnote:StackAddNote("", "ATInt_weirdconst"))
             else if constint and listofvars(ex)=[var] then
                      (rawmk:false, fb:StackAddFeedback("", "ATInt_const"), ansnote:StackAddNote("", "ATInt_const"))
                  else
@@ -3026,7 +3083,7 @@ Intfun(SA, SB, SBdisp, constint, acceptformal, var) := block([val,rawmk,ansnote,
         else if freeof(var, ex) and not(ATIntWeirdConstp(ex, var)) then
             (rawmk:true, ansnote:StackAddNote("", "ATInt_true_differentconst"))
         else
-            (rawmk:acceptformal, fb:StackAddFeedback("", "ATInt_EqFormalDiff"), ansnote:StackAddNote("", "ATInt_EqFormalDiff"))
+            (rawmk:acceptformal, fb:StackAddFeedback(StackAddFeedback("", "ATInt_EqFormalDiff"), "seekhelp"), ansnote:StackAddNote("", "ATInt_EqFormalDiff"))
     ) else /* Check for the special cases where the buggy rule is true. */
        if ev(algebraic_equivalence(SAa, ev(diff(SBd, var), simp)), simp) and ev(algebraic_equivalence(exp(x), SBd), simp)#true then
            (rawmk:false, fb:StackAddFeedback("", "ATInt_diff"), ansnote:StackAddNote("", "ATInt_diff"))
@@ -3037,7 +3094,7 @@ Intfun(SA, SB, SBdisp, constint, acceptformal, var) := block([val,rawmk,ansnote,
             (rawmk:false, fb:StackAddFeedback(fb, "ATInt_logabs"), ansnote:StackAddNote(ansnote, "ATInt_logabs")),
     /* Has the student been inconsistent in using log(x) vs log(abs(x)) in their answer? */
     if not(SAConsistentLogs) then
-            (rawmk:false, fb:StackAddFeedback("", "ATInt_logabs_inconsistent"), ansnote:StackAddNote(ansnote, "ATInt_logabs_inconsistent")),
+            (rawmk:false, fb:StackAddFeedback(StackAddFeedback("", "ATInt_logabs_inconsistent"), "seekhelp"), ansnote:StackAddNote(ansnote, "ATInt_logabs_inconsistent")),
     lSAv:listofvars(SA),
     lSAv:listofvars(SA),
     lSBv:listofvars(SB),
@@ -3093,7 +3150,7 @@ ATInt_logabs_to_STACKLA(ex):=block(
     else if safe_op(first(args(ex))) = "abs" then
         return(STACKLA(first(args(first(args(ex))))))
     ),
-  return(apply(op(ex),maplist(ATInt_logabs_to_STACKLA,args(ex))))
+  return(apply(op(ex), maplist('ATInt_logabs_to_STACKLA, args(ex))))
 )$
 
 /* Has the student been consistent in using log(abs(ex))?                     */
@@ -3116,8 +3173,146 @@ ATInt_consistent_logabs_p(ex, var):=block([helper],
 ATIntGetVar(ex):= block(
     if atom(ex) then return([]),
     if safe_op(ex)="int" then return([second(args(ex))]),
-    flatten(map(ATIntGetVar, args(ex)))
+    flatten(map('ATIntGetVar, args(ex)))
 );
+
+/********************************************************************/
+/* An answer test for antiderivative questions.                     */
+/********************************************************************/
+
+ATAntidiff(sa, sb, so) := block([var, sbdisp],
+    simp:false,
+    /* How to display the teacher's answer? */
+    sbdisp:[],
+
+    SAA:errcatch(ev(sa, simp, nouns)),
+    if (is(SAA=[STACKERROR]) or is(SAA=[])) then
+        return([false, false, StackAddNote("", "ATAntidiff_STACKERROR_SAns"), ""]),
+    SBB:errcatch(ev(sb, simp, nouns)),
+    if (is(SBB=[STACKERROR]) or is(SBB=[])) then
+        return([false, false, StackAddNote("", "ATAntidiff_STACKERROR_TAns"), ""]),
+    SOO:errcatch(ev(so, simp, nouns)),
+    if (is(SOO=[STACKERROR]) or is(SOO=[])) then
+        return([false, false, StackAddNote("", "ATAntidiff_STACKERROR_Opt"), ""]),
+
+    /* We always simplify the teacher's answer. */
+    sb:first(SBB),
+
+    var:first(SOO),
+    /* The options field should be exactly a variable and nothing else */
+    if not(is(variablep(var))) then return(StackBasicReturn(false, false, "ATAntidiff_STACKERROR_Opt")),
+
+    /* If we haven't explicitly got a displayed expression for feedback then generate one. */
+    if equal(sbdisp, []) then
+        sbdisp:ev(diff(sb, var), simp),
+
+    /* Calculate derivatives */
+    SAd:ev(diff(sa, var), simp),
+    SBd:ev(diff(sb, var), simp),
+    if debug then print([SAa, SBd]),
+    if debug then print(["Derivatives : ", SAd, SBd]),
+    if ev(algebraic_equivalence(SAd, SBd), simp) then return([true, true, StackAddNote("", "ATAntidiff_true"), ""]),
+
+    /* Did the student differentiate instead of integrating? */
+    SABd : ev(fullratsimp(sa - ev(diff(SBd, var), simp)), simp),
+    if debug then print(["Simplified difference:", SABd]),
+    if ev(diff(SABd,var),simp)=0 and ev(algebraic_equivalence(exp(x), SBd), simp)#true then return(StackBasicReturn(false, false, "ATAntidiff_diff")),
+
+    /* if not, we fail the test generically */
+    return([false, false, StackAddNote("", "ATAntidiff_generic"), StackAddFeedback("", "ATAntidiff_generic",stack_disp(SBd, "d"), stack_disp(var, "i"), stack_disp(SAd, "d") ) ])
+)$
+
+/********************************************************************/
+/* An answer test to check for an additive constant.                */
+/* Given an expression sa and a list of variables so in the options,*/
+/* it checks if exactly one other variable is contained additively, */
+/* like "+C". The main use case for this are Antiderivative tasks.  */
+/* This answer test ignores the teacher answer completely.          */
+/********************************************************************/
+
+ATAddConst(sa, sb, so) := block([oldsimp, SAresult, SAnote, SBresult, SBnote],
+    simp: false,
+
+    SAA:errcatch(ev(sa, simp, nouns)),
+    if (is(SAA=[STACKERROR]) or is(SAA=[])) then
+        return([false, false, StackAddNote("", "ATAddConst_STACKERROR_SAns"), ""]),
+    /*SBB:errcatch(ev(sb, simp, nouns)),
+    if (is(SBB=[STACKERROR]) or is(SBB=[])) then
+        return([false, false, StackAddNote("", "ATAddConst_STACKERROR_TAns"), ""]),*/
+    SOO:errcatch(ev(so, simp, nouns)),
+    if (is(SOO=[STACKERROR]) or is(SOO=[])) then
+        return([false, false, StackAddNote("", "ATAddConst_STACKERROR_Opt"), ""]),
+
+    SA : first(SAA),
+    /*SB : first(SBB),*/
+    SOvars : first(SOO),
+
+    /* did the teacher do this correctly? */
+    /*[SBresult, SBnote] : hasAddConst(SB,SOVars),
+    if not(SBresult) then return([false, false, StackAddNote("", concat("ATAddConst_TAns. ", SBnote)), ""]),*/
+
+    /* did the student do this correctly? */
+    [SAresult, SAnote] : hasAddConst(SA,SOvars),
+    if not(SAresult) then return(StackBasicReturn(false, false, SAnote)),
+
+    return(StackBasicReturn(true, true, SAnote))
+)$
+
+/* This function dows the actual checking described above. */
+/* returns a true/false mark and the name of an answer note. */
+hasAddConst(expr, vars) := block([othervars, const, deriv, allvariables, strict],
+    strict: true,
+    /* is this a list of variables? If just one variable is given, listify. */
+    if debug then print(["Variables: ", vars]),
+
+    if not(is(listp(vars))) then vars : [vars],
+
+    if debug then print(["Listified variables: ", vars]),
+    if member(NONSTRICT, vars) then (
+        if debug then print(["Found NONSTRICT option"]),
+        strict : false,
+        vars : delete(NONSTRICT, vars)
+    ),
+    allvariables : true,
+    for var in vars do block (
+        if debug then print(["Variable: ", var,is(variablep(var))]),
+        if not(is(variablep(var))) then allvariables : false
+    ),
+    if not(allvariables) then return([false, "ATAddConst_Opt"]),
+    if debug then print(["All list entries are variables"]),
+
+	/* build list of candidates for constants: othervars */
+	othervars : listofvars(expr),
+    if debug then print(["Variables in expression: ", othervars]),
+	for var in vars do othervars : delete(var,othervars),
+    if debug then print(["Remaining variables after deletion: ", othervars]),
+
+
+    /* check number of candidates, should be exactly 1 */
+    if length(othervars) = 0 then
+        return([false, "ATAddConst_noconst"]),
+    if length(othervars) > 1 then
+        return([false, "ATAddConst_severalconst"]),
+
+    /* if there is one candidate, check if it's exactly additive or something else */
+    const : othervars[1],
+    deriv : ev(diff(expr,const), simp),
+    if debug then print(["Derivative by the constant: ", deriv]),
+    if strict then (
+        if debug then print(["Checking strictly "]),
+        if algebraic_equivalence(deriv,1) then
+            return([true, "ATAddConst_true"])
+        else return([false, "ATAddConst_generic"])
+    )
+    else
+    (
+        if debug then print(["Checking NON-strictly "]),
+        if emptyp(delete(const,listofvars(deriv))) then
+            return([true, "ATAddConst_true"])
+        else return([false, "ATAddConst_generic"])
+    )
+
+)$
 
 /********************************************************************/
 /* An answer test for differentiation questions.                    */
@@ -3129,15 +3324,12 @@ ATDiff(sa, sb, so) :=
     old_simp:simp, simp:false, RawMark:false, FeedBack:"", AnswerNote:"",
     keepfloat:true,
 
-    SAA:errcatch(ev(sa, simp, nouns)),
+    SAA:errcatch(ev(sa, nouns, simp)),
     if (is(SAA=[STACKERROR]) or is(SAA=[])) then return([false,false,StackAddNote("","ATDiff_STACKERROR_SAns"),""]),
-    SBB:errcatch(ev(sb, simp, nouns)),
+    SBB:errcatch(ev(sb, nouns, simp)),
     if (is(SBB=[STACKERROR]) or is(SBB=[])) then return([false,false,StackAddNote("","ATDiff_STACKERROR_TAns"),""]),
-    SOO:errcatch(ev(so, simp, nouns)),
+    SOO:errcatch(ev(so, nouns, simp)),
     if (is(SOO=[STACKERROR]) or is(SOO=[])) then return([false,false,StackAddNote("","ATDiff_STACKERROR_Opt"),""]),
-
-    /* We always simplify the teacher's answer. */
-    sb:first(SBB),
 
     /* SA should be only an expression. */
     if expressionp(sa)=false then
@@ -3184,7 +3376,7 @@ Difffun(SA, SB, v) := block([val, rawmk, ansnote, fb, ret, lSAv, lSBv, mSAv, mSB
 ATDiffGetVar(ex):= block(
     if atom(ex) then return([]),
     if safe_op(ex)="diff" then return([second(args(ex))]),
-    flatten(map(ATDiffGetVar, args(ex)))
+    flatten(map('ATDiffGetVar, args(ex)))
 )$
 
 /* ****************************************************** */
@@ -3234,14 +3426,14 @@ truth_table(ex) := block([exs, vars, tab, tt],
     /* Store this variable to prevent 2^n re-evaluations of this function. */
     exs: noun_logic_remove(ex),
     tab: maplist(lambda([ex2], zip_with("=", vars, ex2)), truth_table_allvars(vars)),
-    tab: maplist(lambda([ex2], append(maplist(rhs, ex2), [ev(logic_simp(exs), ex2)])), tab),
+    tab: maplist(lambda([ex2], append(maplist('rhs, ex2), [ev(logic_simp(exs), ex2)])), tab),
     tab: append([append(vars, [ex])], tab),
-    apply(table, tab)
+    apply('table, tab)
 )$
 
 truth_table_allvars(l) := block(
    if emptyp(l) then return([[]]),
-   return(append( maplist(lambda([ex], append([false], ex)), truth_table_allvars(rest(l))),
+   return(append(maplist(lambda([ex], append([false], ex)), truth_table_allvars(rest(l))),
            maplist(lambda([ex], append([true], ex)), truth_table_allvars(rest(l)))))
 )$
 
@@ -3249,7 +3441,7 @@ truth_table_allvars(l) := block(
 table_bool_abbreviate:true$
 table_bool_abbreviate_fn(ex):= block(
     if safe_op(ex) = "texcolor" then return(sconcat("\\color{", first(args(ex)), "}{\\underline{", table_bool_abbreviate_fn(second(args(ex))), "}}")),
-    if table_bool_abbreviate=true then 
+    if table_bool_abbreviate=true then
         return(if ex=true then "\\mathbf{T} " else if ex=false then "\\mathbf{F} " else stack_disp(ex, ""))
     else stack_disp(ex, "")
 )$
@@ -3258,14 +3450,14 @@ table_tex(ex):= block([ret, astart],
     /* Make a header. */
     astart: ev(makelist("c", k, length(first(ex))), simp),
     astart: sconcat("\\begin{array}{", simplode(astart, "|"), "} "),
-    ret: matrixmap(table_bool_abbreviate_fn, apply(matrix, args(ex))),
+    ret: matrixmap('table_bool_abbreviate_fn, apply('matrix, args(ex))),
     ret: maplist(lambda([ex2], simplode(ex2, " & ")), args(ret)),
     rest:sconcat(astart, first(ret), "\\\\ \\hline ", simplode(rest(ret), " \\\\ "), "\\end{array} ")
 )$
 texput(table, table_tex)$
 
 table_zip_with(fn, T1, T2) := block(
-  apply(table, zip_with(lambda([ex1,ex2], zip_with(fn,ex1,ex2)), args(T1), args(T2)))
+  apply('table, zip_with(lambda([ex1,ex2], zip_with(fn,ex1,ex2)), args(T1), args(T2)))
 )$
 
 table_difference(T1, T2) := table_zip_with(lambda([ex1,ex2], if ex1=ex2 then ex1 else texcolor("red", ex1)), T1, T2)$
@@ -3289,22 +3481,22 @@ tree_rec(e) := block([treelist],
   if is(safe_op(e)="binomial") then return(sconcat("<span class='atom'>", stack_disp(e, "i") ,"</span>")),
   if is(safe_op(e)="disp_parens") then return(tree_rec(first(ex))),
 
-  treelist:flatten(["<code>", op(noun_logic_remove(e)), "</code><ul>", map(lambda([ex], sconcat("<li>", tree_rec(ex) ,"</li>")), args(e)), "</ul>"]),  
+  treelist:flatten(["<code>", op(noun_logic_remove(e)), "</code><ul>", map(lambda([ex], sconcat("<li>", tree_rec(ex) ,"</li>")), args(e)), "</ul>"]),
 
   /* Lots of opportunities/need for fine-tuning. */
 
-  if is(safe_op(e)="int") then treelist:flatten(["<span class='op'>\\(\\int \\cdots \\mathrm{d}", stack_disp(second(e), ""), " \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]), 
-  if is(safe_op(e)="diff") then treelist:flatten(["<span class='op'>\\(", stack_disp(apply(noundiff, append([NULLNUM], rest(args(e)))), ""), " \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]), 
-  if is(safe_op(e)="sum" or safe_op(e)="'sum") then treelist:flatten(["<span class='op'>\\(\\sum_{", stack_disp(second(e), ""), "=", stack_disp(third(e), ""), "}^{", stack_disp(fourth(e), ""), "} \\cdots \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]), 
-  if is(safe_op(e)="limit" or safe_op(e)="'limit") then treelist:flatten(["<span class='op'>\\(\\lim_{", stack_disp(second(e), ""), "\\rightarrow{", stack_disp(third(e), ""), "}} \\cdots \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]), 
+  if is(safe_op(e)="int") then treelist:flatten(["<span class='op'>\\(\\int \\cdots \\mathrm{d}", stack_disp(second(e), ""), " \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]),
+  if is(safe_op(e)="diff") then treelist:flatten(["<span class='op'>\\(", stack_disp(apply('noundiff, append([NULLNUM], rest(args(e)))), ""), " \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]),
+  if is(safe_op(e)="sum" or safe_op(e)="'sum") then treelist:flatten(["<span class='op'>\\(\\sum_{", stack_disp(second(e), ""), "=", stack_disp(third(e), ""), "}^{", stack_disp(fourth(e), ""), "} \\cdots \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]),
+  if is(safe_op(e)="limit" or safe_op(e)="'limit") then treelist:flatten(["<span class='op'>\\(\\lim_{", stack_disp(second(e), ""), "\\rightarrow{", stack_disp(third(e), ""), "}} \\cdots \\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]),
   /* This example mirrors tex-gamma. */
-  if is(safe_op(e)="gamma") then treelist:flatten(["<span class='op'>\\(\\Gamma\\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]), 
+  if is(safe_op(e)="gamma") then treelist:flatten(["<span class='op'>\\(\\Gamma\\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]),
   /* This example mirrors tex-sqrt. */
-  if is(safe_op(e)="sqrt") then treelist:flatten(["<span class='op'>\\(\\sqrt{}\\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]), 
+  if is(safe_op(e)="sqrt") then treelist:flatten(["<span class='op'>\\(\\sqrt{}\\)</span><ul><li>", tree_rec(first(e)), "</li></ul>"]),
 
   if elementp(safe_op(e), tree_texlist) or logicp(e) then block(
         /* Apply the operator to as many arguments as we have, none of which print. */
-        treelist:["<span class='op'>\\(", stack_disp(apply(op(e), ev(makelist(NULLNUM,k,1,length(args(e))),simp)), ""), "\\)</span>"], 
+        treelist:["<span class='op'>\\(", stack_disp(apply(op(e), ev(makelist(NULLNUM,k,1,length(args(e))),simp)), ""), "\\)</span>"],
         /* Try to get a symbol from the tex database, to avoid empty brackets round functions. */
         if symbolp(op(e)) then block([%_do],
             if not(stringp(%_do:get_texword(op(e)))) then %_do:get_texsym(op(e)),
@@ -3313,7 +3505,7 @@ tree_rec(e) := block([treelist],
         treelist:flatten(append(treelist, ["<ul>", map(lambda([ex], sconcat("<li>", tree_rec(ex) ,"</li>")), args(e)), "</ul>"]))
         ),
 
-  apply(sconcat, treelist)
+  apply('sconcat, treelist)
 )$
 
 
@@ -3331,4 +3523,4 @@ is_lang(code):=ev(is(%_STACK_LANG=code),simp=true)$
 
 /* Stack expects some output with the version number the output happens at */
 /* maximalocal.mac after additional library loading */
-stackmaximaversion:2023121100$
+stackmaximaversion:2025102100$

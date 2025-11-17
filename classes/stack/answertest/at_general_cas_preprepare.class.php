@@ -15,16 +15,17 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 /**
  * General answer test which connects to the CAS - prevents duplicate code.
  *
+ * @package    qtype_stack
  * @copyright  2020 University of Edinburgh
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_answertest_general_cas_preprepare extends stack_answertest_general_cas {
 
     /**
+     * Add description here
      * @param  string $sans
      * @param  string $tans
      * @param  string $casoption

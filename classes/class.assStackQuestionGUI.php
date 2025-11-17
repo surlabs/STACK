@@ -319,7 +319,7 @@ class assStackQuestionGUI extends assQuestionGUI
         }
 
 		//Ensure evaluation has been done
-		if (empty($this->object->getEvaluation())) {
+        if (empty($this->object->getEvaluation())) {
             try{
                 $this->object->evaluateQuestion($user_response);
             } catch (stack_exception|StackException $e) {

@@ -18,8 +18,6 @@
  *
  */
 
-use classes\platform\StackConfig;
-
 
 /**
  * Class with STATIC METHODS used in the whole STACK Question
@@ -403,7 +401,7 @@ class assStackQuestionUtils
 	public static function _isInputEvaluated($prt, $input_name)
 	{
 		foreach ($prt->getPRTNodes() as $node_name => $node) {
-			if (strpos($node->getStudentAnswer(), $input_name) !== false or strpos($node->getTeacherAnswer(), $input_name)) {
+			if (str_contains($node->getStudentAnswer(), $input_name) or strpos($node->getTeacherAnswer(), $input_name)) {
 				return TRUE;
 			}
 		}
@@ -1098,6 +1096,7 @@ class assStackQuestionUtils
             if (!$all_formative) {
                 $prt_value = $prt_data->value / $total_value;
             }
+            $prt_data->feedbackstyle = 1;
             $question->prts[$name] = new stack_potentialresponse_tree_lite($prt_data, $prt_value);
         }
 
@@ -1168,35 +1167,35 @@ class assStackQuestionUtils
                     //Inputs
 
                     // User response value
-                    if (strpos($solution_entry['value1'], 'xqcas_input_') !== false && strpos($solution_entry['value1'], '_value') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_input_') && str_contains($solution_entry['value1'], '_value')) {
                         $input_name = str_replace('xqcas_input_', '', $solution_entry['value1']);
                         $input_name = str_replace('_value', '', $input_name);
                         $parsed_user_response_from_db['inputs'][$input_name]['value'] = $solution_entry['value2'];
                     }
 
                     // User response display
-                    if (strpos($solution_entry['value1'], 'xqcas_input_') !== false && strpos($solution_entry['value1'], '_display') !== false && strpos($solution_entry['value1'], '_model_answer') === false && strpos($solution_entry['value1'], '_validation') === false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_input_') && str_contains($solution_entry['value1'], '_display') && !str_contains($solution_entry['value1'], '_model_answer') && !str_contains($solution_entry['value1'], '_validation')) {
                         $input_name = str_replace('xqcas_input_', '', $solution_entry['value1']);
                         $input_name = str_replace('_display', '', $input_name);
                         $parsed_user_response_from_db['inputs'][$input_name]['display'] = $solution_entry['value2'];
                     }
 
                     // Correct answer value
-                    if (strpos($solution_entry['value1'], 'xqcas_input_') !== false && strpos($solution_entry['value1'], '_model_answer') !== false && strpos($solution_entry['value1'], '_model_answer_display') === false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_input_') && str_contains($solution_entry['value1'], '_model_answer') && !str_contains($solution_entry['value1'], '_model_answer_display')) {
                         $input_name = str_replace('xqcas_input_', '', $solution_entry['value1']);
                         $input_name = str_replace('_model_answer', '', $input_name);
                         $parsed_user_response_from_db['inputs'][$input_name]['correct_value'] = $solution_entry['value2'];
                     }
 
                     // Correct answer display
-                    if (strpos($solution_entry['value1'], 'xqcas_input_') !== false && strpos($solution_entry['value1'], '_model_answer_display') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_input_') && str_contains($solution_entry['value1'], '_model_answer_display')) {
                         $input_name = str_replace('xqcas_input_', '', $solution_entry['value1']);
                         $input_name = str_replace('_model_answer_display', '', $input_name);
                         $parsed_user_response_from_db['inputs'][$input_name]['correct_display'] = $solution_entry['value2'];
                     }
 
                     // Input validation
-                    if (strpos($solution_entry['value1'], 'xqcas_input_') !== false && strpos($solution_entry['value1'], '_validation_display') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_input_') && str_contains($solution_entry['value1'], '_validation_display')) {
                         $input_name = str_replace('xqcas_input_', '', $solution_entry['value1']);
                         $input_name = str_replace('_validation_display', '', $input_name);
                         $parsed_user_response_from_db['inputs'][$input_name]['validation_display'] = $solution_entry['value2'];
@@ -1205,35 +1204,35 @@ class assStackQuestionUtils
                     //Prts
 
                     //PRT name
-                    if (strpos($solution_entry['value1'], 'xqcas_prt_') !== false && strpos($solution_entry['value1'], '_name') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_prt_') && str_contains($solution_entry['value1'], '_name')) {
                         $prt_name = str_replace('xqcas_prt_', '', $solution_entry['value1']);
                         $prt_name = str_replace('_name', '', $prt_name);
                         $parsed_user_response_from_db['prts'][$prt_name]['name'] = $solution_entry['value2'];
                     }
 
                     //PRT errors
-                    if (strpos($solution_entry['value1'], 'xqcas_prt_') !== false && strpos($solution_entry['value1'], '_errors') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_prt_') && str_contains($solution_entry['value1'], '_errors')) {
                         $prt_name = str_replace('xqcas_prt_', '', $solution_entry['value1']);
                         $prt_name = str_replace('_errors', '', $prt_name);
                         $parsed_user_response_from_db['prts'][$prt_name]['errors'] = $solution_entry['value2'];
                     }
 
                     //PRT feedback
-                    if (strpos($solution_entry['value1'], 'xqcas_prt_') !== false && strpos($solution_entry['value1'], '_feedback') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_prt_') && str_contains($solution_entry['value1'], '_feedback')) {
                         $prt_name = str_replace('xqcas_prt_', '', $solution_entry['value1']);
                         $prt_name = str_replace('_feedback', '', $prt_name);
                         $parsed_user_response_from_db['prts'][$prt_name]['feedback'] = $solution_entry['value2'];
                     }
 
                     //PRT status
-                    if (strpos($solution_entry['value1'], 'xqcas_prt_') !== false && strpos($solution_entry['value1'], '_status') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_prt_') && str_contains($solution_entry['value1'], '_status')) {
                         $prt_name = str_replace('xqcas_prt_', '', $solution_entry['value1']);
                         $prt_name = str_replace('_status', '', $prt_name);
                         $parsed_user_response_from_db['prts'][$prt_name]['status'] = $solution_entry['value2'];
                     }
 
                     //PRT answer notes
-                    if (strpos($solution_entry['value1'], 'xqcas_prt_') !== false && strpos($solution_entry['value1'], '_answernote') !== false) {
+                    if (str_contains($solution_entry['value1'], 'xqcas_prt_') && str_contains($solution_entry['value1'], '_answernote')) {
                         $prt_name = str_replace('xqcas_prt_', '', $solution_entry['value1']);
                         $prt_name = str_replace('_answernote', '', $prt_name);
                         $parsed_user_response_from_db['prts'][$prt_name]['answer_notes'] = $solution_entry['value2'];
@@ -1285,37 +1284,37 @@ class assStackQuestionUtils
 
                 unset($db_values[$index]);
             } else {
-                if (strpos($value['value1'], 'xqcas_prt_') !== false && strpos($value['value1'], '_name') !== false) {
+                if (str_contains($value['value1'], 'xqcas_prt_') && str_contains($value['value1'], '_name')) {
                     $prt_name = str_replace('xqcas_prt_', '', $value['value1']);
                     $prt_name = str_replace('_name', '', $prt_name);
                     $results['prt'][$prt_name]['points'] = $value['points'];
 
                     unset($db_values[$index]);
-                } elseif (strpos($value['value1'], 'xqcas_prt_') !== false && strpos($value['value1'], '_errors') !== false) {
+                } elseif (str_contains($value['value1'], 'xqcas_prt_') && str_contains($value['value1'], '_errors')) {
                     $prt_name = str_replace('xqcas_prt_', '', $value['value1']);
                     $prt_name = str_replace('_errors', '', $prt_name);
                     $results['prt'][$prt_name]['errors'] = $value['value2'];
 
                     unset($db_values[$index]);
-                } elseif (strpos($value['value1'], 'xqcas_prt_') !== false && strpos($value['value1'], '_feedback') !== false) {
+                } elseif (str_contains($value['value1'], 'xqcas_prt_') && str_contains($value['value1'], '_feedback')) {
                     $prt_name = str_replace('xqcas_prt_', '', $value['value1']);
                     $prt_name = str_replace('_feedback', '', $prt_name);
                     $results['prt'][$prt_name]['feedback'] = $value['value2'];
 
                     unset($db_values[$index]);
-                } elseif (strpos($value['value1'], 'xqcas_prt_') !== false && strpos($value['value1'], '_status') !== false) {
+                } elseif (str_contains($value['value1'], 'xqcas_prt_') && str_contains($value['value1'], '_status')) {
                     $prt_name = str_replace('xqcas_prt_', '', $value['value1']);
                     $prt_name = str_replace('_status', '', $prt_name);
                     $results['prt'][$prt_name]['status']['value'] = $value['value2'];
 
                     unset($db_values[$index]);
-                } elseif (strpos($value['value1'], 'xqcas_prt_') !== false && strpos($value['value1'], '_status_message') !== false) {
+                } elseif (str_contains($value['value1'], 'xqcas_prt_') && str_contains($value['value1'], '_status_message')) {
                     $prt_name = str_replace('xqcas_prt_', '', $value['value1']);
                     $prt_name = str_replace('_status_message', '', $prt_name);
                     $results['prt'][$prt_name]['status']['message'] = $value['value2'];
 
                     unset($db_values[$index]);
-                } elseif (strpos($value['value1'], 'xqcas_prt_') !== false && strpos($value['value1'], '_answernote') !== false) {
+                } elseif (str_contains($value['value1'], 'xqcas_prt_') && str_contains($value['value1'], '_answernote')) {
                     $prt_name = str_replace('xqcas_prt_', '', $value['value1']);
                     $prt_name = str_replace('_answernote', '', $prt_name);
                     $results['prt'][$prt_name]['answernote'] = $value['value2'];
@@ -1325,22 +1324,22 @@ class assStackQuestionUtils
                     $prt_name = str_replace('xqcas_prt_', '', $value['value1']);
                     $prt_name = substr($prt_name, 0, strpos($prt_name, '_'));
 
-                    if (strpos($value['value1'], 'xqcas_prt_' . $prt_name . '_value_') !== false) {
+                    if (str_contains($value['value1'], 'xqcas_prt_' . $prt_name . '_value_')) {
                         $input_name = str_replace('xqcas_prt_' . $prt_name . '_value_', '', $value['value1']);
                         $results['prt'][$prt_name]['response'][$input_name]['value'] = $value['value2'];
 
                         unset($db_values[$index]);
-                    } elseif (strpos($value['value1'], 'xqcas_prt_' . $prt_name . '_display_') !== false) {
+                    } elseif (str_contains($value['value1'], 'xqcas_prt_' . $prt_name . '_display_')) {
                         $input_name = str_replace('xqcas_prt_' . $prt_name . '_display_', '', $value['value1']);
                         $results['prt'][$prt_name]['response'][$input_name]['display'] = $value['value2'];
 
                         unset($db_values[$index]);
-                    } elseif (strpos($value['value1'], 'xqcas_prt_' . $prt_name . '_model_answer_display_') !== false) {
+                    } elseif (str_contains($value['value1'], 'xqcas_prt_' . $prt_name . '_model_answer_display_')) {
                         $input_name = str_replace('xqcas_prt_' . $prt_name . '_model_answer_display_', '', $value['value1']);
                         $results['prt'][$prt_name]['response'][$input_name]['model_answer_display'] = $value['value2'];
 
                         unset($db_values[$index]);
-                    } elseif (strpos($value['value1'], 'xqcas_prt_' . $prt_name . '_model_answer_') !== false) {
+                    } elseif (str_contains($value['value1'], 'xqcas_prt_' . $prt_name . '_model_answer_')) {
                         $input_name = str_replace('xqcas_prt_' . $prt_name . '_model_answer_', '', $value['value1']);
                         $results['prt'][$prt_name]['response'][$input_name]['model_answer'] = $value['value2'];
 
@@ -1358,7 +1357,7 @@ class assStackQuestionUtils
         $found_random = false;
         if ('' == $question->question_note) {
             foreach (stack_cas_security::get_all_with_feature('random') as $random_id) {
-                if (!(false === strpos($question->question_variables, $random_id))) {
+                if (!(!str_contains($question->question_variables, $random_id))) {
                     $found_random = true;
                     break;
                 }
@@ -1426,7 +1425,7 @@ class assStackQuestionUtils
 
     public static function parseToHTMLWithoutLatex($input): string
     {
-        if (strpos($input, "\r\n") !== false) {
+        if (str_contains($input, "\r\n")) {
             return str_replace("\r\n", "<br>", $input);
         }
 
@@ -1483,5 +1482,18 @@ class assStackQuestionUtils
                 return '';
             }
         }, $a_str);
+    }
+
+    public static function getMathjaxVersion(): string
+    {
+        $repo = new ilMathJaxConfigSettingsRepository(new ilSetting('MathJax'));
+
+        $url = $repo->getConfig()->getClientScriptUrl();
+
+        if (str_contains($url, 'mathjax3')) {
+            return "3";
+        }
+
+        return "2";
     }
 }

@@ -14,8 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/filter.interface.php');
 
 /**
  * AST filter that splits variables at number-letter boundaries not
@@ -25,12 +30,13 @@
  */
 class stack_ast_filter_403_split_at_number_letter_boundary implements stack_cas_astfilter {
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $process = function($node) use (&$answernotes) {
             if ($node instanceof MP_Identifier && !$node->is_function_name()) {
                 // First find the boundaries.
-                $splits = array();
+                $splits = [];
                 $alpha = true;
                 $last = 0;
                 for ($i = 1; $i < mb_strlen($node->value); $i++) {
@@ -47,6 +53,9 @@ class stack_ast_filter_403_split_at_number_letter_boundary implements stack_cas_
                 if (count($splits) > 1) {
                     if (array_search('missing_stars', $answernotes) === false) {
                         $answernotes[] = 'missing_stars';
+                    }
+                    if (array_search('(403)', $answernotes) === false) {
+                        $answernotes[] = '(403)';
                     }
                     // Initial identifier is turned to multiplication chain.
                     $temp = new MP_Identifier('rhs');

@@ -14,16 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Input factory.
+ * Provides a convenient way to create an input of any type,
+ * and to get metadata about the input types.
+ * @package    qtype_stack
+ * @copyright  2012 University of Birmingham.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../options.class.php');
-//require_once(__DIR__ . '/inputbase.class.php');
 
-// Input factory. Provides a convenient way to create an input of any type,
-// and to get metadata about the input types.
-//
-// @copyright  2012 University of Birmingham.
-// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
-
+/**
+ * Input factory.
+ * Provides a convenient way to create an input of any type,
+ * and to get metadata about the input types.
+ */
 class stack_input_factory {
     /**
      * @var array type name => array of parameter names used. Used to cache the
@@ -31,20 +36,19 @@ class stack_input_factory {
      */
     protected static $parametersdefaults = null;
 
-	/**
-	 * Create an input of a given type and return it.
-	 * @param string $type the required type. Must be one of the values retured by
-	 *      {@link getAvailableTypes()}.
-	 * @param string $name the name of the input. This is the name of the
-	 *      POST variable that the input from this element will be submitted as.
-	 * @param int $width size of the input.
-	 * @param string $default initial contets of the input.
-	 * @param int $maxLength limit on the maximum input length.
-	 * @param int $height height of the input.
-	 * @param array $param some sort of options.
-	 * @return stack_input the requested input.
-	 * @throws stack_exception
-	 */
+    /**
+     * Create an input of a given type and return it.
+     * @param string $type the required type. Must be one of the values retured by
+     *      {@link getAvailableTypes()}.
+     * @param string $name the name of the input. This is the name of the
+     *      POST variable that the input from this element will be submitted as.
+     * @param int $width size of the input.
+     * @param string $default initial contets of the input.
+     * @param int $maxLength limit on the maximum input length.
+     * @param int $height height of the input.
+     * @param array $param some sort of options.
+     * @return stack_input the requested input.
+     */
     public static function make($type, $name, $teacheranswer, $options = null, $parameters = null, $runtime = true) {
         $class = self::class_for_type($type);
         return new $class($name, $teacheranswer, $options, $parameters, $runtime);
@@ -67,7 +71,7 @@ class stack_input_factory {
         if (!is_readable($file)) {
             throw new stack_exception('stack_input_factory: unknown input type ' . $type);
         }
-        //include_once($file);
+        include_once($file);
 
         if (!class_exists($class)) {
             throw new stack_exception('stack_input_factory: input type ' . $type .
@@ -78,16 +82,17 @@ class stack_input_factory {
     }
 
     /**
+     * Add description here.
      * @return array of available type names.
      */
     public static function get_available_types() {
-        $ignored = array('CVS', '_vti_cnf', 'tests', 'yui', 'phpunit');
+        $ignored = ['CVS', '_vti_cnf', 'tests', 'yui', 'phpunit'];
         static $types = null;
         if ($types !== null) {
             return $types;
         }
 
-        $types = array();
+        $types = [];
         foreach (new DirectoryIterator(__DIR__) as $item) {
             // Skip . and .. and non-dirs.
             if ($item->isDot() || !$item->isDir()) {
@@ -100,11 +105,9 @@ class stack_input_factory {
                 continue;
             }
 
-            // fau: Moodle  method clean param not used
             // Skip folders with dubious names.
-            //$inputname = clean_param($foldername, PARAM_PLUGIN);
-			$inputname = $foldername;
-			if (empty($inputname) || $inputname != $foldername) {
+            $inputname = $foldername;
+            if (empty($inputname) || $inputname != $foldername) {
                 continue;
             }
 
@@ -115,7 +118,7 @@ class stack_input_factory {
             }
 
             // Skip folders that don't define the right class.
-            //include_once($file);
+            include_once($file);
             $class = "stack_{$inputname}_input";
             if (!class_exists($class)) {
                 continue;
@@ -129,11 +132,12 @@ class stack_input_factory {
     }
 
     /**
+     * Add description here.
      * @return array input type internal name => display name.
      */
     public static function get_available_type_choices() {
         $types = self::get_available_types();
-        $choices = array();
+        $choices = [];
         foreach ($types as $type => $notused) {
             $choices[$type] = stack_string('inputtype' . $type);
         }
@@ -148,7 +152,7 @@ class stack_input_factory {
      */
     public static function get_parameters_used() {
 
-        $used = array();
+        $used = [];
         foreach (self::get_parameters_defaults() as $type => $defaults) {
             $used[$type] = array_keys($defaults);
             $used[$type][] = 'inputType';
@@ -162,7 +166,7 @@ class stack_input_factory {
      * @return array $typename => array of names of options used.
      */
     public static function get_parameters_fromform_mapping($type) {
-        $parametermapping = array(
+        $parametermapping = [
             'sameType'           => 'checkanswertype',
             'mustVerify'         => 'mustverify',
             'showValidation'     => 'showvalidation',
@@ -175,10 +179,11 @@ class stack_input_factory {
             'allowWords'         => 'allowwords',
             'forbidFloats'       => 'forbidfloat',
             'lowestTerms'        => 'requirelowestterms',
-            'options'            => 'options');
+            'options'            => 'options',
+        ];
 
         $used = self::get_parameters_defaults();
-        $mapping = array();
+        $mapping = [];
         foreach ($used[$type] as $param => $defaults) {
                 $mapping[$param] = $parametermapping[$param];
         }
@@ -194,7 +199,7 @@ class stack_input_factory {
         if (!is_null(self::$parametersdefaults)) {
             return self::$parametersdefaults;
         }
-        self::$parametersdefaults = array();
+        self::$parametersdefaults = [];
         foreach (self::get_available_types() as $type => $class) {
             self::$parametersdefaults[$type] = $class::get_parameters_defaults();
         }
@@ -205,8 +210,10 @@ class stack_input_factory {
      * Convert a raw value as received from a fromform value into a correct datatype.
      */
     public static function convert_parameter_fromform($key, $value) {
-        $booleanparamaters = array('strictSyntax' => true, 'mustVerify' => true, 'sameType' => true,
-            'forbidFloats' => true, 'lowestTerms' => true);
+        $booleanparamaters = [
+            'strictSyntax' => true, 'mustVerify' => true, 'sameType' => true,
+            'forbidFloats' => true, 'lowestTerms' => true,
+        ];
         if (array_key_exists($key, $booleanparamaters)) {
             $value = (bool) $value;
         }
@@ -214,7 +221,7 @@ class stack_input_factory {
     }
 
     /**
-     * Convert the old value of "insert stars" (version<
+     * Convert the old value of "insert stars".
      */
     public static function convert_legacy_insert_stars($value) {
         $map = [
@@ -229,7 +236,12 @@ class stack_input_factory {
             // Insert stars for implied multiplication and for spaces.
             4 => stack_input::GRAMMAR_FIX_INSERT_STARS | stack_input::GRAMMAR_FIX_SPACES,
             // Insert stars assuming single-character variables, implied and for spaces.
-            5 => stack_input::GRAMMAR_FIX_INSERT_STARS | stack_input::GRAMMAR_FIX_SINGLE_CHAR | stack_input::GRAMMAR_FIX_SPACES
+            5 => stack_input::GRAMMAR_FIX_INSERT_STARS | stack_input::GRAMMAR_FIX_SINGLE_CHAR | stack_input::GRAMMAR_FIX_SPACES,
+            // Insert stars for implied multiplication, spaces, and no user-functions.
+            6 => stack_input::GRAMMAR_FIX_INSERT_STARS | stack_input::GRAMMAR_FIX_SPACES | stack_input::GRAMMAR_FIX_FUNCTIONS,
+            // Insert stars for implied multiplication, spaces, no user-functions and assuming single-character var.
+            7 => stack_input::GRAMMAR_FIX_INSERT_STARS | stack_input::GRAMMAR_FIX_SPACES |
+                stack_input::GRAMMAR_FIX_FUNCTIONS | stack_input::GRAMMAR_FIX_SINGLE_CHAR,
         ];
         return $map[$value];
     }

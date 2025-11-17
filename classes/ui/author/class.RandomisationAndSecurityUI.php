@@ -711,7 +711,7 @@ class RandomisationAndSecurityUI
         }
 
         foreach ($unit_test as $key => $value) {
-            if (strpos($key, "result_") !== false) {
+            if (str_contains($key, "result_")) {
                 unset($unit_test[$key]);
                 $key = str_replace("result_", "", $key);
                 $unit_test["expected"][$key] = $value;

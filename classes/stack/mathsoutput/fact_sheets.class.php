@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * The fact sheets class for STACK.
  *
+ * @package    qtype_stack
  * @copyright  2014 Loughborough University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,15 +28,18 @@ abstract class stack_fact_sheets {
      * two corresponding lines in the language file.
      * E.g. greek_alphabet_name and greek_alphabet_fact
      */
-    protected static $factsheets = array('greek_alphabet', 'alg_inequalities',
-                    'alg_indices', 'alg_logarithms', 'alg_quadratic_formula',
-                    'alg_partial_fractions', 'trig_degrees_radians', 'trig_standard_values',
-                    'trig_standard_identities', 'hyp_functions', 'hyp_identities',
-                    'hyp_inverse_functions', 'calc_diff_standard_derivatives',
-                    'calc_diff_linearity_rule', 'calc_product_rule', 'calc_quotient_rule',
-                    'calc_chain_rule', 'calc_rules', 'calc_int_standard_integrals',
-                    'calc_int_linearity_rule', 'calc_int_methods_substitution',
-                    'calc_int_methods_parts', 'calc_int_methods_parts_indefinite');
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
+    protected static $factsheets = [
+        'greek_alphabet', 'alg_inequalities',
+        'alg_indices', 'alg_logarithms', 'alg_quadratic_formula',
+        'alg_partial_fractions', 'trig_degrees_radians', 'trig_standard_values',
+        'trig_standard_identities', 'hyp_functions', 'hyp_identities',
+        'hyp_inverse_functions', 'calc_diff_standard_derivatives',
+        'calc_diff_linearity_rule', 'calc_product_rule', 'calc_quotient_rule',
+        'calc_chain_rule', 'calc_rules', 'calc_int_standard_integrals',
+        'calc_int_linearity_rule', 'calc_int_methods_substitution',
+        'calc_int_methods_parts', 'calc_int_methods_parts_indefinite',
+    ];
 
     /**
      * Check each facts tag actually corresponds to a valid fact sheet.
@@ -45,7 +48,7 @@ abstract class stack_fact_sheets {
      */
     public static function get_unrecognised_tags($text) {
         $tags = self::get_fact_sheet_tags($text);
-        $errors = array();
+        $errors = [];
         foreach ($tags as $val) {
             if (!in_array($val, self::$factsheets)) {
                 $errors[] = $val;
@@ -59,19 +62,22 @@ abstract class stack_fact_sheets {
      * @return array tags, if there are any. Empty array if none.
      */
     protected static function get_fact_sheet_tags($text) {
+        if (!$text) {
+            return [];
+        }
         if (preg_match_all('|\[\[facts:(\w*)\]\]|U', $text, $matches)) {
             return $matches[1];
         }
-        return array();
+        return [];
     }
 
     /**
      * This function replaces tags with the HTML value.
      * Note, that at this point we assume we have already validated the text.
      * @param string $text the text in which to expand fact sheet tags.
-     * @param qtype_stack_renderer $renderer (options) the STACK renderer, if you have one.
+     * @param qtype_stack_renderer|null $renderer (options) the STACK renderer, if you have one.
      */
-    public static function display($text, qtype_stack_renderer $renderer = null) {
+    public static function display($text, ?qtype_stack_renderer $renderer = null) {
 
         // Convert any old hints tags into the new format.
         $text = self::convert_legacy_tags($text);

@@ -14,26 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
-//fau: #38 Do not use filterlib and filter system from Moodle
-////require_once($CFG->libdir . '/filterlib.php');
-////require_once($CFG->dirroot . '/filter/tex/filter.php');
-//fau.
-
 /**
  * Base class for STACK maths output methods that use a Moodle text filter to do the work.
  *
+ * @package    qtype_stack
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class stack_maths_output_filter_base extends stack_maths_output {
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $filter = null;
-
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $displaywrapstart = '<span class="displayequation">';
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $displaywrapend = '</span>';
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $displaystart;
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $displayend;
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $inlinestart;
+    // phpcs:ignore moodle.Commenting.VariableComment.Missing
     protected $inlineend;
 
     /**
@@ -43,22 +44,23 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
         $this->initialise_delimiters();
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function process_lang_string($string) {
         $string = $this->find_and_render_equations($string);
-		//fau: #35 Use ILIAS plotting system instead of Moodle
         $string = str_replace('!ploturl!', ILIAS_HTTP_PATH . "/" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/xqcas/stack/plots/", $string);
-		//fau.
         return $string;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function post_process_docs_page($html) {
-        $html = str_replace('&#92;', '\\', $html);
-        $html = $this->find_and_render_equations($html);
         $html = parent::post_process_docs_page($html);
+        $html = str_replace('&#92;', '\\', $html);
+        $html = str_replace('&amp;#92;', '\\', $html);
         return $html;
     }
 
-    public function process_display_castext($text, $replacedollars, qtype_stack_renderer $renderer = null) {
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function process_display_castext($text, $replacedollars, ?qtype_stack_renderer $renderer = null) {
         $text = parent::process_display_castext($text, $replacedollars, $renderer);
         $text = $this->find_equations_and_replace_delimiters($text);
         return $text;
@@ -90,16 +92,13 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
      *       an inline-style one.
      */
     protected function render_equation($tex, $displaystyle) {
-		//fau: #39 do not use Moodle filters.
-		//TODO Have a look, it maybe make equations not be properly shown.
-		if ($displaystyle) {
-			return $this->displaywrapstart .
-				$this->displaystart . $tex .
-				$this->displayend . $this->displaywrapend;
-		} else {
-			return $this->inlinestart . $tex . $this->inlineend;
-		}
-		//fau.
+        if ($displaystyle) {
+            return $this->displaywrapstart .
+                    $this->displaystart . $tex .
+                            $this->displayend . $this->displaywrapend;
+        } else {
+            return $this->inlinestart . $tex . $this->inlineend;
+        }
     }
 
     /**
@@ -145,10 +144,11 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
      */
     protected function find_and_process_equations($html, $callback) {
         return preg_replace_callback('~(?<!\\\\)(?<!<code>)\\\\[([](.*?)(?<!\\\\)\\\\([])])(?!</code>)~s',
-                array($this, $callback), $html);
+                [$this, $callback], $html);
     }
 
     /**
+     * Add description here.
      * @return moodle_text_filter an instance of the text filter to use to
      * render equations.
      */
@@ -165,6 +165,7 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
     abstract protected function initialise_delimiters();
 
     /**
+     * Add description here.
      * @return moodle_text_filter an newly created instance of the text filter
      * to use to render equations.
      */

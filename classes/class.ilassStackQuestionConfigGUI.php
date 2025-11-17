@@ -116,7 +116,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                 $this->quality($data);
                 return;
             case "healthcheck":
-                $sections[] = $this->healthcheck($data);
+                $sections[] = $this->healthcheck();
                 $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "healthcheck");
                 $rendered = $this->renderPanel($data, $form_action, $sections);
                 break;
@@ -355,10 +355,10 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         $this->tpl->setContent(PluginConfigurationQualityUI::show($data, $this->getPluginObject()));
     }
 
-    private function healthcheck(array $data): array
+    private function healthcheck(): array
     {
         $this->tabs->activateTab("quality");
-        return PluginConfigurationHealthcheckUI::show($data, $this->getPluginObject());
+        return PluginConfigurationHealthcheckUI::show($this->getPluginObject());
     }
 
     private function bulktesting(array $data): array
@@ -389,15 +389,11 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
     {
         $data = StackConfig::getAll();
 
-        switch ($section_type) {
-            case "configure":
-                return $this->configure($data);
-            case "maxima":
-                return $this->maxima($data);
-            case "defaults":
-                return $this->defaults($data);
-            default :
-                throw new stack_exception("Unknown section type: " . $section_type);
-        }
+        return match ($section_type) {
+            "configure" => $this->configure($data),
+            "maxima" => $this->maxima($data),
+            "defaults" => $this->defaults($data),
+            default => throw new stack_exception("Unknown section type: " . $section_type),
+        };
     }
 }

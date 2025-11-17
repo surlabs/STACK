@@ -1233,7 +1233,7 @@ global $DIC;
 $db = $DIC->database();
 $db->manipulate("ALTER TABLE xqcas_options MODIFY question_note TEXT NOT NULL");
 ?>
-<#58>
+<#59>
 <?php
 global $DIC;
 $db = $DIC->database();
@@ -1248,7 +1248,7 @@ if ($db->tableColumnExists('xqcas_options', 'question_note')) {
     );
 }
 ?>
-<#59>
+<#60>
 <?php
 global $DIC;
 $db = $DIC->database();

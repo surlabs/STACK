@@ -14,10 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Add description here!
+ * @package    qtype_stack
+ * @copyright  2024 University of Edinburgh.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ */
 
-//require_once(__DIR__ . '/../../maximaparser/MP_classes.php');
-//require_once(__DIR__ . '/../cassecurity.class.php');
 
+// phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface stack_cas_astfilter {
 
     /**
@@ -32,6 +37,7 @@ interface stack_cas_astfilter {
 
 }
 
+// phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface stack_cas_astfilter_parametric extends stack_cas_astfilter {
 
     /**
@@ -46,6 +52,7 @@ interface stack_cas_astfilter_parametric extends stack_cas_astfilter {
  * that should one make an coding error leading to such filters being in the
  * same pipeline the situation will become obvious very fast indeed.
  */
+// phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface stack_cas_astfilter_exclusion extends stack_cas_astfilter {
 
     /**

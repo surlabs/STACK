@@ -14,16 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
-
-
-//require_once(__DIR__ . '/../../vle_specific.php');
-
 /**
  * Encapsulates the location of an error happening in CAS with the actual error.
  * Allows us to decide the level of error message specificity at the point of output.
  *
  * This class also defines the syntax for those context/location paths.
  *
+ * @package    qtype_stack
  * @copyright  2022 Aalto University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,6 +36,7 @@ class stack_cas_error {
      */
     private $error;
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function __construct(string $error , string $context = '') {
         $this->error   = $error;
         $this->context = $context;
@@ -68,7 +66,7 @@ class stack_cas_error {
             'pc' => 'prtcorrect',
             'pp' => 'prtpartiallycorrect',
             'pi' => 'prtincorrect',
-            'td' => 'textdownload'
+            'td' => 'textdownload',
         ];
 
         // Short names for the PRT-node level items.
@@ -84,7 +82,7 @@ class stack_cas_error {
             'pf' => 'falsepenalty',
             // CASText.
             'ft' => 'truefeedback',
-            'ff' => 'falsefeedback'
+            'ff' => 'falsefeedback',
         ];
 
         $interpreted = [];
@@ -136,6 +134,8 @@ class stack_cas_error {
                 if (count($parts) > 2) {
                     if ($parts[3] === 'a') {
                         $interpreted['field'] = 'tans';
+                    } else if ($parts[3] === 'sh') {
+                        $interpreted['field'] = 'syntaxhint';
                     } else {
                         $interpreted['field'] = $parts[3];
                     }
@@ -182,10 +182,12 @@ class stack_cas_error {
         return $this->error;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_context(): string {
         return $this->context;
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function get_interpreted_context($question): array {
         // Maybe that should be cached, on the other hand errors are slow anyway.
         return self::interpret_context($this->context);
@@ -203,7 +205,7 @@ class stack_cas_error {
      */
     public function get_error($question): string {
         // NOTES:
-        // (1) this code is not currently "plumbed in" to the rest of the code base (TODO).
+        // (1) this code is not currently "plumbed in" to the rest of the code base (TO-DO).
         // (2) the lang strings have not been created, the idea is to have something like:
         // 'errorinfeedbackvarswithdetail' = '{$a->err} in feedback-variables of {$a->prt} specifically at {$a->detail}.'
         // 'errorinfeedbackvars' = '{$a->err} in feedback-variables of {$a->prt}.'
@@ -233,10 +235,10 @@ class stack_cas_error {
                 }
                 return stack_string('generalerrorinprt', $ctx);
             } else if (isset($ctx['input'])) {
-                // TODO errors in inputs, tans, options, validation.
+                // TO-DO errors in inputs, tans, options, validation.
                 return stack_string('errorininput', $ctx);
             } else if (isset($ctx['questiontest'])) {
-                // TODO errors in evalution of specific inputs to tests.
+                // TO-DO errors in evalution of specific inputs to tests.
                 return stack_string('errorinquestiontest', $ctx);
             }
         } else {

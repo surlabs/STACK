@@ -160,7 +160,7 @@ abstract class StackDatabase {
      */
     public static function isTableAllowed(string $table): bool
     {
-        if (strpos($table, 'xqcas_') === 0) {
+        if (str_starts_with($table, 'xqcas_')) {
             return true;
         }
 

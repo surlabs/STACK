@@ -13,14 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
-use classes\platform\StackConfig;
-use classes\platform\StackException;
 
 /**
  * Connection via proxy to Maxima running in a tomcat-server using the MaximaPool-servlet.
  * This version handles transfer of the plots generated on possibly remote servlet.
  * For details of this see https://github.com/maths/stack_util_maximapool/
  *
+ * @package    qtype_stack
  * @copyright  2012 The University of Birmingham
  * @copyright  2012 Aalto University - Matti Harjula
  * @copyright  2014 Loughborough University
@@ -28,13 +27,12 @@ use classes\platform\StackException;
  */
 class stack_cas_connection_server_proxy extends stack_cas_connection_base {
 
-    /**
-     * @throws StackException
-     */
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function guess_maxima_command($path) {
-        return StackConfig::get("maxima_pool_url");
+        return 'http://localhost:8080/MaximaPool/MaximaPool';
     }
 
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function call_maxima($command) {
         global $CFG;
         $err = '';
@@ -61,10 +59,24 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
         // proxy bypass then, this will just
         // carry on as if we're using the server platform.
         // Based on auth/cas/auth.php/auth_plugin_cas->connectCAS() checks.
-        $iliasProxy = ilProxySettings::_getInstance();
-        if ($iliasProxy->isActive()) {
-            curl_setopt($request, CURLOPT_PROXY, $iliasProxy->getHost());
-            curl_setopt($request, CURLOPT_PROXYPORT, $iliasProxy->getPort());
+        if (!empty($CFG->proxyhost) && !is_proxybypass($this->command)) {
+            curl_setopt($request, CURLOPT_PROXY, $CFG->proxyhost);
+            if (!empty($CFG->proxyport)) {
+                curl_setopt($request, CURLOPT_PROXYPORT, $CFG->proxyport);
+            }
+            if (!empty($CFG->proxytype)) {
+                // Only set CURLOPT_PROXYTYPE if it's something other than the curl-default http.
+                if ($CFG->proxytype == 'SOCKS5') {
+                    curl_setopt($request, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+                }
+            }
+            if (!empty($CFG->proxyuser) && !empty($CFG->proxypassword)) {
+                curl_setopt($request, CURLOPT_PROXYUSERPWD, $CFG->proxyuser.':'.$CFG->proxypassword);
+                if (defined('CURLOPT_PROXYAUTH')) {
+                    // Use any proxy authentication if required - PHP 5.1+.
+                    curl_setopt($request, CURLOPT_PROXYAUTH, CURLAUTH_BASIC | CURLAUTH_NTLM);
+                }
+            }
         }
 
         $ret = curl_exec($request);
@@ -90,7 +102,8 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
             $zip = new ZipArchive();
             $zip->open($ziptemp);
             for ($i = 0; $i < $zip->numFiles; $i++) {
-                $filenameinzip = $zip->getNameIndex($i);
+                // In some PHP versions, zip::getNameIndex returns filename with leading '/', hence trim.
+                $filenameinzip = trim($zip->getNameIndex($i), '/');
 
                 if ($filenameinzip === 'OUTPUT') {
                     // This one contains the output from maxima.
@@ -98,7 +111,7 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
 
                 } else {
                     // Otherwise this is a plot.
-                    $filename =  ILIAS_WEB_DIR . "/" . CLIENT_ID . "/xqcas/stack/plots/" . $filenameinzip;
+                    $filename = $CFG->dataroot . "/stack/plots/" . $filenameinzip;
                     @file_put_contents($filename, $zip->getFromIndex($i));
                 }
             }

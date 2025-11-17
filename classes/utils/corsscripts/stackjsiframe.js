@@ -30,6 +30,17 @@ let INPUT_PROMISES = {};
  */
 let FETCH_PROMISES = {};
 
+/* Map of external button listeners. By id.
+ * For use with `stack_js.register_external_button_listener`
+ */
+let BUTTON_CALLBACKS = {};
+
+/* Map of validation callbacks.
+ * For each input a separate list.
+ * For use with `stack_js.register_validation_state_listener`
+ */
+let VALIDATION_CALLBACKS = {};
+
 /* A promise that will resolve when we first hear from the VLE side.
  * It is important to not send anything before we are absolutely certain that
  * the other end is ready. Although the way this has been built should
@@ -51,6 +62,10 @@ const pinger = setInterval(() => {
     }
 }, 10);
 
+/* A promise for checking if we have a submit button.
+ */
+let _receive_submit_button = null;
+let SUBMIT_BUTTON = null;
 
 window.addEventListener("message", (e) => {
     // NOTE! We do not check the source or origin of the message in
@@ -94,15 +109,24 @@ window.addEventListener("message", (e) => {
         // 2. Set its value. But don't trigger changes.
         DISABLE_CHANGES[msg.name] = true;
         element.value = msg.value;
+
+        // 3. Sync read-only.
         if (msg['input-readonly']) {
             element.setAttribute('readonly', 'readonly');
         }
+
+        // 4. Copy over the data attributes.
+        if (msg['input-dataset']) {
+            Object.keys(msg['input-dataset']).forEach(function(key) {
+                element.dataset[key] = msg['input-dataset'][key];
+            });
+        }
         DISABLE_CHANGES[msg.name] = false;
 
-        // 3. Resolve the promise so that things can move forward.
+        // 5. Resolve the promise so that things can move forward.
         INPUT_PROMISES[msg.name](element.id);
 
-        // 4. Remove the promise from our logic so that the timeout 
+        // 6. Remove the promise from our logic so that the timeout 
         // logic does not trigger.
         delete INPUT_PROMISES[msg.name];
         
@@ -119,6 +143,20 @@ window.addEventListener("message", (e) => {
         DISABLE_CHANGES[msg.name] = false;
 
         break;
+    case 'button-click':
+        if (msg.name in BUTTON_CALLBACKS) {
+            BUTTON_CALLBACKS[msg.name].forEach((callbackfunction) => {
+                callbackfunction(msg.name);
+            });
+        }
+        break;
+    case 'validation-state':
+        if (msg.name in VALIDATION_CALLBACKS) {
+            VALIDATION_CALLBACKS[msg.name].forEach((callbackfunction) => {
+                callbackfunction(msg.completed, msg.valid, msg.name);
+            });
+        }
+        break;
     case 'xfer-content':
         if (msg.target in FETCH_PROMISES) {
             FETCH_PROMISES[msg.target](msg.content);
@@ -129,6 +167,9 @@ window.addEventListener("message", (e) => {
     case 'ping':
         clearInterval(pinger);
         do_connect(true);
+        break;
+    case 'submit-button-info':
+        _receive_submit_button(msg.value);
         break;
     case 'error':
     default:
@@ -158,6 +199,9 @@ window.addEventListener("message", (e) => {
             // We simply throw everything away and replace with the message.
             document.body.replaceChildren(div);
         }
+
+        // 3. Also report the error to the console for hidden iframes.
+        console.log("STACK-JS error: " + errmesg);
         break;
     }
 
@@ -178,8 +222,24 @@ export const stack_js = {
      * From 4.4.7 readonly/disabled inputs are cloned as readonly, at this point
      * we do not automatically disable accessing or editing them but you can base your
      * own logic on the input having that attribute. `.hasAttribute('readonly')`.
+     * 
+     * Note that this does not work with buttons (except radio-buttons), if you need
+     * to react to button presses happening at the VLE side use
+     * `register_external_button_listener`.
+     * 
+     * From STACK-JS: 1.3.0 you can define a boolean third parameter to control whether
+     * you want to only search for inputs within the same question as this iframe (true)
+     * or allow fallback to searching from all the questions on the page if not present
+     * in this question (false). By default this is false as that was the original
+     * behaviour.
+     * 
+     * From STACK-JS: 1.4.0 onwards the data attributes of the input on the VLE side
+     * are copied during registration. There is no mechanism for synchronising them you
+     * will simply get the initial state of them. You might find the type of the input
+     * or the separator settings useful.
+     * `ìnput.dataset["stackInputType"]`, `input.dataset["stackInputListSeparator"]`
      */
-    request_access_to_input: function(inputname, inputevents) {
+    request_access_to_input: function(inputname, inputevents, limittoquestion) {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.id = inputname;
@@ -204,14 +264,19 @@ export const stack_js = {
         // Send the connection request.
         CONNECTED.then((whatever) => {
             const msg ={
-                version: 'STACK-JS:1.0.0',
+                version: 'STACK-JS:1.3.0',
                 type: 'register-input-listener',
                 name: inputname,
+                'limit-to-question': false,
                 src: FRAME_ID
             };
             if (inputevents === true) {
                 msg['track-input'] = true;
             }
+            if (limittoquestion !== undefined) {
+                msg['limit-to-question'] = limittoquestion;
+            }
+
             window.parent.postMessage(JSON.stringify(msg), '*');
         });
 
@@ -228,6 +293,35 @@ export const stack_js = {
                 }
             }, 5000);
         });
+    },
+
+    /**
+     * Attaches a click event listener to a button on the VLE side.
+     * 
+     * There is no way to press the button from inside of the sandbox,
+     * and the normal restrictions related to placement on the VLE side
+     * do apply.
+     * 
+     * The callback function will be given exactly one argument and that
+     * is the buttonid that triggered the callback.
+     * 
+     * Note that we do not currently actually enforce that the target is
+     * a button we only attach a click listener to it. However, you should
+     * not rely on this working with anything else.
+     */
+    register_external_button_listener: function(buttonid, callbackfunction) {
+        if (!(buttonid in BUTTON_CALLBACKS)) {
+            BUTTON_CALLBACKS[buttonid] = [];
+        }
+        BUTTON_CALLBACKS[buttonid].push(callbackfunction);
+
+        const msg = {
+            version: 'STACK-JS:1.2.0',
+            type: 'register-button-listener',
+            target: buttonid,
+            src: FRAME_ID
+        };
+        CONNECTED.then(() => {window.parent.postMessage(JSON.stringify(msg), '*');});
     },
 
     /**
@@ -353,6 +447,139 @@ export const stack_js = {
             // We simply throw everything away and replace with the message.
             document.body.replaceChildren(div);
         }
+
+        // 3. Also report the error to the console for hidden iframes.
+        console.log("STACK-JS error: " + errmesg);
+    },
+
+    /**
+     * Answers to the question whether the question containing this sandbox IFRAME
+     * has a submit button (type="submit" and name/id="...submit"). The existence
+     * of such a button depends on the active question behaviour.
+     * 
+     * If you are planning to use the other functions targetting that button do
+     * first confirm that the button exists, otherwise those will generate annoying
+     * errors.
+     * 
+     * Returns a promise that will resolve to null if no such button exists or to
+     * a string value telling the value of that button as it was during the first
+     * call to this function.
+     * 
+     * Note that we will consider buttons with the "hidden"-attribute as non existent.
+     * For example "Deferred feedback" has such a button.
+     */
+    has_submit_button: function() {
+        if (SUBMIT_BUTTON !== null) {
+            return SUBMIT_BUTTON;
+        }
+        SUBMIT_BUTTON = new Promise((resolve, reject) => {_receive_submit_button = resolve});
+        const msg = {
+            version: 'STACK-JS:1.3.0',
+            type: 'query-submit-button',
+            src: FRAME_ID
+        };
+        CONNECTED.then(() => {window.parent.postMessage(JSON.stringify(msg), '*');});
+        return SUBMIT_BUTTON;
+    },
+
+    /**
+     * Disables/enables the question specific submit-button. 
+     */
+    enable_submit_button: function(enabled) {
+        const msg = {
+            version: 'STACK-JS:1.3.0',
+            type: 'enable-submit-button',
+            src: FRAME_ID,
+            enabled: enabled
+        };
+        CONNECTED.then(() => {window.parent.postMessage(JSON.stringify(msg), '*');});
+    },
+
+    /**
+     * Changes the value of the question specific submit-button. 
+     */
+    relabel_submit_button: function(name) {
+        const msg = {
+            version: 'STACK-JS:1.3.0',
+            type: 'relabel-submit-button',
+            src: FRAME_ID,
+            name: name
+        };
+        CONNECTED.then(() => {window.parent.postMessage(JSON.stringify(msg), '*');});
+    },
+
+    /**
+     * Clears an input. MCQ or otherwise. Unselects, unchecks or sets to ''.
+     * Do note that this does not require you to register the input in advance.
+     * 
+     * Note that we do not yet support matrices.
+     */
+    clear_input: function(name) {
+        const msg = {
+            version: 'STACK-JS:1.3.0',
+            type: 'clear-input',
+            src: FRAME_ID,
+            name: name
+        };
+        CONNECTED.then(() => {window.parent.postMessage(JSON.stringify(msg), '*');});
+    },
+
+    /**
+     * Gets STACK specific input metadata for an input that has been registered and
+     * has completed the registration process. Basically, if you are not using this
+     * with `input-ref-X`-attributes you will need to deal with asynchronity and wait
+     * for that registration to complete.
+     *
+     * This intentionally leaves out all other data-attributes and shortens the keys.
+     * If you wish to look at the others you can always get the input element and
+     * check the `dataset`.
+     * 
+     * Only those keys that get values from the PHP side will be present, so no 
+     * decimal separators will be defined for `boolean`-fields.
+     */
+    get_input_metadata(name) {
+        const input = document.getElementById(name);
+
+        let data = {};
+        for (let key in input.dataset) {
+            if (key.startsWith('stack')) {
+                data[key.substring(5)] = input.dataset[key];
+            }
+        }
+
+        return data;
+    },
+
+    /**
+     * Registers a callback-function to be called when a given inputs validation state
+     * changes, i.e., when AJAX validation starts, completes or fails. The function should
+     * take three arguments: a boolean stating whether the validation is complete, second
+     * argument stating if the validation found the input valid (null signals failure to 
+     * validate or still incomplete), the third parameter is the name of the input.
+     * 
+     * Note that the name of the input does not tell you which question held the input.
+     * Setting the optional third argument to true will ensure that should the input not
+     * be found from the local question it will not be looked for elsewhere and an error
+     * will be seen.
+     * 
+     * Added in STACK-JS 1.5.0. Currently not available for matrix inputs.
+     */
+    register_validation_state_listener(name, callbackfunction, limittoquestion) {
+        let msg = {
+            version: 'STACK-JS:1.5.0',
+            type: 'track-validation-state',
+            src: FRAME_ID,
+            name: name,
+            'limit-to-question': false
+        };
+        if (limittoquestion !== undefined) {
+            msg['limit-to-question'] = limittoquestion;
+        }
+        if (!(name in VALIDATION_CALLBACKS)) {
+            VALIDATION_CALLBACKS[name] = [];
+        }
+        VALIDATION_CALLBACKS[name].push(callbackfunction);
+        CONNECTED.then(() => {window.parent.postMessage(JSON.stringify(msg), '*');});
     }
 };
 
