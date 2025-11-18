@@ -68,7 +68,14 @@ function stack_string($key, $a = null):string
         include_once ILIAS_ABSOLUTE_PATH. "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_$user_language.php";
     }
 
-    return stack_maths::process_lang_string(getString($key, $string, $a));
+    try {
+        return stack_maths::process_lang_string(getString($key, $string, $a));
+    } catch (Exception $e) {
+        // Fallback to English if something goes wrong.
+        include_once ILIAS_ABSOLUTE_PATH. "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_en.php";
+
+        return stack_maths::process_lang_string(getString($key, $string, $a));
+    }
 }
 
 /**
