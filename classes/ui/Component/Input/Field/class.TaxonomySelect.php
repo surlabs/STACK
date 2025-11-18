@@ -66,6 +66,8 @@ class TaxonomySelect extends FormInput {
 
     public function withValue($value): Input
     {
+        $value = $value ?? [];
+
         if (is_string($value)) {
             $value = json_decode($value, true);
         }
