@@ -30,7 +30,7 @@ class stack_cas_castext2_hint extends stack_cas_castext2_block {
         $body = new MP_List([new MP_String('%root')]);
 
         $body->items[] = new MP_String('<details class="stack-hint">');
-        $body->items[] = new MP_String('<summary class="btn btn-secondary" >'.$this->params['title'].'</summary>');
+        $body->items[] = new MP_String('<summary class="btn btn-default" >'.$this->params['title'].'</summary>');
         $body->items[] = new MP_String('<div class="stack-hint-content">');
 
         foreach ($this->children as $item) {
