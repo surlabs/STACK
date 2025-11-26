@@ -195,7 +195,7 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
         // Escape some JavaScript strings.
         $args = [
             json_encode($frameid),
-            'atob(' . json_encode($b64) . ')',
+            'decodeURIComponent(escape(atob(' . json_encode($b64) . ')))',
             json_encode($divid),
             json_encode($title),
             $scrolling ? 'true' : 'false',
