@@ -27,7 +27,7 @@ ini_set("display_errors", "on");
 
 ilInitialisation::initILIAS();
 header('Content-type: application/json; charset=utf-8');
-echo json_encode(checkUserResponse($_REQUEST['question_id'], $_REQUEST['input_name'], $_REQUEST['input_value']));
+echo json_encode(checkUserResponse($_REQUEST['question_id'], $_REQUEST['input_name'], $_REQUEST['input_value'], $_REQUEST['purpose']));
 exit;
 
 /**
@@ -37,7 +37,7 @@ exit;
  * @param $user_response
  * @return string the Validation message.
  */
-function checkUserResponse($question_id, $input_name, $user_response)
+function checkUserResponse($question_id, $input_name, $user_response, $purpose)
 {
     global $DIC;
     require_once ILIAS_ABSOLUTE_PATH .'/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/class.assStackQuestion.php';
@@ -49,10 +49,12 @@ function checkUserResponse($question_id, $input_name, $user_response)
         return $e;
     }
 
+    $seed = assStackQuestionDB::_getSeed($purpose, $question, $DIC->user()->getId());
+
     //Instantiate Question if not.
     if (!$question->isInstantiated()) {
         try{
-            $question->questionInitialisation(1, true);
+            $question->questionInitialisation($seed, true);
         } catch (stack_exception|StackException $e) {
             global $tpl;
             $tpl->setOnScreenMessage('failure', $e->getMessage(), true);

@@ -130,7 +130,7 @@ class StackRenderIlias extends StackRender
      * @return string
      * @throws StackException|stack_exception
      */
-    public static function renderQuestion(array $attempt_data, array $display_options): string
+    public static function renderQuestion(array $attempt_data, array $display_options, string $purpose): string
     {
         global $DIC;
 
@@ -267,6 +267,8 @@ class StackRenderIlias extends StackRender
 
         //Validation
         $jsconfig = new stdClass();
+
+        $jsconfig->purpose = $purpose;
 
         $DIC->globalScreen()->layout()->meta()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/styles.css');
 

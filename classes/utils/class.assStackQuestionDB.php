@@ -2280,9 +2280,11 @@ class assStackQuestionDB
      * @return void
      * @throws stack_exception
      */
-    public static function _savePreviewSolution(assStackQuestion $question, array $data, ?int $seed = 1) :void {
+    public static function _savePreviewSolution(assStackQuestion $question, array $data) :void {
         global $DIC;
         $db = $DIC->database();
+
+        $seed = self::_getSeed("preview", $question, $DIC->user()->getId());
 
         //Instantiate Question if not.
         if (!$question->isInstantiated()) {

@@ -597,7 +597,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         if (!empty($submittedAnswer)) {
             $preview_session->setParticipantsSolution($submittedAnswer);
 
-            assStackQuestionDB::_savePreviewSolution($this, $submittedAnswer, $this->seed);
+            assStackQuestionDB::_savePreviewSolution($this, $submittedAnswer);
         }
     }
 
@@ -1891,7 +1891,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
 
             $this->input_states[$name] = $this->inputs[$name]->validate_student_response(
                 $response, $this->options, $teacheranswer, $this->security, $raw_input,
-                $this->cas_text_processor, $qv, null);
+                $this->cas_text_processor, $qv, null, $this->seed);
             return $this->input_states[$name];
         }
         return '';

@@ -41,7 +41,7 @@ abstract class StackRender {
      * @param array $display_options
      * @return string
      */
-    abstract public static function renderQuestion(array $attempt_data, array $display_options): string;
+    abstract public static function renderQuestion(array $attempt_data, array $display_options, string $purpose): string;
 
     /**
      * Generates the HTML for specific feedback section.

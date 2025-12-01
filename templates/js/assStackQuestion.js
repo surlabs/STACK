@@ -105,7 +105,8 @@ il.assStackQuestion = new function () {
 		$.get(config.validate_url, {
 			'question_id': question_id,
 			'input_name': input_name,
-			'input_value': input_value
+			'input_value': input_value,
+			'purpose': config.purpose
 		})
 			.done(function (data) {
 				remove_spinner();
