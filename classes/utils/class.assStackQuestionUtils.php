@@ -378,24 +378,31 @@ class assStackQuestionUtils
 
 	}
 
-	public static function _getSeedFromTest($question_id, $active_id, $pass, $prt_name)
+	public static function _getSeedFromSTACK2019($question_id, $active_id, $pass, $first_prt_name)
 	{
-		global $DIC;
-		$db = $DIC->database();
-		$query = 'SELECT value2 FROM tst_solutions WHERE question_fi = ' . $question_id;
-		$query .= ' AND active_fi = ' . $active_id;
-		$query .= ' AND pass = ' . $pass;
-		$query .= ' AND value1 = "xqcas_prt_' . $prt_name . '_seed"';
+        global $DIC;
 
-		$result = $db->query($query);
-		while ($row = $db->fetchAssoc($result)) {
-			if ((int)$row['value2']) {
-				return (int)$row['value2'];
-			} else {
-				return FALSE;
-			}
-		}
+        $db = $DIC->database();
+        $query = 'SELECT value2 FROM tst_solutions WHERE question_fi = ' . $question_id;
+        $query .= ' AND active_fi = ' . $active_id;
+        $query .= ' AND pass = ' . $pass;
+        $query .= ' AND value1 LIKE "xqcas_prt_%_seed"';
 
+        $db_result = $db->query($query);
+        $result = [];
+
+        while ($row = $db->fetchAssoc($db_result)) {
+            $result[] = $row;
+        }
+
+        // Give priority to the first PRT seed if available else return the first found
+        foreach ($result as $res) {
+            if (strpos($res['value2'], $first_prt_name) !== false) {
+                return (int) $res['value2'];
+            }
+        }
+
+        return (int) $result[0]['value2'] ?? false;
 	}
 
 	public static function _isInputEvaluated($prt, $input_name)
