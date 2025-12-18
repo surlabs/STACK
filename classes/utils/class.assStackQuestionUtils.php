@@ -402,7 +402,7 @@ class assStackQuestionUtils
             }
         }
 
-        return (int) $result[0]['value2'] ?? false;
+        return isset($result[0]['value2']) ? (int) $result[0]['value2'] : false;
 	}
 
 	public static function _isInputEvaluated($prt, $input_name)
