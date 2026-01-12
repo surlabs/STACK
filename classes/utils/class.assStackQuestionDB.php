@@ -1524,7 +1524,11 @@ class assStackQuestionDB
                 // As a last resort, check whether there is a seed stored in solutions from STACK versions prior to 2019
                 $prts = array_values($question->prts);
                 $first_prt = array_shift($prts);
-                $seed = assStackQuestionUtils::_getSeedFromSTACK2019($question_id, $active_id, $pass, $first_prt->get_name());
+                if (isset($first_prt) && $first_prt instanceof stack_potentialresponse_tree_lite) {
+                    $seed = assStackQuestionUtils::_getSeedFromSTACK2019($question_id, $active_id, $pass, $first_prt->get_name());
+                } else {
+                    $seed = 0;
+                }
 
                 if (!$seed || $seed <= 0) {
                     //Complete randomisation
