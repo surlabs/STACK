@@ -438,99 +438,38 @@ class assStackQuestionUtils
 	 * @param $text string The raw text
 	 * @return string
 	 */
-    public static function _getLatex($text): string
+    public static function _getLatex(string $text): string
     {
-        $matches = [];
-        preg_match_all('/<script>(.*?)<\/script>/s', $text, $matches);
-        $scriptBlocks = $matches[0];
+        $mathjax = new ilSetting("MathJax");
 
-        foreach ($scriptBlocks as $index => $block) {
-            $text = str_replace($block, "##SCRIPTBLOCK{$index}##", $text);
+        $enabled_server = (bool) $mathjax->get("enable_server", false);
+
+        if ($enabled_server) {
+            $text = preg_replace('/\\\\\((.*?)\\\\\)/s', '[tex]$1[/tex]', $text);
+            $text = preg_replace('/\\\\\[(.*?)\\\\\]/s', '<div style="position: relative; display: block; text-align: center; margin: 1em 0;">[tex]$1[/tex]</div>', $text);
         }
 
-        /*
-         * Step 1 check current platform's LaTeX delimiters
-         */
-        //Replace dollars but using mathjax settings in each platform.
-        $mathJaxSetting = new ilSetting("MathJax");
-        //By default [tex]
-        $start = '[tex]';
-        $end = '[/tex]';
+        $text = ilMathJax::getInstance()->insertLatexImages(
+            $text,
+            "\<span class\=\"latex\">",
+            "\<\/span>"
+        );
 
-        switch ((int) $mathJaxSetting->setting['limiter']) {
-            case 0:
-                /*\(...\)*/
-                $start = '\(';
-                $end = '\)';
-                break;
-            case 1:
-                /*[tex]...[/tex]*/
-                $start = '[tex]';
-                $end = '[/tex]';
-                break;
-            case 2:
-                /*&lt;span class="math"&gt;...&lt;/span&gt;*/
-                $start = '&lt;span class="math"&gt;';
-                $end = '&lt;/span&gt;';
-                break;
-            default:
-        }
+        $text = ilMathJax::getInstance()->insertLatexImages(
+            $text,
+            "\[tex\]",
+            "\[\/tex\]"
+        );
 
-        /*
-         * Step 2 Replace $$ from STACK and all other LaTeX delimiter to the current platform's delimiter.
-         */
-        //Get all $$ to replace it
-        $text = preg_replace('~(?<!\\\\)\$\$(.*?)(?<!\\\\)\$\$~', $start . '$1' . $end, $text);
-        $text = preg_replace('~(?<!\\\\)\$(.*?)(?<!\\\\)\$~', $start . '$1' . $end, $text);
-
-        //Comment this in order to have different ebhaviour between display and inline mode of LaTeX,
-        //Solving bug 20783
-        //Search for all /(/) and change it to the current limiter in Mathjaxsettings
-        //$text = str_replace('\(', $start, $text);
-        //$text = str_replace('\)', $end, $text);
-
-        //Search for all \[\] and change it to the current limiter in Mathjaxsettings
-        //$text = str_replace('\[', $start, $text);
-        //$text = str_replace('\]', $end, $text);
-
-        //Search for all [tex] and change it to the current limiter in Mathjaxsettings
-        $text = str_replace('[tex]', $start, $text);
-        $text = str_replace('[/tex]', $end, $text);
-        //Search for all &lt;span class="math"&gt;...&lt;/span&gt; and change it to the current limiter in Mathjaxsettings
-        $text = preg_replace('/<span class="math">(.*?)<\/span>/', $start . '$1' . $end, $text);
-
-        //Search for all &lt;span class="latex"&gt;...&lt;/span&gt; and change it to the current limiter in Mathjaxsettings
-        $text = preg_replace('/<span class="latex">(.*?)<\/span>/', $start . '$1' . $end, $text);
-
-        //Search for all pmatrix and change \ to \\ inside the pmatrix
-        $text = preg_replace_callback('/\\\\begin{pmatrix}(.*?)\\\\end{pmatrix}/s', function($matches) {
-            // Realizar el reemplazo solo dentro de los paréntesis del entorno pmatrix
+        $text = preg_replace_callback('/\\\\begin{pmatrix}(.*?)\\\\end{pmatrix}/s', function ($matches) {
             return str_replace("}\\{", "}\\\\{", $matches[0]);
         }, $text);
 
-        // replace special characters to prevent problems with the ILIAS template system
-        // eg. if someone uses {1} as an answer, nothing will be shown without the replacement
         $text = str_replace("{", "&#123;", $text);
         $text = str_replace("}", "&#125;", $text);
         $text = str_replace("\\", "&#92;", $text);
 
-        foreach ($scriptBlocks as $index => $block) {
-            $text = str_replace("##SCRIPTBLOCK{$index}##", $block, $text);
-        }
-
-        /*
-         * Step 3 User ilMathJax::getInstance()->insertLatexImages to deliver the LaTeX code.
-         */
-        //include_once './Services/MathJax/classes/class.ilMathJax.php';
-        //require_once './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/stack/mathsoutput/mathsoutput.class.php';
-        //ilMathJax::getInstance()->insertLatexImages cannot render \( delimiters so we change it to [tex]
-        if ($start == '\(') {
-            return stack_maths::process_display_castext(ilMathJax::getInstance()->insertLatexImages($text));
-        } else {
-            return stack_maths::process_display_castext(
-                ilMathJax::getInstance()->insertLatexImages($text, $start, $end)
-            );
-        }
+        return ilMathJax::getInstance()->insertLatexImages($text);
     }
 
 	public static function _getNewTestCaseNumber($question_id)
