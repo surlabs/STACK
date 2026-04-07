@@ -1263,3 +1263,34 @@ if ($db->tableColumnExists('xqcas_options', 'question_note')) {
     );
 }
 ?>
+<#61>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if (!$db->tableExists('xqcas_hint_tracking')) {
+    $fields = array(
+        'id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'question_id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'active_id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'pass' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'user_id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'hint_index' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'hint_title' => array('type' => 'text', 'length' => 255, 'notnull' => false),
+        'event_type' => array('type' => 'text', 'length' => 16, 'notnull' => true),
+        'stamp' => array('type' => 'integer', 'length' => 8, 'notnull' => true)
+    );
+
+    $db->createTable('xqcas_hint_tracking', $fields);
+    $db->createSequence('xqcas_hint_tracking');
+    $db->addPrimaryKey('xqcas_hint_tracking', array('id'));
+}
+
+if (!$db->indexExistsByFields('xqcas_hint_tracking', array('question_id', 'active_id', 'pass'))) {
+    $db->addIndex('xqcas_hint_tracking', array('question_id', 'active_id', 'pass'), 'ht1');
+}
+
+if (!$db->indexExistsByFields('xqcas_hint_tracking', array('user_id', 'stamp'))) {
+    $db->addIndex('xqcas_hint_tracking', array('user_id', 'stamp'), 'ht2');
+}
+?>

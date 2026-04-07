@@ -39,10 +39,60 @@ il.assStackQuestion = new function () {
 	this.init = function (a_config, a_texts) {
 		config = a_config;
 		texts = a_texts;
-		$('#ilAssQuestionPreview > form > div.ilc_question_Standard > p:nth-child(1) > button').click(self.validate);
-		$('button.xqcas').click(self.validate);
-		//$('form > div.ilc_question_Standard > button').click(self.validate);
-		$('#ilc_Page > div.ilc_question_Standard > button').click(self.validate);
+		$('#ilAssQuestionPreview > form > div.ilc_question_Standard > p:nth-child(1) > button').off('click.assStackQuestion').on('click.assStackQuestion', self.validate);
+		$('button.xqcas').off('click.assStackQuestion').on('click.assStackQuestion', self.validate);
+		$('#ilc_Page > div.ilc_question_Standard > button').off('click.assStackQuestion').on('click.assStackQuestion', self.validate);
+		self.bindHintTracking();
+	};
+
+	this.bindHintTracking = function () {
+		if (!config.hint_tracking || config.purpose !== 'test') {
+			return;
+		}
+
+		$('details.stack-hint').each(function (index) {
+			var details = $(this);
+			var summary = details.children('summary').first();
+			var title = $.trim(summary.text()).substring(0, 255);
+
+			details.attr('data-stack-hint-index', index + 1);
+			details.attr('data-stack-hint-title', title);
+			details.off('toggle.assStackQuestionHintTracking').on('toggle.assStackQuestionHintTracking', self.trackHintToggle);
+		});
+	};
+
+	this.trackHintToggle = function () {
+		var details = $(this);
+		var tracking = config.hint_tracking;
+
+		if (!tracking || !tracking.track_url) {
+			return;
+		}
+
+		var payload = {
+			question_id: tracking.question_id,
+			active_id: tracking.active_id,
+			pass: tracking.pass,
+			user_id: tracking.user_id,
+			hint_index: parseInt(details.attr('data-stack-hint-index'), 10) || 0,
+			hint_title: details.attr('data-stack-hint-title') || '',
+			event_type: details.prop('open') ? 'open' : 'close'
+		};
+
+		if (navigator.sendBeacon) {
+			var formData = new FormData();
+			Object.keys(payload).forEach(function (key) {
+				formData.append(key, payload[key]);
+			});
+			navigator.sendBeacon(tracking.track_url, formData);
+			return;
+		}
+
+		$.ajax({
+			url: tracking.track_url,
+			method: 'POST',
+			data: payload
+		});
 	};
 
 

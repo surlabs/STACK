@@ -1786,6 +1786,31 @@ class assStackQuestionDB
 		return 1;
 	}
 
+	public static function _storeHintInteraction(
+		int $question_id,
+		int $active_id,
+		int $pass,
+		int $user_id,
+		int $hint_index,
+		string $hint_title,
+		string $event_type
+	): void {
+		global $DIC;
+		$db = $DIC->database();
+
+		$db->insert('xqcas_hint_tracking', [
+			'id' => ['integer', $db->nextId('xqcas_hint_tracking')],
+			'question_id' => ['integer', $question_id],
+			'active_id' => ['integer', $active_id],
+			'pass' => ['integer', $pass],
+			'user_id' => ['integer', $user_id],
+			'hint_index' => ['integer', $hint_index],
+			'hint_title' => ['text', substr(trim($hint_title), 0, 255)],
+			'event_type' => ['text', $event_type],
+			'stamp' => ['integer', time()]
+		]);
+	}
+
 	/**
 	 * @param assStackQuestion $question
 	 * @param int $active_id
