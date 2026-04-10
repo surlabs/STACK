@@ -62,17 +62,53 @@ let DISABLE_CHANGES = false;
  * If not found or exists outside the restricted area then returns `null`.
  *
  * @param {String} id the identifier of the element we want.
+ * @param {String} srciframe optional identifier of the requesting iframe,
+ *   used to extend the search to feedback areas that are siblings of the
+ *   question's ilc_question_Standard container (e.g. test_specific_feedback,
+ *   ilSpecificAnswerFeedback).  These sibling divs are rendered outside
+ *   ilc_question_Standard in ILIAS but belong to the same question.
  */
-function vle_get_element(id) {
+function vle_get_element(id, srciframe) {
     /* In the case of Moodle we are happy as long as the element is inside
        something with the `formulation`-class. */
     let candidate = document.getElementById(id);
+    if (!candidate) {
+        return null;
+    }
     let iter = candidate;
     while (iter && !iter.classList.contains('ilc_question_Standard')) {
         iter = iter.parentElement;
     }
     if (iter && iter.classList.contains('ilc_question_Standard')) {
         return candidate;
+    }
+
+    /* In ILIAS the specific PRT feedback is rendered in a sibling div of
+       ilc_question_Standard (test_specific_feedback in tests,
+       ilSpecificAnswerFeedback in preview) — outside that container but
+       within the same question block.  When a source iframe is known we
+       locate the ilc_question_Standard that holds the iframe, then walk
+       upward through its ancestors until we find one that also contains
+       the candidate element.  This handles any number of intermediate
+       wrapper divs between ilc_question_Standard and the common question
+       wrapper (ilc_Page in tests, the form in preview). */
+    if (srciframe) {
+        let iframeEl = document.getElementById(srciframe);
+        if (iframeEl) {
+            let questionContainer = iframeEl;
+            while (questionContainer && !questionContainer.classList.contains('ilc_question_Standard')) {
+                questionContainer = questionContainer.parentElement;
+            }
+            if (questionContainer) {
+                let ancestor = questionContainer.parentElement;
+                while (ancestor && ancestor !== document.body) {
+                    if (ancestor.contains(candidate)) {
+                        return candidate;
+                    }
+                    ancestor = ancestor.parentElement;
+                }
+            }
+        }
     }
 
     return null;
@@ -546,7 +582,9 @@ window.addEventListener("message", (e) => {
             break;
         case 'get-content':
             // 1. Find the element.
-            element = vle_get_element(msg.target);
+            // Pass msg.src so vle_get_element can also search in feedback
+            // areas that are siblings of the ilc_question_Standard container.
+            element = vle_get_element(msg.target, msg.src);
             // 2. Build the message.
             response.type = 'xfer-content';
             response.tgt = msg.src;
