@@ -1360,3 +1360,32 @@ if (!$db->tableExists('xqcas_anl_inputs')) {
     $db->addIndex('xqcas_anl_inputs', ['active_id', 'pass'], 'ai2');
 }
 ?>
+<#63>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if (!$db->tableExists('xqcas_time_tracking')) {
+    $db->createTable('xqcas_time_tracking', [
+        'id'          => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'question_id' => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'active_id'   => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'pass'        => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'user_id'     => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'total_ms'    => ['type' => 'integer', 'length' => 8, 'notnull' => true, 'default' => 0],
+        'ping_count'  => ['type' => 'integer', 'length' => 8, 'notnull' => true, 'default' => 0],
+        'created_at'  => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'updated_at'  => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+    ]);
+    $db->createSequence('xqcas_time_tracking');
+    $db->addPrimaryKey('xqcas_time_tracking', ['id']);
+}
+
+if (!$db->indexExistsByFields('xqcas_time_tracking', ['question_id', 'active_id', 'pass'])) {
+    $db->addIndex('xqcas_time_tracking', ['question_id', 'active_id', 'pass'], 'qt1');
+}
+
+if (!$db->indexExistsByFields('xqcas_time_tracking', ['user_id', 'updated_at'])) {
+    $db->addIndex('xqcas_time_tracking', ['user_id', 'updated_at'], 'qt2');
+}
+?>

@@ -1922,6 +1922,49 @@ class assStackQuestionDB
 		]);
 	}
 
+	public static function _storeQuestionTime(
+		int $question_id,
+		int $active_id,
+		int $pass,
+		int $user_id,
+		int $duration_ms
+	): void {
+		global $DIC;
+		$db = $DIC->database();
+		$now = time();
+
+		$row = $db->fetchAssoc($db->queryF(
+			"SELECT id, total_ms, ping_count
+			 FROM xqcas_time_tracking
+			 WHERE question_id = %s AND active_id = %s AND pass = %s AND user_id = %s",
+			['integer', 'integer', 'integer', 'integer'],
+			[$question_id, $active_id, $pass, $user_id]
+		));
+
+		if (is_array($row) && isset($row['id'])) {
+			$db->update('xqcas_time_tracking', [
+				'total_ms' => ['integer', ((int) ($row['total_ms'] ?? 0)) + $duration_ms],
+				'ping_count' => ['integer', ((int) ($row['ping_count'] ?? 0)) + 1],
+				'updated_at' => ['integer', $now],
+			], [
+				'id' => ['integer', (int) $row['id']],
+			]);
+			return;
+		}
+
+		$db->insert('xqcas_time_tracking', [
+			'id' => ['integer', $db->nextId('xqcas_time_tracking')],
+			'question_id' => ['integer', $question_id],
+			'active_id' => ['integer', $active_id],
+			'pass' => ['integer', $pass],
+			'user_id' => ['integer', $user_id],
+			'total_ms' => ['integer', $duration_ms],
+			'ping_count' => ['integer', 1],
+			'created_at' => ['integer', $now],
+			'updated_at' => ['integer', $now],
+		]);
+	}
+
 	/**
 	 * @param assStackQuestion $question
 	 * @param int $active_id

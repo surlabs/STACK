@@ -279,6 +279,15 @@ class StackRenderIlias extends StackRender
                 'pass' => (int) ($hint_tracking['pass'] ?? 0),
                 'user_id' => (int) ($hint_tracking['user_id'] ?? 0),
             ];
+
+            $jsconfig->time_tracking = [
+                'track_url' => ilUtil::_getHttpPath() . '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/track_time.php',
+                'question_id' => (int) ($hint_tracking['question_id'] ?? 0),
+                'active_id' => (int) ($hint_tracking['active_id'] ?? 0),
+                'pass' => (int) ($hint_tracking['pass'] ?? 0),
+                'user_id' => (int) ($hint_tracking['user_id'] ?? 0),
+                'flush_interval_ms' => 15000,
+            ];
         }
 
         $DIC->globalScreen()->layout()->meta()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/styles.css');
