@@ -43,7 +43,7 @@ class CustomFactory
         $textareaRTE = new TextareaRTE($label, $by_line);
 
         if ($rteSupport) {
-            $textareaRTE->setRTESupport($obj_id, "qpl", "xqcas");
+            $textareaRTE->setRTESupport($obj_id, "qpl", "assessment");
         }
 
         return $textareaRTE;
