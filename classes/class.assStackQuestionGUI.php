@@ -491,6 +491,13 @@ class assStackQuestionGUI extends assQuestionGUI
 		$tabs->activateTab('edit_properties');
 		$tabs->activateSubTab('edit_question');
 
+        if (!$checkonly && $this->request_data_collector->raw('cmd') === 'save' && $this->object->getId() > 0) {
+            $this->ctrl->setParameter($this, 'q_id', $this->object->getId());
+            $this->ctrl->redirect($this, 'editQuestion');
+
+            return false;
+        }
+
         $is_new_question_before_save = ($this->object->getId() < 1);
 		$this->getQuestionTemplate();
 
