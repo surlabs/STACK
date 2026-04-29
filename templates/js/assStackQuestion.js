@@ -19,6 +19,13 @@ il.assStackQuestion = new function () {
 	 * @private
 	 */
 	var config = {};
+	var timeTrackingState = {
+		key: '',
+		active: false,
+		lastStart: 0,
+		pendingMs: 0,
+		intervalId: null
+	};
 
 	/**
 	 * Texts to be dynamically rendered
@@ -39,10 +46,186 @@ il.assStackQuestion = new function () {
 	this.init = function (a_config, a_texts) {
 		config = a_config;
 		texts = a_texts;
-		$('#ilAssQuestionPreview > form > div.ilc_question_Standard > p:nth-child(1) > button').click(self.validate);
-		$('button.xqcas').click(self.validate);
-		//$('form > div.ilc_question_Standard > button').click(self.validate);
-		$('#ilc_Page > div.ilc_question_Standard > button').click(self.validate);
+		$('#ilAssQuestionPreview > form > div.ilc_question_Standard > p:nth-child(1) > button').off('click.assStackQuestion').on('click.assStackQuestion', self.validate);
+		$('button.xqcas').off('click.assStackQuestion').on('click.assStackQuestion', self.validate);
+		$('#ilc_Page > div.ilc_question_Standard > button').off('click.assStackQuestion').on('click.assStackQuestion', self.validate);
+		self.bindHintTracking();
+		self.bindTimeTracking();
+	};
+
+	this.bindTimeTracking = function () {
+		var tracking = config.time_tracking;
+		if (!tracking || config.purpose !== 'test') {
+			self.stopTimeTracking(true);
+			return;
+		}
+
+		var key = [tracking.question_id, tracking.active_id, tracking.pass, tracking.user_id].join(':');
+		if (timeTrackingState.key === key && timeTrackingState.intervalId !== null) {
+			return;
+		}
+
+		self.stopTimeTracking(true);
+		timeTrackingState.key = key;
+
+		$(document)
+			.off('visibilitychange.assStackQuestionTimeTracking')
+			.on('visibilitychange.assStackQuestionTimeTracking', function () {
+				if (document.hidden) {
+					self.pauseTimeTracking();
+					self.flushTimeTracking(true);
+					return;
+				}
+				self.resumeTimeTracking();
+			});
+
+		$(window)
+			.off('focus.assStackQuestionTimeTracking blur.assStackQuestionTimeTracking beforeunload.assStackQuestionTimeTracking pagehide.assStackQuestionTimeTracking')
+			.on('focus.assStackQuestionTimeTracking', self.resumeTimeTracking)
+			.on('blur.assStackQuestionTimeTracking', function () {
+				self.pauseTimeTracking();
+				self.flushTimeTracking(true);
+			})
+			.on('beforeunload.assStackQuestionTimeTracking pagehide.assStackQuestionTimeTracking', function () {
+				self.stopTimeTracking(true);
+			});
+
+		self.resumeTimeTracking();
+		timeTrackingState.intervalId = window.setInterval(function () {
+			self.flushTimeTracking(false);
+		}, parseInt(tracking.flush_interval_ms, 10) || 15000);
+	};
+
+	this.resumeTimeTracking = function () {
+		if (!config.time_tracking || document.hidden || !document.hasFocus() || timeTrackingState.active) {
+			return;
+		}
+
+		timeTrackingState.lastStart = Date.now();
+		timeTrackingState.active = true;
+	};
+
+	this.pauseTimeTracking = function () {
+		if (!timeTrackingState.active) {
+			return;
+		}
+
+		timeTrackingState.pendingMs += Math.max(0, Date.now() - timeTrackingState.lastStart);
+		timeTrackingState.lastStart = 0;
+		timeTrackingState.active = false;
+	};
+
+	this.flushTimeTracking = function (useBeacon, allowResume) {
+		var tracking = config.time_tracking;
+		if (!tracking || !tracking.track_url) {
+			return;
+		}
+		if (allowResume === undefined) {
+			allowResume = true;
+		}
+
+		var wasActive = timeTrackingState.active;
+		self.pauseTimeTracking();
+
+		var duration = Math.round(timeTrackingState.pendingMs);
+		timeTrackingState.pendingMs = 0;
+
+		if (allowResume && wasActive && !document.hidden && document.hasFocus()) {
+			self.resumeTimeTracking();
+		}
+
+		if (duration <= 0) {
+			return;
+		}
+
+		var payload = {
+			question_id: tracking.question_id,
+			active_id: tracking.active_id,
+			pass: tracking.pass,
+			user_id: tracking.user_id,
+			duration_ms: duration
+		};
+
+		if (useBeacon && navigator.sendBeacon) {
+			var formData = new FormData();
+			Object.keys(payload).forEach(function (key) {
+				formData.append(key, payload[key]);
+			});
+			navigator.sendBeacon(tracking.track_url, formData);
+			return;
+		}
+
+		$.ajax({
+			url: tracking.track_url,
+			method: 'POST',
+			data: payload
+		});
+	};
+
+	this.stopTimeTracking = function (flush) {
+		if (timeTrackingState.intervalId !== null) {
+			window.clearInterval(timeTrackingState.intervalId);
+			timeTrackingState.intervalId = null;
+		}
+
+		if (flush) {
+			self.flushTimeTracking(true, false);
+		} else {
+			self.pauseTimeTracking();
+			timeTrackingState.pendingMs = 0;
+		}
+
+		timeTrackingState.key = '';
+	};
+
+	this.bindHintTracking = function () {
+		if (!config.hint_tracking || config.purpose !== 'test') {
+			return;
+		}
+
+		$('details.stack-hint').each(function (index) {
+			var details = $(this);
+			var summary = details.children('summary').first();
+			var title = $.trim(summary.text()).substring(0, 255);
+
+			details.attr('data-stack-hint-index', index + 1);
+			details.attr('data-stack-hint-title', title);
+			details.off('toggle.assStackQuestionHintTracking').on('toggle.assStackQuestionHintTracking', self.trackHintToggle);
+		});
+	};
+
+	this.trackHintToggle = function () {
+		var details = $(this);
+		var tracking = config.hint_tracking;
+
+		if (!tracking || !tracking.track_url) {
+			return;
+		}
+
+		var payload = {
+			question_id: tracking.question_id,
+			active_id: tracking.active_id,
+			pass: tracking.pass,
+			user_id: tracking.user_id,
+			hint_index: parseInt(details.attr('data-stack-hint-index'), 10) || 0,
+			hint_title: details.attr('data-stack-hint-title') || '',
+			event_type: details.prop('open') ? 'open' : 'close'
+		};
+
+		if (navigator.sendBeacon) {
+			var formData = new FormData();
+			Object.keys(payload).forEach(function (key) {
+				formData.append(key, payload[key]);
+			});
+			navigator.sendBeacon(tracking.track_url, formData);
+			return;
+		}
+
+		$.ajax({
+			url: tracking.track_url,
+			method: 'POST',
+			data: payload
+		});
 	};
 
 

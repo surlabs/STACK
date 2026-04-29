@@ -147,6 +147,7 @@ class StackRenderIlias extends StackRender
         $show_correct_solution = $display_options['show_correct_solution'] ?? false;
 
         $instant_validation = StackConfig::getAll()["instant_validation"];
+        $hint_tracking = $display_options['hint_tracking'] ?? null;
 
         // We need to provide a processor for the CASText2 post-processing,
         // basically for targeting plugin files
@@ -270,7 +271,27 @@ class StackRenderIlias extends StackRender
 
         $jsconfig->purpose = $purpose;
 
+        if (is_array($hint_tracking)) {
+            $jsconfig->hint_tracking = [
+                'track_url' => ilUtil::_getHttpPath() . '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/track_hint.php',
+                'question_id' => (int) ($hint_tracking['question_id'] ?? 0),
+                'active_id' => (int) ($hint_tracking['active_id'] ?? 0),
+                'pass' => (int) ($hint_tracking['pass'] ?? 0),
+                'user_id' => (int) ($hint_tracking['user_id'] ?? 0),
+            ];
+
+            $jsconfig->time_tracking = [
+                'track_url' => ilUtil::_getHttpPath() . '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/track_time.php',
+                'question_id' => (int) ($hint_tracking['question_id'] ?? 0),
+                'active_id' => (int) ($hint_tracking['active_id'] ?? 0),
+                'pass' => (int) ($hint_tracking['pass'] ?? 0),
+                'user_id' => (int) ($hint_tracking['user_id'] ?? 0),
+                'flush_interval_ms' => 15000,
+            ];
+        }
+
         $DIC->globalScreen()->layout()->meta()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/styles.css');
+        $DIC->globalScreen()->layout()->meta()->addJs('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/js/assStackQuestion.js');
 
         if ($instant_validation) {
             //Instant Validation
@@ -280,7 +301,10 @@ class StackRenderIlias extends StackRender
         } else {
             //Button Validation
             $jsconfig->validate_url = ilUtil::_getHttpPath() . "/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/validation.php";
-            $DIC->globalScreen()->layout()->meta()->addJs('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/js/assStackQuestion.js');
+            $DIC->globalScreen()->layout()->meta()->addOnLoadCode('il.assStackQuestion.init(' . json_encode($jsconfig) . ',' . json_encode($question_text) . ')');
+        }
+
+        if (is_array($hint_tracking) && $instant_validation) {
             $DIC->globalScreen()->layout()->meta()->addOnLoadCode('il.assStackQuestion.init(' . json_encode($jsconfig) . ',' . json_encode($question_text) . ')');
         }
 

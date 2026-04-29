@@ -426,7 +426,13 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $entered_values = assStackQuestionDB::_saveUserTestSolution($this, (int)$active_id, (int)$pass, $authorized);
         });
 
-
+        // Analytics: runs outside the lock so all tables are accessible
+        try {
+            assStackQuestionDB::_storeAnalyticsData($this, (int)$active_id, (int)$pass);
+        } catch (Throwable $e) {
+            global $DIC;
+            $DIC->logger()->root()->error('[STACK Analytics] _storeAnalyticsData failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        }
 
         return true;
     }

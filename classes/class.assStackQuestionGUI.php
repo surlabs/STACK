@@ -144,7 +144,7 @@ class assStackQuestionGUI extends assQuestionGUI
      * @throws StackException
      * @throws stack_exception
      */
-    public function getTestOutput(
+	public function getTestOutput(
         int $active_id,
         int $pass,
         bool $is_question_postponed = false,
@@ -152,6 +152,8 @@ class assStackQuestionGUI extends assQuestionGUI
         bool $show_specific_inline_feedback = false
     ): string
 	{
+        global $DIC;
+
         $seed = assStackQuestionDB::_getSeed("test", $this->object, (int) $active_id, (int) $pass);
         $this->object->questionInitialisation($seed, true);
         $user_response = StackUserResponseIlias::getStackUserResponse('test', (int) $this->object->getId(), (int) $active_id, (int) $pass);
@@ -176,6 +178,12 @@ class assStackQuestionGUI extends assQuestionGUI
         $display_options = [];
         $display_options['readonly'] = false;
         $display_options['feedback'] = $show_specific_inline_feedback;
+        $display_options['hint_tracking'] = [
+            'question_id' => (int) $this->object->getId(),
+            'active_id' => $active_id,
+            'pass' => $pass,
+            'user_id' => (int) $DIC->user()->getId(),
+        ];
 
         //Render question
         $question = StackRenderIlias::renderQuestion($attempt_data, $display_options, "test");

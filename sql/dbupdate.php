@@ -1263,3 +1263,129 @@ if ($db->tableColumnExists('xqcas_options', 'question_note')) {
     );
 }
 ?>
+<#61>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if (!$db->tableExists('xqcas_hint_tracking')) {
+    $fields = array(
+        'id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'question_id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'active_id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'pass' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'user_id' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'hint_index' => array('type' => 'integer', 'length' => 8, 'notnull' => true),
+        'hint_title' => array('type' => 'text', 'length' => 255, 'notnull' => false),
+        'event_type' => array('type' => 'text', 'length' => 16, 'notnull' => true),
+        'stamp' => array('type' => 'integer', 'length' => 8, 'notnull' => true)
+    );
+
+    $db->createTable('xqcas_hint_tracking', $fields);
+    $db->createSequence('xqcas_hint_tracking');
+    $db->addPrimaryKey('xqcas_hint_tracking', array('id'));
+}
+
+if (!$db->indexExistsByFields('xqcas_hint_tracking', array('question_id', 'active_id', 'pass'))) {
+    $db->addIndex('xqcas_hint_tracking', array('question_id', 'active_id', 'pass'), 'ht1');
+}
+
+if (!$db->indexExistsByFields('xqcas_hint_tracking', array('user_id', 'stamp'))) {
+    $db->addIndex('xqcas_hint_tracking', array('user_id', 'stamp'), 'ht2');
+}
+?>
+<#62>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+// Denormalized attempt summary: one row per (question_id, active_id, pass)
+if (!$db->tableExists('xqcas_anl_attempts')) {
+    $db->createTable('xqcas_anl_attempts', [
+        'id'           => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'question_id'  => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'active_id'    => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'pass'         => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'user_id'      => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'seed'         => ['type' => 'integer', 'length' => 8, 'notnull' => false],
+        'total_points' => ['type' => 'float',   'notnull' => false],
+        'max_points'   => ['type' => 'float',   'notnull' => false],
+        'prt_count'    => ['type' => 'integer', 'length' => 4, 'notnull' => false],
+        'has_error'    => ['type' => 'integer', 'length' => 1, 'notnull' => false],
+        'stamp'        => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+    ]);
+    $db->createSequence('xqcas_anl_attempts');
+    $db->addPrimaryKey('xqcas_anl_attempts', ['id']);
+    $db->addIndex('xqcas_anl_attempts', ['question_id', 'active_id', 'pass'], 'aa1');
+    $db->addIndex('xqcas_anl_attempts', ['question_id'], 'aa2');
+    $db->addIndex('xqcas_anl_attempts', ['user_id'], 'aa3');
+}
+
+// PRT results: one row per (question_id, active_id, pass, prt_name)
+if (!$db->tableExists('xqcas_anl_prt')) {
+    $db->createTable('xqcas_anl_prt', [
+        'id'           => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'question_id'  => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'active_id'    => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'pass'         => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'prt_name'     => ['type' => 'text',    'length' => 64, 'notnull' => true],
+        'points'       => ['type' => 'float',   'notnull' => false],
+        'max_points'   => ['type' => 'float',   'notnull' => false],
+        'fraction'     => ['type' => 'float',   'notnull' => false],
+        'answer_notes' => ['type' => 'text',    'length' => 1024, 'notnull' => false],
+        'has_error'    => ['type' => 'integer', 'length' => 1, 'notnull' => false],
+        'stamp'        => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+    ]);
+    $db->createSequence('xqcas_anl_prt');
+    $db->addPrimaryKey('xqcas_anl_prt', ['id']);
+    $db->addIndex('xqcas_anl_prt', ['question_id', 'prt_name'], 'ap1');
+    $db->addIndex('xqcas_anl_prt', ['active_id', 'pass'], 'ap2');
+}
+
+// Input responses: one row per (question_id, active_id, pass, input_name)
+if (!$db->tableExists('xqcas_anl_inputs')) {
+    $db->createTable('xqcas_anl_inputs', [
+        'id'             => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'question_id'    => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'active_id'      => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'pass'           => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'input_name'     => ['type' => 'text',    'length' => 64, 'notnull' => true],
+        'response_value' => ['type' => 'text',    'length' => 1024, 'notnull' => false],
+        'is_valid'       => ['type' => 'integer', 'length' => 1, 'notnull' => false],
+        'stamp'          => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+    ]);
+    $db->createSequence('xqcas_anl_inputs');
+    $db->addPrimaryKey('xqcas_anl_inputs', ['id']);
+    $db->addIndex('xqcas_anl_inputs', ['question_id', 'input_name'], 'ai1');
+    $db->addIndex('xqcas_anl_inputs', ['active_id', 'pass'], 'ai2');
+}
+?>
+<#63>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if (!$db->tableExists('xqcas_time_tracking')) {
+    $db->createTable('xqcas_time_tracking', [
+        'id'          => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'question_id' => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'active_id'   => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'pass'        => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'user_id'     => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'total_ms'    => ['type' => 'integer', 'length' => 8, 'notnull' => true, 'default' => 0],
+        'ping_count'  => ['type' => 'integer', 'length' => 8, 'notnull' => true, 'default' => 0],
+        'created_at'  => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+        'updated_at'  => ['type' => 'integer', 'length' => 8, 'notnull' => true],
+    ]);
+    $db->createSequence('xqcas_time_tracking');
+    $db->addPrimaryKey('xqcas_time_tracking', ['id']);
+}
+
+if (!$db->indexExistsByFields('xqcas_time_tracking', ['question_id', 'active_id', 'pass'])) {
+    $db->addIndex('xqcas_time_tracking', ['question_id', 'active_id', 'pass'], 'qt1');
+}
+
+if (!$db->indexExistsByFields('xqcas_time_tracking', ['user_id', 'updated_at'])) {
+    $db->addIndex('xqcas_time_tracking', ['user_id', 'updated_at'], 'qt2');
+}
+?>

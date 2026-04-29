@@ -1786,6 +1786,185 @@ class assStackQuestionDB
 		return 1;
 	}
 
+	public static function _storeAnalyticsData(
+		assStackQuestion $question,
+		int $active_id,
+		int $pass
+	): void {
+		global $DIC;
+		$db          = $DIC->database();
+		$stamp       = time();
+		$question_id = (int) $question->getId();
+		$evaluation  = $question->getEvaluation();
+
+		$user_id      = (int) $DIC->user()->getId();
+		$total_points = (float) ($evaluation['points']['total'] ?? 0.0);
+		$max_points   = (float) $question->getMaximumPoints();
+		$prt_count    = isset($evaluation['prts']) ? count($evaluation['prts']) : 0;
+		$has_error    = 0;
+
+		// Remove stale records for this attempt (idempotent on re-submission)
+		$db->manipulateF(
+			"DELETE FROM xqcas_anl_attempts WHERE question_id = %s AND active_id = %s AND pass = %s",
+			['integer', 'integer', 'integer'],
+			[$question_id, $active_id, $pass]
+		);
+		$db->manipulateF(
+			"DELETE FROM xqcas_anl_prt WHERE question_id = %s AND active_id = %s AND pass = %s",
+			['integer', 'integer', 'integer'],
+			[$question_id, $active_id, $pass]
+		);
+		$db->manipulateF(
+			"DELETE FROM xqcas_anl_inputs WHERE question_id = %s AND active_id = %s AND pass = %s",
+			['integer', 'integer', 'integer'],
+			[$question_id, $active_id, $pass]
+		);
+
+		// PRT rows
+		if (isset($evaluation['prts'])) {
+			foreach ($evaluation['prts'] as $prt_name => $prt) {
+				$prt_points  = (float) ($evaluation['points'][$prt_name]['prt_points'] ?? 0.0);
+				$prt_max     = isset($question->prts[$prt_name]) ? (float) $question->prts[$prt_name]->get_value() : 0.0;
+				$fraction    = ($prt_max > 0.0) ? ($prt_points / $prt_max) : 0.0;
+				$answer_note = substr(implode(';', $prt['prt_result']->get_answernotes()), 0, 1024);
+				$errors      = $prt['prt_result']->get_errors();
+				$prt_error   = !empty($errors) ? 1 : 0;
+
+				if ($prt_error) {
+					$has_error = 1;
+				}
+
+				$db->insert('xqcas_anl_prt', [
+					'id'           => ['integer', $db->nextId('xqcas_anl_prt')],
+					'question_id'  => ['integer', $question_id],
+					'active_id'    => ['integer', $active_id],
+					'pass'         => ['integer', $pass],
+					'prt_name'     => ['text',    $prt_name],
+					'points'       => ['float',   $prt_points],
+					'max_points'   => ['float',   $prt_max],
+					'fraction'     => ['float',   $fraction],
+					'answer_notes' => ['text',    $answer_note],
+					'has_error'    => ['integer', $prt_error],
+					'stamp'        => ['integer', $stamp],
+				]);
+			}
+		}
+
+		// Input rows
+		if (isset($evaluation['inputs']['states'])) {
+			foreach ($evaluation['inputs']['states'] as $input_name => $input_state) {
+				if (!array_key_exists($input_name, $question->inputs)) {
+					continue;
+				}
+				$is_valid = (
+					$input_state->status === stack_input::SCORE ||
+					$input_state->status === stack_input::VALID
+				) ? 1 : 0;
+
+				if ($is_valid) {
+					$response_value = substr((string) $input_state->contentsmodified, 0, 1024);
+				} else {
+					$contents = $input_state->__get('contents');
+					$response_value = substr(is_array($contents) ? implode('', $contents) : (string) $contents, 0, 1024);
+				}
+
+				$db->insert('xqcas_anl_inputs', [
+					'id'             => ['integer', $db->nextId('xqcas_anl_inputs')],
+					'question_id'    => ['integer', $question_id],
+					'active_id'      => ['integer', $active_id],
+					'pass'           => ['integer', $pass],
+					'input_name'     => ['text',    $input_name],
+					'response_value' => ['text',    $response_value],
+					'is_valid'       => ['integer', $is_valid],
+					'stamp'          => ['integer', $stamp],
+				]);
+			}
+		}
+
+		// Attempt summary row (written last so PRT/input rows are already present)
+		$db->insert('xqcas_anl_attempts', [
+			'id'           => ['integer', $db->nextId('xqcas_anl_attempts')],
+			'question_id'  => ['integer', $question_id],
+			'active_id'    => ['integer', $active_id],
+			'pass'         => ['integer', $pass],
+			'user_id'      => ['integer', $user_id],
+			'seed'         => ['integer', (int) $question->seed],
+			'total_points' => ['float',   $total_points],
+			'max_points'   => ['float',   $max_points],
+			'prt_count'    => ['integer', $prt_count],
+			'has_error'    => ['integer', $has_error],
+			'stamp'        => ['integer', $stamp],
+		]);
+	}
+
+	public static function _storeHintInteraction(
+		int $question_id,
+		int $active_id,
+		int $pass,
+		int $user_id,
+		int $hint_index,
+		string $hint_title,
+		string $event_type
+	): void {
+		global $DIC;
+		$db = $DIC->database();
+
+		$db->insert('xqcas_hint_tracking', [
+			'id' => ['integer', $db->nextId('xqcas_hint_tracking')],
+			'question_id' => ['integer', $question_id],
+			'active_id' => ['integer', $active_id],
+			'pass' => ['integer', $pass],
+			'user_id' => ['integer', $user_id],
+			'hint_index' => ['integer', $hint_index],
+			'hint_title' => ['text', substr(trim($hint_title), 0, 255)],
+			'event_type' => ['text', $event_type],
+			'stamp' => ['integer', time()]
+		]);
+	}
+
+	public static function _storeQuestionTime(
+		int $question_id,
+		int $active_id,
+		int $pass,
+		int $user_id,
+		int $duration_ms
+	): void {
+		global $DIC;
+		$db = $DIC->database();
+		$now = time();
+
+		$row = $db->fetchAssoc($db->queryF(
+			"SELECT id, total_ms, ping_count
+			 FROM xqcas_time_tracking
+			 WHERE question_id = %s AND active_id = %s AND pass = %s AND user_id = %s",
+			['integer', 'integer', 'integer', 'integer'],
+			[$question_id, $active_id, $pass, $user_id]
+		));
+
+		if (is_array($row) && isset($row['id'])) {
+			$db->update('xqcas_time_tracking', [
+				'total_ms' => ['integer', ((int) ($row['total_ms'] ?? 0)) + $duration_ms],
+				'ping_count' => ['integer', ((int) ($row['ping_count'] ?? 0)) + 1],
+				'updated_at' => ['integer', $now],
+			], [
+				'id' => ['integer', (int) $row['id']],
+			]);
+			return;
+		}
+
+		$db->insert('xqcas_time_tracking', [
+			'id' => ['integer', $db->nextId('xqcas_time_tracking')],
+			'question_id' => ['integer', $question_id],
+			'active_id' => ['integer', $active_id],
+			'pass' => ['integer', $pass],
+			'user_id' => ['integer', $user_id],
+			'total_ms' => ['integer', $duration_ms],
+			'ping_count' => ['integer', 1],
+			'created_at' => ['integer', $now],
+			'updated_at' => ['integer', $now],
+		]);
+	}
+
 	/**
 	 * @param assStackQuestion $question
 	 * @param int $active_id
