@@ -498,23 +498,11 @@ class assStackQuestionGUI extends assQuestionGUI
             return false;
         }
 
-        $is_new_question_before_save = ($this->object->getId() < 1);
 		$this->getQuestionTemplate();
 
 		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
 
         list($errors, $form) = $authoring_gui->showAuthoringPanel();
-
-        $is_save_successful = !$errors;
-        $has_new_id_after_save = ($this->object->getId() > 0);
-
-        if ($is_new_question_before_save && $is_save_successful && $has_new_id_after_save) {
-
-            $this->ctrl->setParameter($this, 'q_id', $this->object->getId());
-            $this->ctrl->redirect($this, 'editQuestion');
-
-            return false;
-        }
 
         if ($errors) {
             $checkonly = false;
@@ -716,12 +704,9 @@ class assStackQuestionGUI extends assQuestionGUI
 			$tabs->addTarget("statistics", $this->ctrl->getLinkTargetByClass($classname, "assessment"), array("assessment"), $classname, "");
 		}
 
-		if ((isset($_GET["calling_test"]) && $_GET["calling_test"] > 0) ||
-            (isset($_GET["test_ref_id"]) && ($_GET["test_ref_id"] > 0))) {
-			$ref_id = $_GET["calling_test"];
-			if (strlen($ref_id) == 0) {
-				$ref_id = $_GET["test_ref_id"];
-			}
+        $ref_id = (int) $_GET["ref_id"] ?? 0;
+
+		if ($ref_id > 0 && ilObject2::_lookupType($ref_id, true) == "tst") {
 			$tabs->setBackTarget($this->lng->txt("backtocallingtest"), "ilias.php?baseClass=ilObjTestGUI&cmd=questions&ref_id=$ref_id");
 		} else {
 			$tabs->setBackTarget($this->lng->txt("qpl"), $this->ctrl->getLinkTargetByClass("ilobjquestionpoolgui", "questions"));
@@ -840,7 +825,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		$form->addItem($item);
 
 		$hiddenFirstId = new ilHiddenInputGUI('first_question_id');
-		$hiddenFirstId->setValue($_GET['q_id']);
+		$hiddenFirstId->setValue($_GET['q_id'] ?? "0");
 		$form->addItem($hiddenFirstId);
 
 		$form->addCommandButton("importQuestionFromMoodle", $lng->txt("import"));
@@ -914,7 +899,10 @@ class assStackQuestionGUI extends assQuestionGUI
 
 		$options = new ilRadioGroupInputGUI($lng->txt("qpl_qst_xqcas_all_from_pool"), "xqcas_all_from_pool");
 		$only_question = new ilRadioOption($lng->txt("qpl_qst_xqcas_export_only_this"), "xqcas_export_only_this", $lng->txt("qpl_qst_xqcas_export_only_this_info"));
-		if (isset($_GET['calling_test'])) {
+
+        $ref_id = (int) $_GET["ref_id"] ?? 0;
+
+        if ($ref_id && ilObject2::_lookupType($ref_id, true) == "tst") {
 			$all_from_pool = new ilRadioOption($lng->txt("qpl_qst_xqcas_export_all_from_test"), "xqcas_export_all_from_test", $lng->txt("qpl_qst_xqcas_export_all_from_test_info"));
 		} else {
 			$all_from_pool = new ilRadioOption($lng->txt("qpl_qst_xqcas_export_all_from_pool"), "xqcas_export_all_from_pool", $lng->txt("qpl_qst_xqcas_export_all_from_pool_info"));
@@ -923,7 +911,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		$options->addOption($only_question);
 		$options->addOption($all_from_pool);
 
-		if (isset($_GET['calling_test'])) {
+		if ($ref_id && ilObject2::_lookupType($ref_id, true) == "tst") {
 			$options->setValue("xqcas_export_all_from_test");
 		} else {
 			$options->setValue("xqcas_export_all_from_pool");
@@ -932,7 +920,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		$form->addItem($options);
 
 		$hiddenFirstId = new ilHiddenInputGUI('first_question_id');
-		$hiddenFirstId->setValue($_GET['q_id']);
+		$hiddenFirstId->setValue($_GET['q_id']  ?? "0");
 		$form->addItem($hiddenFirstId);
 
 		$form->addCommandButton("exportQuestionToMoodle", $lng->txt("export"));
@@ -1699,7 +1687,9 @@ class assStackQuestionGUI extends assQuestionGUI
 
         $rendered = "";
 
-        if (isset($_GET['calling_test'])) {
+        $ref_id = (int) $_GET['ref_id'] ?? 0;
+
+        if ($ref_id && ilObject2::_lookupType($ref_id, true) == "tst") {
             $questions = assStackQuestionDB::_getAllQuestionsFromTest((int) $this->object->getId(), (int) $this->object->getQuestionTypeID(), true);
         } else {
             $questions = assStackQuestionDB::_getAllQuestionsFromPool((int) $this->object->getId(), (int) $this->object->getQuestionTypeID(), true);

@@ -129,6 +129,14 @@ class assStackQuestionMoodleImport
 
                     //Save standard question data
                     $this->getQuestion()->saveQuestionDataToDb();
+
+                    $ref_id = (int) $_GET["ref_id"];
+
+                    if ($ref_id > 0 && ilObject2::_lookupType($ref_id, true) == "tst") {
+                        $test = new ilObjTest($ref_id, true);
+
+                        $test->insertQuestion($this->getQuestion()->getId(), true);
+                    }
                     //$this->getPlugin()->includeClass('class.assStackQuestionDB.php');
                     try {
                         //Save STACK Parameters forcing insert.
