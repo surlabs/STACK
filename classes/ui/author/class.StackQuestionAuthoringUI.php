@@ -418,7 +418,7 @@ class StackQuestionAuthoringUI
         $inputs["question"] = $this->customFactory->textareaRTE($this->question->getId(), $this->lng->txt("question"), $this->plugin->txt("authoring_input_creation_info"))->withRequired(true)
             ->withValue($this->question->getQuestion());
         $inputs["points"] = $this->factory->input()->field()->numeric($this->plugin->txt("preview_points_message_p3"), $this->plugin->txt("authoring_points_info"))->withRequired(true)
-            ->withValue(1)->withDisabled(true);
+            ->withValue($this->question->getPoints())->withDisabled(true);
         $inputs["question_variables"] = $this->customFactory->textareaRTE($this->question->getId(), $this->plugin->txt("options_question_variables"), $this->plugin->txt("options_question_variables_info"), false)
             ->withValue($this->question->question_variables);
         $inputs["question_note"] = $this->factory->input()->field()->textarea($this->plugin->txt("options_question_note"), $this->plugin->txt("options_question_note_info"))
