@@ -31,6 +31,26 @@ use classes\platform\StackException;
  */
 class ilassStackQuestionPlugin extends ilQuestionsPlugin
 {
+    protected static ?ilassStackQuestionPlugin $instance = null;
+
+    public static function getInstance()
+    {
+        if (!isset(self::$instance)) {
+            global $DIC;
+
+            $component_repository = $DIC["component.repository"];
+
+            $info = $component_repository->getPluginByName("assStackQuestion");
+
+            $component_factory = $DIC["component.factory"];
+
+            $plugin_obj = $component_factory->getPlugin($info->getId());
+
+            self::$instance = $plugin_obj;
+        }
+
+        return self::$instance;
+    }
 
     final function getPluginName(): string
     {
@@ -59,6 +79,18 @@ class ilassStackQuestionPlugin extends ilQuestionsPlugin
         global $DIC;
 
         throw new StackException($DIC->language()->txt("qpl_qst_xqcas_uninstall_not_supported"));
+    }
+
+
+
+    public static function isSurContextHubActive(): bool
+    {
+        if (class_exists('ilSurContextHubPlugin')) {
+            $sur_context_hub_plugin = ilSurContextHubPlugin::getInstance();
+            return $sur_context_hub_plugin->isActive();
+        }
+
+        return false;
     }
 }
 

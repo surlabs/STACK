@@ -25,6 +25,8 @@ namespace Customizing\global\plugins\Modules\TestQuestionPool\Questions\assStack
 
 use assStackQuestionUtils;
 use Expand;
+use ilassStackQuestionPlugin;
+use ilCtrlException;
 use ILIAS\UI\Component\Component;
 use ILIAS\UI\Component\Input\Container\Form\FormInput;
 use ILIAS\UI\Component\Tree\Node\Factory;
@@ -37,6 +39,7 @@ use ilTaxonomyTree;
 use ilTemplate;
 use ilTemplateException;
 use ilTinyMCE;
+use StackAjaxGUI;
 
 /**
  * Class Renderer
@@ -178,7 +181,7 @@ class Renderer extends RendererILIAS
         $tpl = $this->getPreparedTextareaRTETemplate($component);
         $id = $this->bindJSandApplyId($component, $tpl);
 
-        return $this->wrapInFormContext($component, $tpl->get(), $id);
+        return $this->wrapInFormContext($component, $tpl->get() . $this->addAIButton($component, $id), $id);
     }
 
     protected function getPreparedTextareaRTETemplate(TextareaRTE $component): ilTemplate
@@ -219,6 +222,50 @@ class Renderer extends RendererILIAS
         }
 
         return $tpl;
+    }
+
+    /**
+     * @throws ilTemplateException
+     * @throws ilCtrlException
+     */
+    private function addAIButton(TextareaRTE $component, string $textarea_id): string
+    {
+        if (empty($component->getRTESupport()) || !ilassStackQuestionPlugin::isSurContextHubActive()) {
+            return "";
+        }
+
+        $ajax_url = StackAjaxGUI::getEndpoint();
+
+        $send_button = $this->getUIFactory()->button()->standard("Send to AI", "#")->withAdditionalOnLoadCode(function ($id) use ($textarea_id, $ajax_url) {
+            return "
+                $('#$id')
+                .addClass('btn-primary ai-send-button')
+                .removeClass('btn-default')
+                .on('click', function(e) {
+                    sendAIRequestWithContext('$textarea_id', '$ajax_url', this, e);
+                });
+            ;";
+        });
+
+        $modal = $this->getUIFactory()->modal()->roundtrip(
+            "AI Text Generation",
+            [
+                $this->getUIFactory()->legacy('
+                <div class="ilias-spinner hidden">
+                    <div class="spinner-circle"></div>
+                    <span class="spinner-text">Loading...</span>
+                </div>
+                '),
+                $this->getUIFactory()->input()->field()->textarea("Prompt (Optional)", "You can provide additional instructions for the AI here.")
+                ->withAdditionalOnLoadCode(function ($id) {
+                    return "$('#$id').addClass('context-prompt');";
+                })
+            ]
+        )->withCancelButtonLabel("Close")->withActionButtons([$send_button]);
+
+        $button = $this->getUIFactory()->button()->standard("Generate with AI", "#")->withOnClick($modal->getShowSignal());
+
+        return "<div class='ai-assistant-button-container'>" . $this->render($button) . "</div>" . $this->render($modal);
     }
 
     /**

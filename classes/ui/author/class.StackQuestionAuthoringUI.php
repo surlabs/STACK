@@ -96,7 +96,7 @@ class StackQuestionAuthoringUI
      * @throws stack_exception
      * @throws ilTaxonomyException
      */
-    private function buildForm(): StandardForm
+    public function buildForm(bool $realForm = true): StandardForm
     {
         $sections = [
             "basic" => $this->factory->input()->field()->section($this->buildBasicSection(), $this->plugin->txt("edit_cas_question")),
@@ -110,7 +110,7 @@ class StackQuestionAuthoringUI
         }
 
         return $this->factory->input()->container()->form()->standard(
-            $this->ctrl->getLinkTargetByClass("assStackQuestionGUI", "save"),
+            $realForm ? $this->ctrl->getLinkTargetByClass("assStackQuestionGUI", "save") : "#",
             $sections
         );
     }
@@ -380,7 +380,7 @@ class StackQuestionAuthoringUI
             ->withValue(1)->withDisabled(true);
         $inputs["question_variables"] = $this->customFactory->textareaRTE($this->question->getId(), $this->plugin->txt("options_question_variables"), $this->plugin->txt("options_question_variables_info"), false)
             ->withValue($this->question->question_variables);
-        $inputs["question_note"] = $this->factory->input()->field()->textarea($this->plugin->txt("options_question_note"), $this->plugin->txt("options_question_note_info"))
+        $inputs["question_note"] = $this->customFactory->textareaRTE($this->question->getId(), $this->plugin->txt("options_question_note"), $this->plugin->txt("options_question_note_info"), false)
             ->withValue($this->question->question_note);
         $inputs["specific_feedback"] = $this->customFactory->textareaRTE($this->question->getId(), $this->plugin->txt("options_specific_feedback"), $this->plugin->txt("options_specific_feedback_info"))
             ->withValue($this->question->specific_feedback);

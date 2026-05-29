@@ -67,3 +67,50 @@
 .tax-node {
     margin-left: 5px !important;
 }
+
+.ai-assistant-button-container  {
+    margin-top: 5px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.ai-assistant-button-container button {
+    width: 100% !important;
+}
+
+.ilias-spinner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ffffffeb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #3a4c65;
+    margin-left: -15px;
+}
+
+.ilias-spinner.hidden {
+    display: none !important;
+}
+
+.spinner-circle {
+    width: 32px;
+    height: 32px;
+    border: 4px solid #dbe7f5;
+    border-top-color: #3a4c65;
+    border-radius: 50%;
+    animation: ilias-spin 0.9s linear infinite;
+}
+
+.spinner-text {
+    font-size: 14px;
+}
+
+@keyframes ilias-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

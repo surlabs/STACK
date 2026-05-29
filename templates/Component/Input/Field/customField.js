@@ -131,3 +131,94 @@ $(document).ready(function() {
         subtree: true
     });
 });
+
+function sendAIRequestWithContext(textareaId, ajaxUrl, button, e) {
+    e.preventDefault();
+
+    const context = $(button).closest(".modal").find(".context-prompt").val() || "";
+    const questionId = new URLSearchParams(window.location.search).get("q_id") || 0;
+    const close_button = $(button).parent().find(".btn.btn-default[data-dismiss='modal']");
+    const spinner = $(button).parent().parent().find(".ilias-spinner");
+
+    console.log(spinner);
+
+    const formData = {};
+
+    $("#ilContentContainer form").first()
+        .find("input:not(.modal input), select:not(.modal select), textarea:not(.modal textarea)")
+        .each(function() {
+            const name = $(this).attr("name");
+
+            if ($(this).is(":disabled")) {
+                return;
+            }
+
+            if ($(this).attr("type") === "checkbox" && !$(this).is(":checked")) {
+                return;
+            }
+
+            if ($(this).attr("aria-hidden") === "true") {
+                if (typeof tinymce == "object") {
+                    const editor = tinymce.get($(this).attr("id"));
+
+                    if (editor) {
+                        formData[name] = editor.getContent();
+                    }
+                }
+                return;
+            }
+
+            formData[name] = $(this).val();
+        });
+
+    console.log("Context:", context);
+    console.log("Textarea ID:", textareaId);
+    console.log("AJAX URL:", ajaxUrl);
+    console.log("Question ID:", questionId);
+    console.log("Form Data:", formData);
+
+    if (ajaxUrl && ajaxUrl.length > 0) {
+        const payload = new FormData();
+        payload.append("action", "generateWithAI");
+        payload.append("formData", JSON.stringify(formData));
+        payload.append("currentFieldName", $("#" + textareaId).attr("name"));
+        payload.append("questionId", questionId);
+        payload.append("context", context);
+
+        spinner.removeClass("hidden");
+
+        fetch(ajaxUrl, {
+            method: "POST",
+            body: payload,
+        }).then(response => response.json()).then(data => {
+            if (data.generated_text) {
+                if (typeof tinymce == "object") {
+                    const editor = tinymce.get(textareaId);
+
+                    if (editor) {
+                        editor.setContent(data.generated_text);
+                    } else {
+                        console.error("No TinyMCE editor found with ID: " + textareaId);
+                    }
+                } else {
+                    const $textarea = $("#" + textareaId);
+
+                    if ($textarea.length > 0) {
+                        $textarea.text(data.generated_text);
+                    } else {
+                        console.error("No textarea found with ID: " + textareaId);
+                    }
+                }
+            } else if (data.error) {
+                console.error("Error: " + data.error);
+            }
+        }).catch(error => {
+            console.error("Error:", error);
+        }).finally(() => {
+            close_button.click();
+            spinner.addClass("hidden");
+        });
+    } else {
+        console.log("No AJAX URL provided.");
+    }
+}
