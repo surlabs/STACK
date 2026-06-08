@@ -1,7 +1,7 @@
 <div alt style="text-align: center; transform: scale(.5);">
 	<picture>
-		<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/surlabs/STACK/ilias9_stack/templates/assets/stack-collage.png" />
-		<img alt="STACK" src="https://raw.githubusercontent.com/surlabs/STACK/ilias9_stack/templates/assets/stack-collage.png" />
+		<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/surlabs/STACKForILIAS/release_9/templates/assets/stack-collage.png" />
+		<img alt="STACK" src="https://raw.githubusercontent.com/surlabs/STACKForILIAS/release_9/templates/assets/stack-collage.png" />
 	</picture>
 </div>
 
@@ -47,9 +47,9 @@ cdn.mathjax.org or downloaded to your own web server. It has to be configured in
 3. Then, execute:
 
 ```bash
-git clone https://github.com/surlabs/STACK.git ./assStackQuestion
+git clone https://github.com/surlabs/STACKForILIAS.git ./assStackQuestion
 cd assStackQuestion
-git checkout ilias9_stack
+git checkout release_9
 ```
 3. STACK uses the ILIAS composer autoloader functionality so, after installing or update the plugin, ensure you run on the ILIAS root folder
 ```bash
@@ -80,11 +80,11 @@ composer install --no-dev
 - SIG Mathe [Forum](https://docu.ilias.de/goto_docu_frm_7004.html)
 
 # Version History
-* The stable version 10.0.x for **ILIAS 10** with the STACK Core version 4.5.0 can be found in the Github branch **ilias10_stack**
-* The stable version 9.0.x for **ILIAS 9** with the STACK Core version 4.5.0 can be found in the Github branch **ilias9_stack**
-* The stable version 8.5.x for **ILIAS 8** with the STACK Core version 4.5.0 can be found in the Github branch **ilias8_stack**
+* The stable version 10.1.x for **ILIAS 10** with the STACK Core version 4.5.0 can be found in the Github branch **release_10**
+* The stable version 9.5.x for **ILIAS 9** with the STACK Core version 4.5.0 can be found in the Github branch **release_9**
+* The stable version 8.9.x for **ILIAS 8** with the STACK Core version 4.5.0 can be found in the Github branch **release_8**
 * The stable version 8.0.x for **ILIAS 8** with the STACK Core version 4.3.9 can be found in the Github branch **old_ilias8_stack2021** is on only security issues mode.
-* The stable version 7.5.x for **ILIAS 7.13+** with the STACK Core version 4.5.0 can be found in the Github branch **ilias7_stack**
+* The stable version 7.8.x for **ILIAS 7.14+** with the STACK Core version 4.5.0 can be found in the Github branch **release_7**
 * The stable version 7.0.x for **ILIAS 7.13+** with the STACK Core version 4.3.9 can be found in the Github branch **old_ilias7_stack2021** is on only security issues mode.
 * The stable version 3.5 for **ILIAS 7.13+** with the STACK Core version 4.2.2 can be found in the Github branch **unmaintained_ilias713_stack2019** is no longer maintained.
 * The stable version 3.4.3 for **ILIAS <= 7.12** with the STACK Core version 4.2.2 can be found in the Github branch **unmaintained_ilias712_stack2019** is no longer maintained.
