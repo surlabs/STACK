@@ -77,11 +77,15 @@ class stack_cas_castext2_demoodle extends stack_cas_castext2_block {
                 $r .= $v;
             } else {
                 // Parameters as they would be if this were called through the question->format_text.
-                $r .= text_to_html($v, null, false, true);
+                $r .= self::text_to_html($v);
             }
         }
 
         return $r;
+    }
+
+    private static function text_to_html(string $text): string {
+        return nl2br(str_replace(["\r\n", "\r"], "\n", $text), false);
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
