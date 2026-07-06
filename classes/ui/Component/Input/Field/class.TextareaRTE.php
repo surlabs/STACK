@@ -208,6 +208,11 @@ class TextareaRTE extends Input implements Textarea {
         return $this->min_limit > 0 || $this->max_limit > 0;
     }
 
+    public function withoutStripTags(): Textarea
+    {
+        return clone $this;
+    }
+
     public function getUpdateOnLoadCode(): \Closure
     {
         return fn($id) => "$('#$id').on('input', function(event) {
