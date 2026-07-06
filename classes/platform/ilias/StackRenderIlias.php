@@ -214,8 +214,13 @@ class StackRenderIlias extends StackRender
             $field_name = 'xqcas_' . $question->getId() . '_' . $input_name;
             $state = $question->getInputState($input_name, $response);
 
+            $rendered_input = $input->render($state, $field_name, $show_correct_solution, $teacher_answer_value);
+            if (is_a($input, 'stack_checkbox_input')) {
+                $rendered_input = stack_maths::process_display_castext($rendered_input);
+            }
+
             $question_text = str_replace("[[input:$input_name]]",
-                $input->render($state, $field_name, $show_correct_solution, $teacher_answer_value)." ".$validation_button,
+                $rendered_input." ".$validation_button,
                 $question_text);
 
             $ilias_validation = "";
