@@ -440,7 +440,28 @@ class StackRenderIlias extends StackRender
         $path_to_mathjax = $mathjax->get("path_to_mathjax");
         if (is_string($path_to_mathjax) && $path_to_mathjax !== '') {
             $DIC->globalScreen()->layout()->meta()->addJs($path_to_mathjax);
+            return;
         }
+
+        $DIC->globalScreen()->layout()->meta()->addJs('assets/js/mathjax_config.js');
+        $DIC->globalScreen()->layout()->meta()->addJs('node_modules/mathjax/es5/tex-chtml-full.js');
+    }
+
+    public static function renderLatexContent(string $html): string
+    {
+        global $DIC;
+
+        if (class_exists('ilRTE')) {
+            $html = \ilRTE::replaceLatexSpan($html);
+        }
+
+        if (isset($DIC) && method_exists($DIC, 'ui')) {
+            return $DIC->ui()->renderer()->render(
+                $DIC->ui()->factory()->legacy()->latexContent($html)
+            );
+        }
+
+        return $html;
     }
 
     /**
@@ -490,7 +511,7 @@ class StackRenderIlias extends StackRender
                 $randomisation .= $renderer->render($factory->divider()->horizontal()) . "<strong>Seed: </strong>" . $randomisation_data[""]["seed"];
             }
 
-            $panel = $factory->panel()->standard($language->txt("qpl_qst_xqcas_debug_info_message"), $factory->legacy(
+            $panel = $factory->panel()->standard($language->txt("qpl_qst_xqcas_debug_info_message"), $factory->legacy()->content(
                 $randomisation
             ))->withViewControls(array(
                 new Expand(),

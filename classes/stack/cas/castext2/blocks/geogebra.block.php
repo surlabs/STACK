@@ -318,8 +318,6 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
         $r->items[] = new MP_String(json_encode($iparams));
 
         // Then let's add some script tags to the head to load some stuff.
-        $mathjax = new ilSetting("MathJax");
-
         // Silence the MathJax message that blinks on top of every graph.
         $r->items[] = new MP_List([
             new MP_String('script'),
@@ -328,7 +326,7 @@ class stack_cas_castext2_geogebra extends stack_cas_castext2_block {
         ]);
         $r->items[] = new MP_List([
             new MP_String('script'),
-            new MP_String(json_encode(['type' => 'text/javascript', 'src' => $mathjax->get("path_to_mathjax")])),
+            new MP_String(json_encode(['type' => 'text/javascript', 'src' => assStackQuestionUtils::getMathJaxScriptUrl()])),
         ]);
         // Naturally having GeoGebra loaded is important, we load it from our CORS source.
         $r->items[] = new MP_List([

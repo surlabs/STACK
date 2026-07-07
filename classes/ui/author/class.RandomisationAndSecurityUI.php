@@ -102,12 +102,7 @@ class RandomisationAndSecurityUI
         $this->language = $DIC->language();
         $this->control = $DIC->ctrl();
 
-        //Ensure MathJax is loaded
-        $mathJaxSetting = new ilSetting("MathJax");
-        $pathToMathJax = $mathJaxSetting->get("path_to_mathjax");
-        if (is_string($pathToMathJax) && $pathToMathJax !== '') {
-            $DIC->globalScreen()->layout()->meta()->addJs($pathToMathJax);
-        }
+        StackRenderIlias::ensureMathJaxLoaded();
     }
 
     /**
@@ -303,7 +298,7 @@ class RandomisationAndSecurityUI
             $active_variant_identifier .
             $this->renderer->render($this->factory->divider()->vertical()) .
             $this->language->txt("qpl_qst_xqcas_ui_author_randomisation_is_current_active_variant_text"),
-            $this->factory->legacy(
+            $this->factory->legacy()->content(
                 assStackQuestionUtils::_getLatex($active_variant_question_note) .
                 $this->renderer->render($this->factory->divider()->horizontal()) .
                 $this->renderer->render([$button_text, $modal_text]) .
@@ -313,9 +308,9 @@ class RandomisationAndSecurityUI
         )->withFurtherInformation($this->factory->card()->standard(
             $this->language->txt("qpl_qst_xqcas_ui_author_randomisation_question_variables_text")
         )->withSections(array(
-            $this->factory->legacy(assStackQuestionUtils::parseToHTMLWithoutLatex($active_variant_question_variables)),
+            $this->factory->legacy()->content(assStackQuestionUtils::parseToHTMLWithoutLatex($active_variant_question_variables)),
             $this->factory->divider()->horizontal(),
-            $this->factory->legacy(assStackQuestionUtils::parseToHTMLWithoutLatex($active_variant_feedback_variables))
+            $this->factory->legacy()->content(assStackQuestionUtils::parseToHTMLWithoutLatex($active_variant_feedback_variables))
         )))->withActions($current_active_variant_panel_actions);
     }
 
@@ -361,7 +356,7 @@ class RandomisationAndSecurityUI
                 $link = $this->factory->button()->standard($this->language->txt("qpl_qst_xqcas_ui_author_randomisation_set_as_active_variant_action_text"),
                     $this->control->getLinkTargetByClass("assstackquestiongui", "setAsActiveVariant"));
             } else {
-                $link = $this->factory->legacy(
+                $link = $this->factory->legacy()->content(
                     $this->language->txt("qpl_qst_xqcas_ui_author_randomisation_is_current_active_variant_text"));
             }
 
@@ -370,7 +365,7 @@ class RandomisationAndSecurityUI
                 (string)$deployed_variant_identifier .
                 $this->renderer->render($this->factory->divider()->vertical()) .
                 $this->renderer->render($link),
-                $this->factory->legacy(
+                $this->factory->legacy()->content(
                     assStackQuestionUtils::_getLatex($question_note->get_rendered()) .
                     $this->renderer->render($this->factory->divider()->horizontal())))
                 ->withActions($deployed_variant_individual_actions);
@@ -435,7 +430,7 @@ class RandomisationAndSecurityUI
             ));
 
             $status_text = "<span style='font-weight: bold; color: orange;'>" . $this->language->txt("qpl_qst_xqcas_ui_author_randomisation_unit_test_not_run") . "</span>";
-            $test_results_view = $this->factory->legacy("");
+            $test_results_view = $this->factory->legacy()->content("");
             $last_case = end($unit_test["results"]);
 
             if ($last_case) {
@@ -449,7 +444,7 @@ class RandomisationAndSecurityUI
                     $status_text = "<span style='font-weight: bold; color: red;'>" . $this->language->txt("qpl_qst_xqcas_ui_author_randomisation_unit_test_failed") . "</span>";
                 }
 
-                $test_results_view = $this->factory->legacy($this->renderQtestResults((int) $last_case["seed"], (int) $last_case["timerun"], $last_result));
+                $test_results_view = $this->factory->legacy()->content($this->renderQtestResults((int) $last_case["seed"], (int) $last_case["timerun"], $last_result));
             }
 
             $list[$unit_test_number] = $this->factory->item()->group($status_text .

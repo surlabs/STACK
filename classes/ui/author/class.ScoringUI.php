@@ -161,7 +161,7 @@ class ScoringUI
         }
 
         foreach ($this->question->prts as $prt) {
-            $panel = $this->factory->panel()->standard($this->plugin->txt("sco_prt_name") . " " . $prt->get_name(), $this->factory->legacy(
+            $panel = $this->factory->panel()->standard($this->plugin->txt("sco_prt_name") . " " . $prt->get_name(), $this->factory->legacy()->content(
                 $this->plugin->txt("sco_prt_value") . " <strong>" . ($prt->get_value() / $max_weight) * $this->question->getPoints() . " </strong><br>" .
                 $this->getTableHtml($prt, $max_weight, $this->questionPoints)
             ))->withViewControls(array(

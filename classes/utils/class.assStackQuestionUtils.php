@@ -444,7 +444,7 @@ class assStackQuestionUtils
 
         $enabled_server = (bool) $mathjax->get("enable_server", false);
 
-        if ($enabled_server) {
+        if ($enabled_server || !class_exists('ilMathJax')) {
             $text = preg_replace('/\\\\\((.*?)\\\\\)/s', '[tex]$1[/tex]', $text);
             $text = preg_replace('/\\\\\[(.*?)\\\\\]/s', '<div style="position: relative; display: block; text-align: center; margin: 1em 0;">[tex]$1[/tex]</div>', $text);
         }
@@ -473,6 +473,10 @@ class assStackQuestionUtils
 
         if (class_exists('ilMathJax')) {
             return ilMathJax::getInstance()->insertLatexImages($text);
+        }
+
+        if (class_exists('classes\\platform\\ilias\\StackRenderIlias')) {
+            return \classes\platform\ilias\StackRenderIlias::renderLatexContent($text);
         }
 
         return $text;
@@ -1450,5 +1454,16 @@ class assStackQuestionUtils
         }
 
         return "2";
+    }
+
+    public static function getMathJaxScriptUrl(): string
+    {
+        $mathjax = new ilSetting('MathJax');
+        $url = (string) ($mathjax->get('path_to_mathjax') ?? '');
+        if ($url !== '') {
+            return $url;
+        }
+
+        return ilUtil::_getHttpPath() . '/node_modules/mathjax/es5/tex-chtml-full.js';
     }
 }

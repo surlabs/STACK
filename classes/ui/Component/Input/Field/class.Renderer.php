@@ -224,7 +224,17 @@ class Renderer extends RendererILIAS
         $rteSupport = $component->getRTESupport();
 
         if (!empty($rteSupport)) {
-            $rte->addRTESupport($rteSupport["obj_id"], $rteSupport["obj_type"], $rteSupport["module"], false, $rteSupport['cfg_template']);
+            global $DIC;
+
+            $rte->addRTESupport(
+                $DIC->language(),
+                $DIC->user(),
+                $rteSupport["obj_id"],
+                $rteSupport["obj_type"],
+                $rteSupport["module"],
+                false,
+                $rteSupport['cfg_template']
+            );
 
             $tpl->setVariable('RTE_EDITOR', "RTEditor");
         }
@@ -387,7 +397,7 @@ class Renderer extends RendererILIAS
             ];
         }
 
-        $modal = $this->getUIFactory()->modal()->roundtrip($this->txt("tax_nodes"), [$this->getUIFactory()->legacy($this->buildTaxonomyNodes($component->getTree()))])->withCancelButtonLabel($this->txt("save"));
+        $modal = $this->getUIFactory()->modal()->roundtrip($this->txt("tax_nodes"), [$this->getUIFactory()->legacy()->content($this->buildTaxonomyNodes($component->getTree()))])->withCancelButtonLabel($this->txt("save"));
         $modal_rendered = $this->render($modal);
 
         $modal_load_code = "

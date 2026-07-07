@@ -575,16 +575,17 @@ class assStackQuestionGUI extends assQuestionGUI
 	 */
 	public function initRTESupport()
 	{
-		//include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
-		$this->rte_tags = ilObjAdvancedEditing::_getUsedHTMLTags($this->rte_module);
+		global $DIC;
+
+		$this->rte_tags = ilRTESettings::_getUsedHTMLTags($this->rte_module);
 
 		$this->required_tags = array("a", "blockquote", "br", "cite", "code", "div", "em", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "img", "li", "ol", "p", "pre", "span", "strike", "strong", "sub", "sup", "table", "caption", "thead", "th", "td", "tr", "u", "ul", "i", "b", "gap");
 
 		if (serialize($this->rte_tags) != serialize(($this->required_tags))) {
 
 			$this->rte_tags = $this->required_tags;
-			$obj_advance = new ilObjAdvancedEditing();
-			$obj_advance->setUsedHTMLTags($this->rte_tags, $this->rte_module);
+			$rte_settings = new ilRTESettings($DIC->language(), $DIC->user());
+			$rte_settings->setUsedHTMLTags($this->rte_tags, $this->rte_module);
 		}
 	}
 
@@ -1014,13 +1015,7 @@ class assStackQuestionGUI extends assQuestionGUI
         );
         $ui = new RandomisationAndSecurityUI($array);
 
-		//Add MathJax (Ensure MathJax is loaded)
-		//include_once "./Services/Administration/classes/class.ilSetting.php";
-		$mathJaxSetting = new ilSetting("MathJax");
-		$pathToMathJax = $mathJaxSetting->get("path_to_mathjax");
-		if (is_string($pathToMathJax) && $pathToMathJax !== '') {
-			$DIC->globalScreen()->layout()->meta()->addJs($pathToMathJax);
-		}
+		StackRenderIlias::ensureMathJaxLoaded();
 
 		//Add CSS
 		//$DIC->globalScreen()->layout()->meta()->addCss($this->plugin->getStyleSheetLocation('css/qpl_xqcas_deployed_seeds_management.css'));
