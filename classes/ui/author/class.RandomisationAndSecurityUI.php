@@ -104,7 +104,10 @@ class RandomisationAndSecurityUI
 
         //Ensure MathJax is loaded
         $mathJaxSetting = new ilSetting("MathJax");
-        $DIC->globalScreen()->layout()->meta()->addJs($mathJaxSetting->get("path_to_mathjax"));
+        $pathToMathJax = $mathJaxSetting->get("path_to_mathjax");
+        if (is_string($pathToMathJax) && $pathToMathJax !== '') {
+            $DIC->globalScreen()->layout()->meta()->addJs($pathToMathJax);
+        }
     }
 
     /**

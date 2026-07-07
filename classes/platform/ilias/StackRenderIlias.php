@@ -39,7 +39,6 @@ use Expand;
  *********************************************************************/
 class StackRenderIlias extends StackRender
 {
-
     /**
      * Generates the HTML for the feedback of a specific potential response tree.
      * @param array $attempt_data
@@ -438,7 +437,10 @@ class StackRenderIlias extends StackRender
     {
         global $DIC;
         $mathjax = new ilSetting("MathJax");
-        $DIC->globalScreen()->layout()->meta()->addJs($mathjax->get("path_to_mathjax"));
+        $path_to_mathjax = $mathjax->get("path_to_mathjax");
+        if (is_string($path_to_mathjax) && $path_to_mathjax !== '') {
+            $DIC->globalScreen()->layout()->meta()->addJs($path_to_mathjax);
+        }
     }
 
     /**

@@ -50,11 +50,12 @@ class StackScoringTableData implements DataRetrieval
 
     public function getRows(
         DataRowBuilder $row_builder,
-        ?array         $visible_column_ids,
+        array          $visible_column_ids,
         Range          $range,
         Order          $order,
-        ?array         $filter_data,
-        ?array         $additional_parameters
+        mixed          $additional_viewcontrol_data,
+        mixed          $filter_data,
+        mixed          $additional_parameters
     ): Generator
     {
         $records_to_display = $this->getRecords();
@@ -67,8 +68,9 @@ class StackScoringTableData implements DataRetrieval
     }
 
     public function getTotalRowCount(
-        ?array $filter_data,
-        ?array $additional_parameters
+        mixed $additional_viewcontrol_data,
+        mixed $filter_data,
+        mixed $additional_parameters
     ): ?int
     {
         return count($this->prt_data->get_nodes());

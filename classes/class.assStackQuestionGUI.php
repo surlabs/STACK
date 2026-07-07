@@ -1017,7 +1017,10 @@ class assStackQuestionGUI extends assQuestionGUI
 		//Add MathJax (Ensure MathJax is loaded)
 		//include_once "./Services/Administration/classes/class.ilSetting.php";
 		$mathJaxSetting = new ilSetting("MathJax");
-		$DIC->globalScreen()->layout()->meta()->addJs($mathJaxSetting->get("path_to_mathjax"));
+		$pathToMathJax = $mathJaxSetting->get("path_to_mathjax");
+		if (is_string($pathToMathJax) && $pathToMathJax !== '') {
+			$DIC->globalScreen()->layout()->meta()->addJs($pathToMathJax);
+		}
 
 		//Add CSS
 		//$DIC->globalScreen()->layout()->meta()->addCss($this->plugin->getStyleSheetLocation('css/qpl_xqcas_deployed_seeds_management.css'));

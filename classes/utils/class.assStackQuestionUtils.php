@@ -449,17 +449,19 @@ class assStackQuestionUtils
             $text = preg_replace('/\\\\\[(.*?)\\\\\]/s', '<div style="position: relative; display: block; text-align: center; margin: 1em 0;">[tex]$1[/tex]</div>', $text);
         }
 
-        $text = ilMathJax::getInstance()->insertLatexImages(
-            $text,
-            "\<span class\=\"latex\">",
-            "\<\/span>"
-        );
+        if (class_exists('ilMathJax')) {
+            $text = ilMathJax::getInstance()->insertLatexImages(
+                $text,
+                "\<span class\=\"latex\">",
+                "\<\/span>"
+            );
 
-        $text = ilMathJax::getInstance()->insertLatexImages(
-            $text,
-            "\[tex\]",
-            "\[\/tex\]"
-        );
+            $text = ilMathJax::getInstance()->insertLatexImages(
+                $text,
+                "\[tex\]",
+                "\[\/tex\]"
+            );
+        }
 
         $text = preg_replace_callback('/\\\\begin{pmatrix}(.*?)\\\\end{pmatrix}/s', function ($matches) {
             return str_replace("}\\{", "}\\\\{", $matches[0]);
@@ -469,7 +471,11 @@ class assStackQuestionUtils
         $text = str_replace("}", "&#125;", $text);
         $text = str_replace("\\", "&#92;", $text);
 
-        return ilMathJax::getInstance()->insertLatexImages($text);
+        if (class_exists('ilMathJax')) {
+            return ilMathJax::getInstance()->insertLatexImages($text);
+        }
+
+        return $text;
     }
 
 	public static function _getNewTestCaseNumber($question_id)
@@ -1432,11 +1438,14 @@ class assStackQuestionUtils
 
     public static function getMathjaxVersion(): string
     {
-        $repo = new ilMathJaxConfigSettingsRepository(new ilSetting('MathJax'));
-
-        $url = $repo->getConfig()->getClientScriptUrl();
+        $mathjax = new ilSetting('MathJax');
+        $url = (string) ($mathjax->get('path_to_mathjax') ?? '');
 
         if (str_contains($url, 'mathjax3')) {
+            return "3";
+        }
+
+        if ($url === '') {
             return "3";
         }
 

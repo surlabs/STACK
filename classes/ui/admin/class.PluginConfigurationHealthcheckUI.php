@@ -76,11 +76,11 @@ class PluginConfigurationHealthcheckUI
                 $form_fields = [];
 
                 if (isset($value['details'])) {
-                    $form_fields["details"] = self::$factory->legacy($value["details"]);
+                    $form_fields["details"] = self::$factory->legacy()->content($value["details"]);
 
                     $sections[$value["tag"]] = self::$factory->panel()->standard(
                         $plugin_object->txt("ui_admin_configuration_defaults_section_title_healthcheck_" . $value["tag"]),
-                        self::$factory->legacy(
+                        self::$factory->legacy()->content(
                             self::$renderer->render($form_fields)
                         )
                     );
