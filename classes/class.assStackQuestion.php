@@ -360,7 +360,9 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         require_once __DIR__ . '/utils/class.assStackQuestionInitialization.php';
         require_once(__DIR__ . '/utils/locallib.php');
 
-        if($owner === -1){
+        $q_id = filter_input(INPUT_GET, 'q_id', FILTER_VALIDATE_INT);
+
+        if($owner === -1 && $q_id <= 0) {
             try{
                 $this->loadStandardQuestion();
             } catch (stack_exception $e){
