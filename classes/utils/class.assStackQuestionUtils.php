@@ -922,9 +922,6 @@ class assStackQuestionUtils
 		}
 
 		//load inputs
-		//reset inputs first, otherwise the default input/PRT pair set by the question
-		//constructor (owner -1) stays alongside the ones loaded from the import array
-		$question->inputs = [];
 		$inputs_from_array = $array['inputs'];
 		$required_parameters = stack_input_factory::get_parameters_used();
 
@@ -975,9 +972,6 @@ class assStackQuestionUtils
 		}
 
 		//load PRTs and PRT nodes
-		//reset PRTs first, otherwise the default PRT set by the question constructor
-		//(owner -1) stays alongside the ones loaded from the import array
-		$question->prts = [];
 		$prt_from_array = $array['prts'];
 
         // $prt_from_array siempre es un array
