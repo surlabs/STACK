@@ -53,7 +53,7 @@ stack_reset(not_used) := block(
   /* Sets up randomization, using Maxima's internal random command. */
   stack_randseed(10000),
 
-  mminusbp120(true),
+  mminusbp134(true),
 
   /*Reload local settings*/
   STACK_SETUP(true),
@@ -120,6 +120,7 @@ stack_dispvalue(ex) := block(
       ex: make_displayscivalue(ex),
       ex: subst("*", stackunits, ex),
       ex: unary_minus_sort(ex),
+      ex: unary_minus_initial_sum(ex),
       ex: destackvector(ex)),
   return(string(ex))
 )$
@@ -137,7 +138,7 @@ load("stack_logic.lisp");
 load("Ksimplifier.lisp");
 
 /* We don't want to allow people to put boxes round things. */
-box(ex) := ex;
+kill(box);
 
 /* Although this works well in MAXIMA, |'s are not allowed in STACK */
 /* The heuristics to catch the various errors do not work, since | is symmetrical */
@@ -168,10 +169,15 @@ load("stackstrings.mac");
 load("fboundp.mac");
 load("functs");
 
+/* Combined and processed maximasrc/ content. */
+load("maximasrccompiled.mac");
+load("chemistry.mac");
+
 /* Are we printing normal Maxima or plain atoms? */
 tex_plain_atoms:false$
 
 load("stacktex.lisp");
+mminusbp134(true);
 /* Ensure back compatability with versions before 5.41.0. */
 if is(MAXIMA_VERSION_NUM<40.1) then load("stacktex40.lisp");
 if is(MAXIMA_VERSION_NUM<44.0) then load("stack44.mac");
@@ -225,7 +231,7 @@ make_complexJ(OPT_COMPLEXJ) := block(
 
 /* Choose the symbol for the multiplication sign. */
 make_multsgn(OPT_MULTSGN) := block(
-    if ev(not(elementp(OPT_MULTSGN, {"cross", "dot", "onum", "none", "space"})), simp) 
+    if ev(not(elementp(OPT_MULTSGN, {"cross", "dot", "onum", "none", "space"})), simp)
         then error("make_multsgn received un-supported option: ", OPT_MULTSGN),
     if OPT_MULTSGN = "cross" then (texput("*", "\\times ", nary),
                                    texput("nounmul", "\\times ", nary)),
@@ -247,14 +253,14 @@ multsgnonlyfornumbers(e) := block([arglist, resstr, a, lastisnum, isnum, multsgn
     arglist: args(e),
     a: pop(arglist),
     resstr: if ev(is(safe_op(a) = "-" or (real_numberp(a) and is(a<0)))=true, simp) then sconcat("\\left(", tex1(a), "\\right)")
-                else if (atom(a) or is(length(args(a))=1) or safe_op(a) = "^") then tex1(a)
+                else if (atom(a) or is(length(args(a))=1) or safe_op(a) = "^") or rational_numberp(a) then tex1(a)
                 else sconcat("\\left(", tex1(a), "\\right)"),
-    lastisnum: numberp(a),
+    lastisnum: real_numberp(a),
     for a in arglist do (
-        isnum: numberp(a),
+        isnum: real_numberp(a),
         multsgn: if ev(is(lastisnum and isnum)=true, simp) then tex1(multsgnonlyfornumberssym) else "\\,",
         str: if ev(is(safe_op(a) = "-" or (real_numberp(a) and is(a<0)))=true, simp) then sconcat("\\left(", tex1(a), "\\right)")
-                else if ev(is(atom(a) or is(length(args(a))=1) or safe_op(a) = "^")=true, simp) then tex1(a)
+                else if ev(is(atom(a) or is(length(args(a))=1) or safe_op(a) = "^")=true, simp) or rational_numberp(a) then tex1(a)
                 else sconcat("\\left(", tex1(a), "\\right)"),
         resstr: sconcat(resstr, multsgn, " ", str),
         lastisnum: isnum
@@ -726,7 +732,7 @@ _CS2out() := (
 stack_disp(expr, exprm) := block([str:"", expru],
     /* LaTeX display */
     if OPT_OUTPUT = "LaTeX" then
-        if not(ev(elementp(exprm, {"", "i", "d", "id", "i{", "{"}), simp)) then print(concat("ERROR: illegal delimiter option found: ", exprm)),
+        if not(ev(elementp(exprm, {"", "i", "d", "id", "i{", "{"}), simp)) then error(concat("ERROR: stack_disp illegal delimiter option found: ", exprm)),
     /* Fine tune display, e.g. sort out display of atoms like theta0. */
     expru: %_ce_rem(expr),
     if not(stack_disp_control_structurep(expr)) then block(
@@ -743,7 +749,7 @@ stack_disp(expr, exprm) := block([str:"", expru],
         if exprm = "d" then block(ld: "\\[", rd:"\\]"),
         mminusbp100(true),
         expstr: tex(expru, false),
-        mminusbp120(true),
+        mminusbp134(true),
         expstr: concat(ld, stack_disp_strip_dollars(expstr), rd)
     ),
     /* String display */
@@ -894,9 +900,9 @@ stack_matrix_disp(m):= block([ret, lp, rp, parens],
 
 texput(matrix, stack_matrix_disp)$
 
-/* ********************************** */
-/* Display: Sort out the unary minus  */
-/* ********************************** */
+/* *********************************** */
+/* Display: Sort out the unary minus.  */
+/* *********************************** */
 
 /* To see an interesting example, see the following.
    simp:false;
@@ -959,13 +965,32 @@ unary_minus_pull_helper(ex) := block([fe],
   return(ex)
 )$
 
-
 /* Sorts out display of expressions in the case simp:false */
 unary_minus_sort(ex) := block([ex2],
   if simp or atom(ex) or taylorp(ex) or functionp(ex) then return(ex),
-  ex2: unary_minus_traverse(ex),
-  return(unary_minus_pull(ex2))
+  ex2:unary_minus_traverse(ex),
+  ex2:unary_minus_pull(ex2),
+  return(ex2)
 )$
+
+/* Removes redundent brackets in the string representation of an expression. */
+unary_minus_initial_sum(ex) := block([_ex1,_exr],
+  if atom(ex) then return(ex),
+  if not(is(op(ex) = "+")) then return(apply(op(ex), map(unary_minus_initial_sum, args(ex)))),
+  _exr:map(unary_minus_initial_sum, rest(args(ex))),
+  _ex1:unary_minus_initial_sum_helper(first(args(ex))),
+  return(apply("+", append([_ex1], _exr)))
+)$
+unary_minus_initial_sum_helper(ex) := block(
+  if atom(ex) then return(ex),
+  if not(is(safe_op(ex) = "-")) then return(unary_minus_initial_sum(ex)),
+  if numberp(first(ex)) then return(ev(ex,simp)),  /* Turns "-"8 back into -8. */
+  if not(is(safe_op(first(ex)) = "*")) then return(unary_minus_initial_sum(ex)),
+  if numberp(first(first(ex))) then return(apply("*", append([-first(first(ex))], rest(args(first(unary_minus_initial_sum(ex))))))),
+  unary_minus_initial_sum(ex)
+)$
+
+
 
 /* ********************************** */
 /* Generate feedback                  */
@@ -1009,13 +1034,24 @@ set_plot_option([gnuplot_default_term_command, ""]);
 plot(ex, [ra]) :=  /*stack_web_plot*/
     block([simp:true, tfn, tfnp1, tfnp2, tfnp3, afn, ufn, lvs, preamble, sysp, sysr,
         filename, tn, alt, altc, alttext, ral, ralforbid, pltargs, plotfunmake, plotdebug,
-        plotgrid2d, size, psize, plot_size, plot_tags, stack_mtell_quiet, plotpid, margin],
+        plotgrid2d, plotbox, size, psize, plot_size, plot_tags, stack_mtell_quiet, plotpid, margin],
     stack_mtell_quiet:true,
     plotdebug: false,
     /* Check for grid2d  in the plotoptions. */
     plotgrid2d: false,
     if member(grid2d, ra) or member(STACKGRID, ra) then
          plotgrid2d: true,
+    /*******************/
+    /* Check for box.  */
+    plotbox:sublist(ra, lambda([ex], if listp(ex) then is(first(ex) = box) else false)),
+    if emptyp(plotbox) then plotbox:true else block(
+            ra:delete(first(plotbox), ra), 
+            if not(second(first(plotbox))) then plotbox:false
+        ),
+    /* For new versions. */
+    if member(nobox, ra) then plotbox:false,
+    if plotdebug then print("Should plot2d print a box? ", plotbox),
+    /************************************/
     /* Arguments to plot must be lists. */
     ral: sublist(ra, listp), /* The actual arguments used by plot. */
     /* Check expressions to be plotted has/have only one variable. */
@@ -1024,9 +1060,9 @@ plot(ex, [ra]) :=  /*stack_web_plot*/
     if not(freeof(lg, ex)) then
         ex:ev(ex, lg=logbasesimp),
     lvs: listofvars(%_ce_rem(ex)),
-    lvs: sublist(lvs, lambda([ex], not(ex = discrete or ex = parametric or ex = minus or ex = plus))),
-    if length(lvs)>1 then
-       error("Plot error: Can't create a plot with more than one variable, whereas you have: \\(",string(lvs),"\\)"),
+    lvs: sublist(lvs, lambda([ex], not(ex = discrete or ex = parametric or ex = contour or ex = minus or ex = plus))),
+    if length(lvs)>2 then
+       error("Plot error: Can't create a plot with more than two variables, whereas you have: \\(",string(lvs),"\\)"),
     /*********************/
     /* Sort out alt-text */
     kill(alt),
@@ -1054,7 +1090,8 @@ plot(ex, [ra]) :=  /*stack_web_plot*/
     /**********************************************************/
     /* Remove from option list ral any non-permitted options. */
     kill(y),
-    permitted_options: [y, xlabel, ylabel, label, legend, color, style, point_type, nticks, logx, logy, axes, box, plot_realpart, yx_ratio, xtics, ytics, ztics, adapt_depth, margin],
+    kill(t),
+    permitted_options: [x, y, t, xlabel, ylabel, label, legend, contour, levels, color, style, point_type, nticks, logx, logy, axes, box, plot_realpart, yx_ratio, xtics, ytics, ztics, adapt_depth, plotepsilon, xy_scale, same_xy, yx_ratio, sample, margin],
     /* In the case the list of variables is empty we need to add in "x" so the constant functions can be plotted. */
     if not(emptyp(lvs)) then permitted_options:append([first(lvs)], permitted_options)
     else  permitted_options:append([x], permitted_options),
@@ -1102,6 +1139,9 @@ set output ", afn),
     /* Add in the command for the grid. */
     if plotgrid2d and MAXIMA_VERSION_NUM>34 then
         ral: append(ral, [grid2d]),
+    /* Add in the command for the nobox. */
+    if not(plotbox) then if MAXIMA_VERSION_NUM>47 then 
+        ral:append(ral, [nobox]) else ral:append(ral, [[box,false]]),
     if plotdebug then print(preamble),
     if PLOT_TERMINAL="svg" then set_plot_option([svg_file, afn]),
     if PLOT_TERMINAL="svg" then
@@ -1230,7 +1270,7 @@ ATAlgEquivfun(SA, SB) :=  block([SApoly, SBpoly, keepfloat, RawMark, FeedBack, A
     /* Are we dealing with lists? */
     if listp(SB) then
       if listp(SA)#true then
-          if is(stackfltsep=".") then 
+          if is(stackfltsep=".") then
             return(StackBasicReturn(false, false, "ATAlgEquiv_SA_not_list"))
           else
             return([false, false, StackAddNote("", "ATAlgEquiv_SA_not_list"), StackAddFeedback("", "ATAlgEquiv_SA_not_list_semi")])
@@ -1239,7 +1279,7 @@ ATAlgEquivfun(SA, SB) :=  block([SApoly, SBpoly, keepfloat, RawMark, FeedBack, A
     /* Are we dealing with sets? */
     if safe_setp(SB) then
       if safe_setp(SA)=false then
-          if is(stackfltsep=".") then 
+          if is(stackfltsep=".") then
             return(StackBasicReturn(false, false, "ATAlgEquiv_SA_not_set"))
           else
             return([false, false, StackAddNote("", "ATAlgEquiv_SA_not_set"), StackAddFeedback("", "ATAlgEquiv_SA_not_set_semi")])
@@ -1464,7 +1504,8 @@ ATEquation(SA, SB) := block([keepfloat, RawMark, SA1, SB1, SB2, Rationalex1, Rat
              return([true, true, "ATEquation_zero", ""])
         else return([true, false, "ATEquation_zero_fail", ""]),
     if numberp(float(abs(Rationalex1/Rationalex2))) then
-        return([true, true, "", ""]),    Rationalex1:num(ratsimp(Rationalex1)),
+        return([true, true, "ATEquation_num", ""]),
+    Rationalex1:num(ratsimp(Rationalex1)),
     Rationalex2:num(ratsimp(Rationalex2)),
     if algebraic_equivalence(abs(Rationalex1/Rationalex2), 1) then
         return([true, true, "ATEquation_ratio", ""]),
@@ -1612,7 +1653,7 @@ ATMatrix(SA, SB) := block([RawMark, FeedBack, AnswerNote, str, ret, SAr, SAc, SB
         retnew:ATAlgEquivfun(SA[kloop], SB[kloop]),
         ret[1]:ret[1] and retnew[1],
         ret[2]:ret[2] and retnew[2],
-        ret[3]:concat(ret[3], " ", retnew[3]),
+        ret[3]:strim(" ", concat(ret[3], " ", retnew[3])),
         if retnew[2] = false then AddFeedBack:true
     ),
     if AddFeedBack = true then block(
@@ -1658,7 +1699,7 @@ ATSets(SA, SB) := block([RawMark, FeedBack, AnswerNote, SAsimp, SBsimp],
     if not(safe_setp(SB)) then
         return(StackBasicReturn(false, false, "ATSets_SB_not_set")),
     if not(safe_setp(SA)) then
-          if is(stackfltsep=".") then 
+          if is(stackfltsep=".") then
             return(StackBasicReturn(false, false, "ATSets_SA_not_set"))
           else
             return([false, false, StackAddNote("", "ATSets_SA_not_set"), StackAddFeedback("", "ATSets_SA_not_set_semi")]),
@@ -2287,7 +2328,7 @@ ATCasEqual(SA,SB) :=
 /* SA>SB? */
 ATGT(SA,SB) :=
     block([keepfloat, Validity, RawMark, FeedBack, AnswerNote, str, ex],
-    Validity:true, RawMark:false, FeedBack:"", AnswerNote:"Not number",
+    Validity:true, RawMark:false, FeedBack:"", AnswerNote:"ATGT_NotNumber",
     keepfloat:true,               /* See pg 23 */
 
     SAA:errcatch(ev(SA, simp, nouns)),
@@ -2309,7 +2350,7 @@ ATGT(SA,SB) :=
 /* SA>=SB? */
 ATGTE(SA,SB) :=
     block([keepfloat, Validity, RawMark, FeedBack, AnswerNote, str, ex, SAA, SBB],
-    Validity:true, RawMark:false, FeedBack:"", AnswerNote:"Not number",
+    Validity:true, RawMark:false, FeedBack:"", AnswerNote:"ATGT_NotNumber",
     keepfloat:true,
 
     SAA:errcatch(ev(SA, simp, nouns)),
@@ -3035,7 +3076,7 @@ Intfun(SA, SB, SBdisp, constint, acceptformal, var) := block([val,rawmk,ansnote,
     SB:strip_int_const(SB, var),
     /* This strips off any trailing constant of integration from the student's answer */
     SAa:strip_int_const(ev(SA, logexpand:super, simp), var),
-    if debug then print(["Striped off  constants of integration: ", SA, SB]),
+    if debug then print(["Striped off  constants of integration: ", SAa, SB]),
     /* If the teacher has not used logabs, then strip out any logabs from the student's answer. */
     /* Student consistency is a different issue. */
     SAConsistentLogs:ATInt_consistent_logabs_p(SA, var),
@@ -3046,7 +3087,7 @@ Intfun(SA, SB, SBdisp, constint, acceptformal, var) := block([val,rawmk,ansnote,
     /* Calculate derivatives */
     SAd:ev(diff(SA, var), simp),
     SBd:ev(diff(SB, var), simp),
-    if debug then print([SAa, SBd]),
+    if debug then print(["Expressions for comparison :", SAa, SBd]),
     if debug then print(["Derivatives : ", SAd, SBd]),
     if ev(algebraic_equivalence(SAd, SBd), simp) then block(
     /* Check for constant of integration - code copied from algebraic_equivalence. */
@@ -3345,7 +3386,7 @@ ATDiff(sa, sb, so) :=
 Difffun(SA, SB, v) := block([val, rawmk, ansnote, fb, ret, lSAv, lSBv, mSAv, mSBv],
     val:true, rawmk:false, fb:"", ansnote:"",
     ret:[val, rawmk, ansnote, fb],
-    if algebraic_equivalence(SA, SB) then
+    if ev(algebraic_equivalence(SA, SB), simp) then
         (rawmk:true, ansnote:StackAddNote("", "ATDiff_true"))
     else
         if ev(algebraic_equivalence(diff(SA,v), int(SB,v)), simp) then (
@@ -3420,15 +3461,15 @@ assess(ex1,ex2):=block([ret],
 /* ****************************************************** */
 
 /* A function to create a truth table of an expression ex. */
-truth_table(ex) := block([exs, vars, tab, tt],
+truth_table(ex) := block([exs, vars, tbl, tt],
     vars: ev(sort(listofvars(ex)),simp),
     if length(vars) > 5 then error("truth_table will only print with fewer than 6 variables."),
     /* Store this variable to prevent 2^n re-evaluations of this function. */
     exs: noun_logic_remove(ex),
-    tab: maplist(lambda([ex2], zip_with("=", vars, ex2)), truth_table_allvars(vars)),
-    tab: maplist(lambda([ex2], append(maplist('rhs, ex2), [ev(logic_simp(exs), ex2)])), tab),
-    tab: append([append(vars, [ex])], tab),
-    apply('table, tab)
+    tbl: maplist(lambda([ex2], zip_with("=", vars, ex2)), truth_table_allvars(vars)),
+    tbl: maplist(lambda([ex2], append(maplist('rhs, ex2), [ev(logic_simp(exs), ex2)])), tbl),
+    tbl: append([append(vars, [ex])], tbl),
+    apply('table, tbl)
 )$
 
 truth_table_allvars(l) := block(
@@ -3523,4 +3564,4 @@ is_lang(code):=ev(is(%_STACK_LANG=code),simp=true)$
 
 /* Stack expects some output with the version number the output happens at */
 /* maximalocal.mac after additional library loading */
-stackmaximaversion:2025102100$
+stackmaximaversion:2026062900$
