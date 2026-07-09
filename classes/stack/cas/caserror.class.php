@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
 /**
  * Encapsulates the location of an error happening in CAS with the actual error.
  * Allows us to decide the level of error message specificity at the point of output.
@@ -25,7 +27,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_cas_error {
-
     /**
      * @var string The location where things went wrong.
      */
@@ -37,7 +38,7 @@ class stack_cas_error {
     private $error;
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function __construct(string $error , string $context = '') {
+    public function __construct(string $error, string $context = '') {
         $this->error   = $error;
         $this->context = $context;
     }
@@ -243,13 +244,17 @@ class stack_cas_error {
             }
         } else {
             if (isset($ctx['prt'])) {
-                if (isset($ctx['field'])
-                    && ($ctx['field'] === 'truefeedback' || $ctx['field'] === 'falsefeedback')) {
+                if (
+                    isset($ctx['field'])
+                    && ($ctx['field'] === 'truefeedback' || $ctx['field'] === 'falsefeedback')
+                ) {
                     return stack_string('errorinfeedback');
                 }
                 return stack_string('erroringrading');
-            } else if (isset($ctx['input']) && isset($ctx['field'])
-                && $ctx['field'] === 'validation') { // This is a special field-name.
+            } else if (
+                isset($ctx['input']) && isset($ctx['field'])
+                && $ctx['field'] === 'validation'
+            ) { // This is a special field-name.
                 return stack_string('errorininputvalidation');
             } else if (isset($ctx['input'])) {
                 return stack_string('errorininitialisingquestion');

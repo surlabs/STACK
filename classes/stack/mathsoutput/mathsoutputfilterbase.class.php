@@ -47,7 +47,11 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function process_lang_string($string) {
         $string = $this->find_and_render_equations($string);
-        $string = str_replace('!ploturl!', ILIAS_HTTP_PATH . "/" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/xqcas/stack/plots/", $string);
+        $string = str_replace(
+            '!ploturl!',
+            moodle_url::make_file_url('/question/type/stack/plot.php', '/'),
+            $string
+        );
         return $string;
     }
 
@@ -94,10 +98,10 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
     protected function render_equation($tex, $displaystyle) {
         if ($displaystyle) {
             return $this->displaywrapstart .
-                    $this->displaystart . $tex .
-                            $this->displayend . $this->displaywrapend;
+                    $this->get_filter()->filter($this->displaystart . $tex .
+                            $this->displayend) . $this->displaywrapend;
         } else {
-            return $this->inlinestart . $tex . $this->inlineend;
+            return $this->get_filter()->filter($this->inlinestart . $tex . $this->inlineend);
         }
     }
 
@@ -143,8 +147,11 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
      * @return string the updated HTML.
      */
     protected function find_and_process_equations($html, $callback) {
-        return preg_replace_callback('~(?<!\\\\)(?<!<code>)\\\\[([](.*?)(?<!\\\\)\\\\([])])(?!</code>)~s',
-                [$this, $callback], $html);
+        return preg_replace_callback(
+            '~(?<!\\\\)(?<!<code>)\\\\[([](.*?)(?<!\\\\)\\\\([])])(?!</code>)~s',
+            [$this, $callback],
+            $html
+        );
     }
 
     /**
@@ -171,4 +178,3 @@ abstract class stack_maths_output_filter_base extends stack_maths_output {
      */
     abstract protected function make_filter();
 }
-

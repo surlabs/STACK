@@ -15,6 +15,7 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
 /**
  * Class to parse user-entered data into CAS sessions.
  *
@@ -23,7 +24,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_cas_keyval {
-
     /** @var Holds the raw text as entered by a question author. */
     private $raw;
 
@@ -59,7 +59,7 @@ class stack_cas_keyval {
     public $errclass = 'stack_cas_error';
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function __construct($raw, $options = null, $seed=null, $ctx='', $pslash=false) {
+    public function __construct($raw, $options = null, $seed = null, $ctx = '', $pslash = false) {
         $this->raw          = $raw;
         $this->statements   = [];
         $this->errors       = [];
@@ -80,7 +80,6 @@ class stack_cas_keyval {
         if (!is_null($seed) && !is_int($seed)) {
             throw new stack_exception('stack_cas_keyval: seed must be a null or an integer.');
         }
-
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
@@ -91,6 +90,9 @@ class stack_cas_keyval {
             return true;
         }
 
+        $str = $this->raw;
+        // phpcs:disable Squiz.PHP.CommentedOutCode.Found
+        /* TO-DO: if we accept $ and @ in the new parser ignore these.
         // Protect things inside strings before we do QMCHAR tricks, and check for @, $.
         $str = maxima_parser_utils::remove_comments($this->raw);
 
@@ -117,6 +119,8 @@ class stack_cas_keyval {
         foreach ($strings as $key => $string) {
             $str = str_replace('[STR:'.$key.']', '"' .$string . '"', $str);
         }
+        */
+        // phpcs:enable Squiz.PHP.CommentedOutCode.Found
 
         // 6/10/18 No longer split by line change, split by statement.
         // Allow writing of loops and other long statements onto multiple lines.
@@ -127,16 +131,21 @@ class stack_cas_keyval {
                 $this->errors[] = new $this->errclass($ast->getMessage(), $this->context);
                 $this->valid = false;
                 return false;
+            } else {
+                // Set up stack_maxima_parser_exception.
+                $syntaxerror = $ast;
+                $ei = stack_parser_options::get_cas_config()->get_author_error_interpreter();
+                $errs = [];
+                $notes = [];
+                $error = $ei->interprete($syntaxerror, $errs, $notes);
+                $this->errors[] = new $this->errclass($error, $this->context);
+                $this->valid = false;
+                return false;
             }
-            $syntaxerror = $ast;
-            $error = $syntaxerror->getMessage();
-            if (isset($syntaxerror->grammarLine) && isset($syntaxerror->grammarColumn)) {
-                $error .= ' (' . stack_string('stackCas_errorpos',
-                        ['line' => $syntaxerror->grammarLine, 'col' => $syntaxerror->grammarColumn]) . ')';
-            }
-            $this->errors[] = new $this->errclass($error, $this->context);
-            $this->valid = false;
-            return false;
+        } else if (count($ast->items) === 0) {
+            // There is no active content in the source, i.e., empty input which is valid.
+            $this->valid = true;
+            return true;
         }
 
         $vallist = [];
@@ -166,8 +175,11 @@ class stack_cas_keyval {
                 }
                 // Context variables should always be silent.  We might need a separate feature "silent" in future.
                 if (stack_cas_security::get_feature($op, 'contextvariable') !== null) {
-                    $cs = stack_ast_container_silent::make_from_teacher_ast($item, '',
-                            $this->security);
+                    $cs = stack_ast_container_silent::make_from_teacher_ast(
+                        $item,
+                        '',
+                        $this->security
+                    );
                 }
                 $this->valid = $this->valid && $cs->get_valid();
                 $this->errors = array_merge($this->errors, $cs->get_errors('objects'));
@@ -331,7 +343,7 @@ class stack_cas_keyval {
         $strings = stack_utils::all_substring_strings($str);
 
         foreach ($strings as $key => $string) {
-            $str = str_replace('"'.$string.'"', '[STR:'.$key.']', $str);
+            $str = str_replace('"' . $string . '"', '[STR:' . $key . ']', $str);
         }
 
         $str = str_replace('?', 'QMCHAR', $str);
@@ -340,7 +352,7 @@ class stack_cas_keyval {
             if ($this->pslash) {
                 $string = stack_utils::protect_backslash_latex($string);
             }
-            $str = str_replace('[STR:'.$key.']', '"' .$string . '"', $str);
+            $str = str_replace('[STR:' . $key . ']', '"' . $string . '"', $str);
         }
 
         if ($this->pslash) {
@@ -360,12 +372,15 @@ class stack_cas_keyval {
             '610_castext_static_string_extractor' => ['static string extractor' => $map],
             '995_ev_modification' => ['flags' => true],
         ];
-        $pipeline = stack_parsing_rule_factory::get_filter_pipeline([
+        $pipeline = stack_parsing_rule_factory::get_filter_pipeline(
+            [
             '601_castext',
             '602_castext_simplifier', '680_gcl_sconcat', '995_ev_modification',
             '996_call_modification', '998_security', '999_strict',
-        ],
-            $filteroptions, true);
+            ],
+            $filteroptions,
+            true
+        );
         $tostringparams = ['nosemicolon' => true, 'pmchar' => 1];
         $securitymodel = $this->security;
 
@@ -377,7 +392,6 @@ class stack_cas_keyval {
         // Process the AST.
         foreach ($ast->items as $item) {
             if ($item instanceof MP_Statement) {
-
                 // Strip off the %_C protection at the top level to establish if this is a context variable.
                 if ($item->statement instanceof MP_Group) {
                     $r0 = $item->statement->items[0];

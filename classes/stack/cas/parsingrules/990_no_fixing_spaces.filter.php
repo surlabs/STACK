@@ -21,18 +21,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that marks everything that has been fixed by fixing
  * spaces as invalid.
  */
 class stack_ast_filter_990_no_fixing_spaces implements stack_cas_astfilter_exclusion {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $spaces = false;
 
-        $check = function($node) use (&$spaces) {
+        $check = function ($node) use (&$spaces) {
             if (isset($node->position['fixspaces'])) {
                 $spaces = true;
                 $node->position['invalid'] = true;
@@ -45,7 +45,8 @@ class stack_ast_filter_990_no_fixing_spaces implements stack_cas_astfilter_exclu
         // Now that those have been checked and invalidated. Let's write custom errors.
         if ($spaces === true) {
             $missingstring = $ast->toString(
-                    ['fixspaces_as_red_spaces' => true, 'qmchar' => true, 'inputform' => true]);
+                ['fixspaces_as_red_spaces' => true, 'qmchar' => true, 'inputform' => true]
+            );
             if ($ast instanceof MP_Root) {
                 $missingstring = mb_substr($missingstring, 0, -2);
             }

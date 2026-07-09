@@ -23,6 +23,7 @@
  */
 
 
+
 /**
  * Represents a node in a STACK PRT extending {@link stack_abstract_graph}.
  *

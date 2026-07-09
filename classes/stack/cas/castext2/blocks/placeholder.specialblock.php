@@ -21,13 +21,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
+
 /**
  * Internal use block for marking active bits out generated output that need
  * to be protected from filtering. Only use this for marking of compile time
  * content.
  */
 class stack_cas_castext2_special_placeholder extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         return new MP_String("THIS NEVER HAPPENS, IT IS NOT ALLOWED TO USE THIS BLOCK ON THE AUTHOR SIDE");
@@ -44,9 +45,11 @@ class stack_cas_castext2_special_placeholder extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
         return $holder->add_to_map($params[1]);
     }
-
 }

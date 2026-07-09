@@ -22,6 +22,7 @@
  */
 
 
+
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_special_stack_translate extends stack_cas_castext2_block {
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
@@ -42,8 +43,11 @@ class stack_cas_castext2_special_stack_translate extends stack_cas_castext2_bloc
      * should execute whatever additional logic is needed. Register JavaScript and such
      * things it must then return the content that will take this blocks place.
      */
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
         if (count($params) < 2) {
             // Nothing at all.
             return '';

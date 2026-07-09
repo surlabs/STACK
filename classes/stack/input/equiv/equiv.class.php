@@ -16,7 +16,6 @@
 
 
 
-
 /**
  * This is an input that allows reasoning by equivalence.
  * Each line input becomes one element of a list.
@@ -26,7 +25,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_equiv_input extends stack_input {
-
     /**
      * From STACK 4.1 we are not going to continue to add input options as columns in the database.
      * This has numerous problems, and is difficult to maintain. Extra options will be in a JSON-like format.
@@ -54,6 +52,9 @@ class stack_equiv_input extends stack_input {
         'calculus' => false,
         'consolidatesubscripts' => false,
         'checkvars' => 0,
+        'align' => 'left',
+        'monospace' => false,
+        'manualgraded' => false,
     ];
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
@@ -75,6 +76,7 @@ class stack_equiv_input extends stack_input {
             }
             // Put the first line of the value of the teacher's answer in the input.
             if (trim($this->parameters['syntaxHint']) == 'firstline') {
+                // The teacher's answer, $tavalue, always uses commas here.
                 $values = stack_utils::list_to_array($tavalue, false);
                 if (array_key_exists(0, $values) && !is_null($values[0])) {
                     $cs = stack_ast_container::make_from_teacher_source($values[0]);
@@ -109,6 +111,13 @@ class stack_equiv_input extends stack_input {
             'autocapitalize' => 'none',
             'spellcheck'     => 'false',
         ];
+        if ($this->extraoptions['align'] === 'right') {
+            $attributes['class'] .= ' algebraic-right';
+        }
+        if ($this->extraoptions['monospace']) {
+            $attributes['class'] .= ' input-monospace';
+        }
+
         if ($placeholder) {
             $attributes['placeholder'] = $placeholder;
         }
@@ -220,7 +229,7 @@ class stack_equiv_input extends stack_input {
                 $vals[] = 'EMPTYCHAR';
             }
         }
-        $s = '['.implode(',', $vals).']';
+        $s = '[' . implode(',', $vals) . ']';
         return stack_ast_container::make_from_student_source($s, '', $secrules);
     }
 
@@ -231,7 +240,7 @@ class stack_equiv_input extends stack_input {
      * @return string
      */
     public function contents_to_maxima($contents) {
-        return '['.implode(',', $contents).']';
+        return '[' . implode(',', $contents) . ']';
     }
 
     /**
@@ -241,7 +250,11 @@ class stack_equiv_input extends stack_input {
      * @return string
      */
     private function maxima_to_raw_input($in) {
-        $values = stack_utils::list_to_array($in, false);
+        $delim = ',';
+        if ($this->options->get_option('decimals') === ',') {
+            $delim = ';';
+        }
+        $values = stack_utils::list_to_array($in, false, $delim);
         foreach ($values as $key => $val) {
             if (trim($val) != '') {
                 $cs = stack_ast_container::make_from_teacher_source($val);
@@ -286,7 +299,7 @@ class stack_equiv_input extends stack_input {
         $caslines = [];
         $ilines = [];
 
-        list ($secrules, $filterstoapply) = $this->validate_contents_filters($basesecurity);
+         [$secrules, $filterstoapply] = $this->validate_contents_filters($basesecurity);
         // Separate rules for inert display logic, which wraps floats with certain functions.
         $secrulesd = clone $secrules;
         $secrulesd->add_allowedwords('dispdp,displaysci');
@@ -300,9 +313,15 @@ class stack_equiv_input extends stack_input {
                 $val = '';
             }
 
-            $answer = stack_ast_container::make_from_student_source($val, '', $secrules,
-                    array_merge($filterstoapply, $this->protectfilters),
-                    [], 'Equivline', $this->options->get_option('decimals'));
+            $answer = stack_ast_container::make_from_student_source(
+                $val,
+                '',
+                $secrules,
+                array_merge($filterstoapply, $this->protectfilters),
+                [],
+                'Equivline',
+                $this->options->get_option('decimals')
+            );
 
             // Is the student permitted to include comments in their answer?
             if (!$this->extraoptions['comments'] && $answer->is_string()) {
@@ -323,9 +342,15 @@ class stack_equiv_input extends stack_input {
             $errors[] = $answer->get_errors();
 
             // Construct inert version of that.
-            $inertdisplayform = stack_ast_container::make_from_student_source($val, '', $secrulesd,
+            $inertdisplayform = stack_ast_container::make_from_student_source(
+                $val,
+                '',
+                $secrulesd,
                 array_merge($filterstoapply, $this->protectfilters),
-                [], 'Equivline', $this->options->get_option('decimals'));
+                [],
+                'Equivline',
+                $this->options->get_option('decimals')
+            );
             $inertdisplayform->get_valid();
             $ilines[] = $inertdisplayform;
         }
@@ -349,8 +374,18 @@ class stack_equiv_input extends stack_input {
      * @return string any error messages describing validation failures. An empty
      *      string if the input is valid - at least according to this test.
      */
-    protected function validation_display($answer, $lvars, $caslines, $additionalvars,
-                                            $valid, $errors, $castextprocessor, $inertdisplayform, $ilines, $notes) {
+    protected function validation_display(
+        $answer,
+        $lvars,
+        $caslines,
+        $additionalvars,
+        $valid,
+        $errors,
+        $castextprocessor,
+        $inertdisplayform,
+        $ilines,
+        $notes
+    ) {
 
         if ($this->extraoptions['firstline']) {
             $foundfirstline = false;
@@ -439,19 +474,19 @@ class stack_equiv_input extends stack_input {
             $showdomain = 'false';
         }
         $debuglist = 'false';
-        $s = 'equiv'.$this->name.':disp_stack_eval_arg('.$this->name.', '.$showlogic.', '. $showdomain.
-            ', '.$equivdebug.', '.$debuglist.')';
+        $s = 'equiv' . $this->name . ':disp_stack_eval_arg(' . $this->name . ', ' . $showlogic . ', ' . $showdomain .
+            ', ' . $equivdebug . ', ' . $debuglist . ')';
         $an = stack_ast_container::make_from_teacher_source($s);
 
         // Check we have valid overall reasoning.
-        $d = 'argvalidation:stack_eval_arg_validationp('.$this->name.')';
+        $d = 'argvalidation:stack_eval_arg_validationp(' . $this->name . ')';
         $db = stack_ast_container::make_from_teacher_source($d);
 
         $calculus = 'false';
         if ($this->extraoptions['calculus']) {
             $calculus = 'true';
         }
-        $ca = stack_ast_container::make_from_teacher_source('stack_calculus:'.$calculus);
+        $ca = stack_ast_container::make_from_teacher_source('stack_calculus:' . $calculus);
         $ca->get_valid();
 
         $tresponse = $this->maxima_to_response_array($teacheranswer);
@@ -463,7 +498,7 @@ class stack_equiv_input extends stack_input {
                 $ta = $tcontents[0];
                 if (array_key_exists(0, $caslines)) {
                     $sa = $caslines[0]->get_inputform();
-                    $fl = stack_ast_container::make_from_teacher_source('firstline:second(ATEqualComAss('.$sa.','.$ta.'))');
+                    $fl = stack_ast_container::make_from_teacher_source('firstline:second(ATEqualComAss(' . $sa . ',' . $ta . '))');
                 }
             }
         }
@@ -484,7 +519,7 @@ class stack_equiv_input extends stack_input {
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     private function comment_tag($index) {
-        return 'EQUIVCOMMENT'.$index;
+        return 'EQUIVCOMMENT' . $index;
     }
 
     /**
@@ -515,7 +550,7 @@ class stack_equiv_input extends stack_input {
      */
     public function internal_validate_parameter($parameter, $value) {
         $valid = true;
-        switch($parameter) {
+        switch ($parameter) {
             case 'boxWidth':
                 $valid = is_int($value) && $value > 0;
                 break;
@@ -537,14 +572,14 @@ class stack_equiv_input extends stack_input {
         }
         $values = stack_utils::list_to_array($value, false);
         foreach ($values as $key => $val) {
-            if (trim($val) !== '' ) {
+            if (trim($val) !== '') {
                 $cs = stack_ast_container::make_from_teacher_source($val);
                 $cs->get_valid();
-                $val = '<code>'.$cs->get_inputform(true, 0, true, $this->options->get_option('decimals')).'</code>';
+                $val = '<code>' . $cs->get_inputform(true, 0, true, $this->options->get_option('decimals')) . '</code>';
             }
             $values[$key] = $val;
         }
-        $value = "<br/>".implode("<br/>", $values);
+        $value = "<br/>" . implode("<br/>", $values);
 
         return stack_string('teacheranswershow', ['value' => $value, 'display' => $display]);
     }
@@ -582,8 +617,11 @@ class stack_equiv_input extends stack_input {
         }
 
         if (self::INVALID == $state->status) {
-            $feedback .= html_writer::tag('div', stack_string('studentValidation_invalidAnswer'),
-                    ['class' => 'alert alert-danger stackinputerror']);
+            $feedback .= html_writer::tag(
+                'span',
+                stack_string('studentValidation_invalidAnswer'),
+                ['class' => 'alert alert-danger stackinputerror']
+            );
         }
 
         if ($this->get_parameter('showValidation', 1) == 1 && !($state->lvars === '' || $state->lvars === '[]')) {

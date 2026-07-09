@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that examines whether we have a pattern like a*x*b which might have arisen from axb, indicating
  * x has been used to indicate multiplication.  Typically 23.2 x 10^b, which is why we look for an identifier x10.
@@ -28,11 +29,10 @@
  * Intended originally to be used by the unit input.
  */
 class stack_ast_filter_210_x_used_as_multiplication implements stack_cas_astfilter {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
-        $process = function($node) use (&$answernotes, &$errors) {
+        $process = function ($node) use (&$answernotes, &$errors) {
             // @codingStandardsIgnoreStart
             // The kind of patterns we want are x*(10^? * ?), x*10^?, x*(10^? / ?).
             // ([Op: *] ([Id] x), ([Op: *] ([Op: ^] ([Int] 10)
@@ -47,26 +47,28 @@ class stack_ast_filter_210_x_used_as_multiplication implements stack_cas_astfilt
             // ([Root] ([Op: *] ([Float] 523.2), ([Op: *] ([Id] x), ([Op: *] ([Op: ^] ([Int] 10), ([Int] 2)), ([Op: /] ([Id] m), ([Id] s))))))
             // @codingStandardsIgnoreEnd
 
-            if ($node instanceof MP_Operation &&
+            if (
+                $node instanceof MP_Operation &&
                     $node->op === '*' &&
                     $node->lhs instanceof MP_Identifier && $node->lhs->value === 'x' &&
                     $node->rhs instanceof MP_Operation && ($node->rhs->op === '*' || $node->rhs->op === '/') &&
                     $node->rhs->lhs instanceof MP_Operation && $node->rhs->lhs->op === '^' &&
                     // Don't use the strict === below, as MP_Integer values can be integers.
                     $node->rhs->lhs->lhs instanceof MP_Integer && $node->rhs->lhs->lhs->value == '10'
-                    ) {
+            ) {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
                 $errors[] = stack_string('Illegal_x10');
                 return false;
             }
 
-            if ($node instanceof MP_Operation &&
+            if (
+                $node instanceof MP_Operation &&
                     $node->op === '*' &&
                     $node->lhs instanceof MP_Identifier && $node->lhs->value === 'x' &&
                     $node->rhs instanceof MP_Operation && $node->rhs->op === '^' &&
                     $node->rhs->lhs instanceof MP_Integer && $node->rhs->lhs->value == '10'
-                    ) {
+            ) {
                 $node->position['invalid'] = true;
                 $answernotes[] = 'Illegal_x10';
                 $errors[] = stack_string('Illegal_x10');
@@ -87,4 +89,3 @@ class stack_ast_filter_210_x_used_as_multiplication implements stack_cas_astfilt
         return $ast;
     }
 }
-

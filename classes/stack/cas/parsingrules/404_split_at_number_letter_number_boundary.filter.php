@@ -22,6 +22,7 @@
  */
 
 
+
 /**
  * AST filter that splits variables at number-letter boundaries and
  * at letter-number. e.g. ab3c4 => ab*3*c*4.
@@ -31,11 +32,10 @@
  * Tags the stars and adds 'missing_stars' answernote.
  */
 class stack_ast_filter_404_split_at_number_letter_number_boundary implements stack_cas_astfilter {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
-        $process = function($node) use (&$answernotes) {
+        $process = function ($node) use (&$answernotes) {
             if ($node instanceof MP_Identifier && !$node->is_function_name()) {
                 // First find the boundaries.
                 $splits = [];

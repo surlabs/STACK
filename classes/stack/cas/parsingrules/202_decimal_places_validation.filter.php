@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that examines the decimal places of the leftmost
  * integer or float.
@@ -85,4 +86,3 @@ class stack_ast_filter_202_decimal_places_validation implements stack_cas_astfil
         return $ast;
     }
 }
-

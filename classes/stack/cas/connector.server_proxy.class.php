@@ -26,7 +26,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_cas_connection_server_proxy extends stack_cas_connection_base {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function guess_maxima_command($path) {
         return 'http://localhost:8080/MaximaPool/MaximaPool';
@@ -71,7 +70,7 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
                 }
             }
             if (!empty($CFG->proxyuser) && !empty($CFG->proxypassword)) {
-                curl_setopt($request, CURLOPT_PROXYUSERPWD, $CFG->proxyuser.':'.$CFG->proxypassword);
+                curl_setopt($request, CURLOPT_PROXYUSERPWD, $CFG->proxyuser . ':' . $CFG->proxypassword);
                 if (defined('CURLOPT_PROXYAUTH')) {
                     // Use any proxy authentication if required - PHP 5.1+.
                     curl_setopt($request, CURLOPT_PROXYAUTH, CURLAUTH_BASIC | CURLAUTH_NTLM);
@@ -86,7 +85,7 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
         // The servlet will return 416 if the evaluation hits the timelimit.
         if (curl_getinfo($request, CURLINFO_HTTP_CODE) != '200') {
             if (curl_getinfo($request, CURLINFO_HTTP_CODE) != '416') {
-                throw new Exception('stack_cas_connection: MaximaPool error: '.curl_getinfo($request, CURLINFO_HTTP_CODE));
+                throw new Exception('stack_cas_connection: MaximaPool error: ' . curl_getinfo($request, CURLINFO_HTTP_CODE));
             } else {
                 $timedout = true;
             }
@@ -95,7 +94,7 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
         // Did we get files?
         if (strpos(curl_getinfo($request, CURLINFO_CONTENT_TYPE), "text/plain") === false) {
             // We have to save the zip file on local disk before opening.
-            $ziptemp = @tempnam($CFG->dataroot . '/stack/tmp/', 'zip');
+            $ziptemp = tempnam($CFG->dataroot . '/stack/tmp/', 'zip');
             file_put_contents($ziptemp, $ret);
 
             // Loop over the contents of the zip.
@@ -108,11 +107,10 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
                 if ($filenameinzip === 'OUTPUT') {
                     // This one contains the output from maxima.
                     $ret = $zip->getFromIndex($i);
-
                 } else {
                     // Otherwise this is a plot.
                     $filename = $CFG->dataroot . "/stack/plots/" . $filenameinzip;
-                    @file_put_contents($filename, $zip->getFromIndex($i));
+                    file_put_contents($filename, $zip->getFromIndex($i));
                 }
             }
 
@@ -125,7 +123,7 @@ class stack_cas_connection_server_proxy extends stack_cas_connection_base {
 
         $now = microtime(true);
 
-        $this->debug->log('Timings', "Start: {$starttime}, End: {$now}, Taken = ".($now - $starttime));
+        $this->debug->log('Timings', "Start: {$starttime}, End: {$now}, Taken = " . ($now - $starttime));
 
         // Add sufficient closing ]'s to allow something to be un-parsed from the CAS.
         // WARNING: the string 'The CAS timed out' is used by the cache to serach for a timout occurance.

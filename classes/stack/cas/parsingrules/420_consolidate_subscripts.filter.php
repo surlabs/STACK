@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that consolidates subscripted atoms in the form M_1 into M1.
  * Consolidating students' input in this way makes it less likley they will be penalised
@@ -29,15 +30,13 @@
  * By design this filter only looks for very basic patterns, and ignores double subscripts.
  */
 class stack_ast_filter_420_consolidate_subscripts implements stack_cas_astfilter {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $protected = stack_cas_security::get_protected_identifiers('variable', $identifierrules->get_units());
 
-        $process = function($node) use (&$valid, &$errors, &$answernotes, $protected) {
+        $process = function ($node) use (&$valid, &$errors, &$answernotes, $protected) {
             if ($node instanceof MP_Identifier && !$node->is_function_name()) {
-
                 if (preg_match('/^[a-zA-Z]+_[0-9]+$/', $node->value, $matches)) {
                     $answernotes[] = 'consolidate_subscripts';
                     $node->value = str_replace('_', '', $node->value);

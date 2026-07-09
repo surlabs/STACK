@@ -22,9 +22,9 @@
  */
 
 
+
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_castext2_comment extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // Comments do not get anywhere ever.

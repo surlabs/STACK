@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
+
 /**
  * A block for outputting question usage level unique identifiers.
  * Primarily used for scripting and to ensure that identifiers stay
@@ -28,8 +30,6 @@
  * questions and those questions appear on the same page.
  */
 class stack_cas_castext2_quid extends stack_cas_castext2_block {
-
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         return new MP_List([new MP_String('quid'), new MP_String($this->params['id'])]);
@@ -41,8 +41,11 @@ class stack_cas_castext2_quid extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
         $id = $params[1];
         // Use the input field naming to get the question usage level id.
         // Add some extra chars to avoid likely collisions with inputs, those cannot
@@ -57,10 +60,12 @@ class stack_cas_castext2_quid extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function validate(&$errors=[], $options=[]): bool {
+    public function validate(&$errors = [], $options = []): bool {
         if (!array_key_exists('id', $this->params)) {
-            $errors[] = new $options['errclass']('quid-blocks need an id-attribute with a value.',
-                $options['context'] . '/' . $this->position['start'] . '-' . $this->position['end']);
+            $errors[] = new $options['errclass'](
+                'quid-blocks need an id-attribute with a value.',
+                $options['context'] . '/' . $this->position['start'] . '-' . $this->position['end']
+            );
             return false;
         }
 

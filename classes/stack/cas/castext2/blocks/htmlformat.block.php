@@ -22,6 +22,7 @@
  */
 
 
+
 /**
  * Special block allowing swithing the injection formating back to RAW.
  * Useful if writing something one does not want to be escaped on output
@@ -29,7 +30,6 @@
  * with injected values inside Markdown context.
  */
 class stack_cas_castext2_htmlformat extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // Basically we change the value of $format for this subtree.
@@ -70,8 +70,11 @@ class stack_cas_castext2_htmlformat extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
         $content = '';
         // Just collapse it.
         for ($i = 1; $i < count($params); $i++) {

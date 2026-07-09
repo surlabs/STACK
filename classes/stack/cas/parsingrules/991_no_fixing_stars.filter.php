@@ -21,18 +21,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that marks everything that has been fixed by inserting
  * stars as invalid.
  */
 class stack_ast_filter_991_no_fixing_stars implements stack_cas_astfilter_exclusion {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
         $stars = false;
 
-        $check = function($node) use (&$stars) {
+        $check = function ($node) use (&$stars) {
             if (isset($node->position['insertstars'])) {
                 $stars = true;
                 $node->position['invalid'] = true;

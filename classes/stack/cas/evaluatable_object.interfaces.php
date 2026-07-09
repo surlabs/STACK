@@ -22,11 +22,11 @@
  * @package    qtype_stack
  * @copyright  2019 Aalto University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
  */
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface cas_evaluatable {
-
     /**
      * Is it valid for evaluation.
      */
@@ -72,7 +72,6 @@ interface cas_evaluatable {
 // cheaper using traditional means.
 // phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface cas_value_extractor extends cas_evaluatable {
-
     /**
      * Receives the value that CAS returned when evaluating the session.
      * note that the value is the value of the key given at the end of
@@ -81,12 +80,10 @@ interface cas_value_extractor extends cas_evaluatable {
      * of evaluation.
      */
     public function set_cas_evaluated_value(MP_Node $ast);
-
 }
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface cas_raw_value_extractor extends cas_evaluatable {
-
     /**
      * Receives the value that CAS returned when evaluating the session.
      * note that the value is the value of the key given at the end of
@@ -95,13 +92,11 @@ interface cas_raw_value_extractor extends cas_evaluatable {
      * of evaluation.
      */
     public function set_cas_evaluated_value(string $value);
-
 }
 
 // Things that also come out. In the latex form.
 // phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface cas_latex_extractor extends cas_evaluatable {
-
     /**
      * Receives the value of `stack_disp()` that CAS returned when
      * evaluating the session. Note that the value is the value of the key
@@ -110,13 +105,11 @@ interface cas_latex_extractor extends cas_evaluatable {
      * the value at the point of evaluation.
      */
     public function set_cas_latex_value(string $latex);
-
 }
 
 // Things that also come out. In the old display form.
 // phpcs:ignore moodle.Commenting.MissingDocblock.Interface
 interface cas_display_value_extractor extends cas_evaluatable {
-
     /**
      * Receives the value of `stack_dispvalue()` that CAS returned when
      * evaluating the session. Note that the value is the value of the key
@@ -125,5 +118,4 @@ interface cas_display_value_extractor extends cas_evaluatable {
      * the value at the point of evaluation.
      */
     public function set_cas_display_value(string $displayvalue);
-
 }

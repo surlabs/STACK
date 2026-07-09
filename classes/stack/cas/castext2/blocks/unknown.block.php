@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
+
 /**
  * A block to turn unknown block references to something readable.
  *
@@ -30,7 +32,6 @@
  * As requested in #959.
  */
 class stack_cas_castext2_unknown extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // Unknown blocks do not get anywhere ever.
@@ -51,8 +52,10 @@ class stack_cas_castext2_unknown extends stack_cas_castext2_block {
      * Unknown blocks are always invalid.
      */
     public function validate(&$errors = [], $options = []): bool {
-        $errors[] = new $options['errclass'](stack_string('unknown_block', ['type' => $this->params[' type']]),
-                $options['context'] . '/' . $this->position['start'] . '-' . $this->position['end']);
+        $errors[] = new $options['errclass'](
+            stack_string('unknown_block', ['type' => $this->params[' type']]),
+            $options['context'] . '/' . $this->position['start'] . '-' . $this->position['end']
+        );
         return false;
     }
 }

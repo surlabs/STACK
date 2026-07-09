@@ -17,6 +17,7 @@
 
 global $CFG;
 
+
 /**
  * STACK maths output methods for using The OU's maths filter.
  *
@@ -25,7 +26,6 @@ global $CFG;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_maths_output_oumaths extends stack_maths_output_filter_base {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function initialise_delimiters() {
         $this->displaystart = '&lt;tex mode="display"&gt;';

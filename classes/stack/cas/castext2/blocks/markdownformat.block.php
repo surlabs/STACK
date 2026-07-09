@@ -23,6 +23,7 @@
 
 
 global $CFG;
+
 /**
  * Block that will simply convert anything inside it from Markdown
  * to HTML. Allowing certain types of mixed contents. Primarily exists

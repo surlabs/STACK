@@ -15,6 +15,7 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
 /**
  * A basic text-field input which is always interpreted as a Maxima string.
  * This has been requested to support the input of things like multi-base numbers.
@@ -29,6 +30,7 @@ class stack_string_input extends stack_algebraic_input {
         'hideanswer' => false,
         'allowempty' => false,
         'validator' => false,
+        'manualgraded' => false,
     ];
 
     /**
@@ -49,7 +51,7 @@ class stack_string_input extends stack_algebraic_input {
             'name'  => $fieldname,
             'id'    => $fieldname,
             'size'  => $this->parameters['boxWidth'] * 1.1,
-            'style' => 'width: '.$size.'em',
+            'style' => 'width: ' . $size . 'em',
             'autocapitalize' => 'none',
             'spellcheck'     => 'false',
             'class'     => 'maxima-string',
@@ -192,7 +194,7 @@ class stack_string_input extends stack_algebraic_input {
     public function ensure_string($ex) {
         $ex = trim($ex);
         if (substr($ex, 0, 1) !== '"') {
-            $ex = '"'.$ex.'"';
+            $ex = '"' . $ex . '"';
         }
         return $ex;
     }

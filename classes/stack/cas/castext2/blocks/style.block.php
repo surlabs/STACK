@@ -23,6 +23,7 @@
  */
 
 
+
 /**
  * A block for dealing with style in IFRAME blocks.
  *
@@ -31,7 +32,6 @@
  * the <head> instead of the <body>.
  */
 class stack_cas_castext2_style extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         $r = new MP_List([
@@ -69,8 +69,11 @@ class stack_cas_castext2_style extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
 
         $parameters = json_decode($params[1], true);
         $content    = '';

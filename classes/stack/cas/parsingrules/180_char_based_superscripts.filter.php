@@ -21,13 +21,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that check identifiers for the use of chars that are
  * considered supercript. If found converts the expression into its
  * logical equivalent, i.e.,  `x² -> x^2`
  */
 class stack_ast_filter_180_char_based_superscripts implements stack_cas_astfilter {
-
     // phpcs:ignore moodle.Commenting.VariableComment.Missing
     public static $ssmap = null;
 
@@ -37,7 +37,7 @@ class stack_ast_filter_180_char_based_superscripts implements stack_cas_astfilte
             self::$ssmap = json_decode(file_get_contents(__DIR__ . '/../../maximaparser/unicode/superscript-stack.json'), true);
         }
 
-        $process = function($node) use (&$errors, &$answernotes) {
+        $process = function ($node) use (&$errors, &$answernotes) {
             if ($node instanceof MP_Identifier && !(isset($node->position['invalid']) && $node->position['invalid'])) {
                 // Iterate over the name to detect when we move from normal to superscript.
                 $norm = true;

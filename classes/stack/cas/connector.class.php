@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
+
 /**
  * The base class for connections to Maxima.
  *
@@ -58,10 +61,10 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compute($command) {
 
-        $context = "Platform: ". stack_connection_helper::get_platform() . "\n";
-        $context .= "Maxima shell command: ". $this->command . "\n";;
-        $context .= "Maxima initial command: ". $this->initcommand . "\n";
-        $context .= "Maxima timeout: ". $this->timeout;
+        $context = "Platform: " . stack_connection_helper::get_platform() . "\n";
+        $context .= "Maxima shell command: " . $this->command . "\n";
+        $context .= "Maxima initial command: " . $this->initcommand . "\n";
+        $context .= "Maxima timeout: " . $this->timeout;
         $this->debug->log('Context used', $context);
 
         $this->debug->log('Maxima command', $command);
@@ -219,7 +222,7 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
         // Check we have a STACKSTART stamp & remove everything before it.
         $ts = substr_count($rawresult, '[STACKSTART');
         if ($ts != 1) {
-            $this->debug->log('', 'unpack_raw_result: no STACKSTART returned. Data returned was: '.$rawresult);
+            $this->debug->log('', 'unpack_raw_result: no STACKSTART returned. Data returned was: ' . $rawresult);
             return [];
         } else {
             $result = strstr($rawresult, '[STACKSTART'); // Remove everything before the [STACKSTART.
@@ -252,7 +255,6 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
                         unset($loc['error']);
                     }
                     $locals[$var] = $loc;
-
                 } else {
                     $errors["LocalVarGet$var"] = "Couldn't unpack the local variable $var from the string $valdval.";
                 }
@@ -261,7 +263,6 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
 
         // Next process and tidy up these values.
         foreach ($locals as $i => &$local) {
-
             if (isset($local['error'])) {
                 $local['error'] = $this->tidy_error($local['error']);
             } else {
@@ -271,8 +272,11 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
             $plot = isset($local['display']) ? substr_count($local['display'], '!ploturl!') : 0;
             if ($plot > 0) {
                 if ($this->wwwroothasunderscores) {
-                    $local['display'] = str_replace($this->wwwrootfixupfind,
-                            $this->wwwrootfixupreplace, $local['display']);
+                    $local['display'] = str_replace(
+                        $this->wwwrootfixupfind,
+                        $this->wwwrootfixupreplace,
+                        $local['display']
+                    );
                 }
             }
             foreach ($local as $key => $val) {
@@ -308,7 +312,6 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
                 $unparsed[$var] = $val;
                 $offset = $gb[2];
             } while (($offset >= 0) && ($offset < $rawresultfragmentlen) && ($eqpos = strpos($rawresultfragment, '=', $offset)));
-
         } else {
             $errors['PREPARSE'] = "There are no ='s in the raw output from the CAS!";
         }
@@ -353,5 +356,4 @@ abstract class stack_cas_connection_base implements stack_cas_connection {
 
         return trim(implode(" ", $errorclean));
     }
-
 }

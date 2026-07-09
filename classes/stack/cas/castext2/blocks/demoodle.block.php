@@ -23,13 +23,14 @@
 
 
 global $CFG;
+
+
 /**
  * Block that will simply convert anything inside it from Moodle-auto-format
  * to HTML. Allowing certain types of mixed contents. Primarily exists
  * to map the problem of Moodle auto-format back to the normal HTML-processing.
  */
 class stack_cas_castext2_demoodle extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // Basically mark the contents for post-processing.
@@ -51,14 +52,19 @@ class stack_cas_castext2_demoodle extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
         // First collapse the content.
         $content = [''];
         $dontproc = [];
         for ($i = 1; $i < count($params); $i++) {
-            if (is_array($params[$i]) && $params[$i][0] !== 'demoodle' &&
-                    $params[$i][0] !== 'demarkdown' && $params[$i][0] !== 'htmlformat') {
+            if (
+                is_array($params[$i]) && $params[$i][0] !== 'demoodle' &&
+                    $params[$i][0] !== 'demarkdown' && $params[$i][0] !== 'htmlformat'
+            ) {
                 $content[count($content) - 1] .= $processor->process($params[$i][0], $params[$i], $holder, $processor);
             } else if (is_array($params[$i])) {
                 $dontproc[count($content)] = true;
@@ -77,15 +83,11 @@ class stack_cas_castext2_demoodle extends stack_cas_castext2_block {
                 $r .= $v;
             } else {
                 // Parameters as they would be if this were called through the question->format_text.
-                $r .= self::text_to_html($v);
+                $r .= text_to_html($v, null, false, true);
             }
         }
 
         return $r;
-    }
-
-    private static function text_to_html(string $text): string {
-        return nl2br(str_replace(["\r\n", "\r"], "\n", $text), false);
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function

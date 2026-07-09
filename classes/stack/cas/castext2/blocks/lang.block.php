@@ -22,13 +22,13 @@
  */
 
 
+
 /**
  * A block for toggling content based on the active language.
  * The active language is defined elsewhere and exists as an variable
  * in the session.
  */
 class stack_cas_castext2_lang extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         $checks = null;
@@ -85,7 +85,7 @@ class stack_cas_castext2_lang extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function validate(&$errors=[], $options=[]): bool {
+    public function validate(&$errors = [], $options = []): bool {
         if (!array_key_exists('code', $this->params)) {
             $errors[] = new $options['errclass']('The "lang"-block needs a code atribute with a singular code or a comma ' .
                 'separated list of alternatives.', $options['context'] . '/' . $this->position['start'] . '-' .

@@ -22,11 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
+
 /**
  * Block for entity escaping CASText output. e.g. "<" -> "&lt;"
  */
 class stack_cas_castext2_entityescape extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         $r = new MP_List([new MP_String('entityescape')]);
@@ -68,8 +69,11 @@ class stack_cas_castext2_entityescape extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
         // NOTE! We now have a problem with $holder the htmlentities won't get applied to things
         // held there.
 

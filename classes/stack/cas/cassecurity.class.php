@@ -15,6 +15,7 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
 /**
  * CAS identifier related security data-lookups.
  *
@@ -321,8 +322,10 @@ class stack_cas_security {
         }
 
         // Forbid keywords and operators as variable names.
-        if (($this->has_feature($identifier, 'keyword') || $this->has_feature($identifier, 'operator')) &&
-                !$this->has_feature($identifier, 'specialallowvariable')) {
+        if (
+            ($this->has_feature($identifier, 'keyword') || $this->has_feature($identifier, 'operator')) &&
+                !$this->has_feature($identifier, 'specialallowvariable')
+        ) {
             // The special one is for 'inches'.
             return false;
         }
@@ -392,8 +395,10 @@ class stack_cas_security {
      */
     public function is_allowed_to_write(string $security, string $identifier): bool {
         // If not readable then not writable either and constants are a thing.
-        if ($this->has_feature($identifier, 'constant') ||
-            !$this->is_allowed_to_read($security, $identifier)) {
+        if (
+            $this->has_feature($identifier, 'constant') ||
+            !$this->is_allowed_to_read($security, $identifier)
+        ) {
             return false;
         }
 
@@ -457,7 +462,7 @@ class stack_cas_security {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function is_allowed_word(string $identifier, string $type='variable'): bool {
+    public function is_allowed_word(string $identifier, string $type = 'variable'): bool {
         if ($this->allowedwordsasmap == null) {
             $this->allowedwordsasmap = self::list_to_map($this->allowedwords);
         }
@@ -500,7 +505,7 @@ class stack_cas_security {
      * Checks for case variant keys of the given identifier.
      * Returns all keys that we know of that are equal in case insensitive sense.
      */
-    public function get_case_variants(string $identifier, string $type='variable'): array {
+    public function get_case_variants(string $identifier, string $type = 'variable'): array {
         static $cache = null;
         if ($cache === null) {
             $cache = [];
@@ -693,8 +698,10 @@ class stack_cas_security {
                     return $variablewithoutunits;
                 }
             }
-            $workmap = array_merge(self::get_all_with_feature('variable', $units),
-                                   self::get_all_with_feature('constant', $units));
+            $workmap = array_merge(
+                self::get_all_with_feature('variable', $units),
+                self::get_all_with_feature('constant', $units)
+            );
             if ($units === true) {
                 $variablewithunits = $workmap;
                 return $variablewithunits;
@@ -710,5 +717,4 @@ class stack_cas_security {
             return $functions;
         }
     }
-
 }

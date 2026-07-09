@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
 /**
  * A basic text-field input which is always interpreted as a Maxima string.
  * This has been requested to support the input of things like multi-base numbers.
@@ -28,6 +30,7 @@ class stack_json_input extends stack_string_input {
         'hideanswer' => false,
         'allowempty' => false,
         'validator' => false,
+        'manualgraded' => false,
     ];
 
     /**
@@ -37,8 +40,18 @@ class stack_json_input extends stack_string_input {
      * @return string any error messages describing validation failures. An empty
      *      string if the input is valid - at least according to this test.
      */
-    protected function validation_display($answer, $lvars, $caslines, $additionalvars, $valid, $errors,
-        $castextprocessor, $inertdisplayform, $ilines, $notes) {
+    protected function validation_display(
+        $answer,
+        $lvars,
+        $caslines,
+        $additionalvars,
+        $valid,
+        $errors,
+        $castextprocessor,
+        $inertdisplayform,
+        $ilines,
+        $notes
+    ) {
 
         // Always display something sensible.
         $display = $this->contents_to_maxima($this->rawcontents);

@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
+
 /**
  * STACK maths output methods for using Moodle's TeX filter.
  *
@@ -22,7 +25,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_maths_output_tex extends stack_maths_output_filter_base {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function initialise_delimiters() {
         $this->displaystart = '\[\displaystyle ';

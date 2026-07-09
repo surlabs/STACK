@@ -23,13 +23,13 @@
 
 
 global $CFG;
+
 /**
  * Block that will simply convert anything inside it from Markdown
  * to HTML. Allowing certain types of mixed contents. Primarily exists
  * to map the problem of Markdown back to the normal HTML-processing.
  */
 class stack_cas_castext2_demarkdown extends stack_cas_castext2_block {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function compile($format, $options): ?MP_Node {
         // Basically mark the contents for post-processing.
@@ -57,14 +57,19 @@ class stack_cas_castext2_demarkdown extends stack_cas_castext2_block {
     }
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function postprocess(array $params, castext2_processor $processor,
-        castext2_placeholder_holder $holder): string {
+    public function postprocess(
+        array $params,
+        castext2_processor $processor,
+        castext2_placeholder_holder $holder
+    ): string {
         // First collapse the content.
         $content = [''];
         $dontproc = [];
         for ($i = 1; $i < count($params); $i++) {
-            if (is_array($params[$i]) && $params[$i][0] !== 'demoodle' &&
-                    $params[$i][0] !== 'demarkdown' && $params[$i][0] !== 'htmlformat') {
+            if (
+                is_array($params[$i]) && $params[$i][0] !== 'demoodle' &&
+                    $params[$i][0] !== 'demarkdown' && $params[$i][0] !== 'htmlformat'
+            ) {
                 $content[count($content) - 1] .= $processor->process($params[$i][0], $params[$i], $holder, $processor);
             } else if (is_array($params[$i])) {
                 $dontproc[count($content)] = true;
@@ -82,14 +87,17 @@ class stack_cas_castext2_demarkdown extends stack_cas_castext2_block {
             if (isset($dontproc[$k])) {
                 $r .= $v;
             } else {
-                // $v = markdown_to_html($v);
+                $v = markdown_to_html($v);
                 // Note that at this point most of the interesting chars are entities.
                 // We need to revert some of those conversions to allow later processign to
                 // detect LaTeX for MathJax.
                 // This makes the text such that it should not be reprocessed in any Markdown
                 // filter luckily we will not do that.
-                $r .= str_replace(['&#92;', '&#40;', '&#91;', '&#123;', '&#41;', '&#93;', '&#125;', '&#95;'],
-                    ["\\", '(', '[', '{', ')', ']', '}', '_'], $v);
+                $r .= str_replace(
+                    ['&#92;', '&#40;', '&#91;', '&#123;', '&#41;', '&#93;', '&#125;', '&#95;'],
+                    ["\\", '(', '[', '{', ')', ']', '}', '_'],
+                    $v
+                );
             }
         }
 

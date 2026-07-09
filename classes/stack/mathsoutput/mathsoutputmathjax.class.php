@@ -15,6 +15,7 @@
 // along with Stack.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
 /**
  * STACK maths output methods for using MathJax.
  *
@@ -23,7 +24,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stack_maths_output_mathjax extends stack_maths_output_filter_base {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     protected function initialise_delimiters() {
         $this->displaywrapstart = '';

@@ -22,6 +22,7 @@
  */
 
 
+
 /**
  * A wrapper class encapsulating castext2 evaluation logic. Push one of
  * these in a cassession and be done with it. Once the session has been
@@ -35,7 +36,6 @@
  * as a handle for the castext content.
  */
 class castext2_evaluatable implements cas_raw_value_extractor {
-
     // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private $compiled = null;
     // phpcs:ignore moodle.Commenting.VariableComment.Missing
@@ -73,8 +73,11 @@ class castext2_evaluatable implements cas_raw_value_extractor {
     private $holder;
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public static function make_from_compiled(string $compiled, string $context,
-            castext2_static_replacer $statics): castext2_evaluatable {
+    public static function make_from_compiled(
+        string $compiled,
+        string $context,
+        castext2_static_replacer $statics
+    ): castext2_evaluatable {
         $r = new castext2_evaluatable();
         $r->valid = true; // The compiled fragment is assumed to be validated.
         $r->compiled = $compiled;
@@ -113,7 +116,7 @@ class castext2_evaluatable implements cas_raw_value_extractor {
     // Markdown or other types of formated stuff it will do the formating
     // and the rendered output will be FORMAT_HTML.
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-    public function get_valid($format=null, $options=null, $sec=null): bool {
+    public function get_valid($format = null, $options = null, $sec = null): bool {
         if ($this->valid !== null) {
             return $this->valid;
         }
@@ -122,20 +125,20 @@ class castext2_evaluatable implements cas_raw_value_extractor {
         }
         $ast = null;
         switch ($format) {
-            case assStackQuestionUtils::FORMAT_HTML:
+            case FORMAT_HTML:
             case castext2_parser_utils::RAWFORMAT:
                 // We do nothing to this.
                 break;
-            case assStackQuestionUtils::FORMAT_MARKDOWN:
+            case FORMAT_MARKDOWN:
             case castext2_parser_utils::MDFORMAT:
                 // We want to process it down to HTML.
                 $this->source = '[[demarkdown]]' . $this->source . '[[/demarkdown]]';
                 break;
-            case assStackQuestionUtils::FORMAT_MOODLE:
+            case FORMAT_MOODLE:
                 // We want to process it down to HTML.
                 $this->source = '[[demoodle]]' . $this->source . '[[/demoodle]]';
                 break;
-            case assStackQuestionUtils::FORMAT_PLAIN:
+            case FORMAT_PLAIN:
                 // TO-DO... We need to have something more complex for this
                 // as the formating logic will need to also stop filtering for
                 // this. Check /lib/weblib.php in Moodle.
@@ -185,8 +188,10 @@ class castext2_evaluatable implements cas_raw_value_extractor {
         }
 
         if ($this->valid) {
-            if ($this->context === '/qt' || strpos($this->context, 'scenetext') !== false ||
-                    $this->context === 'validation-questiontext') {
+            if (
+                $this->context === '/qt' || strpos($this->context, 'scenetext') !== false ||
+                    $this->context === 'validation-questiontext'
+            ) {
                 $options['in main content'] = true;
             }
 

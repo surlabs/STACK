@@ -26,6 +26,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_cas_session2 {
     /**
@@ -91,7 +92,7 @@ class stack_cas_session2 {
             if (is_int($seed)) {
                 $this->seed = $seed;
             } else {
-                throw new stack_exception('stack_cas_session: $seed must be a number.  Got "'.$seed.'"');
+                throw new stack_exception('stack_cas_session: $seed must be a number.  Got "' . $seed . '"');
             }
         } else {
             $this->seed = time();
@@ -107,8 +108,10 @@ class stack_cas_session2 {
     public function get_contextvariables(): array {
         $ret = [];
         foreach ($this->statements as $statement) {
-            if (method_exists($statement, 'is_toplevel_property') &&
-                $statement->is_toplevel_property('contextvariable')) {
+            if (
+                method_exists($statement, 'is_toplevel_property') &&
+                $statement->is_toplevel_property('contextvariable')
+            ) {
                     $ret[] = $statement;
             }
         }
@@ -325,10 +328,12 @@ class stack_cas_session2 {
             $ef = $statement->get_evaluationform();
             $line = '_EC(errcatch(' . $ef . '),';
             $key = null;
-            if (($statement instanceof cas_value_extractor ||
+            if (
+                ($statement instanceof cas_value_extractor ||
                     $statement instanceof cas_raw_value_extractor) ||
                     ($statement instanceof cas_latex_extractor) ||
-                    ($statement instanceof cas_display_value_extractor)) {
+                    ($statement instanceof cas_display_value_extractor)
+            ) {
                 // One of those that need to be collected later.
                 if (($key = $statement->get_key()) === '') {
                     $key = '__s' . $num;
@@ -338,8 +343,10 @@ class stack_cas_session2 {
             $line .= stack_utils::php_string_to_maxima_string($statement->get_source_context());
             $line .= ')';
 
-            if (($statement instanceof stack_secure_loader && $statement->get_blockexternal()) ||
-                (method_exists($statement, 'is_toplevel_property') && $statement->is_toplevel_property('blockexternal'))) {
+            if (
+                ($statement instanceof stack_secure_loader && $statement->get_blockexternal()) ||
+                (method_exists($statement, 'is_toplevel_property') && $statement->is_toplevel_property('blockexternal'))
+            ) {
                 $preblock .= 'errcatch(' . $ef . ")$\n";
             } else {
                 $command .= self::SEP . $line;
@@ -495,8 +502,10 @@ class stack_cas_session2 {
             $config = stack_utils::get_config();
             if ($usedversion !== $config->stackmaximaversion) {
                 $errors = [
-                    new $this->errclass(stack_string_error('healthchecksstackmaximaversionmismatch',
-                    ['fix' => '', 'usedversion' => $usedversion, 'expectedversion' => $config->stackmaximaversion]), ''),
+                    new $this->errclass(stack_string_error(
+                        'healthchecksstackmaximaversionmismatch',
+                        ['fix' => '', 'usedversion' => $usedversion, 'expectedversion' => $config->stackmaximaversion]
+                    ), ''),
                 ];
                 foreach ($this->statements as $num => $statement) {
                     $statement->set_cas_status($errors, [], []);

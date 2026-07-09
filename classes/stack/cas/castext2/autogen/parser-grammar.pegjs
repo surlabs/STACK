@@ -20,7 +20,6 @@
 {
 
  /** <?php
- require_once(__DIR__ . '/../CTP_classes.php');
  ?> **/
 }
 Root

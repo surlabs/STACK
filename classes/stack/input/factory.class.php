@@ -24,6 +24,7 @@
  */
 
 
+
 /**
  * Input factory.
  * Provides a convenient way to create an input of any type,
@@ -106,7 +107,7 @@ class stack_input_factory {
             }
 
             // Skip folders with dubious names.
-            $inputname = $foldername;
+            $inputname = clean_param($foldername, PARAM_PLUGIN);
             if (empty($inputname) || $inputname != $foldername) {
                 continue;
             }

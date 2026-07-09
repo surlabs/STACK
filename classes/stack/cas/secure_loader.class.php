@@ -23,12 +23,13 @@
  * @package    qtype_stack
  * @copyright  2019 Aalto University.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
  */
+
 
 
 // phpcs:ignore moodle.Commenting.MissingDocblock.Class
 class stack_secure_loader implements cas_evaluatable {
-
     // phpcs:ignore moodle.Commenting.VariableComment.Missing
     private $code;
     // phpcs:ignore moodle.Commenting.VariableComment.Missing

@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that prevents the use of any evaluation groups.
  * `(x+y)` is ok but `(x,y)` is not. Happens later if someone does
@@ -29,7 +30,7 @@
 class stack_ast_filter_505_no_evaluation_groups implements stack_cas_astfilter {
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
-        $checkfloats = function($node) use (&$answernotes, &$errors) {
+        $checkfloats = function ($node) use (&$answernotes, &$errors) {
             if ($node instanceof MP_Group && count($node->items) > 1) {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_groups', $answernotes) === false) {

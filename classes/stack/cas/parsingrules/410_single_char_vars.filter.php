@@ -21,12 +21,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that splits variable names into single characters.
  * Or longest known variable names.
  */
 class stack_ast_filter_410_single_char_vars implements stack_cas_astfilter {
-
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
@@ -36,7 +36,7 @@ class stack_ast_filter_410_single_char_vars implements stack_cas_astfilter {
         // Get the list/map of protected variable names and constants.
         $protected = stack_cas_security::get_protected_identifiers('variable', $identifierrules->get_units());
 
-        $process = function($node) use (&$valid, &$errors, &$answernotes, $protected) {
+        $process = function ($node) use (&$valid, &$errors, &$answernotes, $protected) {
             if ($node instanceof MP_Identifier && !$node->is_function_name()) {
                 // Cannot split further.
                 if (mb_strlen($node->value) === 1) {

@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that examines the significant figures of the leftmost
  * integer or float.
@@ -119,7 +120,7 @@ class stack_ast_filter_201_sig_figs_validation implements stack_cas_astfilter_pa
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public static function get_leftmost_int_or_float(MP_Node $tree) {
         $nodes = [];
-        $search = function($node) use(&$nodes) {
+        $search = function ($node) use (&$nodes) {
             if ($node instanceof MP_Float || $node instanceof MP_Integer) {
                 $nodes[] = $node;
             }
@@ -183,4 +184,3 @@ class stack_ast_filter_201_sig_figs_validation implements stack_cas_astfilter_pa
         return $thenode;
     }
 }
-

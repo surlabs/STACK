@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that prevents any function calls, including standard functions.
  * Currently this comes _after_ we split variable names into single characters in 410.
@@ -29,7 +30,7 @@ class stack_ast_filter_442_split_all_functions implements stack_cas_astfilter_ex
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
 
-        $process = function($node) use (&$hasany, &$errors) {
+        $process = function ($node) use (&$hasany, &$errors) {
             if ($node instanceof MP_FunctionCall && $node->name instanceof MP_Identifier) {
                 // Insert stars into the pattern.
                 // Probably not very sensible to end up with sin(x) -> sin*(x) but ho hum.
@@ -51,9 +52,11 @@ class stack_ast_filter_442_split_all_functions implements stack_cas_astfilter_ex
 
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function conflicts_with(string $otherfiltername): bool {
-        if ($otherfiltername === '542_no_functions_at_all' ||
+        if (
+            $otherfiltername === '542_no_functions_at_all' ||
             $otherfiltername === '541_no_unknown_functions' ||
-            $otherfiltername === '407_split_unknown_functions') {
+            $otherfiltername === '407_split_unknown_functions'
+        ) {
             return true;
         }
         return false;

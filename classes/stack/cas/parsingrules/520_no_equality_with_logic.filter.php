@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+
 /**
  * AST filter that spots statements like 'x=1 or 2' and 'x=1 and 2'.
  */
@@ -31,11 +32,12 @@ class stack_ast_filter_520_no_equality_with_logic implements stack_cas_astfilter
         // The logic is that if you have a logic operation and one side has
         // an equality operation the other one must also have such.
 
-        $process = function($node) use (&$answernotes, &$errors) {
-            if ($node instanceof MP_Operation && (($node->op === 'or') ||
+        $process = function ($node) use (&$answernotes, &$errors) {
+            if (
+                $node instanceof MP_Operation && (($node->op === 'or') ||
                 $node->op === 'and') && (($node->lhs instanceof MP_Operation) ||
-                $node->rhs instanceof MP_Operation)) {
-
+                $node->rhs instanceof MP_Operation)
+            ) {
                 $lefteq = $node->lhs instanceof MP_Operation && $node->lhs->op === '=';
                 $righteq = $node->rhs instanceof MP_Operation && $node->rhs->op === '=';
 
