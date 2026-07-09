@@ -28,7 +28,7 @@
 class stack_ast_filter_102_no_strings implements stack_cas_astfilter {
     // phpcs:ignore moodle.Commenting.MissingDocblock.Function
     public function filter(MP_Node $ast, array &$errors, array &$answernotes, stack_cas_security $identifierrules): MP_Node {
-        $checkfloats = function($node) use (&$answernotes, &$errors) {
+        $checkfloats = function ($node) use (&$answernotes, &$errors) {
             if ($node instanceof MP_String) {
                 $node->position['invalid'] = true;
                 if (array_search('Illegal_strings', $answernotes) === false) {
