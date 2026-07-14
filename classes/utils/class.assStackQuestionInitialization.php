@@ -19,3 +19,21 @@
  */
 
 require_once __DIR__ . '/ilias_moodle_functions.php';
+require_once __DIR__ . '/class.StackIframeHolder.php';
+if (!class_exists('api\\util\\StackIframeHolder', false)) {
+    class_alias(StackIframeHolder::class, 'api\\util\\StackIframeHolder');
+}
+require_once __DIR__ . '/../stack/maximaparser/MP_classes.php';
+require_once __DIR__ . '/../stack/maximaparser/lexer.base.class.php';
+require_once __DIR__ . '/../stack/maximaparser/decimal.comma.lexer.class.php';
+require_once __DIR__ . '/../stack/maximaparser/parser.options.class.php';
+require_once __DIR__ . '/../stack/maximaparser/parser.common.classes.php';
+require_once __DIR__ . '/../stack/maximaparser/autogen/parser-root.php';
+require_once __DIR__ . '/../stack/maximaparser/autogen/parser-equivline.php';
+
+$stackParsingRulesDir = __DIR__ . '/../stack/cas/parsingrules';
+require_once $stackParsingRulesDir . '/filter.interface.php';
+foreach (glob($stackParsingRulesDir . '/*.filter.php') as $stackParsingRuleFile) {
+    require_once $stackParsingRuleFile;
+}
+require_once $stackParsingRulesDir . '/504_insert_tuples_for_groups.php';

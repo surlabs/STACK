@@ -41,6 +41,13 @@ class stack_maths_output_mathjax extends stack_maths_output_filter_base {
             $filter = new \filter_mathjaxloader\text_filter($PAGE->context, []);
         } else {
             // Once Moodle 4.5 is the lowest supported version of Moodle.
+            if (!class_exists('filter_mathjaxloader')) {
+                return new class {
+                    public function filter($text) {
+                        return $text;
+                    }
+                };
+            }
             return new filter_mathjaxloader($PAGE->context, []);
         }
 
