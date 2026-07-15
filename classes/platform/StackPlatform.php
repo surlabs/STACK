@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace classes\platform;
 
-use classes\platform\ilias\StackPlatformIlias;
+use ilLanguage;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -23,32 +23,33 @@ use classes\platform\ilias\StackPlatformIlias;
  * stack@surlabs.es
  *
  *********************************************************************/
-abstract class StackPlatform
+class StackPlatform
 {
-    public static StackPlatform $platform;
+    private static bool $initialized = false;
+    private static ilLanguage $language;
 
     /**
      * Start the platform
-     * In this mathod, the platform should be initialized, the database connection should be established and the configuration should be loaded
+     * In this method, the platform should be initialized, the database connection should be established and the configuration should be loaded
      *
      * @param string $x
      * @return void
      * @throws StackException
-     * @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection
      */
     public static function initialize(string $x): void {
-        if (!isset(self::$platform)) {
-            switch ($x) {
-                case 'ilias':
-                    self::$platform = new StackPlatformIlias();
-                    break;
-                default:
-                    throw new StackException('Invalid platform selected: ' . $x . '.');
+        if (!self::$initialized) {
+            if ($x !== 'ilias') {
+                throw new StackException('Invalid platform selected: ' . $x . '.');
             }
+
+            global $DIC;
+            self::$language = $DIC->language();
 
             StackDatabase::setPlatform($x);
 
             StackConfig::load();
+
+            self::$initialized = true;
         }
     }
 
@@ -60,7 +61,7 @@ abstract class StackPlatform
      */
     public static function getTranslation(string $str, mixed $params = null): ?string
     {
-        $txt = self::$platform->getTranslationInternal($str);
+        $txt = self::$language->txt($str);
 
         if (isset($params)) {
             if (is_string($params)) $params = array($params);
@@ -77,11 +78,11 @@ abstract class StackPlatform
      */
     public static function getPlatformDefaultQuestionOptions(): ?array
     {
-        return self::$platform->getPlatformDefaultQuestionOptionsInternal();
+        return [];
     }
 
-
     /**
+     * Creates an HTML object from the contents
      * @param string $tag
      * @param string $contents
      * @param array $attributes
@@ -89,7 +90,15 @@ abstract class StackPlatform
      */
     public static function createTag(string $tag, string $contents, array $attributes = []): string
     {
-        return self::$platform->createTagInternal($tag, $contents, $attributes);
+        $html = "<" . $tag;
+
+        foreach ($attributes as $key => $value) {
+            $html .= " " . $key . "=\"" . $value . "\"";
+        }
+
+        $html .= ">" . $contents . "</" . $tag . ">";
+
+        return $html;
     }
 
     /**
@@ -98,8 +107,9 @@ abstract class StackPlatform
      * @param string $command
      * @return bool
      */
-    public static function isProxyBypass(string $command) :bool {
-        return self::$platform->isProxyBypassInternal($command);
+    public static function isProxyBypass(string $command): bool {
+        // TODO: Implement isProxyBypass() method.
+        return true;
     }
 
     /**
@@ -107,7 +117,8 @@ abstract class StackPlatform
      *
      * @return bool
      */
-    public static function isProxySettingsOk() :bool {
-        return self::$platform->isProxySettingsOkInternal();
+    public static function isProxySettingsOk(): bool {
+        // TODO: Implement isProxySettingsOk() method.
+        return true;
     }
 }

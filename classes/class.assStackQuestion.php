@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use classes\platform\ilias\StackPlatformIlias;
 use classes\platform\StackConfig;
 use classes\platform\StackException;
 use classes\platform\StackPlatform;
