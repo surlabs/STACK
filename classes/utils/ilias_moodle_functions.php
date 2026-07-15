@@ -1488,11 +1488,9 @@ if (!function_exists('clean_param')) {
 /**
  * Base class for all the types of exception we throw.
  */
-if (!class_exists('stack_exception')) {
-    class stack_exception extends StackException {
-        public function __construct($error) {
-            parent::__construct($error);
-        }
+class stack_exception extends StackException {
+    public function __construct($error) {
+        parent::__construct($error);
     }
 }
 
@@ -1714,35 +1712,33 @@ if (!function_exists('stack_string_sanitise')) {
  * This class is needed to ignore requests for pluginfile rewrites in the bulk tester
  * and possibly elsewhere, e.g. API.
  */
-if (!class_exists('stack_outofcontext_process')) {
-    class stack_outofcontext_process {
+class stack_outofcontext_process {
 
-        // phpcs:ignore moodle.Commenting.MissingDocblock.Function
-        public function __construct() {
-        }
+    // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+    public function __construct() {
+    }
 
-        /**
-         * Calls {@link question_rewrite_question_urls()} with appropriate parameters
-         * for content belonging to this question.
-         * @param string $text the content to output.
-         * @param string $component the component name (normally 'question' or 'qtype_...')
-         * @param string $filearea the name of the file area.
-         * @param int $itemid the item id.
-         * @return string the content with the URLs rewritten.
-         */
-        public function rewrite_pluginfile_urls($text, $component, $filearea, $itemid) {
-            return $text;
-        }
+    /**
+     * Calls {@link question_rewrite_question_urls()} with appropriate parameters
+     * for content belonging to this question.
+     * @param string $text the content to output.
+     * @param string $component the component name (normally 'question' or 'qtype_...')
+     * @param string $filearea the name of the file area.
+     * @param int $itemid the item id.
+     * @return string the content with the URLs rewritten.
+     */
+    public function rewrite_pluginfile_urls($text, $component, $filearea, $itemid) {
+        return $text;
+    }
 
-        /**
-         * Get the name (in the sense a HTML name="" attribute, or a $_POST variable
-         * name) to use for a question_type variable belonging to this question_attempt.
-         *
-         * @param string $varname The short form of the variable name.
-         * @return string The field name to use.
-         */
-        public function get_qt_field_name($varname) {
-            return $varname;
-        }
+    /**
+     * Get the name (in the sense a HTML name="" attribute, or a $_POST variable
+     * name) to use for a question_type variable belonging to this question_attempt.
+     *
+     * @param string $varname The short form of the variable name.
+     * @return string The field name to use.
+     */
+    public function get_qt_field_name($varname) {
+        return $varname;
     }
 }
