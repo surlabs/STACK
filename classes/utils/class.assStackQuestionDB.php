@@ -1201,30 +1201,6 @@ class assStackQuestionDB
 		}
 	}
 
-    /**
-     * @param int $question_id
-     * @param string $old_prt_name
-     * @param string $new_prt_name
-     * @return bool
-     */
-    public static function _changePrtName(int $question_id, string $old_prt_name, string $new_prt_name): bool
-    {
-        global $DIC;
-        $db = $DIC->database();
-        $query = /** @lang text */
-            'UPDATE xqcas_prts SET name = ' . $db->quote($new_prt_name, 'text') . ' WHERE question_id = ' . $db->quote($question_id, 'integer') . ' AND name = ' . $db->quote($old_prt_name, 'text');
-
-        $query_nodes = /** @lang text */
-            'UPDATE xqcas_prt_nodes SET prt_name = ' . $db->quote($new_prt_name, 'text') . ' WHERE question_id = ' . $db->quote($question_id, 'integer') . ' AND prt_name = ' . $db->quote($old_prt_name, 'text');
-
-
-        if ($db->manipulate($query) && $db->manipulate($query_nodes)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 	/**
 	 * @param int $question_id
 	 * @param string $prt_name
@@ -1966,76 +1942,6 @@ class assStackQuestionDB
 	}
 
 	/**
-	 * @param assStackQuestion $question
-	 * @param int $active_id
-	 * @param int $pass
-	 * @param string $prt_name
-	 * @param float $points
-	 * @param bool|null $authorized
-	 */
-	public static function _addPointsToPRTDBEntry(assStackQuestion $question, int $active_id, int $pass, string $prt_name, float $points, ?bool $authorized = null)
-	{
-		global $DIC;
-		$db = $DIC->database();
-
-		//Get solutionID as getCurrentSolutionResultSet is protected we have to overwrite this method
-		$query = /** @lang text */
-			"
-				SELECT solution_id
-				FROM tst_solutions
-				WHERE active_fi = %s
-				AND question_fi = %s
-				AND pass = %s
-				AND value1 = %s
-				AND authorized = %s
-			";
-
-		$result = $db->queryF(
-			$query,
-			array('integer', 'integer', 'integer', 'text', 'integer'),
-			array($active_id, $question->getId(), $pass, 'xqcas_prt_' . $prt_name . '_name', (int)$authorized)
-		);
-
-		$row = $db->fetchAssoc($result);
-		$solution_id = $row["solution_id"];
-
-		//Prepare data to update
-		$field_data = array('points' => array('float', $points));
-
-		//Get step in case it exists
-		if ($question->getStep() !== null) {
-			$field_data['step'] = array('integer', $question->getStep());
-		}
-
-		//Replace points in tst_solution solution_id entry
-		if ($solution_id != null) {
-			$db->update('tst_solutions', $field_data, array('solution_id' => array('integer', (int)$solution_id)));
-		}
-	}
-
-	/**
-	 * @param assStackQuestion $question
-	 * @param int $active_id
-	 * @param int $pass
-	 * @param string $input_name
-	 * @return void
-	 */
-	public static function _saveModelAnswerIntoDB(assStackQuestion $question, int $active_id, int $pass, string $input_name, string $input_value, string $input_display)
-	{
-		try {
-			//value1 = xqcas_input_*_model_answer, value2 = teacher answer for this question input in raw format but initialised
-			$question->saveCurrentSolution($active_id, $pass, 'xqcas_input_' . $input_name . '_model_answer', $input_value);
-
-			//value1 = xqcas_input_*_model_answer_display_, value2 = teacher answer for this question input validation display
-			$question->saveCurrentSolution($active_id, $pass, 'xqcas_input_' . $input_name . '_model_answer_display', $input_display);
-
-		} catch (stack_exception $e) {
-            global $tpl;
-            $tpl->setOnScreenMessage('failure', $e->getMessage(), true);
-		}
-	}
-
-	/**
 	 * @return assStackQuestion[]
 	 * @throws stack_exception
 	 */
@@ -2109,67 +2015,6 @@ class assStackQuestionDB
 
 		return $questions_array;
 	}
-
-    /**
-     * Manages the add PRT function from Authoring interface
-     *
-     * @param string $question_id
-     * @param string $prt_name
-     * @param stack_potentialresponse_tree_lite $prt
-     * @return bool
-     */
-    public static function _addPRTFunction(string $question_id, string $prt_name, stack_potentialresponse_tree_lite $prt): bool
-    {
-        global $DIC;
-        $db = $DIC->database();
-
-        //CREATE PRT WITH ORIGINAL PRT STATS IN NEW QUESTION
-        $db->insert("xqcas_prts", array(
-            "id" => array("integer", $db->nextId('xqcas_prts')),
-            "question_id" => array("integer", (int)$question_id),
-            "name" => array("text", $prt_name),
-            "value" => array("text", $prt->get_value()),
-            "auto_simplify" => array("integer", (int)$prt->isSimplify()),
-            "feedback_variables" => array("clob", $prt->get_feedbackvariables_keyvals()),
-            "first_node_name" => array("text", $prt->get_first_node()),
-        ));
-
-        //Manage Nodes
-        $nodes = $prt->get_nodes();
-        foreach ($nodes as $node_id => $node) {
-            //CREATE NODE WITH ORIGINAL NODE STATS IN NEW QUESTION PRT
-            $db->insert("xqcas_prt_nodes", array(
-                "id" => array("integer", $DIC->database()->nextId('xqcas_prt_nodes')),
-                "question_id" => array("integer", (int)$question_id),
-                "prt_name" => array("text", $prt_name),
-                "node_name" => array("text", $node_id),
-                "answer_test" => array("text", $node->answertest),
-                "sans" => array("text", $node->sans),
-                "tans" => array("text", $node->tans),
-                "test_options" => array("text", $node->testoptions),
-                "quiet" => array("integer", (int)$node->quiet),
-                "true_score_mode" => array("text", $node->truescoremode),
-                "true_score" => array("text", $node->truescore),
-                "true_penalty" => array("text", $node->truepenalty),
-                "true_next_node" => array("text", $node->truenextnode),
-                "true_answer_note" => array("text", $prt_name . '-' . $node_id . '-T'),
-                "true_feedback" => array("clob", $node->truefeedback),
-                "true_feedback_format" => array("integer", 0),
-                "false_score_mode" => array("text", $node->falsescoremode),
-                "false_score" => array("text", $node->falsescore),
-                "false_penalty" => array("text", $node->falsepenalty),
-                "false_next_node" => array("text", $node->falsenextnode),
-                "false_answer_note" => array("text", $prt_name . '-' . $node_id . '-F'),
-                "false_feedback" => array("clob", $node->falsefeedback),
-                "false_feedback_format" => array("integer", 0),
-            ));
-        }
-
-        global $tpl;
-        $tpl->setOnScreenMessage('info', $DIC->language()->txt("qpl_qst_xqcas_prt_created"), true);
-
-        return true;
-    }
 
 	/**
 	 * Manages the copy PRT function from Authoring interface
@@ -2248,57 +2093,6 @@ class assStackQuestionDB
 	}
 
 	/**
-	 * Manages the add node function from Authoring interface
-	 * @param string $original_question_id
-	 * @param string $original_prt_name
-	 * @param string $original_node_id
-	 * @param string $new_question_id
-	 * @param string $new_prt_name
-	 * @param string $new_node_name
-	 * @return bool
-	 */
-	public static function _addNodeFunction(string $question_id, string $prt_name, string $new_node_name): bool
-	{
-
-		$standard_prt = StackConfig::getAll('prts');
-
-		global $DIC;
-
-		//CREATE NODE WITH ORIGINAL NODE STATS IN NEW QUESTION PRT
-		$DIC->database()->insert("xqcas_prt_nodes", array(
-			"id" => array("integer", $DIC->database()->nextId('xqcas_prt_nodes')),
-			"question_id" => array("integer", (int)$question_id),
-			"prt_name" => array("text", $prt_name),
-			"node_name" => array("text", $new_node_name),
-			"answer_test" => array("text", $standard_prt['prt_node_answer_test']),
-			"sans" => array("text", "ans1"),
-			"tans" => array("text", "ta"),
-			"test_options" => array("text", $standard_prt['prt_node_options']),
-			"quiet" => array("integer", (int)$standard_prt['prt_node_quiet']),
-			"true_score_mode" => array("text", $standard_prt['prt_pos_mod']),
-			"true_score" => array("text", $standard_prt['prt_pos_score']),
-			"true_penalty" => array("text", $standard_prt['prt_pos_penalty']),
-			"true_next_node" => array("text", "-1"),
-			"true_answer_note" => array("text", $prt_name . '-' . $new_node_name . '-T'),
-			"true_feedback" => array("clob", ""),
-			"true_feedback_format" => array("integer", 0),
-			"false_score_mode" => array("text", $standard_prt['prt_neg_mod']),
-			"false_score" => array("text", $standard_prt['prt_neg_score']),
-			"false_penalty" => array("text", $standard_prt['prt_neg_penalty']),
-			"false_next_node" => array("text", "-1"),
-			"false_answer_note" => array("text", $prt_name . '-' . $new_node_name . '-F'),
-			"false_feedback" => array("clob", ""),
-			"false_feedback_format" => array("integer", 0),
-		));
-
-		unset($_SESSION['copy_node']);
-        global $tpl;
-		$tpl->setOnScreenMessage('info', $DIC->language()->txt("qpl_qst_xqcas_node_paste"), true);
-
-		return true;
-	}
-
-	/**
 	 * Manages the copy node function from Authoring interface
 	 * @param string $original_question_id
 	 * @param string $original_prt_name
@@ -2351,31 +2145,6 @@ class assStackQuestionDB
 	}
 
     /**
-     * Get the qtest results for a question
-     *
-     * @param int $question_id
-     * @return array
-     */
-    public static function _readQtestResult(int $question_id) :array
-    {
-        global $DIC;
-        $db = $DIC->database();
-
-        $query = /** @lang text */
-            'SELECT * FROM xqcas_qtest_results WHERE question_id = ' . $db->quote($question_id, 'integer');
-
-        $result = $db->query($query);
-
-        $qtest_results = array();
-
-        while ($row = $db->fetchAssoc($result)) {
-            $qtest_results[$row['test_case']] = $row;
-        }
-
-        return $qtest_results;
-    }
-
-    /**
      * Save a qtest result for a question
      *
      * @param int $question_id
@@ -2395,50 +2164,6 @@ class assStackQuestionDB
             'result' => array('text', $data['result']),
             'timerun' => array('integer', $data['timerun']),
         ));
-    }
-
-    /**
-     * Delete a qtest result for a question
-     *
-     * @param int $question_id
-     * @param int $test_case
-     * @return bool
-     */
-    public static function _deleteQtestResult(int $question_id, int $test_case): bool
-    {
-        global $DIC;
-        $db = $DIC->database();
-
-        $query = /** @lang text */
-            'DELETE FROM xqcas_qtest_results WHERE question_id = ' . $db->quote($question_id, 'integer') . ' AND test_case = ' . $db->quote($test_case, 'integer');
-
-        if ($db->manipulate($query)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Read the current active seed for a question
-     *
-     * @param int $question_id
-     * @return array|null
-     */
-    public static function _readActiveSeed(int $question_id) {
-        global $DIC;
-        $db = $DIC->database();
-
-        $res = $db->query("SELECT seed FROM xqcas_preview WHERE question_id = " .
-            $db->quote($question_id, 'integer') . " AND user_id = " .
-            $db->quote($DIC->user()->getId(), 'integer') . " AND is_active = 1");
-
-        $row = $db->fetchAssoc($res);
-        if ($row) {
-            return (string)$row['seed'];
-        }
-
-        return null;
     }
 
     /**
