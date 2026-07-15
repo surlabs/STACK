@@ -28,6 +28,7 @@ require_once __DIR__ . '/../stack/maximaparser/lexer.base.class.php';
 require_once __DIR__ . '/../stack/maximaparser/decimal.comma.lexer.class.php';
 require_once __DIR__ . '/../stack/maximaparser/parser.options.class.php';
 require_once __DIR__ . '/../stack/maximaparser/parser.common.classes.php';
+require_once __DIR__ . '/../stack/maximaparser/preparser.class.php';
 require_once __DIR__ . '/../stack/maximaparser/autogen/parser-root.php';
 require_once __DIR__ . '/../stack/maximaparser/autogen/parser-equivline.php';
 
