@@ -412,17 +412,14 @@ if (!function_exists('stack_trans')) {
  * EXCEPTIONS
  */
 
+/**
+ * A Moodle-$CFG-shaped adapter over StackConfig, consumed by classes/stack/**.
+ * Do not add config storage logic here, only key translation - StackConfig
+ * (classes/platform/StackConfig.php) is the single source of truth.
+ */
 if (!function_exists('get_config')) {
     function get_config($component = 'qtype_stack', $parameter = null) {
         global $CFG;
-
-        // Verificar si $CFG está vacío e inicializarlo si es necesario
-        if (empty((array)$CFG)) {
-            $CFG = new stdClass();
-            $CFG->wwwroot = ilUtil::_getHttpPath();
-            $CFG->dirroot = realpath(dirname(__FILE__) . '/../..');
-            $CFG->dataroot = ILIAS_WEB_DIR . "/" . CLIENT_ID . '/xqcas';
-        }
 
         // Si no se solicita un parámetro específico, devolver toda la configuración
         if ($parameter === null) {
