@@ -96,26 +96,6 @@ class assStackQuestionUtils
 	}
 
 	/**
-	 * Redo changes done by self::_debugText for a few tags
-	 * (Deprecated, not used anymore)
-	 *
-	 * @param $text
-	 * @return mixed
-	 * @deprecated
-	 */
-	public static function _solveHTMLProblems($text)
-	{
-		$text1 = str_replace('< p >', '<p>', $text);
-		$text2 = str_replace('< /p >', '</p>', $text1);
-		$text3 = str_replace('< br >', '<br>', $text2);
-		$text4 = str_replace('< /br >', '</br>', $text3);
-		$text5 = str_replace('< br / >', '<br/>', $text4);
-
-		return $text5;
-	}
-
-
-	/**
 	 * @param $array_of_seeds /array of deployed seeds
 	 * @param $seed /string created for this pass and active id
 	 * @return int chosen seed
@@ -347,37 +327,6 @@ class assStackQuestionUtils
             || preg_match('~\bstack_seed~', $text);
     }
 
-	/**
-	 * Checks wheter a question uses randomisation or not
-	 * @param $question_variables_text string the question variables
-	 * @return boolean
-	 */
-	public static function _getInputsAndPRTStructure($question_id)
-	{
-		$structure = array();
-		$structure['input'] = assStackQuestionInput::_read($question_id);
-		$structure['prt'] = assStackQuestionPRT::_read($question_id);
-
-		return $structure;
-	}
-
-	public static function _useInstantValidation()
-	{
-		global $DIC;
-		$db = $DIC->database();
-		$query = 'SELECT value FROM xqcas_configuration WHERE parameter_name = "instant_validation"';
-
-		$result = $db->query($query);
-		while ($row = $db->fetchAssoc($result)) {
-			if ((int)$row['value']) {
-				return TRUE;
-			} else {
-				return FALSE;
-			}
-		}
-
-	}
-
 	public static function _getSeedFromSTACK2019($question_id, $active_id, $pass, $first_prt_name)
 	{
         global $DIC;
@@ -604,18 +553,6 @@ class assStackQuestionUtils
 		$result = $db->query($query);
 		while ($row = $db->fetchAssoc($result)) {
 			return $row["value"];
-		}
-	}
-
-	public static function _isPhP72()
-	{
-		$php_version = phpversion();
-
-		$version = substr($php_version, 0, 3);
-		if ($version < 7.2) {
-			return FALSE;
-		} else {
-			return TRUE;
 		}
 	}
 
