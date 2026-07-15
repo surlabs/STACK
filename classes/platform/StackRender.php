@@ -271,9 +271,16 @@ class StackRender
 
         $jsconfig->purpose = $purpose;
 
+        $DIC->globalScreen()->layout()->meta()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/styles.css');
+        $DIC->globalScreen()->layout()->meta()->addJs('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/js/assStackQuestion.js');
+
+        $DIC->ctrl()->setParameterByClass('assStackQuestionGUI', 'q_id', (int) $attempt_data['question']->getId());
+        $DIC->ctrl()->setParameterByClass('assStackQuestionGUI', 'question_id', (int) $attempt_data['question']->getId());
+        $jsconfig->validate_url = $DIC->ctrl()->getLinkTargetByClass('assStackQuestionGUI', 'validateInput');
+
         if (is_array($hint_tracking)) {
             $jsconfig->hint_tracking = [
-                'track_url' => ilUtil::_getHttpPath() . '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/track_hint.php',
+                'track_url' => $DIC->ctrl()->getLinkTargetByClass('assStackQuestionGUI', 'trackHint'),
                 'question_id' => (int) ($hint_tracking['question_id'] ?? 0),
                 'active_id' => (int) ($hint_tracking['active_id'] ?? 0),
                 'pass' => (int) ($hint_tracking['pass'] ?? 0),
@@ -281,7 +288,7 @@ class StackRender
             ];
 
             $jsconfig->time_tracking = [
-                'track_url' => ilUtil::_getHttpPath() . '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/track_time.php',
+                'track_url' => $DIC->ctrl()->getLinkTargetByClass('assStackQuestionGUI', 'trackTime'),
                 'question_id' => (int) ($hint_tracking['question_id'] ?? 0),
                 'active_id' => (int) ($hint_tracking['active_id'] ?? 0),
                 'pass' => (int) ($hint_tracking['pass'] ?? 0),
@@ -289,13 +296,6 @@ class StackRender
                 'flush_interval_ms' => 15000,
             ];
         }
-
-        $DIC->globalScreen()->layout()->meta()->addCss('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/css/styles.css');
-        $DIC->globalScreen()->layout()->meta()->addJs('Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/templates/js/assStackQuestion.js');
-
-        $DIC->ctrl()->setParameterByClass('assStackQuestionGUI', 'q_id', (int) $attempt_data['question']->getId());
-        $DIC->ctrl()->setParameterByClass('assStackQuestionGUI', 'question_id', (int) $attempt_data['question']->getId());
-        $jsconfig->validate_url = $DIC->ctrl()->getLinkTargetByClass('assStackQuestionGUI', 'validateInput');
 
         if ($instant_validation) {
             //Instant Validation

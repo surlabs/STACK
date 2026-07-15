@@ -588,6 +588,100 @@ class assStackQuestionGUI extends assQuestionGUI
         exit;
     }
 
+    /**
+     * AJAX endpoint for hint-reveal tracking. This must run through ilCtrl so ILIAS is fully bootstrapped.
+     */
+    public function trackHint(): void
+    {
+        global $DIC;
+
+        header('Content-type: application/json; charset=utf-8');
+
+        $question_id = (int) ($_REQUEST['question_id'] ?? 0);
+        $active_id = (int) ($_REQUEST['active_id'] ?? 0);
+        $pass = (int) ($_REQUEST['pass'] ?? 0);
+        $user_id = (int) ($_REQUEST['user_id'] ?? 0);
+        $hint_index = (int) ($_REQUEST['hint_index'] ?? 0);
+        $hint_title = (string) ($_REQUEST['hint_title'] ?? '');
+        $event_type = (string) ($_REQUEST['event_type'] ?? '');
+        $current_user_id = (int) $DIC->user()->getId();
+        $current_pass = ilObjTest::_getPass($active_id);
+
+        $valid_event_types = ['open', 'close'];
+
+        if (
+            $question_id <= 0 ||
+            $active_id <= 0 ||
+            $pass < 0 ||
+            $hint_index <= 0 ||
+            $current_user_id <= 0 ||
+            $user_id !== $current_user_id ||
+            $current_pass !== $pass ||
+            !in_array($event_type, $valid_event_types, true)
+        ) {
+            http_response_code(400);
+            echo json_encode(['status' => 'ignored']);
+            exit;
+        }
+
+        assStackQuestionDB::_storeHintInteraction(
+            $question_id,
+            $active_id,
+            $pass,
+            $current_user_id,
+            $hint_index,
+            $hint_title,
+            $event_type
+        );
+
+        echo json_encode(['status' => 'ok']);
+        exit;
+    }
+
+    /**
+     * AJAX endpoint for question-time tracking. This must run through ilCtrl so ILIAS is fully bootstrapped.
+     */
+    public function trackTime(): void
+    {
+        global $DIC;
+
+        header('Content-type: application/json; charset=utf-8');
+
+        $question_id = (int) ($_REQUEST['question_id'] ?? 0);
+        $active_id = (int) ($_REQUEST['active_id'] ?? 0);
+        $pass = (int) ($_REQUEST['pass'] ?? 0);
+        $user_id = (int) ($_REQUEST['user_id'] ?? 0);
+        $duration_ms = (int) ($_REQUEST['duration_ms'] ?? 0);
+        $current_user_id = (int) $DIC->user()->getId();
+        $current_pass = ilObjTest::_getPass($active_id);
+
+        if (
+            $question_id <= 0 ||
+            $active_id <= 0 ||
+            $pass < 0 ||
+            $current_user_id <= 0 ||
+            $user_id !== $current_user_id ||
+            $current_pass !== $pass ||
+            $duration_ms <= 0 ||
+            $duration_ms > 3600000
+        ) {
+            http_response_code(400);
+            echo json_encode(['status' => 'ignored']);
+            exit;
+        }
+
+        assStackQuestionDB::_storeQuestionTime(
+            $question_id,
+            $active_id,
+            $pass,
+            $current_user_id,
+            $duration_ms
+        );
+
+        echo json_encode(['status' => 'ok']);
+        exit;
+    }
+
 	/* RTE, Javascript, Ajax, jQuery etc. METHODS BEGIN */
 
 	/**
