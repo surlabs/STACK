@@ -233,45 +233,6 @@ function stack_string_sanitise($str) {
 }
 
 /**
- * Used by the questiontest*.php scripts, and deploy.php, to do some initialisation
- * that is needed on all of them.
- * @return array page context, selected seed (or null), and URL parameters.
- */
-function qtype_stack_setup_question_test_page($question) {
-    $seed = optional_param('seed', null, PARAM_INT);
-    $urlparams = ['questionid' => $question->id];
-    if (!is_null($seed) && $question->has_random_variants()) {
-        $urlparams['seed'] = $seed;
-    }
-
-    // Were we given a particular context to run the question in?
-    // This affects things like filter settings, or forced theme or language.
-    if ($cmid = optional_param('cmid', 0, PARAM_INT)) {
-        $cm = get_coursemodule_from_id(false, $cmid);
-        require_login($cm->course, false, $cm);
-        $context = context_module::instance($cmid);
-        $urlparams['cmid'] = $cmid;
-
-    } else if ($courseid = optional_param('courseid', 0, PARAM_INT)) {
-        require_login($courseid);
-        $context = context_course::instance($courseid);
-        $urlparams['courseid'] = $courseid;
-
-    } else {
-        $context = $question->get_context();
-        if ($context->contextlevel == CONTEXT_MODULE) {
-            $urlparams['cmid'] = $context->instanceid;
-        } else if ($context->contextlevel == CONTEXT_COURSE) {
-            $urlparams['courseid'] = $context->instanceid;
-        } else {
-            $urlparams['courseid'] = SITEID;
-        }
-    }
-
-    return [$context, $seed, $urlparams];
-}
-
-/**
  * This class is needed to ignore requests for pluginfile rewrites in the bulk tester
  * and possibly elsewhere, e.g. API.
  */

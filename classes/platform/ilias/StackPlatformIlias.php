@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace classes\platform\ilias;
 
-use classes\core\security\StackException;
 use ilComponentFactory;
 use ilComponentRepository;
 use ilLanguage;
