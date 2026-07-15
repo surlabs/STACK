@@ -470,7 +470,7 @@ class RandomisationAndSecurityUI
      * @param object|null $result
      * @return string
      */
-    public function renderQtestResults(int $seed, int $timerun, object $result = null): string
+    public function renderQtestResults(int $seed, int $timerun, ?object $result = null): string
     {
         $html = "<div style='margin-left: 20px;'>";
         $html .= "<strong>Seed</strong>: " . $seed . "<br>";
@@ -564,7 +564,7 @@ class RandomisationAndSecurityUI
         return $this->renderCustomTest($form_action, $sections, $question);
     }
 
-    public function initCustomTest(string $description = "", array $inputs = null, array $expected = null, array $prts = null, array $question_inputs = null): array
+    public function initCustomTest(string $description = "", ?array $inputs = null, ?array $expected = null, ?array $prts = null, ?array $question_inputs = null): array
     {
 
         try {

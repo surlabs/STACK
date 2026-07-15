@@ -159,7 +159,7 @@ class Renderer extends RendererILIAS
         return $name;
     }
 
-    protected function applyValue(FormInput $component, ilTemplate|Template $tpl, callable $escape = null): void
+    protected function applyValue(FormInput $component, ilTemplate|Template $tpl, ?callable $escape = null): void
     {
         $value = $component->getValue();
         if (!is_null($escape)) {

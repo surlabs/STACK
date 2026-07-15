@@ -1036,7 +1036,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             //}
 
             $results = $this->getPrtResult($prt_name, $user_response, true);
-            $total_weight += $results->getWeight();
+            $total_weight += $results->get_weight();
             $evaluation_data['prts'][$prt_name]['prt_result'] = $results;
 
             if ($this->canExecutePrt($this->prts[$prt_name], $user_response, true)) {
@@ -1046,9 +1046,9 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
                 //Set Feedback type
                 if ($frac <= 0.0) {
                     $evaluation_data['points'][$prt_name]['status'] = 'incorrect';
-                } elseif ($frac == $results->getWeight()) {
+                } elseif ($frac == $results->get_weight()) {
                     $evaluation_data['points'][$prt_name]['status'] = 'correct';
-                } elseif ($frac < $results->getWeight()) {
+                } elseif ($frac < $results->get_weight()) {
                     $evaluation_data['points'][$prt_name]['status'] = 'partially_correct';
                 } else {
                     throw new StackException('Error,  more points given than MAX Points');
@@ -1273,7 +1273,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param bool|null $accept_valid if this is true, then we will grade things even
      * if the corresponding inputs are only VALID, and not SCORE.
      */
-    public function validateCache(array $response, bool $accept_valid = null)
+    public function validateCache(array $response, ?bool $accept_valid = null)
     {
         if (is_null($this->getLastResponse())) {
             $this->setLastResponse($response);
@@ -2956,7 +2956,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
      * @param null|string $name
      * @return stack_ast_container[]|stack_ast_container
      */
-    public function getTas(string $name = null)
+    public function getTas(?string $name = null)
     {
         if ($name) {
             return $this->tas[$name];

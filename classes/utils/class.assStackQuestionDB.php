@@ -800,7 +800,7 @@ class assStackQuestionDB
      * @param int|null $added_seed
      * @return bool
      */
-	public static function _saveStackSeeds(assStackQuestion $question, string $purpose = '', int $added_seed = null): bool
+	public static function _saveStackSeeds(assStackQuestion $question, string $purpose = '', ?int $added_seed = null): bool
 	{
         global $DIC;
         $db = $DIC->database();
@@ -1309,7 +1309,7 @@ class assStackQuestionDB
 	 * @param string $seed_id
 	 * @return bool
 	 */
-	public static function _deleteStackSeeds(int $question_id, string $seed_id = '', int $delete_seed = null): bool
+	public static function _deleteStackSeeds(int $question_id, string $seed_id = '', ?int $delete_seed = null): bool
 	{
 		global $DIC;
 		$db = $DIC->database();
@@ -1973,7 +1973,7 @@ class assStackQuestionDB
 	 * @param float $points
 	 * @param bool|null $authorized
 	 */
-	public static function _addPointsToPRTDBEntry(assStackQuestion $question, int $active_id, int $pass, string $prt_name, float $points, bool $authorized = null)
+	public static function _addPointsToPRTDBEntry(assStackQuestion $question, int $active_id, int $pass, string $prt_name, float $points, ?bool $authorized = null)
 	{
 		global $DIC;
 		$db = $DIC->database();
