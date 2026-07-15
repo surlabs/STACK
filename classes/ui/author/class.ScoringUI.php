@@ -191,7 +191,7 @@ class ScoringUI
         ];
         $data_provider = new StackScoringTableData($prt_data, $max_weight , $questionPoints);
 
-        $table_component = $this->factory->table()->data('', $columns, $data_provider)->withRequest($this->request);
+        $table_component = $this->factory->table()->data($data_provider, '', $columns)->withRequest($this->request);
         return $this->renderer->render($table_component);
     }
 }
