@@ -2640,21 +2640,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             }
         }
 
-        // Check files use match the files in the question.
-        //TODO SUR por ahora comentado
-        /*
-        $fs = get_file_storage();
-        $pat = '/@@PLUGINFILE@@([^@"])*[\'"]/';
-        $fields = array('questiontext', 'specificfeedback', 'generalfeedback', 'questiondescription');
-        foreach ($fields as $field) {
-            $text = $this->$field;
-            $filesexpected = preg_match($pat, $text ?? '');
-            $filesfound    = $fs->get_area_files($context->id, 'question', $field, $this->id);
-            if (!$filesexpected && $filesfound != array()) {
-                $errors[] = stack_string('stackfileuseerror', stack_string($field));
-            }
-        }*/
-
         // Add in any warnings.
         $errors = array_merge($errors, $this->validateWarnings(true));
 
@@ -3551,19 +3536,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
 
     /* QUESTIONTYPE METHODS END */
 
-    /**
-     * @return bool
-     */
-    public function checkMaximaConnection(): bool
-    {
-        try {
-            list($message, $genuinedebug, $result) = stack_connection_helper::stackmaxima_genuine_connect();
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
     public function getCasTextProcessor(): ?castext2_processor
     {
         return $this->cas_text_processor;
@@ -3611,18 +3583,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
                 $startrow++;
             }
         }
-
-        // Question prts
-//        if (!empty($solutions["prts"])) {
-//            ksort($solutions["prts"]);
-//            foreach ($solutions["prts"] as $prt_name => $prt) {
-//                $worksheet->setCell($startrow, 0, "Prt " . $prt_name . " points: ");
-//                $worksheet->setCell($startrow, 1, $prt["points"] ?? 0);
-//
-//                // Next line
-//                $startrow++;
-//            }
-//        }
 
         // Leave a blank line between questions
         return $startrow + 1;
