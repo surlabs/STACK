@@ -6,7 +6,7 @@ namespace classes\ui\author;
 use assStackQuestion;
 use assStackQuestionDB;
 use assStackQuestionUtils;
-use classes\platform\ilias\StackRenderIlias;
+use classes\platform\StackRenderIlias;
 use classes\platform\StackException;
 use classes\platform\StackUnitTest;
 use ilCtrl;

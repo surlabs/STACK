@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use classes\platform\ilias\StackRenderIlias;
+use classes\platform\StackRenderIlias;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Implementation\Component\Input\Field\Section;
 use classes\platform\StackException;
