@@ -32,6 +32,7 @@
  */
 
 use classes\platform\StackConfig;
+use classes\platform\StackDatabase;
 use classes\platform\StackException;
 
 if (!defined('FORMAT_HTML')) {
@@ -250,7 +251,24 @@ if (!class_exists('moodle_database')) {
 
         public function get_records(string $table, array $conditions = [], string $sort = ''): array
         {
-            $sql = 'SELECT * FROM ' . $this->map_table($table) . $this->where($conditions);
+            $mapped_table = $this->map_table($table);
+
+            if (StackDatabase::isTableAllowed($mapped_table)) {
+                $rows = StackDatabase::select($mapped_table, $conditions ?: null);
+                $records = [];
+                foreach ($rows as $row) {
+                    $obj = (object) $row;
+                    $records[$obj->id ?? count($records)] = $obj;
+                }
+                if ($sort !== '') {
+                    uasort($records, fn($a, $b) => ($a->$sort ?? null) <=> ($b->$sort ?? null));
+                }
+                return $records;
+            }
+
+            // Fallback for tables outside StackDatabase's allow-list - these are Moodle-only
+            // table names this vendored core code path never actually reaches in ILIAS.
+            $sql = 'SELECT * FROM ' . $mapped_table . $this->where($conditions);
             if ($sort !== '') {
                 $sql .= ' ORDER BY ' . $sort;
             }
@@ -265,6 +283,17 @@ if (!class_exists('moodle_database')) {
         public function insert_record(string $table, stdClass $data)
         {
             $mapped_table = $this->map_table($table);
+
+            if (StackDatabase::isTableAllowed($mapped_table)) {
+                $id = StackDatabase::nextId($mapped_table);
+                $values = ['id' => $id];
+                foreach (get_object_vars($data) as $field => $value) {
+                    $values[$field] = $value;
+                }
+                StackDatabase::insert($mapped_table, $values);
+                return $id;
+            }
+
             $id = $this->db->nextId($mapped_table);
             $values = ['id' => ['integer', $id]];
             foreach (get_object_vars($data) as $field => $value) {
@@ -276,7 +305,17 @@ if (!class_exists('moodle_database')) {
 
         public function delete_records(string $table, array $conditions = []): void
         {
-            $this->db->manipulate('DELETE FROM ' . $this->map_table($table) . $this->where($conditions));
+            $mapped_table = $this->map_table($table);
+
+            // Empty $conditions means "delete all rows" (e.g. clearing the whole CAS
+            // cache) - StackDatabase::delete() always appends a WHERE clause, so it
+            // can't express that; keep direct access for that case.
+            if ($conditions !== [] && StackDatabase::isTableAllowed($mapped_table)) {
+                StackDatabase::delete($mapped_table, $conditions);
+                return;
+            }
+
+            $this->db->manipulate('DELETE FROM ' . $mapped_table . $this->where($conditions));
         }
 
         public function delete_records_list(string $table, string $field, array $values): void
