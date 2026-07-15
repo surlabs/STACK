@@ -524,6 +524,71 @@ class assStackQuestionGUI extends assQuestionGUI
         return $errors;
 	}
 
+    /**
+     * AJAX endpoint for input validation. This must run through ilCtrl so ILIAS is fully bootstrapped.
+     */
+    public function validateInput(): void
+    {
+        global $DIC;
+
+        header('Content-type: application/json; charset=utf-8');
+
+        try {
+            $question_id = (int) ($_REQUEST['question_id'] ?? 0);
+            $input_name = (string) ($_REQUEST['input_name'] ?? '');
+            $input_value = (string) ($_REQUEST['input_value'] ?? '');
+            $purpose = (string) ($_REQUEST['purpose'] ?? 'preview');
+
+            if ($question_id <= 0 || $input_name === '') {
+                throw new InvalidArgumentException('Missing validation parameters.');
+            }
+
+            if ((int) $this->object->getId() !== $question_id) {
+                $this->object->loadFromDb($question_id);
+            }
+
+            $seed = assStackQuestionDB::_getSeed($purpose, $this->object, $DIC->user()->getId());
+
+            if (!$this->object->isInstantiated()) {
+                $this->object->questionInitialisation($seed, true);
+            }
+
+            $user_response = [$input_name => $input_value];
+            if (is_a($input = $this->object->inputs[$input_name], 'stack_matrix_input')) {
+                $user_response = $input->maxima_to_response_array($user_response[$input_name]);
+
+                if (isset($user_response)) {
+                    $temp = [];
+
+                    foreach ($user_response as $key => $value) {
+                        if (preg_match('/^' . $input_name . '_sub_(\d+)_(\d+)$/', $key, $matches)) {
+                            $temp[$matches[1]][$matches[2]] = $value;
+                        }
+                    }
+
+                    if (isset($user_response[$input_name . '_val']) &&
+                            $input->contents_to_maxima($temp) != $user_response[$input_name . '_val']) {
+                        echo json_encode(html_writer::tag(
+                            'div',
+                            $DIC->language()->txt('qpl_qst_xqcas_matrix_syntax_error'),
+                            ['class' => 'alert alert-danger stackinputerror']
+                        ));
+                        exit;
+                    }
+                }
+            }
+
+            $status = $this->object->getInputState($input_name, $user_response);
+            echo json_encode(assStackQuestionUtils::_getLatex(
+                stack_maxima_latex_tidy($this->object->inputs[$input_name]->render_validation($status, $input_name))
+            ));
+        } catch (Throwable $e) {
+            echo json_encode(html_writer::tag('div', $e->getMessage(), ['class' => 'alert alert-danger stackinputerror']));
+        }
+
+        exit;
+    }
+
 	/* RTE, Javascript, Ajax, jQuery etc. METHODS BEGIN */
 
 	/**
