@@ -688,7 +688,7 @@ class StackQuestionAuthoringUI
         $inputs["prt_value"] = $this->factory->input()->field()->text($this->plugin->txt("prt_value"), $this->plugin->txt("prt_value_info"))->withRequired(true)
             ->withValue((string) $prt->get_value());
         $inputs["simplify"] = $this->factory->input()->field()->checkbox($this->plugin->txt("prt_simplify"), $this->plugin->txt("prt_simplify_info"))
-            ->withValue($prt->isSimplify());
+            ->withValue($prt->is_simplify());
         $inputs["feedback_variables"] = $this->customFactory->textareaRTE($this->question->getId(), $this->plugin->txt("prt_feedback_variables"), $this->plugin->txt("prt_feedback_variables_info"), false)
             ->withValue($prt->get_feedbackvariables_keyvals());
 
@@ -951,7 +951,7 @@ class StackQuestionAuthoringUI
         );
 
         $nodes_from_db_array = assStackQuestionDB::_readPrtNodes($this->question->getId(), $prt_name);
-        $prt->setNodes($nodes_from_db_array);
+        $prt->set_nodes($nodes_from_db_array);
 
         $this->question->prts[$prt_name] = $prt;
 
@@ -984,7 +984,7 @@ class StackQuestionAuthoringUI
             }
         }
 
-        $prt->setNodes($new_nodes);
+        $prt->set_nodes($new_nodes);
         $this->question->prts[$prt_name] = $prt;
 
         assStackQuestionDB::_saveStackPRTs($this->question);
@@ -1041,7 +1041,7 @@ class StackQuestionAuthoringUI
 
             $nodes_from_db_array = assStackQuestionDB::_readPrtNodes($this->question->getId(), $to_prt_name);
 
-            $prt->setNodes($nodes_from_db_array);
+            $prt->set_nodes($nodes_from_db_array);
         }
 
         return true;

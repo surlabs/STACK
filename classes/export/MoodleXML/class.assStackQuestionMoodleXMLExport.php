@@ -209,7 +209,7 @@ class assStackQuestionMoodleXMLExport
 
 					$a_xml_writer->xmlElement("name", NULL, $prt->get_name());
 					$a_xml_writer->xmlElement("value", NULL, $prt->get_value());
-					$a_xml_writer->xmlElement("autosimplify", NULL, (int)$prt->isSimplify());
+					$a_xml_writer->xmlElement("autosimplify", NULL, (int)$prt->is_simplify());
 
 					$a_xml_writer->xmlStartTag("feedbackvariables", array("format" => "html"));
 					$a_xml_writer->xmlElement("text", NULL, $prt->get_feedbackvariables_keyvals());

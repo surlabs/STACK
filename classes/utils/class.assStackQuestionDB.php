@@ -673,7 +673,7 @@ class assStackQuestionDB
 					"question_id" => array("integer", $question_id),
 					"name" => array("text", $question->prts[$prt_name]->get_name()),
 					"value" => array("text", $question->prts[$prt_name]->get_value() === null ? "1.0" : $question->prts[$prt_name]->get_value()),
-					"auto_simplify" => array("integer", $question->prts[$prt_name]->isSimplify() == null ? 0 : $question->prts[$prt_name]->isSimplify()),
+					"auto_simplify" => array("integer", $question->prts[$prt_name]->is_simplify() == null ? 0 : $question->prts[$prt_name]->is_simplify()),
 					"feedback_variables" => array("clob", $question->prts[$prt_name]->get_feedbackvariables_keyvals() == null ? "" : $question->prts[$prt_name]->get_feedbackvariables_keyvals()),
 					"first_node_name" => array("text", $question->prts[$prt_name]->get_first_node() == null ? '-1' : $question->prts[$prt_name]->get_first_node()),
 				));
@@ -693,7 +693,7 @@ class assStackQuestionDB
 						"question_id" => array("integer", $question_id),
 						"name" => array("text", $question->prts[$prt_name]->get_name()),
 						"value" => array("text", $question->prts[$prt_name]->get_value() === null ? "1.0" : $question->prts[$prt_name]->get_value()),
-						"auto_simplify" => array("integer", $question->prts[$prt_name]->isSimplify() == null ? 0 : $question->prts[$prt_name]->isSimplify()),
+						"auto_simplify" => array("integer", $question->prts[$prt_name]->is_simplify() == null ? 0 : $question->prts[$prt_name]->is_simplify()),
 						"feedback_variables" => array("clob", $question->prts[$prt_name]->get_feedbackvariables_keyvals() == null ? "" : $question->prts[$prt_name]->get_feedbackvariables_keyvals()),
 						"first_node_name" => array("text", $question->prts[$prt_name]->get_first_node() == null ? '-1' : $question->prts[$prt_name]->get_first_node()),
 					)
