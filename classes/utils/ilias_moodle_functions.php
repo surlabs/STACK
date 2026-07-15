@@ -1270,13 +1270,13 @@ if (!function_exists('make_upload_directory')) {
 
 if (!function_exists('stack_plot_url_base')) {
     function stack_plot_url_base(): string {
-        return ilUtil::_getHttpPath() . '/data/' . CLIENT_ID . '/xqcas/stack/plots/';
+        return \classes\platform\StackRender::getPlotUrlBase();
     }
 }
 
 if (!function_exists('stack_cors_link')) {
     function stack_cors_link(string $filename): string {
-        return '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/corsscripts/cors.php?name=' . urlencode($filename);
+        return \classes\platform\StackRender::getCorsLink($filename);
     }
 }
 

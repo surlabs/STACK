@@ -520,4 +520,21 @@ class StackRender
             return "";
         }
     }
+
+    /**
+     * Base URL where STACK-generated CAS plot images are served from.
+     * @return string
+     */
+    public static function getPlotUrlBase(): string {
+        return ilUtil::_getHttpPath() . '/data/' . CLIENT_ID . '/xqcas/stack/plots/';
+    }
+
+    /**
+     * URL of the CORS proxy used to serve a corsscripts asset by filename.
+     * @param string $filename
+     * @return string
+     */
+    public static function getCorsLink(string $filename): string {
+        return '/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/corsscripts/cors.php?name=' . urlencode($filename);
+    }
 }
