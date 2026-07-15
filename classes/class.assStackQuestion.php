@@ -358,7 +358,6 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         $this->setLastChange(time());
         //Initialize some STACK required parameters
         require_once __DIR__ . '/utils/class.assStackQuestionInitialization.php';
-        require_once(__DIR__ . '/utils/locallib.php');
 
         if($owner === -1){
             try{

@@ -130,7 +130,6 @@ class assStackQuestionGUI extends assQuestionGUI
         }
         //Initialize some STACK required parameters
         require_once __DIR__ . '/utils/class.assStackQuestionInitialization.php';
-        require_once(__DIR__ . '/utils/locallib.php');
     }
 
     /**

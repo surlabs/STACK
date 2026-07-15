@@ -159,14 +159,6 @@ class assStackQuestionUtils
 		return $adapted_user_response;
 	}
 
-	public static function stack_output_castext($castext)
-	{
-		//require_once './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/stack/mathsoutput/mathsoutput.class.php';
-		//Initialize some STACK required parameters
-		//include_once './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/classes/utils/class.assStackQuestionInitialization.php';
-		return stack_maths::process_display_castext($castext);
-	}
-
 	/**
 	 * Returns a text with a format from the content style
 	 * @param $a_text

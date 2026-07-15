@@ -64,7 +64,6 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
         StackPlatform::initialize('ilias');
         //Initialize some STACK required parameters
         require_once __DIR__ . '/utils/class.assStackQuestionInitialization.php';
-        require_once(__DIR__ . '/utils/locallib.php');
         //Set tabs
         //try {
 

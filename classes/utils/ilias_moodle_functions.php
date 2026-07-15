@@ -32,6 +32,7 @@
  */
 
 use classes\platform\StackConfig;
+use classes\platform\StackException;
 
 if (!defined('FORMAT_HTML')) {
     define('FORMAT_HTML', 0);
@@ -1481,5 +1482,267 @@ if (!function_exists('clean_param')) {
         }
 
         return $param;
+    }
+}
+
+/**
+ * Base class for all the types of exception we throw.
+ */
+if (!class_exists('stack_exception')) {
+    class stack_exception extends StackException {
+        public function __construct($error) {
+            parent::__construct($error);
+        }
+    }
+}
+
+/**
+ * You need to call this method on the string you get from
+ * $castext->get_display_castext() before you echo it. This ensures that equations
+ * are displayed properly.
+ * @param string $castext the result of calling $castext->get_display_castext().
+ * @return string HTML ready to output.
+ */
+if (!function_exists('stack_ouput_castext')) {
+    function stack_ouput_castext($castext) {
+        return stack_maths::process_display_castext($castext);
+    }
+}
+
+/**
+ * Equivalent to get_string($key, 'qtype_stack', $a), but this method ensure that
+ * any equations in the string are displayed properly.
+ * @param string $key the string name.
+ * @param mixed $a (optional) any values to interpolate into the string.
+ * @return string the language string
+ */
+if (!function_exists('stack_string')) {
+    function stack_string($key, $a = null): string
+    {
+        global $DIC;
+        $lng = $DIC->language();
+        $user_language = $lng->getUserLanguage();
+        static $string = array();
+        static $available_languages = ["en", "de", "es"];
+
+        if (!in_array($user_language, $available_languages)) {
+            $user_language = 'de';
+        }
+
+        if (empty($string)) {
+            include_once ILIAS_ABSOLUTE_PATH . "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_$user_language.php";
+        }
+
+        try {
+            return stack_maths::process_lang_string(getString($key, $string, $a));
+        } catch (Exception $e) {
+            // Fallback to English if something goes wrong.
+            include_once ILIAS_ABSOLUTE_PATH . "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_en.php";
+
+            return stack_maths::process_lang_string(getString($key, $string, $a));
+        }
+    }
+}
+
+/**
+ * Equivalent to get_string($key, 'qtype_stack', $a), but this method ensure that
+ * any equations in the string are displayed properly and that this message is formatted as an error.
+ * @param string $key the string name.
+ * @param mixed $a (optional) any values to interpolate into the string.
+ * @return string the language string
+ */
+if (!function_exists('stack_string_error')) {
+    function stack_string_error($key, $a = null) {
+        $key = stack_maths::process_lang_string(get_string($key, 'qtype_stack', $a));
+        return '<i class="icon fa fa-exclamation-circle text-danger fa-fw " title="' . $key . '" aria-label="' .
+                $key . '"></i>' . $key;
+    }
+}
+
+/**
+ * Private helper used by the next function.
+ *
+ * @return array search => replace strings.
+ */
+if (!function_exists('get_stack_maxima_latex_replacements')) {
+    function get_stack_maxima_latex_replacements() {
+        // This is an array language code => replacements array.
+        static $replacements = [];
+
+        $lang = getLanguage();
+        if (!isset($replacements[$lang])) {
+            $replacements[$lang] = [
+                'QMCHAR' => '?',
+                '!LEFTSQ!' => '\left[',
+                '!LEFTR!' => '\left(',
+                '!RIGHTSQ!' => '\right]',
+                '!RIGHTR!' => '\right)',
+                '!ANDOR!' => stack_string('equiv_ANDOR'),
+                '!SAMEROOTS!' => stack_string('equiv_SAMEROOTS'),
+                '!MISSINGVAR!' => stack_string('equiv_MISSINGVAR'),
+                '!ASSUMEPOSVARS!' => stack_string('equiv_ASSUMEPOSVARS'),
+                '!ASSUMEPOSREALVARS!' => stack_string('equiv_ASSUMEPOSREALVARS'),
+                '!LET!' => stack_string('equiv_LET'),
+                '!AND!' => stack_string('equiv_AND'),
+                '!OR!' => stack_string('equiv_OR'),
+                '!NOT!' => stack_string('equiv_NOT'),
+                '!NAND!' => stack_string('equiv_NAND'),
+                '!NOR!' => stack_string('equiv_NOR'),
+                '!XOR!' => stack_string('equiv_XOR'),
+                '!XNOR!' => stack_string('equiv_XNOR'),
+                '!IMPLIES!' => stack_string('equiv_IMPLIES'),
+                '!BOOLTRUE!' => stack_string('true'),
+                '!BOOLFALSE!' => stack_string('false'),
+            ];
+        }
+        return $replacements[$lang];
+    }
+}
+
+/**
+ * This function tidies up LaTeX from Maxima.
+ * @param string $rawfeedback
+ * @return string
+ */
+if (!function_exists('stack_maxima_latex_tidy')) {
+    function stack_maxima_latex_tidy($latex) {
+        $replacements = get_stack_maxima_latex_replacements();
+        $latex = str_replace(array_keys($replacements), array_values($replacements), $latex);
+
+        // Also previously some spaces have been eliminated and line changes dropped.
+        // Apparently returning verbatim LaTeX was not a thing.
+        $latex = str_replace("\n ", '', $latex);
+        $latex = str_replace("\n", '', $latex);
+        // Just don't want to use regexp.
+        $latex = str_replace('    ', ' ', $latex);
+        $latex = str_replace('   ', ' ', $latex);
+        $latex = str_replace('  ', ' ', $latex);
+
+        return $latex;
+    }
+}
+
+/**
+ * This function takes a feedback string from Maxima and unpacks and translates it.
+ * @param string $rawfeedback
+ * @return string
+ */
+if (!function_exists('stack_maxima_translate')) {
+    function stack_maxima_translate($rawfeedback) {
+
+        if (strpos($rawfeedback, 'stack_trans') === false) {
+            return trim(stack_maxima_latex_tidy($rawfeedback));
+        } else {
+            $rawfeedback = str_replace('[[', '', $rawfeedback);
+            $rawfeedback = str_replace(']]', '', $rawfeedback);
+            $rawfeedback = str_replace("\n", '', $rawfeedback);
+            $rawfeedback = str_replace('\n', '', $rawfeedback);
+            $rawfeedback = str_replace('!quot!', '"', $rawfeedback);
+
+            $translated = [];
+            preg_match_all('/stack_trans\(.*?\);/', $rawfeedback, $matches);
+            $feedback = $matches[0];
+            foreach ($feedback as $fb) {
+                $fb = substr($fb, 12, -2);
+                if (strstr($fb, "' , \"") === false) {
+                    // We only have a feedback tag, with no optional arguments.
+                    $translated[] = trim(stack_string(substr($fb, 1, -1)));
+                } else {
+                    // We have a feedback tag and some optional arguments.
+                    $tag = substr($fb, 1, strpos($fb, "' , \"") - 1);
+                    $arg = substr($fb, strpos($fb, "' , \"") + 5, -2);
+                    $args = explode('"  , "', $arg);
+
+                    $a = [];
+                    for ($i = 0; $i < count($args); $i++) {
+                        $a["m{$i}"] = $args[$i];
+                    }
+                    $translated[] = trim(stack_string($tag, $a));
+                }
+            }
+
+            return stack_maxima_latex_tidy(implode(' ', $translated));
+        }
+    }
+}
+
+// phpcs:ignore moodle.Commenting.MissingDocblock.Function
+if (!function_exists('stack_maxima_format_casstring')) {
+    function stack_maxima_format_casstring($str) {
+        // Santise the output, E.g. '>' -> '&gt;'.
+        $str = stack_string_sanitise($str);
+        $str = str_replace('[[syntaxexamplehighlight]', '<span class="stacksyntaxexamplehighlight">', $str);
+        $str = str_replace('[syntaxexamplehighlight]]', '</span>', $str);
+
+        return html_writer::tag('span', $str, ['class' => 'stacksyntaxexample']);
+    }
+}
+
+// phpcs:ignore moodle.Commenting.MissingDocblock.Function
+if (!function_exists('stack_string_sanitise')) {
+    function stack_string_sanitise($str) {
+        // Students may not input strings containing specific LaTeX
+        // i.e. no math-modes due to us being unable to decide if
+        // it is safe.
+        $str = str_replace('\\[', '\\&#8203;[', $str);
+        $str = str_replace('\\]', '\\&#8203;]', $str);
+        $str = str_replace('\\(', '\\&#8203;(', $str);
+        $str = str_replace('\\)', '\\&#8203;)', $str);
+        $str = str_replace('$$', '$&#8203;$', $str);
+        // Also any script tags need to be disabled.
+        $str = str_ireplace('<script', '&lt;&#8203;script', $str);
+        $str = str_ireplace('</script>', '&lt;&#8203;/script&gt;', $str);
+        $str = str_ireplace('<iframe', '&lt;&#8203;iframe', $str);
+        $str = str_ireplace('</iframe>', '&lt;&#8203;/iframe&gt;', $str);
+        $str = str_ireplace('<style', '&lt;&#8203;style', $str);
+        $str = str_ireplace('</style>', '&lt;&#8203;/style&gt;', $str);
+        $str = str_ireplace('<div', '&lt;&#8203;div', $str);
+        $str = str_ireplace('</div>', '&lt;&#8203;/div&gt;', $str);
+        $str = str_ireplace('/>', '/&gt;', $str);
+        $str = str_ireplace('</', '&lt;/', $str);
+        $str = str_ireplace('<!--', '&lt;!--', $str);
+        $str = str_ireplace('-->', '--&gt;', $str);
+
+        $pat = ['/(on)([a-z]+[ ]*)(=)/i', '/(href)([ ]*)(=)/i', '/(src)([ ]*)(=)/i'];
+        $rep = ['on&#0;$2&#0;&#61;', 'href&#0;$2&#61;', 'src&#0;$2&#61;'];
+        $str = preg_replace($pat, $rep, $str);
+        return $str;
+    }
+}
+
+/**
+ * This class is needed to ignore requests for pluginfile rewrites in the bulk tester
+ * and possibly elsewhere, e.g. API.
+ */
+if (!class_exists('stack_outofcontext_process')) {
+    class stack_outofcontext_process {
+
+        // phpcs:ignore moodle.Commenting.MissingDocblock.Function
+        public function __construct() {
+        }
+
+        /**
+         * Calls {@link question_rewrite_question_urls()} with appropriate parameters
+         * for content belonging to this question.
+         * @param string $text the content to output.
+         * @param string $component the component name (normally 'question' or 'qtype_...')
+         * @param string $filearea the name of the file area.
+         * @param int $itemid the item id.
+         * @return string the content with the URLs rewritten.
+         */
+        public function rewrite_pluginfile_urls($text, $component, $filearea, $itemid) {
+            return $text;
+        }
+
+        /**
+         * Get the name (in the sense a HTML name="" attribute, or a $_POST variable
+         * name) to use for a question_type variable belonging to this question_attempt.
+         *
+         * @param string $varname The short form of the variable name.
+         * @return string The field name to use.
+         */
+        public function get_qt_field_name($varname) {
+            return $varname;
+        }
     }
 }
