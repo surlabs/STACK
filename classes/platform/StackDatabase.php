@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace classes\platform;
 
-use classes\platform\ilias\StackDatabaseIlias;
+use Exception;
+use ilDBInterface;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -23,8 +24,8 @@ use classes\platform\ilias\StackDatabaseIlias;
  * stack@surlabs.es
  *
  *********************************************************************/
-abstract class StackDatabase {
-    public static StackDatabase $platform;
+class StackDatabase {
+    private static ilDBInterface $db;
     private static array $allowedTables = array(
         "style_char"
     );
@@ -34,16 +35,14 @@ abstract class StackDatabase {
      * @param string $x
      * @return void
      * @throws StackException
-     * @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection
      */
     public static function setPlatform(string $x): void {
-        switch ($x) {
-            case 'ilias':
-                self::$platform = new StackDatabaseIlias();
-                break;
-            default:
-                throw new StackException('Invalid platform selected to DB: ' . $x . '.');
+        if ($x !== 'ilias') {
+            throw new StackException('Invalid platform selected to DB: ' . $x . '.');
         }
+
+        global $DIC;
+        self::$db = $DIC->database();
     }
 
     /**
@@ -61,7 +60,13 @@ abstract class StackDatabase {
             throw new StackException('Table not allowed: ' . $table);
         }
 
-        self::$platform->insertInternal($table, $data);
+        try {
+            self::$db->query("INSERT INTO " . $table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . implode(", ", array_map(function ($value) {
+                    return self::$db->quote($value);
+            }, array_values($data))) . ")");
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -79,7 +84,17 @@ abstract class StackDatabase {
             throw new StackException('Table not allowed: ' . $table);
         }
 
-        self::$platform->insertOnDuplicatedKeyInternal($table, $data);
+        try {
+            self::$db->query("INSERT INTO " . $table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . implode(", ", array_map(function ($value) {
+                    return self::$db->quote($value);
+                }, array_values($data))) . ") ON DUPLICATE KEY UPDATE " . implode(", ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($data), array_map(function ($value) {
+                    return self::$db->quote($value);
+                }, array_values($data)))));
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -98,7 +113,19 @@ abstract class StackDatabase {
             throw new StackException('Table not allowed: ' . $table);
         }
 
-        self::$platform->updateInternal($table, $data, $where);
+        try {
+            self::$db->query("UPDATE " . $table . " SET " . implode(", ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($data), array_map(function ($value) {
+                    return self::$db->quote($value);
+                }, array_values($data)))) . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($where), array_map(function ($value) {
+                    return self::$db->quote($value);
+                }, array_values($where)))));
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -116,7 +143,15 @@ abstract class StackDatabase {
             throw new StackException('Table not allowed: ' . $table);
         }
 
-        self::$platform->deleteInternal($table, $where);
+        try {
+            self::$db->query("DELETE FROM " . $table . " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+                return $key . " = " . $value;
+            }, array_keys($where), array_map(function ($value) {
+                return self::$db->quote($value);
+            }, array_values($where)))));
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -135,7 +170,29 @@ abstract class StackDatabase {
             throw new StackException('Table not allowed: ' . $table);
         }
 
-        return self::$platform->selectInternal($table, $where, $columns);
+        try {
+            $query = "SELECT " . (isset($columns) ? implode(", ", $columns) : "*") . " FROM " . $table;
+
+            if (isset($where)) {
+                $query .= " WHERE " . implode(" AND ", array_map(function ($key, $value) {
+                    return $key . " = " . $value;
+                }, array_keys($where), array_map(function ($value) {
+                    return self::$db->quote($value);
+                }, array_values($where))));
+            }
+
+            $result = self::$db->query($query);
+
+            $rows = [];
+
+            while ($row = self::$db->fetchAssoc($result)) {
+                $rows[] = $row;
+            }
+
+            return $rows;
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
@@ -150,7 +207,11 @@ abstract class StackDatabase {
             throw new StackException('Table not allowed: ' . $table);
         }
 
-        return self::$platform->nextIdInternal($table);
+        try {
+            return self::$db->nextId($table);
+        } catch (Exception $e) {
+            throw new StackException($e->getMessage());
+        }
     }
 
     /**
