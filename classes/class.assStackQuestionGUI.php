@@ -56,7 +56,7 @@ class assStackQuestionGUI extends assQuestionGUI
 	 *
 	 * @var string
 	 */
-	protected string $rte_module = "xqcas";
+	protected string $rte_module = "assesment";
 
 	/**
 	 * @var array
