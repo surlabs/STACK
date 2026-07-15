@@ -1,10 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace classes\platform;
+namespace classes\platform\ilias;
 
 use assStackQuestion;
 use assStackQuestionUtils;
+use classes\platform\StackConfig;
+use classes\platform\StackEvaluation;
+use classes\platform\StackException;
 use ilObjStyleSheet;
 use ilSetting;
 use ilUtil;
