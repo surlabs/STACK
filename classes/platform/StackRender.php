@@ -1,13 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace classes\platform\ilias;
+namespace classes\platform;
 
 use assStackQuestion;
 use assStackQuestionUtils;
-use classes\platform\StackConfig;
-use classes\platform\StackEvaluation;
-use classes\platform\StackException;
 use ilObjStyleSheet;
 use ilSetting;
 use ilUtil;
@@ -36,7 +33,7 @@ use Expand;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackRenderIlias
+class StackRender
 {
     /**
      * Generates the HTML for the feedback of a specific potential response tree.

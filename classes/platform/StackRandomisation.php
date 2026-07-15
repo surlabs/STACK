@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace classes\platform\ilias;
+namespace classes\platform;
 
 
 use assStackQuestion;
@@ -26,7 +26,7 @@ use maxima_parser_utils;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackRandomisationIlias
+class StackRandomisation
 {
 
     public static function getRandomisationData(assStackQuestion $question, ?int $force_active_seed): array

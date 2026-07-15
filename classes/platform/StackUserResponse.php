@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace classes\platform;
 
+use assStackQuestionDB;
+
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -22,10 +24,34 @@ namespace classes\platform;
  * stack@surlabs.es
  *
  *********************************************************************/
+class StackUserResponse
+{
 
-abstract class StackUserResponse {
+    /**
+     * Returns the stack user response from different sources depending on the purpose.
+     * @throws StackException
+     */
+    public static function getStackUserResponse(string $purpose, int $question_id, int $id, int $pass = 0): array
+    {
 
-    abstract public static function getStackUserResponse(string $purpose, int $question_id, int $id): array;
+        $stack_user_response = match ($purpose) {
+            'post' => self::getPostStackUserResponse(),
+            'preview' => self::getPreviewStackUserResponse($question_id, $id),
+            'test' => self::getTestStackUserResponse($question_id, $id, $pass),
+            'unit_test' => self::getUnitTestStackUserResponse(),
+            'correct' => self::getCorrectStackUserResponse(),
+            default => throw new StackException('Invalid purpose selected: ' . $purpose . '.'),
+        };
+
+        if ($stack_user_response === null) {
+            return [];
+        }
+        if (!self::checkStackUserResponse($stack_user_response)) {
+            throw new StackException('Invalid stack user response.');
+        } else {
+            return $stack_user_response;
+        }
+    }
 
     protected static function checkStackUserResponse(array $stack_user_response): bool {
         //TODO: SUR
@@ -34,6 +60,45 @@ abstract class StackUserResponse {
         } else {
             return false;
         }
+    }
+
+    public function saveStackUserResponse(array $stack_user_response, string $purpose): void
+    {
+
+        $stack_user_response = match ($purpose) {
+            'preview' => $this->getPreviewStackUserResponse(),
+            'test' => $this->getTestStackUserResponse(),
+            default => throw new StackException('Invalid purpose selected: ' . $purpose . '.'),
+        };
+
+    }
+
+    private static function getPostStackUserResponse(): array
+    {
+        $stack_user_response = array();
+        return $stack_user_response;
+    }
+
+    private static function getPreviewStackUserResponse(int $question_id, int $user_id): ?array
+    {
+        return assStackQuestionDB::_readPreviewSolution($question_id, $user_id);
+    }
+
+    private static function getTestStackUserResponse(int $question_id, int $active_id, int $pass = 0): array
+    {
+        return assStackQuestionDB::_readTestSolution($question_id, $active_id, $pass);
+    }
+
+    private static function getCorrectStackUserResponse(): array
+    {
+        $stack_user_response = array();
+        return $stack_user_response;
+    }
+
+    private static function getUnitTestStackUserResponse(): array
+    {
+        $stack_user_response = array();
+        return $stack_user_response;
     }
 
 }

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use classes\platform\ilias\StackBulktestingIlias;
+use classes\platform\StackBulktesting;
 use classes\platform\StackCheckPrt;
 use classes\platform\StackConfig;
 use classes\platform\StackPlatform;
@@ -125,7 +125,7 @@ class ilassStackQuestionConfigGUI extends ilPluginConfigGUI
                 return;
             case "bulktesting":
                 //TODO connect with the bulktesting class
-                $data = StackBulktestingIlias::doBulktesting();
+                $data = StackBulktesting::doBulktesting();
                 $sections = $this->bulktesting($data);
                 $form_action = $this->control->getLinkTargetByClass("ilassStackQuestionConfigGUI", "bulktesting");
                 $rendered = $this->renderPanel($data, $form_action, $sections);

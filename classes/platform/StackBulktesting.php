@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace classes\platform\ilias;
+namespace classes\platform;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -21,7 +21,7 @@ namespace classes\platform\ilias;
  * stack@surlabs.es
  *
  *********************************************************************/
-class StackBulktestingIlias
+class StackBulktesting
 {
 
     /**

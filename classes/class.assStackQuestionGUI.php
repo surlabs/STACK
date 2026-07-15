@@ -19,9 +19,9 @@ declare(strict_types=1);
  *
  */
 
-use classes\platform\ilias\StackRandomisationIlias;
-use classes\platform\ilias\StackRenderIlias;
-use classes\platform\ilias\StackUserResponseIlias;
+use classes\platform\StackRandomisation;
+use classes\platform\StackRender;
+use classes\platform\StackUserResponse;
 use classes\platform\StackCheckPrt;
 use classes\platform\StackException;
 use classes\platform\StackPlatform;
@@ -155,7 +155,7 @@ class assStackQuestionGUI extends assQuestionGUI
 
         $seed = assStackQuestionDB::_getSeed("test", $this->object, (int) $active_id, (int) $pass);
         $this->object->questionInitialisation($seed, true);
-        $user_response = StackUserResponseIlias::getStackUserResponse('test', (int) $this->object->getId(), (int) $active_id, (int) $pass);
+        $user_response = StackUserResponse::getStackUserResponse('test', (int) $this->object->getId(), (int) $active_id, (int) $pass);
 
         if (isset($user_response["inputs"])) {
             $temp_user_response = array();
@@ -185,7 +185,7 @@ class assStackQuestionGUI extends assQuestionGUI
         ];
 
         //Render question
-        $question = StackRenderIlias::renderQuestion($attempt_data, $display_options, "test");
+        $question = StackRender::renderQuestion($attempt_data, $display_options, "test");
         return $this->outQuestionPage('',
             $is_question_postponed,
             $active_id,
@@ -217,7 +217,7 @@ class assStackQuestionGUI extends assQuestionGUI
     {
         global $DIC, $tpl;
 
-        StackRenderIlias::ensureMathJaxLoaded();
+        StackRender::ensureMathJaxLoaded();
 
         if (!is_null($active_id) && (int)$active_id !== 0) {
             $purpose = 'test';
@@ -241,7 +241,7 @@ class assStackQuestionGUI extends assQuestionGUI
             }
         }
 
-        $user_response =  $show_correct_solution ? $this->object->getCorrectResponse() : StackUserResponseIlias::getStackUserResponse('test', (int) $this->object->getId(), (int) $active_id, (int) $pass);
+        $user_response =  $show_correct_solution ? $this->object->getCorrectResponse() : StackUserResponse::getStackUserResponse('test', (int) $this->object->getId(), (int) $active_id, (int) $pass);
 
         //Ensure evaluation has been done
         if (empty($this->object->getEvaluation())) {
@@ -276,14 +276,14 @@ class assStackQuestionGUI extends assQuestionGUI
         $display_options['feedback'] = $show_feedback;
 
         //Render question (and general feedback if solution)
-        $question = assStackQuestionUtils::_getLatex(StackRenderIlias::renderQuestion($attempt_data, $display_options, $purpose));
+        $question = assStackQuestionUtils::_getLatex(StackRender::renderQuestion($attempt_data, $display_options, $purpose));
 
         if ($show_correct_solution) {
             global $DIC;
             $question .= $DIC->ui()->renderer()->render($DIC->ui()->factory()->divider()->horizontal());
-            $question .= assStackQuestionUtils::_getLatex(StackRenderIlias::renderGeneralFeedback($attempt_data, $display_options));
+            $question .= assStackQuestionUtils::_getLatex(StackRender::renderGeneralFeedback($attempt_data, $display_options));
         } else if ($display_options['feedback']) {
-            $question .= assStackQuestionUtils::_getLatex(StackRenderIlias::renderSpecificFeedback($attempt_data, $display_options));
+            $question .= assStackQuestionUtils::_getLatex(StackRender::renderSpecificFeedback($attempt_data, $display_options));
         }
 
         if (!$show_question_only) {
@@ -310,7 +310,7 @@ class assStackQuestionGUI extends assQuestionGUI
         $user_response = [];
 
         if (!is_null($this->getPreviewSession()) && $this->getPreviewSession()->getParticipantsSolution() !== null) {
-            $user_response = StackUserResponseIlias::getStackUserResponse('preview', $this->object->getId(), $DIC->user()->getId());
+            $user_response = StackUserResponse::getStackUserResponse('preview', $this->object->getId(), $DIC->user()->getId());
         } else {
             assStackQuestionDB::_savePreviewSolution($this->object, array());
         }
@@ -354,9 +354,9 @@ class assStackQuestionGUI extends assQuestionGUI
             )
         ));*/
 
-        $question_preview = StackRenderIlias::renderQuestion($attempt_data, $display_options, "preview");
+        $question_preview = StackRender::renderQuestion($attempt_data, $display_options, "preview");
 
-        $question_preview .= StackRenderIlias::renderQuestionVariables(StackRandomisationIlias::getRandomisationData($this->object, $this->object->getSeed()));
+        $question_preview .= StackRender::renderQuestionVariables(StackRandomisation::getRandomisationData($this->object, $this->object->getSeed()));
 
         return assStackQuestionUtils::_getLatex($question_preview);
 	}
@@ -374,7 +374,7 @@ class assStackQuestionGUI extends assQuestionGUI
 
         if ($this->is_preview) {
             $seed = assStackQuestionDB::_getSeed("preview", $this->object, $DIC->user()->getId());
-            $response = StackUserResponseIlias::getStackUserResponse('preview', (int)$this->object->getId(), $DIC->user()->getId());
+            $response = StackUserResponse::getStackUserResponse('preview', (int)$this->object->getId(), $DIC->user()->getId());
         } else {
             if (array_key_exists('active_id', $DIC->http()->request()->getQueryParams())) {
                 $active_id = $DIC->http()->request()->getQueryParams()['active_id'];
@@ -384,7 +384,7 @@ class assStackQuestionGUI extends assQuestionGUI
             $pass = ilObjTest::_getPass($active_id);
 
             $seed = assStackQuestionDB::_getSeed("test", $this->object, (int)$active_id, (int)$pass);
-            $user_response = StackUserResponseIlias::getStackUserResponse('test', (int)$this->object->getId(), (int) $active_id, (int) $pass);
+            $user_response = StackUserResponse::getStackUserResponse('test', (int)$this->object->getId(), (int) $active_id, (int) $pass);
             $response = [];
             if (isset($user_response["inputs"])) {
                 $temp_user_response = array();
@@ -427,7 +427,7 @@ class assStackQuestionGUI extends assQuestionGUI
         $display_options['feedback'] = true;
 
         //Render question specific feedback
-        $specific_feedback_preview = StackRenderIlias::renderSpecificFeedback($attempt_data, $display_options);
+        $specific_feedback_preview = StackRender::renderSpecificFeedback($attempt_data, $display_options);
 
         return assStackQuestionUtils::_getLatex($specific_feedback_preview);
     }
@@ -1069,7 +1069,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		$tabs->activateSubTab('randomisation_and_security');
 		$this->getQuestionTemplate();
 
-        $deployed_seed_data = StackRandomisationIlias::getRandomisationData($this->object, $force_active_seed);
+        $deployed_seed_data = StackRandomisation::getRandomisationData($this->object, $force_active_seed);
 
         $array = array(
             'deployed_seeds' => $deployed_seed_data,
@@ -1079,7 +1079,7 @@ class assStackQuestionGUI extends assQuestionGUI
         );
         $ui = new RandomisationAndSecurityUI($array);
 
-		StackRenderIlias::ensureMathJaxLoaded();
+		StackRender::ensureMathJaxLoaded();
 
 		//Add CSS
 		//$DIC->globalScreen()->layout()->meta()->addCss($this->plugin->getStyleSheetLocation('css/qpl_xqcas_deployed_seeds_management.css'));

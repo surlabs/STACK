@@ -6,7 +6,7 @@ namespace classes\ui\author;
 use assStackQuestion;
 use assStackQuestionDB;
 use assStackQuestionUtils;
-use classes\platform\ilias\StackRenderIlias;
+use classes\platform\StackRender;
 use classes\platform\StackException;
 use classes\platform\StackUnitTest;
 use ilCtrl;
@@ -102,7 +102,7 @@ class RandomisationAndSecurityUI
         $this->language = $DIC->language();
         $this->control = $DIC->ctrl();
 
-        StackRenderIlias::ensureMathJaxLoaded();
+        StackRender::ensureMathJaxLoaded();
     }
 
     /**
@@ -270,7 +270,7 @@ class RandomisationAndSecurityUI
 
         //Render question text
         $question_text = "<div class='ilc_question_Standard'>" .
-            StackRenderIlias::renderQuestion($attempt_data, $display_options, "preview")
+            StackRender::renderQuestion($attempt_data, $display_options, "preview")
             . "</div>";
 
         $page_text = $this->factory->modal()->lightboxTextPage(assStackQuestionUtils::_getLatex($question_text), $this->language->txt("qpl_qst_xqcas_message_question_text"));
@@ -280,7 +280,7 @@ class RandomisationAndSecurityUI
             ->withOnClick($modal_text->getShowSignal());
 
         //Render general feedback
-        $general_feedback = StackRenderIlias::renderGeneralFeedback($attempt_data, $display_options);
+        $general_feedback = StackRender::renderGeneralFeedback($attempt_data, $display_options);
 
         $page_general_feedback = $this->factory->modal()->lightboxTextPage(assStackQuestionUtils::_getLatex($general_feedback), $this->language->txt("qpl_qst_xqcas_message_general_feedback"));
         $modal_general_feedback = $this->factory->modal()->lightbox($page_general_feedback);

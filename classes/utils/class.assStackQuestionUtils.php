@@ -141,8 +141,8 @@ class assStackQuestionUtils
             return ilMathJax::getInstance()->insertLatexImages($text);
         }
 
-        if (class_exists('classes\\platform\\ilias\\StackRenderIlias')) {
-            return \classes\platform\ilias\StackRenderIlias::renderLatexContent($text);
+        if (class_exists('classes\\platform\\StackRender')) {
+            return \classes\platform\StackRender::renderLatexContent($text);
         }
 
         return $text;
