@@ -243,15 +243,24 @@ class assStackQuestionDB
 			$potential_response_tree_nodes[$prt_node_name]->truescoremode = $row['true_score_mode'];
 			$potential_response_tree_nodes[$prt_node_name]->truepenalty = $row['true_penalty'];
 			$potential_response_tree_nodes[$prt_node_name]->trueanswernote = $row['true_answer_note'];
-			$potential_response_tree_nodes[$prt_node_name]->truefeedback = ilRTE::_replaceMediaObjectImageSrc($row['true_feedback'] ?? "", 1);
-			$potential_response_tree_nodes[$prt_node_name]->truefeedbackformat = (int)$row['true_feedback_format'];
+			$raw_true_feedback = ilRTE::_replaceMediaObjectImageSrc($row['true_feedback'] ?? "", 1);
+			$potential_response_tree_nodes[$prt_node_name]->truefeedbackraw = $raw_true_feedback;
+			$potential_response_tree_nodes[$prt_node_name]->truefeedbackstyle = (int)($row['true_feedback_style'] ?? 0);
+			$potential_response_tree_nodes[$prt_node_name]->truefeedback = assStackQuestionUtils::_wrapFeedbackWithStyle($raw_true_feedback, $potential_response_tree_nodes[$prt_node_name]->truefeedbackstyle);
+			// Always real HTML; the "Feedback Type" style selection used to be
+			// mistakenly stored here, which the vendored core misreads as a
+			// Moodle CASText format. See sql/dbupdate.php step <#64>.
+			$potential_response_tree_nodes[$prt_node_name]->truefeedbackformat = 0;
 
 			$potential_response_tree_nodes[$prt_node_name]->falsescore = $row['false_score'];
 			$potential_response_tree_nodes[$prt_node_name]->falsescoremode = $row['false_score_mode'];
 			$potential_response_tree_nodes[$prt_node_name]->falsepenalty = $row['false_penalty'];
 			$potential_response_tree_nodes[$prt_node_name]->falseanswernote = $row['false_answer_note'];
-			$potential_response_tree_nodes[$prt_node_name]->falsefeedback = ilRTE::_replaceMediaObjectImageSrc($row['false_feedback'] ?? "", 1);
-			$potential_response_tree_nodes[$prt_node_name]->falsefeedbackformat = (int)$row['false_feedback_format'];
+			$raw_false_feedback = ilRTE::_replaceMediaObjectImageSrc($row['false_feedback'] ?? "", 1);
+			$potential_response_tree_nodes[$prt_node_name]->falsefeedbackraw = $raw_false_feedback;
+			$potential_response_tree_nodes[$prt_node_name]->falsefeedbackstyle = (int)($row['false_feedback_style'] ?? 0);
+			$potential_response_tree_nodes[$prt_node_name]->falsefeedback = assStackQuestionUtils::_wrapFeedbackWithStyle($raw_false_feedback, $potential_response_tree_nodes[$prt_node_name]->falsefeedbackstyle);
+			$potential_response_tree_nodes[$prt_node_name]->falsefeedbackformat = 0;
 		}
 
 		if ($just_id) {
@@ -752,14 +761,16 @@ class assStackQuestionDB
                 "true_next_node" => array("text", $node->truenextnode),
                 "true_answer_note" => array("text", $node->trueanswernote),
                 "true_feedback" => array("clob", ilRTE::_replaceMediaObjectImageSrc($node->truefeedback)),
-                "true_feedback_format" => array("integer", (int) $node->truefeedbackformat),
+                "true_feedback_style" => array("integer", (int) ($node->truefeedbackstyle ?? 0)),
+                "true_feedback_format" => array("integer", 0),
                 "false_score_mode" => array("text", $node->falsescoremode),
                 "false_score" => array("text", $node->falsescore),
                 "false_penalty" => array("text", $node->falsepenalty),
                 "false_next_node" => array("text", $node->falsenextnode),
                 "false_answer_note" => array("text", $node->falseanswernote),
                 "false_feedback" => array("clob", ilRTE::_replaceMediaObjectImageSrc($node->falsefeedback)),
-                "false_feedback_format" => array("integer", (int) $node->falsefeedbackformat),
+                "false_feedback_style" => array("integer", (int) ($node->falsefeedbackstyle ?? 0)),
+                "false_feedback_format" => array("integer", 0),
 			));
 		} else {
 			//UPDATE
@@ -781,14 +792,16 @@ class assStackQuestionDB
                     "true_next_node" => array("text", $node->truenextnode),
                     "true_answer_note" => array("text", $node->trueanswernote),
                     "true_feedback" => array("clob", ilRTE::_replaceMediaObjectImageSrc($node->truefeedback)),
-                    "true_feedback_format" => array("integer", (int) $node->truefeedbackformat),
+                    "true_feedback_style" => array("integer", (int) ($node->truefeedbackstyle ?? 0)),
+                    "true_feedback_format" => array("integer", 0),
                     "false_score_mode" => array("text", $node->falsescoremode),
                     "false_score" => array("text", $node->falsescore),
                     "false_penalty" => array("text", $node->falsepenalty),
                     "false_next_node" => array("text", $node->falsenextnode),
                     "false_answer_note" => array("text", $node->falseanswernote),
                     "false_feedback" => array("clob", ilRTE::_replaceMediaObjectImageSrc($node->falsefeedback)),
-                    "false_feedback_format" => array("integer", (int) $node->falsefeedbackformat),
+                    "false_feedback_style" => array("integer", (int) ($node->falsefeedbackstyle ?? 0)),
+                    "false_feedback_format" => array("integer", 0),
 				)
 			);
 		}
@@ -1262,6 +1275,7 @@ class assStackQuestionDB
                 "true_next_node" => array("text", "-1"),
                 "true_answer_note" => array("text", $prt_name . '-' . $node_name . '-T'),
                 "true_feedback" => array("clob", ""),
+                "true_feedback_style" => array("integer", 0),
                 "true_feedback_format" => array("integer", 0),
                 "false_score_mode" => array("text", "="),
                 "false_score" => array("text", "0"),
@@ -1269,6 +1283,7 @@ class assStackQuestionDB
                 "false_next_node" => array("text", "-1"),
                 "false_answer_note" => array("text", $prt_name . '-' . $node_name . '-F'),
                 "false_feedback" => array("clob", ""),
+                "false_feedback_style" => array("integer", 0),
                 "false_feedback_format" => array("integer", 0),
                 "description" => array("clob", "")
             ));
@@ -2067,14 +2082,16 @@ class assStackQuestionDB
                     "true_penalty" => array("text", $node->truepenalty),
                     "true_next_node" => array("text", $node->truenextnode),
                     "true_answer_note" => array("text", $new_prt_name . '-' . $node_id . '-T'),
-                    "true_feedback" => array("clob", $node->truefeedback),
+                    "true_feedback" => array("clob", $node->truefeedbackraw),
+                    "true_feedback_style" => array("integer", (int) ($node->truefeedbackstyle ?? 0)),
                     "true_feedback_format" => array("integer", 0),
                     "false_score_mode" => array("text", $node->falsescoremode),
                     "false_score" => array("text", $node->falsescore),
                     "false_penalty" => array("text", $node->falsepenalty),
                     "false_next_node" => array("text", $node->falsenextnode),
                     "false_answer_note" => array("text", $new_prt_name . '-' . $node_id . '-F'),
-                    "false_feedback" => array("clob", $node->falsefeedback),
+                    "false_feedback" => array("clob", $node->falsefeedbackraw),
+                    "false_feedback_style" => array("integer", (int) ($node->falsefeedbackstyle ?? 0)),
                     "false_feedback_format" => array("integer", 0),
                 ));
             }
@@ -2126,15 +2143,17 @@ class assStackQuestionDB
 			"true_penalty" => array("text", $db_original_node->truepenalty),
 			"true_next_node" => array("text", "-1"),
 			"true_answer_note" => array("text", $new_prt_name . '-' . $new_node_name . '-T'),
-			"true_feedback" => array("clob", $db_original_node->truefeedback),
-			"true_feedback_format" => array("integer", $db_original_node->truefeedbackformat),
+			"true_feedback" => array("clob", $db_original_node->truefeedbackraw),
+			"true_feedback_style" => array("integer", (int) ($db_original_node->truefeedbackstyle ?? 0)),
+			"true_feedback_format" => array("integer", 0),
 			"false_score_mode" => array("text", $db_original_node->falsescoremode),
 			"false_score" => array("text", $db_original_node->falsescore),
 			"false_penalty" => array("text", $db_original_node->falsepenalty),
 			"false_next_node" => array("text", "-1"),
 			"false_answer_note" => array("text", $new_prt_name . '-' . $new_node_name . '-F'),
-			"false_feedback" => array("clob", $db_original_node->falsefeedback),
-			"false_feedback_format" => array("integer", $db_original_node->falsefeedbackformat),
+			"false_feedback" => array("clob", $db_original_node->falsefeedbackraw),
+			"false_feedback_style" => array("integer", (int) ($db_original_node->falsefeedbackstyle ?? 0)),
+			"false_feedback_format" => array("integer", 0),
 		));
 
 		unset($_SESSION['copy_node']);

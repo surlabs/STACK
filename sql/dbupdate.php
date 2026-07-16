@@ -1389,3 +1389,28 @@ if (!$db->indexExistsByFields('xqcas_time_tracking', ['user_id', 'updated_at']))
     $db->addIndex('xqcas_time_tracking', ['user_id', 'updated_at'], 'qt2');
 }
 ?>
+<#64>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if ($db->tableExists('xqcas_prt_nodes')) {
+    if (!$db->tableColumnExists("xqcas_prt_nodes", "true_feedback_style")) {
+        $db->addTableColumn("xqcas_prt_nodes", "true_feedback_style", array('type' => 'integer', 'length' => 2, 'notnull' => true, 'default' => 0));
+    }
+    if (!$db->tableColumnExists("xqcas_prt_nodes", "false_feedback_style")) {
+        $db->addTableColumn("xqcas_prt_nodes", "false_feedback_style", array('type' => 'integer', 'length' => 2, 'notnull' => true, 'default' => 0));
+    }
+
+    // Data-heal: the "Feedback Type" dropdown (Style 1..6) was, until this update,
+    // mistakenly written into true/false_feedback_format, which the vendored STACK
+    // core interprets as a Moodle CASText FORMAT (1 = Markdown -> [[demarkdown]],
+    // which fatals because markdown_to_html() does not exist in this codebase;
+    // 2 = Moodle format -> [[demoodle]], which mangles/blanks output). Move any
+    // non-zero value into the new *_style column and reset format to 0
+    // (FORMAT_HTML), which is always correct here since ILIAS's RTE only ever
+    // produces HTML, never Markdown/Moodle format.
+    $db->manipulate("UPDATE xqcas_prt_nodes SET true_feedback_style = true_feedback_format, true_feedback_format = 0 WHERE true_feedback_format <> 0");
+    $db->manipulate("UPDATE xqcas_prt_nodes SET false_feedback_style = false_feedback_format, false_feedback_format = 0 WHERE false_feedback_format <> 0");
+}
+?>

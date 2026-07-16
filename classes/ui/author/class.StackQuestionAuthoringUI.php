@@ -270,7 +270,9 @@ class StackQuestionAuthoringUI
                 $node_data->truenextnode = $node["feedback"]["positive"]["next_node"];
                 $node_data->trueanswernote = $node["feedback"]["positive"]["answernote"];
                 $node_data->truefeedback = $node["feedback"]["positive"]["specific_feedback"];
-                $node_data->truefeedbackformat = $node["feedback"]["positive"]["feedback_class"];
+                $node_data->truefeedbackraw = $node["feedback"]["positive"]["specific_feedback"];
+                $node_data->truefeedbackstyle = (int) $node["feedback"]["positive"]["feedback_class"];
+                $node_data->truefeedbackformat = 0;
 
                 $node_data->falsescoremode = $node["feedback"]["negative"]["mode"];
                 $node_data->falsescore = $node["feedback"]["negative"]["score"];
@@ -278,7 +280,9 @@ class StackQuestionAuthoringUI
                 $node_data->falsenextnode = $node["feedback"]["negative"]["next_node"];
                 $node_data->falseanswernote = $node["feedback"]["negative"]["answernote"];
                 $node_data->falsefeedback = $node["feedback"]["negative"]["specific_feedback"];
-                $node_data->falsefeedbackformat = $node["feedback"]["negative"]["feedback_class"];
+                $node_data->falsefeedbackraw = $node["feedback"]["negative"]["specific_feedback"];
+                $node_data->falsefeedbackstyle = (int) $node["feedback"]["negative"]["feedback_class"];
+                $node_data->falsefeedbackformat = 0;
 
                 $prt_data->nodes[$node_name] = $node_data;
             }
@@ -813,9 +817,9 @@ class StackQuestionAuthoringUI
         $inputs["answernote"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_pos_answernote"), $this->plugin->txt("prt_node_pos_answernote_info"))->withRequired(true)
             ->withValue($node->trueanswernote);
         $inputs["specific_feedback"] = $this->customFactory->textareaRTE($this->question->getId(), $this->plugin->txt("prt_node_pos_specific_feedback"), $this->plugin->txt("prt_node_pos_specific_feedback_info"))
-            ->withValue($node->truefeedback);
+            ->withValue($node->truefeedbackraw ?? $node->truefeedback ?? '');
         $inputs["feedback_class"] = $this->factory->input()->field()->select($this->plugin->txt('prt_node_pos_feedback_class'), $this->getFeedbackFormatOptions(), $this->plugin->txt('prt_node_pos_feedback_class_info'))->withRequired(true)
-            ->withValue($node->truefeedbackformat);
+            ->withValue($node->truefeedbackstyle ?? 0);
 
         return $inputs;
     }
@@ -847,9 +851,9 @@ class StackQuestionAuthoringUI
         $inputs["answernote"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_neg_answernote"), $this->plugin->txt("prt_node_neg_answernote_info"))->withRequired(true)
             ->withValue($node->falseanswernote);
         $inputs["specific_feedback"] = $this->customFactory->textareaRTE($this->question->getId(), $this->plugin->txt("prt_node_neg_specific_feedback"), $this->plugin->txt("prt_node_neg_specific_feedback_info"))
-            ->withValue($node->falsefeedback);
+            ->withValue($node->falsefeedbackraw ?? $node->falsefeedback ?? '');
         $inputs["feedback_class"] = $this->factory->input()->field()->select($this->plugin->txt('prt_node_neg_feedback_class'), $this->getFeedbackFormatOptions(), $this->plugin->txt('prt_node_neg_feedback_class_info'))->withRequired(true)
-            ->withValue($node->falsefeedbackformat);
+            ->withValue($node->falsefeedbackstyle ?? 0);
 
         return $inputs;
     }

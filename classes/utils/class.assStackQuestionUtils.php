@@ -19,6 +19,8 @@
  */
 
 
+use classes\platform\StackConfig;
+
 /**
  * Class with STATIC METHODS used in the whole STACK Question
  *
@@ -177,6 +179,35 @@ class assStackQuestionUtils
 		while ($row = $db->fetchAssoc($result)) {
 			return $row["value"];
 		}
+	}
+
+	/**
+	 * Resolves an author-selected node feedback "style" (0 = default/none, 1-6 =
+	 * a slot configured under Administration > STACK plugin > Feedback Styles
+	 * Settings) into the wrapper StackRender::renderPRTFeedback() already knows
+	 * how to recognize (str_contains($feedback, "ilc_section_")) to load the
+	 * matching content stylesheet CSS instead of the plain success/failure
+	 * message box.
+	 * @param string $html raw, author-entered feedback HTML for this branch
+	 * @param int $style_id 0 = no style; 1-6 = configured style slot
+	 * @return string
+	 */
+	public static function _wrapFeedbackWithStyle(string $html, int $style_id): string
+	{
+		if ($style_id <= 0 || trim($html) === '') {
+			return $html;
+		}
+
+		$characteristic = StackConfig::get("feedback_styles_style_$style_id");
+
+		if (empty($characteristic)) {
+			// Style slot picked by the author but never mapped to a content-style
+			// characteristic by the admin: degrade to no wrapping rather than emit
+			// a bogus CSS class.
+			return $html;
+		}
+
+		return '<div class="ilc_section_' . $characteristic . '">' . $html . '</div>';
 	}
 
 	/**
