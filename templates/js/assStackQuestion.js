@@ -251,8 +251,12 @@ il.assStackQuestion = new function () {
 		var input_name = name.substr(i + 1);
 		var is_matrix = $('#xqcas_' + question_id + '_' + input_name + '_sub_0_0').val();
 		if (typeof is_matrix === "string") {
-			var rows = $('#xqcas_input_matrix_height_' + input_name).html();
-			var columns = $('#xqcas_input_matrix_width_' + input_name).html();
+			var rows = 0, columns = 0;
+			$('input[id^="xqcas_' + question_id + '_' + input_name + '_sub_"]').each(function () {
+				var pos = this.id.substr(('xqcas_' + question_id + '_' + input_name + '_sub_').length).split('_');
+				rows = Math.max(rows, parseInt(pos[0], 10) + 1);
+				columns = Math.max(columns, parseInt(pos[1], 10) + 1);
+			});
 			var user_response = 'matrix(';
 			for (var r = 0; r < rows; r++) {
 				user_response += '[';
