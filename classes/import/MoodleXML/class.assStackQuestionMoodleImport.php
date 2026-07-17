@@ -137,6 +137,22 @@ class assStackQuestionMoodleImport
 
                         $test->insertQuestion($this->getQuestion()->getId(), true);
                     }
+                    //Mantis #0048036: if this question already existed in DB (e.g. a blank
+                    //placeholder question used as the import target), it may still carry the
+                    //default 'ans1' input / 'prt1' PRT that got persisted before the import
+                    //ran. The save below forces insert ('import' purpose) instead of update,
+                    //so those defaults are never overwritten - they must be removed explicitly
+                    //here or they remain as orphan duplicates alongside the imported ones.
+                    $imported_placeholders = stack_utils::extract_placeholders($this->getQuestion()->getQuestion(), 'input');
+
+                    if (!in_array('ans1', $imported_placeholders)) {
+                        assStackQuestionDB::_deleteStackInputs($this->getQuestion()->getId(), 'ans1');
+                    }
+
+                    if (!array_key_exists('prt1', $this->getQuestion()->prts)) {
+                        assStackQuestionDB::_deleteStackPrts($this->getQuestion()->getId(), 'prt1');
+                    }
+
                     //$this->getPlugin()->includeClass('class.assStackQuestionDB.php');
                     try {
                         //Save STACK Parameters forcing insert.

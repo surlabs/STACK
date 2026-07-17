@@ -1162,7 +1162,7 @@ class assStackQuestionDB
 	 * @param string $input_name
 	 * @return bool
 	 */
-	private static function _deleteStackInputs(int $question_id, string $input_name = ''): bool
+	public static function _deleteStackInputs(int $question_id, string $input_name = ''): bool
 	{
 		global $DIC;
 		$db = $DIC->database();
