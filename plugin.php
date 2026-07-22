@@ -20,13 +20,13 @@
 
 $id = "xqcas";
  
-$version = "10.2.3";
+$version = "10.2.4";
 
 $ilias_min_version = "10.00";
 $ilias_max_version = "10.999";
  
-$responsible = "Jesús Copado Mejías";
-$responsible_mail = "jcopado@surlabs.es"    ;
+$responsible = 'Jesus Copado';
+$responsible_mail = 'jcopado@surlabs.com';
 
 $supports_export = true;
 $supports_cli_setup = true;

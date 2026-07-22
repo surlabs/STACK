@@ -34,7 +34,7 @@ class assStackQuestionDeployedSeed
 	private $question_note;
 
 
-	function __construct($seed_id = '', $question_id, $seed)
+	function __construct($seed_id, $question_id, $seed)
 	{
 		$this->setSeedId($seed_id);
 		$this->setQuestionId($question_id);
