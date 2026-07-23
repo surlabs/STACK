@@ -132,6 +132,22 @@ class assStackQuestionGUI extends assQuestionGUI
         require_once __DIR__ . '/utils/class.assStackQuestionInitialization.php';
     }
 
+    public function getGenericFeedbackOutput(int $active_id, ?int $pass): string
+    {
+        // STACK owns automatic feedback; keep only feedback entered manually by a tutor.
+        return ilObjTest::getManualFeedback($active_id, $this->object->getId(), $pass);
+    }
+
+    public function getGenericFeedbackOutputForCorrectSolution(): string
+    {
+        return '';
+    }
+
+    public function getGenericFeedbackOutputForIncorrectSolution(): string
+    {
+        return '';
+    }
+
     /**
      * Returns the HTML for the Test View
      * @param int $active_id
