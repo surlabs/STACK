@@ -50,19 +50,10 @@ class PluginConfigurationMaximaUI
         );
 
         //get sections
-        if ($data["platform_type"] == "server") {
-            $content = [
-                'common' => self::getMaximaCommonSection($data, $plugin_object),
-                'server' => self::getMaximaServerSection($data, $plugin_object)
-            ];
-        } elseif ($data["platform_type"] == "linux") {
-            $content = [
-                'common' => self::getMaximaCommonSection($data, $plugin_object),
-                'linux' => self::getMaximaLocalSection($data, $plugin_object)
-            ];
-        } else {
-            throw new stack_exception("Error: Platform type not valid: " . $data["platform_type"]);
-        }
+        $content = [
+            'common' => self::getMaximaCommonSection($data, $plugin_object),
+            'server' => self::getMaximaServerSection($data, $plugin_object)
+        ];
 
         return $content;
     }
@@ -282,68 +273,6 @@ class PluginConfigurationMaximaUI
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_title"),
             $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_server_description")
         );
-    }
-
-    /**
-     * Gets the form for the plugin configuration Maxima settings when using
-     * the Local option to connect to Maxima
-     * @param array $data
-     * @param ilPlugin $plugin_object
-     * @return Section
-     */
-    private static function getMaximaLocalSection(array $data, ilPlugin $plugin_object): Section
-    {
-        global $DIC;
-        //Maxima command
-        $maxima_command = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_command_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_command_description")
-        )->withValue($data["maxima_command"] ?? "")
-            ->withAdditionalTransformation($DIC->refinery()->custom()->transformation(
-                function ($v) {
-                    StackConfig::set('maxima_command', $v ?? "", "connection");
-                }
-            ));
-
-        //Optimized Maxima command
-        //$optimized_maxima_command_value = $data["optimized_maxima_command"] ?? "";
-        //FEATURE Optimized Maxima command
-        /*
-        $optimized_maxima_command = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_optimized_maxima_command_description")
-        )->withValue(");*/
-
-        //Plot command
-        $plot_command_value = $data["plot_command"] ?? "";
-        $plot_command = self::$factory->input()->field()->text(
-            $plugin_object->txt("ui_admin_configuration_connection_plot_command_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_plot_command_description")
-        )->withValue($plot_command_value);
-
-        //Maxima uses proxy
-
-        $maxima_uses_proxy = self::$factory->input()->field()->checkbox(
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_uses_proxy_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_uses_proxy_description")
-        )->withValue($data["maxima_uses_proxy"] == "1")
-            ->withAdditionalTransformation($DIC->refinery()->custom()->transformation(
-                function ($v) {
-                    StackConfig::set('maxima_uses_proxy', $v ? "1" : "0", "linux");
-                }
-            ));
-
-        return self::$factory->input()->field()->section(
-            [
-                'maxima_command' => $maxima_command,
-                //'optimized_maxima_command' => $optimized_maxima_command,
-                'plot_command' => $plot_command,
-                'maxima_uses_proxy' => $maxima_uses_proxy,
-            ],
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_title"),
-            $plugin_object->txt("ui_admin_configuration_connection_maxima_connection_local_description")
-        );
-
     }
 
 }

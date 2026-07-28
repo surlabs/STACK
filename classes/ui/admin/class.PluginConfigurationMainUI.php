@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use ILIAS\UI\Factory;
 use ILIAS\UI\Implementation\Component\Input\Field\Section;
-use classes\platform\StackConfig;
 
 /**
  * This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
@@ -50,7 +49,6 @@ class PluginConfigurationMainUI
 
             //get sections
             $content = [
-                'connection' => self::getMaximaConnectionSection($data, $plugin_object),
                 'display' => self::getDisplayOptionsSection($data, $plugin_object)
             ];
 
@@ -59,42 +57,6 @@ class PluginConfigurationMainUI
         }
 
         return $content;
-    }
-
-    private static function getMaximaConnectionSection(array $data, ilPlugin $plugin_object): Section
-    {
-        global $DIC;
-
-        $maxima_connection_options = self::$factory->input()->field()->radio(
-            "",
-            ""
-        )
-            ->withOption('linux',
-                $plugin_object->txt("ui_admin_configuration_maxima_connection_unix_title"),
-                $plugin_object->txt("ui_admin_configuration_defaults_maxima_connection_unix_description"))
-            ->withOption('server',
-                $plugin_object->txt("ui_admin_configuration_defaults_maxima_connection_server_title"),
-                $plugin_object->txt("ui_admin_configuration_defaults_maxima_connection_server_description")
-            )
-            ->withValue($data['platform_type'] ?: "linux")
-            ->withAdditionalTransformation($DIC->refinery()->custom()->transformation(
-                function ($v) {
-                    if($v){
-                        StackConfig::set('platform_type', $v, "connection");
-                    }
-
-                }
-            ));
-
-        return self::$factory->input()->field()->section(
-            [
-                'platform_type' => $maxima_connection_options
-            ],
-            $plugin_object->txt("ui_admin_configuration_maxima_connection_title"),
-            $plugin_object->txt("ui_admin_configuration_maxima_connection_description")
-        );
-
-
     }
 
     private static function getDisplayOptionsSection(array $data, ilPlugin $plugin_object): Section

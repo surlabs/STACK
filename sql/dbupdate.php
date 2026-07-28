@@ -1027,7 +1027,7 @@ global $DIC;
 $db = $DIC->database();
 
 if ($db->tableExists('xqcas_configuration') && $db->tableColumnExists("xqcas_configuration", "value")) {
-    $db->update("xqcas_configuration", array("value" => array("clob", "linux")), array("parameter_name" => array("text", "platform_type"), "value" => array("clob", "unix")));
+    $db->update("xqcas_configuration", array("value" => array("clob", "server")), array("parameter_name" => array("text", "platform_type"), "value" => array("clob", "unix")));
 }
 ?>
 <#49>
@@ -1412,5 +1412,15 @@ if ($db->tableExists('xqcas_prt_nodes')) {
     // produces HTML, never Markdown/Moodle format.
     $db->manipulate("UPDATE xqcas_prt_nodes SET true_feedback_style = true_feedback_format, true_feedback_format = 0 WHERE true_feedback_format <> 0");
     $db->manipulate("UPDATE xqcas_prt_nodes SET false_feedback_style = false_feedback_format, false_feedback_format = 0 WHERE false_feedback_format <> 0");
+}
+?>
+<#65>
+<?php
+global $DIC;
+$db = $DIC->database();
+
+if ($db->tableExists('xqcas_configuration') && $db->tableColumnExists('xqcas_configuration', 'value')) {
+    $db->update('xqcas_configuration', ['value' => ['clob', 'server']], ['parameter_name' => ['text', 'platform_type'], 'value' => ['clob', 'linux']]);
+    $db->update('xqcas_configuration', ['value' => ['clob', 'server']], ['parameter_name' => ['text', 'platform_type'], 'value' => ['clob', 'unix']]);
 }
 ?>

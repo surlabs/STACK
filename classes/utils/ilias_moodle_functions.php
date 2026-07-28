@@ -468,26 +468,19 @@ if (!function_exists('get_config')) {
             /*
              * CONNECTION CONFIGURATION
              */
-            $configs->platform = $saved_config['platform_type'];
+            $configs->platform = 'server';
             $configs->maximaversion = $saved_config['maxima_version'];
             $configs->castimeout = $saved_config['cas_connection_timeout'];
             $configs->casresultscache = $saved_config['cas_result_caching'];
             $configs->serveruserpass = $saved_config['serveruserpass'] ?? '';
 
-            if ($saved_config['platform_type'] == 'server') {
-                $configs->maximacommand = $saved_config['maxima_pool_url'];
-                $configs->maximacommandserver = $saved_config['maxima_pool_url'];
+            $configs->maximacommand = $saved_config['maxima_pool_url'];
+            $configs->maximacommandserver = $saved_config['maxima_pool_url'];
+            $configs->plotcommand = '';
 
-                if ($saved_config["maxima_uses_proxy"] == "1") {
-                    $configs->platform = "server-proxy";
-                }
-            } elseif (!$saved_config['maxima_command'] || $saved_config['platform_type'] == 'unix') {
-                $configs->maximacommand = "maxima";
-            } else {
-                $configs->maximacommand = $saved_config['maxima_command'];
+            if ($saved_config["maxima_uses_proxy"] == "1") {
+                $configs->platform = "server-proxy";
             }
-
-            $configs->plotcommand = $saved_config['plot_command'] ?: "gnuplot";
             $configs->casdebugging = $saved_config['cas_debugging'] == 1;
 
             /*
