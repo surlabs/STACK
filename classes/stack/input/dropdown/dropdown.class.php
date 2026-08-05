@@ -556,6 +556,9 @@ class stack_dropdown_input extends stack_input {
     public static function get_parameters_defaults() {
 
         return [
+            'insertStars'     => 0,
+            'syntaxHint'      => '',
+            'syntaxAttribute' => 0,
             'mustVerify'     => false,
             'showValidation' => 0,
             'options'        => '',
