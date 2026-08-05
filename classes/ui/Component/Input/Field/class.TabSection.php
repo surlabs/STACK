@@ -46,6 +46,7 @@ class TabSection extends Input implements FormInput
     use Triggerer;
 
     protected array $tabs;
+    protected array $tab_labels = [];
     protected string $label;
     protected ?string $byline;
     protected bool $is_required = false;
@@ -76,6 +77,18 @@ class TabSection extends Input implements FormInput
     public function setTabs(array $tabs): void
     {
         $this->tabs = $tabs;
+    }
+
+    public function withTabLabels(array $tab_labels): self
+    {
+        $clone = clone $this;
+        $clone->tab_labels = $tab_labels;
+        return $clone;
+    }
+
+    public function getTabLabel(string|int $tab_name): string
+    {
+        return $this->tab_labels[$tab_name] ?? $tab_name;
     }
 
     protected function nameTabs(NameSource $source, string $parent_name): array
