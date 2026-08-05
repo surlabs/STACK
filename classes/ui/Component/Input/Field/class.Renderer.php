@@ -284,7 +284,8 @@ class Renderer extends RendererILIAS
         $uid = uniqid();
 
         foreach ($component->getTabs() as $tab_name => $tab) {
-            $tabs_buttons .= "<div class='tab-button$isFirst' data-tab='$tab_name' data-section-id='$uid'>{$tab_name}</div>";
+            $tab_label = $component->getTabLabel($tab_name);
+            $tabs_buttons .= "<div class='tab-button$isFirst' data-tab='$tab_name' data-section-id='$uid'>{$tab_label}</div>";
 
             $inputs_html = "";
 

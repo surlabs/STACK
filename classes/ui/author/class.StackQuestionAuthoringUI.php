@@ -674,7 +674,12 @@ class StackQuestionAuthoringUI
             $node_list[$node_name] = $node_name;
         }
         $inputs["settings"] = $this->customFactory->expandableSection($this->buildPrtOptions($prt), $this->plugin->txt("prt_settings_and_nodes"))->withExpandedByDefault(true);
-        $inputs["nodes"] = $this->customFactory->tabSection($this->buildNodeSection($prt), $this->plugin->txt("prt_nodes"));
+        $node_labels = [];
+        foreach (array_keys($prt->get_nodes()) as $node_name) {
+            $node_labels[$node_name] = (string) ((int) $node_name + 1);
+        }
+        $inputs["nodes"] = $this->customFactory->tabSection($this->buildNodeSection($prt), $this->plugin->txt("prt_nodes"))
+            ->withTabLabels($node_labels);
 
         return $inputs;
     }
