@@ -126,12 +126,15 @@ class StackQuestionAuthoringUI
      * @throws ilTestQuestionPoolInvalidArgumentException
      * @throws stack_exception
      */
-    public function showAuthoringPanel(): array
+    public function showAuthoringPanel(bool $process_submission = true): array
     {
         $form = $this->buildForm();
         $errors = false;
 
-        if ($this->request->getMethod() == "POST" && array_key_exists('save_stack_question', $this->request->getQueryParams()) && $this->request->getQueryParams()['save_stack_question'] == 'yes') {
+        if ($process_submission
+            && $this->request->getMethod() == "POST"
+            && array_key_exists('save_stack_question', $this->request->getQueryParams())
+            && $this->request->getQueryParams()['save_stack_question'] == 'yes') {
             $form = $form->withRequest($this->request);
             $result = $form->getData();
 
