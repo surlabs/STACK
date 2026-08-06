@@ -499,18 +499,11 @@ class assStackQuestionGUI extends assQuestionGUI
 		$tabs->activateTab('edit_properties');
 		$tabs->activateSubTab('edit_question');
 
-        if (!$checkonly && $this->request_data_collector->raw('cmd') === 'save' && $this->object->getId() > 0) {
-            $this->ctrl->setParameter($this, 'q_id', $this->object->getId());
-            $this->ctrl->redirect($this, 'editQuestion');
-
-            return false;
-        }
-
 		$this->getQuestionTemplate();
 
 		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
 
-        list($errors, $form) = $authoring_gui->showAuthoringPanel();
+        list($errors, $form) = $authoring_gui->showAuthoringPanel($is_save_cmd !== false);
 
         if ($errors) {
             $checkonly = false;
@@ -518,6 +511,9 @@ class assStackQuestionGUI extends assQuestionGUI
         }
 
         if (!$checkonly) {
+            if ($is_save_cmd === false && $this->needsSyncQuery()) {
+                $form .= $this->getQuestionSyncModal('syncQuestion');
+            }
             $this->tpl->setVariable("QUESTION_DATA", $form);
         }
 
