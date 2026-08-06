@@ -693,7 +693,7 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
         //$this->getPlugin()->includeClass('class.assStackQuestionDB.php');
 
         $options_from_db_array = assStackQuestionDB::_readOptions($this->getId());
-        if (!$options_from_db_array) {
+        if (!is_array($options_from_db_array)) {
 
             //NEW QUESTION, LOAD STANDARD INFORMATION FROM CONFIGURATION
             $this->loadStandardQuestion();
