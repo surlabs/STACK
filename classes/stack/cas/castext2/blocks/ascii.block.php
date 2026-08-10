@@ -125,17 +125,18 @@ class stack_cas_castext2_ascii extends stack_cas_castext2_block {
         ]);
 
         // Size from the iframe viewport so the display area tracks frame resizing.
-        // Keep a configured minimum so default 400px frames start at 370px content height.
-        $astyle = "width:calc({$xpars['width']} - 20px);height:calc(100vh - 30px);";
-        $astyle .= "min-height:calc({$xpars['height']} - 30px);";
+        // Keep a configured minimum after applying the stylesheet offsets.
+        $astyle = "width:calc({$xpars['width']} - var(--stack-ascii-horizontal-offset));";
+        $astyle .= "height:calc(100vh - var(--stack-ascii-vertical-offset));";
+        $astyle .= "min-height:calc({$xpars['height']} - var(--stack-ascii-vertical-offset));";
         if (array_key_exists('aspect-ratio', $xpars)) {
             $aspectratio = $xpars['aspect-ratio'];
             // Unset the undefined dimension, if both are defined then we have a problem.
             if ($existsuserheight) {
-                $astyle = "height:calc(100vh - 30px);aspect-ratio:$aspectratio;";
-                $astyle .= "min-height:calc({$xpars['height']} - 30px);";
+                $astyle = "height:calc(100vh - var(--stack-ascii-vertical-offset));aspect-ratio:$aspectratio;";
+                $astyle .= "min-height:calc({$xpars['height']} - var(--stack-ascii-vertical-offset));";
             } else if ($existsuserwidth) {
-                $astyle = "width:calc({$xpars['width']} - 20px);aspect-ratio:$aspectratio;";
+                $astyle = "width:calc({$xpars['width']} - var(--stack-ascii-horizontal-offset));aspect-ratio:$aspectratio;";
             }
         }
         $r->items[] = new MP_String('<script type="module">');

@@ -1562,6 +1562,10 @@ if (!function_exists('stack_string')) {
             include_once ILIAS_ABSOLUTE_PATH . "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_$user_language.php";
         }
 
+        if (!array_key_exists($key, $string)) {
+            include_once ILIAS_ABSOLUTE_PATH . "/public/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assStackQuestion/lang/stack_en.php";
+        }
+
         try {
             return stack_maths::process_lang_string(getString($key, $string, $a));
         } catch (Exception $e) {
@@ -1773,5 +1777,17 @@ if (!class_exists('stack_outofcontext_process')) {
         public function get_qt_field_name($varname) {
             return $varname;
         }
+    }
+}
+
+if (!function_exists('stack_cors_scripts_dir')) {
+    /**
+     * Get the directory path for the corsscripts directory.
+     * @return string
+     */
+    function stack_cors_scripts_dir(): string
+    {
+        global $CFG;
+        return $CFG->dirroot . '/question/type/stack/corsscripts/';
     }
 }

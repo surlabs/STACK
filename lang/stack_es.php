@@ -414,6 +414,34 @@ $string['healthcheckcache_none'] = 'CAS results are not being cached.';
 $string['healthcheckcachestatus'] = 'The cache currently contains {$a} entries.';
 $string['healthcheckconnect'] = 'Trying to connect to the CAS';
 $string['healthcheckconnectintro'] = 'We are trying to evaluate the following CAS text:';
+$string['healthcheckfreetext'] = 'Bloque de pregunta de texto libre';
+$string['healthcheckfreetextintro'] = 'A continuacion deberia aparecer un panel de texto libre vinculado a un campo de entrada de area de texto. Las expresiones ASCIIMath del campo de entrada deberian mostrarse como LaTeX completamente renderizado: la primera linea alineada a la izquierda y las demas ecuaciones centradas y alineadas por sus signos igual. El resultado deberia ser la representacion matricial de ASCIIMath.';
+$string['healthcheckfreetextsample'] = '<div class="que stack">
+<div class="content">
+<div class="formulation clearfix">
+<div class="qtext">
+<div class="free-text-container">
+<textarea id="_ans1" cols="60">
+`prod_(k=0)^(n+1)(1+x^(2^k))=sum_(k=0)^(2^((n+1)+1)-1) x^k.`
+
+`
+a = b
+c = d
+[[2,1],[3,2]] [[2,-1],[-3,2]] =[[1,0],[0,1]]
+`
+
+This line is NOT the result
+</textarea>
+[[ascii input="ans1" width="100%"]]
+  [[extractor targetinput="ans2" type="lastexpr"/]]
+[[/ascii]]
+</div>
+</div>
+<p>Result = <input id="_ans2"/></p>
+</div>
+</div>
+</div>
+</div>';
 $string['healthchecklatex'] = 'Check LaTeX is being converted correctly';
 $string['healthchecklatexintro'] = 'STACK generates LaTeX on the fly, and enables teachers to write LaTeX in questions. It assumes that LaTeX will be converted by a moodle filter.  Below are samples of displayed and inline expressions in LaTeX which should be appear correctly in your browser.  Problems here indicate incorrect moodle filter settings, not faults with STACK itself. Stack only uses the single and double dollar notation itself, but some question authors may be relying on the other forms.';
 $string['healthchecklatexmathjax'] = 'One way to get equiation rendering to work is to copy the following code into the <b>Within HEAD</b> setting on <a href="{$a}">Additional HTML</a>.';

@@ -347,7 +347,7 @@ class stack_cas_castext2_jsxgraph extends stack_cas_castext2_block {
             ) {
                 $valid    = false;
                 $err[] = stack_string('stackBlock_jsxgraph_unknown_style', ['style' => $stylename]);
-            } else if (!file_exists($CFG->dirroot . '/classes/utils/corsscripts/jsxgraphstyles/' . $stylename . '.css')) {
+            } else if (!file_exists(stack_cors_scripts_dir() . 'jsxgraphstyles/' . $stylename . '.css')) {
                 $valid    = false;
                 $err[] = stack_string('stackBlock_jsxgraph_unknown_style', ['style' => $stylename]);
             }

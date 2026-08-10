@@ -169,7 +169,7 @@ class stack_cas_castext2_iframe extends stack_cas_castext2_block {
         }
         $scrolling = true;
         if (isset($parameters['scrolling'])) {
-            $scrolling = $parameters['scrolling'];
+            $scrolling = filter_var($parameters['scrolling'], FILTER_VALIDATE_BOOLEAN);
         }
 
         // Construct the contents of the IFRAME.

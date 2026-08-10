@@ -169,6 +169,12 @@ class stack_cas_healthcheck {
                 true
             );
             $this->output_cas_text(
+                'healthcheckfreetext',
+                stack_string('healthcheckfreetextintro'),
+                get_string('healthcheckfreetextsample', 'qtype_stack'),
+                true
+            );
+            $this->output_cas_text(
                 'healthcheckgeogebra',
                 stack_string('healthcheckgeogebraintro'),
                 get_string('healthcheckgeogebrasample', 'qtype_stack'),

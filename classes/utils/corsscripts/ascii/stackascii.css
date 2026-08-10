@@ -1,4 +1,6 @@
 .asciimath {
+    --stack-ascii-horizontal-offset: 13px;
+    --stack-ascii-vertical-offset: 14px;
     background-color: ivory;
     border-radius: 5px;
     border: solid 1px;

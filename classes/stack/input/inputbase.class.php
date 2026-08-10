@@ -204,8 +204,12 @@ abstract class stack_input {
         if (trim($options ?? '') != '') {
             $options = explode(',', $options);
             foreach ($options as $option) {
-                $option = strtolower(trim($option));
                 [$option, $arg] = stack_utils::parse_option($option);
+                // Keep bespoke validator and feedback function names case-sensitive.
+                $option = strtolower(trim($option));
+                if (!($option === 'validator' || $option === 'feedback')) {
+                    $arg = strtolower(trim($arg));
+                }
                 // Only accept those options specified in the array for this input type.
                 if (array_key_exists($option, $this->extraoptions)) {
                     if ($arg === '') {
@@ -1595,7 +1599,8 @@ abstract class stack_input {
      * @return bool
      */
     protected function validation_renders_inline() {
-        return $this->get_validation_method() == 'equiv' || $this->get_parameter('showValidation', 1) == 3;
+        return (defined('MOODLE_INTERNAL') && $this->get_validation_method() == 'equiv')
+            || $this->get_parameter('showValidation', 1) == 3;
     }
 
     /**

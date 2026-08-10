@@ -650,6 +650,34 @@ $string['healthcheckmaximalocal'] = 'Inhalte der maximalocal-Datei';
 $string['healthchecknombstring'] = 'STACK v4.3 und höher erfordert das PHP-Modul mbstring, das fehlt. Bitte lesen Sie die Installationsanleitung.';
 $string['healthcheckparsons'] = 'Parsons Drag&Drop Beweisblock';
 $string['healthcheckparsonsintro'] = 'Unten sollte sich ein Drag-and-Drop-Parson-Beweisblock befinden, der mit einem Eingabefeld verknüpft ist. Das Eingabefeld sollte zunächst leer sein und sich mit einem JSON-Text füllen, der dem Zustand der Parson-Drag-and-Drop-Felder entspricht, sobald man beginnt, die Elemente zu verschieben.';
+$string['healthcheckfreetext'] = 'Freitext-Frageblock';
+$string['healthcheckfreetextintro'] = 'Unten sollte ein Freitext-Anzeigebereich erscheinen, der mit einem Textbereich-Eingabefeld verknüpft ist. Die ASCIIMath-Ausdrücke im Eingabefeld sollten im Anzeigebereich als vollständig gerendertes LaTeX erscheinen: die erste Zeile linksbündig, die anderen Gleichungen zentriert und an ihren Gleichheitszeichen ausgerichtet. Das Ergebnis sollte die ASCIIMath-Matrixdarstellung sein.';
+$string['healthcheckfreetextsample'] = '<div class="que stack">
+<div class="content">
+<div class="formulation clearfix">
+<div class="qtext">
+<div class="free-text-container">
+<textarea id="_ans1" cols="60">
+`prod_(k=0)^(n+1)(1+x^(2^k))=sum_(k=0)^(2^((n+1)+1)-1) x^k.`
+
+`
+a = b
+c = d
+[[2,1],[3,2]] [[2,-1],[-3,2]] =[[1,0],[0,1]]
+`
+
+This line is NOT the result
+</textarea>
+[[ascii input="ans1" width="100%"]]
+  [[extractor targetinput="ans2" type="lastexpr"/]]
+[[/ascii]]
+</div>
+</div>
+<p>Result = <input id="_ans2"/></p>
+</div>
+</div>
+</div>
+</div>';
 $string['healthcheckpass'] = 'Der Funktionscheck wurde ohne Feststellung von Problemen abgeschlossen. Bitte lesen Sie dennoch die folgenden Details sorgfältig durch. Nicht jedes Problem kann automatisch erkannt werden.';
 $string['healthcheckplots'] = 'Grafiken zeichnen';
 $string['healthcheckplotsintro'] = 'Beispielgrafiken.';
