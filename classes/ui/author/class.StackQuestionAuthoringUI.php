@@ -812,14 +812,7 @@ class StackQuestionAuthoringUI
             ->withValue((string) $node->truescore);
         $inputs["penalty"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_pos_penalty"), $this->plugin->txt("prt_node_pos_penalty_info"))->withRequired(true)
             ->withValue((string) $node->truepenalty);
-        $node_list = [
-            -1 => $this->plugin->txt('end')
-        ];
-        foreach ($prt->get_nodes_summary() as $node_name => $prt_node) {
-            if ($node_name != $node->nodename) {
-                $node_list[$node_name] = $node_name;
-            }
-        }
+        $node_list = $this->getNextNodeOptions($prt, $node);
         $inputs["next_node"] = $this->factory->input()->field()->select($this->plugin->txt("prt_node_pos_next"), $node_list, $this->plugin->txt("prt_node_pos_next_info"))->withRequired(true)
             ->withValue($node->truenextnode);
         $inputs["answernote"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_pos_answernote"), $this->plugin->txt("prt_node_pos_answernote_info"))->withRequired(true)
@@ -846,14 +839,7 @@ class StackQuestionAuthoringUI
             ->withValue((string) $node->falsescore);
         $inputs["penalty"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_neg_penalty"), $this->plugin->txt("prt_node_neg_penalty_info"))->withRequired(true)
             ->withValue((string) $node->falsepenalty);
-        $node_list = [
-            -1 => $this->plugin->txt('end')
-        ];
-        foreach ($prt->get_nodes_summary() as $node_name => $prt_node) {
-            if ($node_name != $node->nodename) {
-                $node_list[$node_name] = $node_name;
-            }
-        }
+        $node_list = $this->getNextNodeOptions($prt, $node);
         $inputs["next_node"] = $this->factory->input()->field()->select($this->plugin->txt("prt_node_neg_next"), $node_list, $this->plugin->txt("prt_node_neg_next_info"))->withRequired(true)
             ->withValue($node->falsenextnode);
         $inputs["answernote"] = $this->factory->input()->field()->text($this->plugin->txt("prt_node_neg_answernote"), $this->plugin->txt("prt_node_neg_answernote_info"))->withRequired(true)
@@ -864,6 +850,21 @@ class StackQuestionAuthoringUI
             ->withValue($node->falsefeedbackstyle ?? 0);
 
         return $inputs;
+    }
+
+    private function getNextNodeOptions(stack_potentialresponse_tree_lite $prt, object $node): array
+    {
+        $node_list = [
+            -1 => $this->plugin->txt('end')
+        ];
+
+        foreach ($prt->get_nodes_summary() as $node_name => $prt_node) {
+            if ((int) $node_name !== -1 && (string) $node_name !== (string) $node->nodename) {
+                $node_list[$node_name] = $prt_node->displayname;
+            }
+        }
+
+        return $node_list;
     }
 
     private function getFeedbackFormatOptions(): array
