@@ -30,6 +30,7 @@ use core_question\local\bank\random_question_loader;
  * a random question.
  * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
  */
+if (!class_exists('stack_random_question_loader', false)) {
 class stack_random_question_loader extends random_question_loader {
     /**
      * Get question ids in Moodle 4.2+.
@@ -51,10 +52,12 @@ class stack_random_question_loader extends random_question_loader {
         return parent::get_question_ids($categoryid, $includesubcategories, $tagids);
     }
 }
+}
 
 /**
  * Retrieves and formats the response data for a particular question in a particular quiz.
  */
+if (!class_exists('stack_question_report', false)) {
 class stack_question_report {
     /**
      * @var object Question being analysed.
@@ -833,4 +836,5 @@ class stack_question_report {
 
         return $quizzes;
     }
+}
 }
