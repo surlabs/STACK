@@ -520,6 +520,14 @@ class assStackQuestionGUI extends assQuestionGUI
         return $errors;
 	}
 
+    public function syncQuestion(): void
+    {
+        parent::syncQuestion();
+
+        $this->ctrl->setParameter($this, 'q_id', $this->object->getId());
+        $this->ctrl->redirect($this, 'editQuestion');
+    }
+
 	/* RTE, Javascript, Ajax, jQuery etc. METHODS BEGIN */
 
 	/**
