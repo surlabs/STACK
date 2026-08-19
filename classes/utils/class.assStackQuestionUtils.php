@@ -1,4 +1,6 @@
 <?php
+use classes\platform\StackConfig;
+
 /**
  *  This file is part of the STACK Question plugin for ILIAS, an advanced STEM assessment tool.
  *  This plugin is developed and maintained by SURLABS and is a port of STACK Question for Moodle,
@@ -28,6 +30,21 @@
  */
 class assStackQuestionUtils
 {
+	public static function _wrapFeedbackWithStyle(string $html, int $style_id): string
+	{
+		if ($style_id <= 0 || trim($html) === '') {
+			return $html;
+		}
+
+		$characteristic = StackConfig::get("feedback_styles_style_$style_id");
+
+		if (empty($characteristic)) {
+			return $html;
+		}
+
+		return '<div class="ilc_section_' . $characteristic . '">' . $html . '</div>';
+	}
+
     const FORMAT_HTML = 0;
     const FORMAT_MARKDOWN = 1;
     const FORMAT_MOODLE = 2;

@@ -1238,6 +1238,8 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $newnode->falsescoremode = '=';
             $newnode->falsepenalty = 0;
             $newnode->falsefeedback = '';
+            $newnode->falsefeedbackraw = '';
+            $newnode->falsefeedbackstyle = 0;
             $newnode->falsefeedbackformat = '0';
             $newnode->falseanswernote = $prt_name . '-0-F';
             $newnode->falsenextnode = '-1';
@@ -1245,6 +1247,8 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
             $newnode->truescoremode = '=';
             $newnode->truepenalty = 0;
             $newnode->truefeedback = '';
+            $newnode->truefeedbackraw = '';
+            $newnode->truefeedbackstyle = 0;
             $newnode->truefeedbackformat = '0';
             $newnode->trueanswernote = $prt_name . '-0-T';
             $newnode->truenextnode = '-1';
