@@ -514,6 +514,13 @@ class assStackQuestionGUI extends assQuestionGUI
 		$tabs->activateTab('edit_properties');
 		$tabs->activateSubTab('edit_question');
 
+		if (!$checkonly && $this->request_data_collector->raw('cmd') === 'save' && $this->object->getId() > 0) {
+			$this->ctrl->setParameter($this, 'q_id', $this->object->getId());
+			$this->ctrl->redirect($this, 'editQuestion');
+
+			return false;
+		}
+
 		$this->getQuestionTemplate();
 
 		$authoring_gui = new StackQuestionAuthoringUI($this->plugin, $this->object, $this);
@@ -795,6 +802,7 @@ class assStackQuestionGUI extends assQuestionGUI
 		global $DIC, $rbacsystem;
 
 		$tabs = $DIC->tabs();
+		$tabs->clearTargets();
 
 		$this->ctrl->setParameterByClass("ilAssQuestionPageGUI", "q_id", $_GET["q_id"]);
 		//include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
