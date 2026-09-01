@@ -662,6 +662,9 @@ class assStackQuestion extends assQuestion implements iQuestionCondition, ilObjQ
     {
         global $DIC, $tpl;
 
+        // Discard the default PRT loaded by the constructor before loading a persisted question.
+        $this->prts = [];
+
         $db = $DIC->database();
         //load the basic question data
         $result = $db->query("SELECT qpl_questions.* FROM qpl_questions WHERE question_id = " . $db->quote($question_id, 'integer'));
